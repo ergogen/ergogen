@@ -1,8 +1,2 @@
 node_modules/
-plans/output/
-.vscode/
-firmware/keyboard.cpp
-firmware/keymap.cpp
-firmware/setup.cpp
-firmware/loop.cpp
-firmware/libraries/
+*.dxf

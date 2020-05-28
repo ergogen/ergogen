@@ -1,8 +1,9 @@
 const fs = require('fs-extra')
 const path = require('path')
 const yaml = require('js-yaml')
+const yargs = require('yargs')
 
-const args = require('yargs')
+const args = yargs
     .option('config', {
         alias: 'c',
         demandOption: true,
@@ -15,8 +16,30 @@ const args = require('yargs')
         describe: 'Output folder',
         type: 'string'
     })
+    .option('outline', {
+        default: false,
+        describe: 'Generate 2D outlines',
+        type: 'boolean'
+    })
+    .option('pcb', {
+        default: false,
+        describe: 'Generate PCB draft',
+        type: 'boolean'
+    })
+    .option('case', {
+        default: false,
+        describe: 'Generate case files',
+        type: 'boolean'
+    })
     .argv
 
-const config = yaml.load(fs.readFileSync(args.c).toString())
+if (!args.outline && !args.pcb && !args.case) {
+    yargs.showHelp("log")
+    console.log('Nothing to do...')
+    process.exit(0)
+}
 
-console.log(config)
+const config = yaml.load(fs.readFileSync(args.c).toString())
+const points = require('./helpers/points').parse(config)
+
+console.log(points)
