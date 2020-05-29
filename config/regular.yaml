@@ -1,3 +1,5 @@
+anchor:
+  angle: -5
 columns:
   - name: pinky
     rotate: 5
@@ -18,7 +20,7 @@ thumbfan:
   - name: palmward
     anchor: 
       ref: inner_bottom
-      shift: [-12, -19]
+      shift: [-7, -19]
     column: ring
     padding: 21.25
     rotate: 28
