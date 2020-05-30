@@ -1,91 +1,61 @@
 const m = require('makerjs')
 const fs = require('fs-extra')
 
+const Point = exports.Point = class Point {
+    constructor(x=0, y=0, r=0, meta={}) {
+        if (Array.isArray(x)) {
+            this.x = x[0]
+            this.y = x[1]
+            this.r = 0
+            this.meta = {}
+        } else {
+            this.x = x
+            this.y = y
+            this.r = r
+            this.meta = meta
+        }
+    }
 
+    get p() {
+        return [this.x, this.y]
+    }
 
+    set p(val) {
+        [this.x, this.y] = val
+    }
 
-// TODO: refactor this to use the new config format
+    add(a) {
+        const res = this.clone()
+        res.x += a[0]
+        res.y += a[1]
+        return res
+    }
 
-// const column = (func, col) => ({
-//     models: {
-//         bottom: up(func(col, 'bottom'), 0 * (side + padding)),
-//         middle: up(func(col, 'middle'), 1 * (side + padding)),
-//         top:    up(func(col, 'top'),    2 * (side + padding))
-//     }
-// })
+    shift(s) {
+        this.x += s[0]
+        this.y += s[1]
+        return this
+    }
 
-// const matrix = (func) => {
-//     const models = {}
-//     let i = 0
-//     let sum = 0
-//     for (const {name, shift} of columns) {
-//         let col = column(func, name)
-//         sum += shift
-//         if (name == 'pinky') {
-//             col = rotate(col, pinky_angle, [side, 0])
-//         }
-//         col = up(col, sum)
-//         col = right(col, i * (side + padding))
-//         models[name] = col
-//         i++
-//     }
-//     return {models}
-// }
+    rotate(angle, origin=[0, 0]) {
+        this.p = m.point.rotate(this.p, angle, origin)
+        this.r += angle
+        return this
+    }
 
-// const thumbfan = (func) => ({
-//     models: {
-//         inner: func('thumb', 'inner'),
-//         home: rotate(
-//             right(
-//                 func('thumb', 'home'),
-//                 side + padding + kc_diff
-//             ),
-//             thumb_angle,
-//             [side + padding / 2, -overhang]
-//         ),
-//         outer: rotate(
-//             right(
-//                 rotate(
-//                     right(
-//                         func('thumb', 'outer'),
-//                         side + padding + kc_diff
-//                     ),
-//                     thumb_angle,
-//                     [side + padding / 2 + kc_diff, -overhang]
-//                 ),
-//                 side + padding + kc_diff
-//             ),
-//             thumb_angle,
-//             [side + padding / 2, -overhang]
-//         )
-//     }
-// })
+    mirror(x) {
+        this.x = 2 * x - this.x
+        this.r = 180 - this.r
+        return this
+    }
 
-// const half = (func) => {
-//     const result = {
-//         models: {
-//             matrix: matrix(func),
-//             thumbfan: move(
-//                 thumbfan(func),
-//                 [
-//                     3 * (side + padding) + thumb_start,
-//                     -(side + padding) + staggers_sum
-//                 ]
-//             )
-//         }
-//     }
-//     return m.model.rotate(result, half_angle)
-// }
-
-
-// TODO temp
-let _debug_key = 0
-const _debug = {}
-const debug = (xy) => {
-    _debug[_debug_key++] = { 
-        type: 'circle', 
-        origin: [xy[0], xy[1]],
-        radius: 1
+    clone() {
+        return new Point(
+            this.x,
+            this.y,
+            this.r,
+            this.meta
+        )
     }
 }
 
@@ -109,38 +79,14 @@ const dump = exports.dump = (points, opts={}) => {
         models[key] = m.model.moveRelative(m.model.rotate({paths}, point.r), point.p)
     }
 
-    // TODO
-    models['debug'] = {paths: _debug}
-
     const assembly = m.model.originate({
         models,
         units: 'mm'
     })
 
+    fs.writeFileSync(`${opts.file || 'dump'}.json`, JSON.stringify(points, null, '    '))
     fs.writeFileSync(`${opts.file || 'dump'}.dxf`, m.exporter.toDXF(assembly))
 }
-
-
-
-
-const Point = exports.Point = class Point {
-    constructor(x, y, r, col={}, row={}) {
-        this.x = x
-        this.y = y
-        this.r = r
-        this.col = col
-        this.row = row
-    }
-
-    get p() {
-        return [this.x, this.y]
-    }
-
-    set p(val) {
-        [this.x, this.y] = val
-    }
-}
-
 
 const push_rotation = (list, angle, origin) => {
     let candidate = origin
@@ -153,143 +99,106 @@ const push_rotation = (list, angle, origin) => {
     })
 }
 
-
-const matrix = (cols, rows, anchor=new Point(0, 0, 0), reverse=false) => {
-
-    console.log('matrix', cols, rows, anchor, reverse)
-
+const render_zone = (cols, rows, anchor=new Point(), reverse=false) => {
 
     const sign = reverse ? -1 : 1
     const points = {}
-    let x = anchor.x
-    let stagger_sum = anchor.y
-    let rotation_sum = anchor.r
-    const rotations = [{
+    const rotations = []
+    
+    // transferring the anchor rotation to "real" rotations
+    rotations.push({
         angle: anchor.r,
-        origin: [0, 0]
-    }]
+        origin: anchor.p
+    })
+
     for (const col of cols) {
         
+        anchor.y += col.stagger || 0        
+        const col_anchor = anchor.clone()
+        // clear potential rotations, as they will get re-applied anyway
+        // and we don't want to apply them twice...
+        col_anchor.r = 0
 
-        // TODO rotation origin reversal is not this easy
-        // and probably the whole reversal idea is not even necessary
-        // sleep on it, and possibly remove to simplify
-
-
-        if (reverse) {
-            x -= col.padding || 19
-            if (col.rotate) {
-                let ox = 0, oy = 0
-                if (col.origin) {
-                    ox = -col.origin[0]
-                    oy = col.origin[1]
-                }
-                push_rotation(
-                    rotations,
-                    col.rotate,
-                    m.point.add([ox, oy], [x, stagger_sum])
-                )
-                rotation_sum += col.rotate
-            }
-        }
-
-        stagger_sum += sign * col.stagger || 0
-        let y = stagger_sum
-        
-
-        for (const row of (col.rows || rows || [{name: 'default'}])) {
-            let point = [x, y]
-            debug(point)
+        for (const row of col.rows || rows) {
+            let point = col_anchor.clone()
             for (const r of rotations) {
-                point = m.point.rotate(point, r.angle, r.origin)
-                debug(point)
+                point.rotate(r.angle, r.origin)
             }
-            points[col.name + '_' + row.name] = new Point(
-                point[0],
-                point[1],
-                rotation_sum + (row.angle || 0),
-                col,
-                row
+            point.r += col.angle || 0
+            point.meta = {col, row}
+
+            const key = `${col.name}_${row.name}`
+            points[key] = point
+
+            col_anchor.y += row.padding || 19
+        }
+
+        if (col.rotate) {
+            push_rotation(
+                rotations,
+                col.rotate,
+                anchor.add(col.origin || [0, 0]).p
             )
-            console.log('new Point', points[col.name + '_' + row.name])
-            y += row.padding || 19
         }
 
-        
-
-
-        if (!reverse) {
-            if (col.rotate) {
-                push_rotation(
-                    rotations,
-                    -col.rotate,
-                    m.point.add(col.origin || [0, 0], [x, stagger_sum])
-                )
-
-                a = rotations.pop()
-                debug(a.origin)
-                rotations.push(a)
-
-                rotation_sum += -col.rotate
-            }
-            x += col.padding || 19
-        }
-
-        
-
+        anchor.x += sign * (col.padding || 19)
     }
+
     return points
 }
 
-
-
-
-
-
-
+const anchor = (raw, points={}) => {
+    let a = new Point()
+    if (raw) {
+        if (raw.ref && points[raw.ref]) {
+            a = points[raw.ref].clone()
+        }
+        if (raw.shift) {
+            a.x += raw.shift[0]
+            a.y += raw.shift[1]
+        }
+        a.r += raw.angle || 0
+    }
+    return a
+}
 
 exports.parse = (config) => {
 
-    // basic matrix
-    let matrix_anchor
-    if (config.anchor) {
-        let x = 0
-        let y = 0
-        if (config.anchor.shift) {
-            x = config.anchor.shift[0]
-            y = config.anchor.shift[1]
+    let points = {}
+
+    for (const zone of Object.values(config.zones)) {
+        points = Object.assign(points, render_zone(
+            zone.columns || [],
+            zone.rows || [{name: 'default'}],
+            anchor(zone.anchor, points),
+            !!zone.reverse
+        ))
+    }
+
+    if (config.angle) {
+        for (const p of Object.values(points)) {
+            p.rotate(config.angle)
         }
-        const r = -config.anchor.angle || 0
-        matrix_anchor = new Point(x, y, r)
-    }
-    let points = matrix(config.columns, config.rows, matrix_anchor)
-
-    // thumbfan
-    let thumb_anchor = new Point(0, 0, 0)
-    let thumb_anchor_index = -1
-    for (const key of config.thumbfan) {
-        thumb_anchor_index++
-        if (key.anchor) {
-            const ref = points[key.anchor.ref] || thumb_anchor
-            thumb_anchor.p = m.point.add(ref.p, key.anchor.shift)
-            thumb_anchor.r += key.anchor.angle || 0
-            break
-        } else continue
     }
 
-    const forward = config.thumbfan.slice(thumb_anchor_index)
-    const rewind = config.thumbfan.slice(0, thumb_anchor_index)
-    const thumb_rows = config.thumb_rows || [{name: 'thumb'}]
-    
-    points = Object.assign(points, matrix(forward, thumb_rows, thumb_anchor))
-    points = Object.assign(points, matrix(rewind, thumb_rows, thumb_anchor, true))
+    if (config.mirror) {
+        let x = anchor(config.mirror, points).x
+        x += (config.mirror.distance || 0) / 2
+        const mirrored_points = {}
+        for (const [name, p] of Object.entries(points)) {
+            const mp = p.clone().mirror(x)
+            mp.meta.mirrored = true
+            const mname = `mirror_${name}`
+            mirrored_points[mname] = mp
+        }
+        Object.assign(points, mirrored_points)
+    }
 
+    const filtered = {}
+    for (const [k, p] of Object.entries(points)) {
+        if (p.meta.col.skip || p.meta.row.skip) continue
+        filtered[k] = p
+    }
 
-    dump(points)
-    throw 2
-
-
-
-
-    return points
+    return filtered
 }

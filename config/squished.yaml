@@ -12,29 +12,48 @@ zones:
         stagger: 5
       - name: index
         stagger: -6
+        padding: 16
       - name: inner
         stagger: -2
     rows:
       - name: bottom
+        padding: 16
       - name: home
+        padding: 16
       - name: top
   thumbfan:
     anchor:
       ref: inner_bottom
-      shift: [-7, -19]
+      shift: [-4, -22]
     columns:
-      - name: near
-        column_wire: ring
+      - name: wrong_near
         padding: 21.25
         rotate: -28
         origin: [9.5, -9]
+        skip: yes
       - name: home
         column_wire: middle
-        padding: 21.25
         rotate: -28
-        origin: [11.75, -9]
+        origin: [9.5, -9]
       - name: far
         column_wire: index
+    rows:
+      - name: thumb
+  thumbfan_reverse_pass:
+    anchor:
+      ref: home_thumb
+    reverse: yes
+    columns:
+      - name: home_again
+        rotate: 28
+        origin: [-9.5, -9]
+        skip: yes
+      - name: near
+        padding: 16
+        column_wire: ring
+      # TODO: this is just a test for Dan
+      - name: nearer
+        column_wire: pinky
     rows:
       - name: thumb
 angle: -20
@@ -53,4 +72,8 @@ mirror:
   # old_origin.rotate(5, [14, 0])
   # old_origin.rotate(-20, [0, 0])
   # new_width = 250 - (2 * old_origin.x)
+  #
+  # TODO: Hahaaa, the squishing fails, because the width reference points are 
+  # NOT stationary! gotta move to distances between some other points
+  # (definitely something from among the HOME positions!!!)
   distance: 233.5881016
