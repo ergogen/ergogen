@@ -47,7 +47,7 @@ const Point = exports.Point = class Point {
 
     mirror(x) {
         this.x = 2 * x - this.x
-        this.r = 180 - this.r
+        this.r = -this.r
         return this
     }
 
@@ -63,20 +63,15 @@ const Point = exports.Point = class Point {
 
 const dump = exports.dump = (points, opts={}) => {
 
-    const line = (a, b) => ({
-        type: 'line',
-        origin: a,
-        end: b
-    })
     const s = (opts.side || 14) / 2
 
     const models = {}
     for (const [key, point] of Object.entries(points)) {
         const paths = {
-            l: line([-s, -s], [-s,  s]),
-            t: line([-s,  s], [ s,  s]),
-            r: line([ s,  s], [ s, -s]),
-            b: line([ s, -s], [-s, -s])
+            l: u.line([-s, -s], [-s,  s]),
+            t: u.line([-s,  s], [ s,  s]),
+            r: u.line([ s,  s], [ s, -s]),
+            b: u.line([ s, -s], [-s, -s])
         }
         models[key] = m.model.moveRelative(m.model.rotate({paths}, point.r), point.p)
     }
@@ -86,7 +81,8 @@ const dump = exports.dump = (points, opts={}) => {
         units: 'mm'
     })
 
-    fs.writeFileSync(`${opts.file || 'dump'}.json`, JSON.stringify(points, null, '    '))
+    fs.writeFileSync(`${opts.file || 'dump'}_points.json`, JSON.stringify(points, null, '    '))
+    fs.writeFileSync(`${opts.file || 'dump'}_assembly.json`, JSON.stringify(assembly, null, '    '))
     fs.writeFileSync(`${opts.file || 'dump'}.dxf`, m.exporter.toDXF(assembly))
 }
 

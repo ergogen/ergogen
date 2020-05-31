@@ -54,8 +54,8 @@ if (args.debug) {
     points_lib.dump(points)
 }
 
-// if (args.outline) {
-//     outline_lib.draw(points, config)
-// }
+if (args.outline) {
+    outline_lib.draw(points, config)
+}
 
 console.log('Done.')
