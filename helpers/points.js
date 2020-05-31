@@ -1,6 +1,8 @@
 const m = require('makerjs')
 const fs = require('fs-extra')
 
+const u = require('./utils')
+
 const Point = exports.Point = class Point {
     constructor(x=0, y=0, r=0, meta={}) {
         if (Array.isArray(x)) {
@@ -54,7 +56,7 @@ const Point = exports.Point = class Point {
             this.x,
             this.y,
             this.r,
-            this.meta
+            u.deepcopy(this.meta)
         )
     }
 }
@@ -186,14 +188,18 @@ exports.parse = (config) => {
         x += (config.mirror.distance || 0) / 2
         const mirrored_points = {}
         for (const [name, p] of Object.entries(points)) {
+            if (p.meta.col.asym == 'left' || p.meta.row.asym == 'left') continue
             const mp = p.clone().mirror(x)
             mp.meta.mirrored = true
-            const mname = `mirror_${name}`
-            mirrored_points[mname] = mp
+            delete mp.meta.asym
+            mirrored_points[`mirror_${name}`] = mp
+            if (p.meta.col.asym == 'right' || p.meta.row.asym == 'right') {
+                p.meta.col.skip = true
+            }
         }
         Object.assign(points, mirrored_points)
     }
-
+    
     const filtered = {}
     for (const [k, p] of Object.entries(points)) {
         if (p.meta.col.skip || p.meta.row.skip) continue

@@ -5,7 +5,7 @@ zones:
     columns:
       - name: pinky
         rotate: -5
-        origin: [7, -7]
+        origin: [7, -10]
       - name: ring
         stagger: 12
       - name: middle
@@ -51,29 +51,22 @@ zones:
       - name: near
         padding: 16
         column_wire: ring
-      # TODO: this is just a test for Dan
-      - name: nearer
-        column_wire: pinky
     rows:
       - name: thumb
 angle: -20
 mirror:
-  ref: pinky_bottom
+  ref: pinky_home
   # The mk1's origin was the bottom left corner of the bottom pinky key.
   # But it later got rotated by the bottom *right* corner as the pinky angle
   # and then rotated again for the inter-half angle so [0, 0] was nowhere on
   # the actual result.
   #
-  # Since the new origin is the center of the pinky bottom, we have to convert
+  # Since the new origin is the center of the pinky home, we have to convert
   # the old, round 250 width to this new coordinate system if we want backward
-  # compatibility. The following snippet was used to arrive at 233.5881016.
+  # compatibility. The following snippet was used to arrive at this distance.
   #
-  # old_origin = new Point(7, 7)
+  # old_origin = new Point(7, 7 + 19)
   # old_origin.rotate(5, [14, 0])
   # old_origin.rotate(-20, [0, 0])
   # new_width = 250 - (2 * old_origin.x)
-  #
-  # TODO: Hahaaa, the squishing fails, because the width reference points are 
-  # NOT stationary! gotta move to distances between some other points
-  # (definitely something from among the HOME positions!!!)
-  distance: 233.5881016
+  distance: 223.7529778
