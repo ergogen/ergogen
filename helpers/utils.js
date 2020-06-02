@@ -21,13 +21,21 @@ exports.circle = (p, r) => {
     return new m.paths.Circle(p, r)
 }
 
-exports.rect = (w, h, o=[0, 0]) => {
-    return m.model.move({paths: {
+exports.rect = (w, h, o=[0, 0], mirrored=false) => {
+    const res = {
         top:    line([0, h], [w, h]),
         right:  line([w, h], [w, 0]),
         bottom: line([w, 0], [0, 0]),
         left:   line([0, 0], [0, h])
-    }}, o)
+    }
+    if (mirrored) {
+        for (const [key, val] of Object.entries(res)) {
+            const tmp = val.origin
+            val.origin = val.end
+            val.end = tmp
+        }
+    }
+    return m.model.move({paths: res}, o)
 }
 
 exports.poly = (arr) => {
@@ -41,4 +49,8 @@ exports.poly = (arr) => {
         prev = p
     }
     return res
+}
+
+exports.eq = (a, b) => {
+    return a[0] === b[0] && a[1] === b[1]
 }

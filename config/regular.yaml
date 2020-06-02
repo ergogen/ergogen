@@ -55,11 +55,26 @@ mirror:
   # new_width = 250 - (2 * old_origin.x)
   distance: 223.7529778
 outline:
-  top:
-    left: inner_top
-    right: mirror_inner_top
-  bottom:
-    left: far_thumb
-    right: mirror_far_thumb
-  hole: 14
+  footprint: 14
   expansion: 5
+  corner: 0.5
+  glue:
+    top:
+      left:
+        key: inner_top
+        line: top
+      right:
+        key: mirror_inner_top
+        line: top
+    bottom:
+      left:
+        key: far_thumb
+        line: right
+      right:
+        key: mirror_far_thumb
+        line: left
+    waypoints:
+      - percent: 50
+        width: 100
+    mid:
+      shrink: 5

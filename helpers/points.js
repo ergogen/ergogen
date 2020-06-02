@@ -59,6 +59,11 @@ const Point = exports.Point = class Point {
             u.deepcopy(this.meta)
         )
     }
+
+    rect(size=14) {
+        let rect = u.rect(size, size, [-size/2, -size/2], this.meta.mirrored)
+        return m.model.moveRelative(m.model.rotate(rect, this.r), this.p)
+    }
 }
 
 const dump = exports.dump = (points, opts={}) => {
