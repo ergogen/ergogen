@@ -1,11 +1,11 @@
 const m = require('makerjs')
 const fs = require('fs-extra')
 
-exports.deepcopy = (value) => JSON.parse(JSON.stringify(value))
+const deepcopy = exports.deepcopy = (value) => JSON.parse(JSON.stringify(value))
 
 exports.dump_model = (model, file='model', json=false) => {
     const assembly = m.model.originate({
-        models: model,
+        models: deepcopy(model),
         units: 'mm'
     })
 

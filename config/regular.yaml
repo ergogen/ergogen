@@ -6,17 +6,39 @@ zones:
       - name: pinky
         rotate: -5
         origin: [7, -7]
+        rows:
+          - bind_x:
+          - bind_x: right
+          - bind_x: right
       - name: ring
         stagger: 12
+        rows:
+          - bind_x: left
+          - bind_x: left
+          - bind_x: right
       - name: middle
         stagger: 5
+        rows:
+          - bind_x: both
+          - bind_x: both
+          - bind_x:
       - name: index
         stagger: -6
+        rows:
+          - bind_x: right
+          - bind_x: left
+          - bind_x: left
       - name: inner
         stagger: -2
+        rows:
+          - bind_x:
+          - bind_x: left
+          - bind_x: left
     rows:
       - name: bottom
+        bind_y: up
       - name: home
+        bind_y: up
       - name: top
   thumbfan:
     anchor:
@@ -28,15 +50,22 @@ zones:
         padding: 21.25
         rotate: -28
         origin: [9.5, -9]
+        rows:
+          - bind_x: right
       - name: home
         column_wire: middle
         padding: 21.25
         rotate: -28
         origin: [11.75, -9]
+        rows:
+          - bind_x: both
       - name: far
         column_wire: index
+        rows:
+          - bind_x: left
     rows:
       - name: thumb
+        bind_y: up
 angle: -20
 mirror:
   ref: pinky_home
@@ -55,8 +84,8 @@ mirror:
   # new_width = 250 - (2 * old_origin.x)
   distance: 223.7529778
 outline:
-  footprint: 14
-  expansion: 5
+  footprint: 18
+  bind: 10
   corner: 0.5
   glue:
     top:
@@ -76,5 +105,5 @@ outline:
     waypoints:
       - percent: 50
         width: 100
-    mid:
-      shrink: 5
+      - percent: 90
+        width: 50
