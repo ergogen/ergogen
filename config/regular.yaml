@@ -14,7 +14,7 @@ zones:
         stagger: 12
         rows:
           - bind_x: left
-          - bind_x: left
+          - bind_x: right
           - bind_x: right
       - name: middle
         stagger: 5

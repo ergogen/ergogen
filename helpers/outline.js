@@ -19,12 +19,17 @@ const outline = (points, config) => {
 
         const glue_conf = config.outline.glue
 
+        const internal_part = (line) => {
+            // taking the middle part only, so that we don't interfere with corner rounding
+            return u.line(m.point.middle(line, 0.4), m.point.middle(line, 0.6))
+        }
+
         const get_line = (def={}) => {
             const point = points[def.key]
             if (!point) throw new Error(`Point ${def.key} not found...`)
             const rect = m.model.originate(point.rect(footprint))
             line = rect.paths[def.line || 'top']
-            return line
+            return internal_part(line)
         }
 
         assert.ok(glue_conf.top)
@@ -68,6 +73,7 @@ const outline = (points, config) => {
     jsu = require('util')
 
     let i = 0
+    const keys = {}
     let left_keys = {}
     let right_keys = {}
     for (const zone of Object.values(config.zones)) {
@@ -101,17 +107,28 @@ const outline = (points, config) => {
                 let key = new m.models.RoundRectangle(to_x - from_x, to_y - from_y, corner)
                 key = m.model.moveRelative(key, [from_x, from_y])
                 key = p.position(key)
-                console.log(i+1, pname, jsu.inspect(key, true, null, true))
-                if (i == 7) throw 7
-                // keys[pname] = u.deepcopy(key)
+                // console.log(i+1, pname, jsu.inspect(key, true, null, true))
+                // if (i == 7) throw 7
+                keys[pname] = u.deepcopy(p.position(u.rect(14, 14, [-7, -7])))
                 if (mirrored) {
                     // TODO running into the problem again where the right side doesn't combine properly
                     // have to debug this at a lower level, it might be a bug in the makerjs source :/
                     // first step is to export these inspections and create a minimal reproduction
                     // if that fails as well, I have to dive into the combineUnion code...
+
+                    // if (pname === 'mirror_inner_top') {
+                    //     u.dump_model({a: right_keys, b: key}, `debug_bad`, true)
+                    // }
+
+
                     right_keys = m.model.combineUnion(key, right_keys)
                     u.dump_model({a: glue, c: right_keys}, `right_${++i}`)
                 } else {
+
+                    // if (pname === 'inner_top') {
+                    //     u.dump_model({a: left_keys, b: key}, `debug_good`, true)
+                    // }
+
                     left_keys = m.model.combineUnion(key, left_keys)
                     u.dump_model({a: glue, b: left_keys}, `left_${++i}`)
                 }
@@ -126,7 +143,7 @@ const outline = (points, config) => {
     glue = m.model.combineUnion(glue, left_keys)
     u.dump_model({a: glue, b: left_keys, c: {models: right_keys}}, `all_after_left`)
     glue = m.model.combineUnion(glue, right_keys)
-    u.dump_model({a: glue, b: left_keys, c: {models: right_keys}}, `all_after_right`)
+    u.dump_model({a: glue, b: {models: keys}}, `fullll`)
 
 
     // glue = m.model.outline(glue, expansion)

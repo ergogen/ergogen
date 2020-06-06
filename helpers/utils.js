@@ -38,6 +38,10 @@ exports.rect = (w, h, o=[0, 0], mirrored=false) => {
     return m.model.move({paths: res}, o)
 }
 
+const eq = exports.eq = (a=[], b=[]) => {
+    return a[0] === b[0] && a[1] === b[1]
+}
+
 exports.poly = (arr) => {
     let counter = 0
     let prev = arr[arr.length - 1]
@@ -45,12 +49,10 @@ exports.poly = (arr) => {
         paths: {}
     }
     for (const p of arr) {
+        if (eq(prev, p)) continue
         res.paths['p' + (++counter)] = line(prev, p)
         prev = p
     }
     return res
 }
 
-exports.eq = (a, b) => {
-    return a[0] === b[0] && a[1] === b[1]
-}
