@@ -1,0 +1,38 @@
+columns:
+  - name: pinky
+    rotate: 5
+    origin: [7, -7] # bottom right corner
+  - name: ring
+    stagger: 12
+  - name: middle
+    stagger: 5
+  - name: index
+    stagger: -6
+  - name: inner
+    stagger: -2
+rows:
+  - name: bottom
+  - name: home
+  - name: top
+thumbfan:
+  - name: palmward
+    anchor: 
+      column: inner
+      row: bottom
+      shift: [-12, -19]
+    column: ring
+    padding: 21.25
+    rotate: 28
+    origin: [9.5, -9]
+  - name: home
+    column: middle
+    padding: 21.25
+    rotate: 28
+    origin: [11.75, -9]
+  - name: outward
+    column: index
+angle: 20
+mirror:
+  column: pinky
+  row: bottom
+  distance: 250
