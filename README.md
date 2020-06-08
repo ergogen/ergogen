@@ -136,43 +136,42 @@ This is where the following section comes into play:
 ```yaml
 glue:
     top:
-        left:
-            ref: <point reference>
-            side: 
-        right:
-            ref: <point reference>
-            side: 
+        left: <line def>
+        right: <line def> | num
     bottom:
-        left:
-            ref: <point reference>
-            side: 
-        right:
-            ref: <point reference>
-            side: 
+        left: <line def>
+        right: <line def> | num
     waypoints:
         - percent: num
           width: num | [num_left, num_right]
         - ...
 ```
 
+...where a `<line def>` looks like:
+
+```yaml
+ref: <point reference>
+rotate: num
+origin: [x, y]
+shift: [x, y]
+relative: true | false (default = false)
+```
+
 The section's `top` and `bottom` are both formatted the same, and describe the center line's top and bottom intersections, respectively.
-In a one-piece case, this means that we choose a side from a left-side reference point's rectangle, another from a right-side reference point's rectangle, and converge them to where they meet.
+In a one-piece case, this means that we project a line from a left-side reference point (optionally rotated and translated), another from the right, and converge them to where they meet.
 Split designs can specify `right` as a single number to mean the x coordinate where the side should be "cut off".
+(The `relative` flag means the unit of the translation specified in `shift` is not mm, but the size the point is laid out with; see below.)
 
 This leads to a gluing middle patch that can be used to meld the left and right sides together, given by the counter-clockwise polygon:
 
 - Top intersection
-- Left top line midpoint
-- Left top point middle
-- Left bottom point middle
-- Left bottom line midpoint
+- Left top point
+- Left bottom point
 - Bottom intersection
-- Right bottom line midpoint
-- Right bottom point middle
-- Right top point middle
-- Right top line midpoint
+- Right bottom point
+- Right top point
 
-If this is insufficient (maybe because it would leave holes), the `waypoints` can be used to supplement.
+If this is insufficient (maybe because it would leave holes), the `waypoints` can be used to supplement the glue.
 Here, `percent` means the y coordinate along the centerline (going from the top intersection to the bottom intersection), and `width` means the offset on the x axis.
 
 <hr />
@@ -214,9 +213,9 @@ Using these, we define exports as follows:
 ```yaml
 exports:
     my_name:
-        - op: add | sub | diff
-          type: all | keys | glue | custom
-          params: ...
+        - op: add | sub | diff (default = add)
+          type: <one of the types>
+          <type-specific params>
         - ...
 ```
 
@@ -225,4 +224,21 @@ Additionally, it is going to be available to further export declarations under t
 If we only want to use it as a building block for further exports, we can start the name with an underscore (e.g., `_my_name`) to prevent it from being actually exported.
 
 ### Case
+
+Cases add a pretty basic and minimal 3D aspect to the generation process.
+In this phase, we take different outlines (exported from the above section), extrude and translate them along the z axis, add some chamfer to the edges, and combine them into one 3D-printable object.
+That's it.
+Declarations might look like this:
+
+```yaml
+case:
+    case_name:
+        - outline: <outline ref>
+          extrude: num
+          raise: num
+          chamfer: num
+          op: add | sub | diff (default = add)
+        - ...
+```
+
 ### PCB
