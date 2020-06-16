@@ -1,16 +1,9 @@
 const m = require('makerjs')
-const fs = require('fs-extra')
 
-const deepcopy = exports.deepcopy = (value) => JSON.parse(JSON.stringify(value))
+exports.deepcopy = (value) => JSON.parse(JSON.stringify(value))
 
-exports.dump_model = (model, file='model', json=false) => {
-    const assembly = m.model.originate({
-        models: deepcopy(model),
-        units: 'mm'
-    })
-
-    if (json) fs.writeFileSync(`${file}.json`, JSON.stringify(assembly, null, '    '))
-    fs.writeFileSync(`${file}.dxf`, m.exporter.toDXF(assembly))
+const eq = exports.eq = (a=[], b=[]) => {
+    return a[0] === b[0] && a[1] === b[1]
 }
 
 const line = exports.line = (a, b) => {
@@ -29,17 +22,11 @@ exports.rect = (w, h, o=[0, 0], mirrored=false) => {
         left:   line([0, 0], [0, h])
     }
     if (mirrored) {
-        for (const [key, val] of Object.entries(res)) {
-            const tmp = val.origin
-            val.origin = val.end
-            val.end = tmp
+        for (const segment of Object.values(res)) {
+            [segment.origin, segment.end] = [segment.end, segment.origin] 
         }
     }
     return m.model.move({paths: res}, o)
-}
-
-const eq = exports.eq = (a=[], b=[]) => {
-    return a[0] === b[0] && a[1] === b[1]
 }
 
 exports.poly = (arr) => {
@@ -55,4 +42,3 @@ exports.poly = (arr) => {
     }
     return res
 }
-

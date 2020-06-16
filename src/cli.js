@@ -3,8 +3,8 @@ const path = require('path')
 const yaml = require('js-yaml')
 const yargs = require('yargs')
 
-const points_lib = require('./helpers/points')
-const outline_lib = require('./helpers/outline')
+const points_lib = require('../helpers/points')
+const outline_lib = require('./outline')
 
 const args = yargs
     .option('config', {
@@ -59,3 +59,13 @@ if (args.outline) {
 }
 
 console.log('Done.')
+
+// exports.dump_model = (model, file='model', json=false) => {
+//     const assembly = m.model.originate({
+//         models: deepcopy(model),
+//         units: 'mm'
+//     })
+
+//     if (json) fs.writeFileSync(`${file}.json`, JSON.stringify(assembly, null, '    '))
+//     fs.writeFileSync(`${file}.dxf`, m.exporter.toDXF(assembly))
+// }

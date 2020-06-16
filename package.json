@@ -1,13 +1,34 @@
 {
-    "name": "absolem",
-    "version": "1.0.0",
-    "description": "Flat, minimalistic, ergonomic keyboard layout generated from JS.",
+    "name": "ergogen",
+    "version": "0.1.0",
+    "description": "Ergonomic keyboard layout generator",
     "author": "Bán Dénes <mr@zealot.hu>",
     "license": "MIT",
+    "homepage": "https://zealot.hu/ergogen",
+    "repository": "github:mrzealot/ergogen",
+    "bugs": "https://github.com/mrzealot/ergogen/issues",
+    "main": "./src/ergogen.js",
+    "bin": "./src/cli.js",
+    "scripts": {
+        "build": "rollup -c",
+        "test": "nyc mocha -r chai/register-should"
+    },
     "dependencies": {
-        "fs-extra": "^9.0.0",
+        "fs-extra": "^9.0.1",
         "js-yaml": "^3.14.0",
         "makerjs": "github:mrzealot/maker.js-dist",
         "yargs": "^15.3.1"
+    },
+    "devDependencies": {
+        "@rollup/plugin-commonjs": "^13.0.0",
+        "chai": "^4.2.0",
+        "mocha": "^8.0.1",
+        "nyc": "^15.1.0",
+        "rollup": "^2.16.1"
+    },
+    "nyc": {
+        "all": true,
+        "include": ["src/*.js"],
+        "exclude": ["src/cli.js"]
     }
 }

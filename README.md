@@ -497,4 +497,79 @@ case:
 After the camfer to the top and/or bottom outside edges, the object is `translate`d/`rotate`d, and combined with what we have so far according to `op`.
 If we only want to use an object as a building block for further objects, we can employ the same "start with an underscore" trick we learned at the outlines section.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## A concrete case example
+
+<br />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## PCB
+
+Everything should be ready for a handwire, but if you'd like the design to be more accessible and easily replicable, you probably want a PCB as well.
+To help you get started, the necessary footprints and an edge cut can be automatically positioned so that all you need to do manually is the routing.
