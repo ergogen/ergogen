@@ -1,0 +1,109 @@
+points:
+  zones:
+    matrix:
+      anchor:
+        rotate: 5
+      columns:
+        pinky:
+          rotate: -5
+          origin: [7, -7]
+          rows:
+            bottom:
+            home:
+              neighbors: [right]
+            top:
+              neighbors: [right]
+        ring:
+          stagger: 12
+          rows:
+            bottom:
+              neighbors: [left]
+            home:
+              neighbors: [right]
+            top:
+              neighbors: [right]
+        middle:
+          stagger: 5
+          rows:
+            bottom:
+              neighbors: [both]
+            home:
+              neighbors: [both]
+            top:
+        index:
+          stagger: -6
+          rows:
+            bottom:
+              neighbors: [right]
+            home:
+              neighbors: [left]
+            top:
+              neighbors: [left]
+        inner:
+          stagger: -2
+          rows:
+            bottom:
+            home:
+              neighbors: [left]
+            top:
+              neighbors: [left]
+      rows:
+        bottom:
+          neighbors: [,up]
+        home:
+          neighbors: [,up]
+        top:
+    thumbfan:
+      anchor:
+        ref: inner_bottom
+        shift: [-7, -19]
+      columns:
+        near:
+          spread: 21.25
+          rotate: -28
+          origin: [9.5, -9]
+          rows:
+            thumb:
+              neighbors: [right]
+        home:
+          spread: 21.25
+          rotate: -28
+          origin: [11.75, -9]
+          rows:
+            thumb:
+              neighbors: [both]
+        far:
+          rows:
+            thumb:
+              neighbors: [left]
+      rows:
+        thumb:
+          neighbors: [,up]
+  rotate: -20
+  mirror:
+    ref: pinky_home
+    distance: 223.7529778
+outline:
+  bind: 10
+  glue:
+    top:
+      left:
+        ref: inner_top
+        shift: [,7]
+      right:
+        ref: mirror_inner_top
+        shift: [,7]
+    bottom:
+      left:
+        ref: far_thumb
+        shift: [7]
+        rotate: 90
+      right:
+        ref: mirror_far_thumb
+        shift: [-7]
+        rotate: 90
+    waypoints:
+      - percent: 50
+        width: 100
+      - percent: 90
+        width: 50

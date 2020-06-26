@@ -1,7 +1,7 @@
 const m = require('makerjs')
 const u = require('./utils')
 
-class Point {
+module.exports = class Point {
     constructor(x=0, y=0, r=0, meta={}) {
         if (Array.isArray(x)) {
             this.x = x[0]
@@ -67,5 +67,3 @@ class Point {
         return this.position(rect)
     }
 }
-
-module.exports = Point

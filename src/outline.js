@@ -1,23 +1,25 @@
 const m = require('makerjs')
-const fs = require('fs-extra')
-const assert = require('assert').strict
-
 const u = require('./utils')
 
+const layout = exports.layout = (points, shape) => {
+    const shapes = {}
+    for (const [pname, p] of Object.entries(points)) {
+        shapes[pname] = p.position(u.deepcopy(shape))
+    }
+    return {layout: {models: shapes}}
+}
 
+const outline = exports._outline = (points, config={}) => params => {
 
-const outline = (points, config) => {
+    let size = params.size || [18, 18]
+    if (!Array.isArray(size)) size = [size, size]
+    const corner = params.corner || 0
 
-    assert.ok(config.outline)
-    const footprint = config.outline.footprint || 18
-    const corner = config.outline.corner || 0
-    const global_bind = config.outline.bind || 5
+    const global_bind = config.bind || 5
 
     let glue = {paths: {}}
     
-    if (config.outline.glue) {
-
-        const glue_conf = config.outline.glue
+    if (config.glue) {
 
         const internal_part = (line) => {
             // taking the middle part only, so that we don't interfere with corner rounding
@@ -25,23 +27,33 @@ const outline = (points, config) => {
         }
 
         const get_line = (def={}) => {
-            const point = points[def.key]
-            if (!point) throw new Error(`Point ${def.key} not found...`)
+            const ref = points[def.ref]
+            if (!ref) throw new Error(`Point ${def.ref} not found...`)
+
+            let from = [0, 0]
+            let to = [ref.meta.mirrored ? -1 : 1, 0]
+
+            // todo: position according to point to get the lines...
+
+            let point = ref.clone().shift(def.shift || [0, 0])
+            point.rotate(def.rotate || 0, point.add(def.origin || [0, 0]))
+
+
             const rect = m.model.originate(point.rect(footprint))
             line = rect.paths[def.line || 'top']
             return internal_part(line)
         }
 
-        assert.ok(glue_conf.top)
-        const tll = get_line(glue_conf.top.left)
-        const trl = get_line(glue_conf.top.right)
+        assert.ok(config.glue.top)
+        const tll = get_line(config.glue.top.left)
+        const trl = get_line(config.glue.top.right)
         const tip = m.path.converge(tll, trl)
         const tlp = u.eq(tll.origin, tip) ? tll.end : tll.origin
         const trp = u.eq(trl.origin, tip) ? trl.end : trl.origin
 
-        assert.ok(glue_conf.bottom)
-        const bll = get_line(glue_conf.bottom.left)
-        const brl = get_line(glue_conf.bottom.right)
+        assert.ok(config.glue.bottom)
+        const bll = get_line(config.glue.bottom.left)
+        const brl = get_line(config.glue.bottom.right)
         const bip = m.path.converge(bll, brl)
         const blp = u.eq(bll.origin, bip) ? bll.end : bll.origin
         const brp = u.eq(brl.origin, bip) ? brl.end : brl.origin
@@ -49,7 +61,7 @@ const outline = (points, config) => {
         const left_waypoints = []
         const right_waypoints = []
 
-        for (const w of glue_conf.waypoints || []) {
+        for (const w of config.glue.waypoints || []) {
             const percent = w.percent / 100
             const center_x = tip[0] + percent * (bip[0] - tip[0])
             const center_y = tip[1] + percent * (bip[1] - tip[1])

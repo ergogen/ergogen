@@ -11,7 +11,7 @@
     "bin": "./src/cli.js",
     "scripts": {
         "build": "rollup -c",
-        "test": "nyc mocha -r chai/register-should"
+        "test": "nyc --reporter=html --reporter=text mocha -r chai/register-should"
     },
     "dependencies": {
         "fs-extra": "^9.0.1",
@@ -28,7 +28,11 @@
     },
     "nyc": {
         "all": true,
-        "include": ["src/*.js"],
-        "exclude": ["src/cli.js"]
+        "include": [
+            "src/*.js"
+        ],
+        "exclude": [
+            "src/cli.js"
+        ]
     }
 }

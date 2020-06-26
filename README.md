@@ -87,7 +87,7 @@ In the following, we'll have an in-depth discussion about each of these, with an
 ## Points
 
 A point in this context refers to a 2D point `[x,y]` with a rotation/orientation `r` added in.
-These can be thought of as the middle points of the keycaps in a resulting keyboard layout, with an additional handling of and angle of the keycap. 
+These can be thought of as the middle points of the keycaps in a resulting keyboard layout, with an additional handling of the angle of the keycap. 
 
 What makes this generator "ergo" is the implicit focus on the column-stagger.
 Of course we could simulate the traditional row-stagger by defining everything with a 90 degree rotation, but that's really not the goal here.
@@ -172,7 +172,7 @@ But if `key = {a: 1}` is extended by `key = {b: 2}`, the result is `key = {a: 1,
 
 Lastly, while there are a few key-specific attributes that have special meaning in the context of points (listed below), any key with any data can be specified here.
 This can be useful for storing arbitrary meta-info about the keys, or just configuring later stages with key-level parameters.
-So, for example, when the outline phase specifies `bind` as a key-level parameter, it means that the global value can be extended just like any other key-level attribute.
+So, for example, when the outline phase specifies `bind` as a key-level parameter (see below), it means that the global value can be extended just like any other key-level attribute.
 
 Now for the "official" key-level attributes:
 
@@ -181,13 +181,15 @@ name: name_override # default = a concatenation of column and row
 shift: [x, y] # default = [0, 0]
 rotate: num # default = 0
 origin: [x, y] # default = the center of the key
+padding: num # default = 19
 skip: boolean # default = false
-asym: left|right|both # default = both
+asym: left | right | both # default = both
 ```
 
 `name` is the unique identifier of this specific key.
 It defaults to a `<row>_<column>` format, but can be overridden if necessary.
 `shift` and `rotate`/`origin` declare an extra, key-level translation or rotation, respectively.
+Then we leave `padding` amount of vertical space before moving on to the next key in the column.
 `skip` signals that the point is just a "helper" and should not be included in the output.
 This can happen when a _real_ point is more easily calculable through a "stepping stone", but then we don't actually want the stepping stone to be a key itself.
 Finally, `asym` relates to mirroring, which we'll cover in a second.
@@ -339,13 +341,11 @@ ref: <point reference>
 shift: [x, y]
 rotate: num
 origin: [x, y]
-relative: boolean # default = false
 ```
 
 The section's `top` and `bottom` are both formatted the same, and describe the center line's top and bottom intersections, respectively.
 In a one-piece case, this means that we project a line from a left-side reference point (optionally rotated and translated), another from the right, and converge them to where they meet.
 Split designs can specify `right` as a single number to mean the x coordinate where the side should be "cut off".
-(The `relative` flag means the unit of the translation specified in `shift` is not mm, but the size the point is laid out with; see below.)
 
 This leads to a gluing middle patch that can be used to meld the left and right sides together, given by the counter-clockwise polygon:
 
@@ -371,13 +371,13 @@ Now we can configure what we want to "export" as outlines from this phase, given
 - `all` : the combined outline that we've just created. Its parameters include:
     - `size: num | [num_x, num_y]` : the width/height of the rectangles to lay onto the points
     - `corner: num # default = 0)` : corner radius of the rectangle
-    - `corner_style: rounded | beveled # default = rounded)` : the styleof the rectangle's corners
+    - `bevel: num # default = 0)` : corner bevel of the rectangle, can be combined with rounding
 - `keys` : only one side of the laid out keys, without the glue. Parameters:
     - everything we could specify for `all`
     - `side: left | right` : the side we want
 - `glue` : just the glue, but the "ideal" version of it. This means that instead of the `glue` we defined above, we get `all` - `left` - `right`, so the _exact_ middle piece we would have needed to glue everything together. Parameters:
     - everything we could specify for `all` (since those are needed for the calculation)
-    - `side: left | right | both # default = both)` : optionally, wecould choose only one side of the glue as well
+    - `side: left | right | both # default = both)` : optionally, we could choose only one side of the glue as well
 
 Additionally, we can use primitive shapes:
     
@@ -395,7 +395,6 @@ Additionally, we can use primitive shapes:
     - `points: [[x, y], ...]` : the points of the polygon
 
 Using these, we define exports as follows:
-
 
 ```yaml
 exports:
@@ -476,7 +475,7 @@ If we only want to use it as a building block for further exports, we can start 
 ## Case
 
 Cases add a pretty basic and minimal 3D aspect to the generation process.
-In this phase, we take different outlines (exported from the above section, even the "private" ones), extrude and position them in space, optionally add some chamfer to the edges, and combine them into one 3D-printable object.
+In this phase, we take different outlines (exported from the above section, even the "private" ones), extrude and position them in space, and combine them into one 3D-printable object.
 That's it.
 Declarations might look like this:
 
@@ -485,17 +484,16 @@ case:
     case_name:
         - outline: <outline ref>
           extrude: num # default = 1
-          chamfer: [num_top, num_bottom] # default = [0, 0]
           translate: [x, y, z] # default = [0, 0, 0]
           rotate: [ax, ay, az] # default = [0, 0, 0]
-          op: add|sub|diff # default = add
+          op: add | sub | diff # default = add
         - ...
     ...
 ```
 
 `outline` specifies which outline to import onto the xy plane, while `extrude` specifies how much it should be extruded along the z axis.
-After the camfer to the top and/or bottom outside edges, the object is `translate`d/`rotate`d, and combined with what we have so far according to `op`.
-If we only want to use an object as a building block for further objects, we can employ the same "start with an underscore" trick we learned at the outlines section.
+After that, the object is `translate`d, `rotate`d, and combined with what we have so far according to `op`.
+If we only want to use an object as a building block for further objects, we can employ the same "start with an underscore" trick we learned at the outlines section to make it "private".
 
 
 

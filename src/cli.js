@@ -1,10 +1,27 @@
+#!/usr/bin/env node
+
+const m = require('makerjs')
 const fs = require('fs-extra')
 const path = require('path')
 const yaml = require('js-yaml')
 const yargs = require('yargs')
 
-const points_lib = require('../helpers/points')
+const u = require('./utils')
+const points_lib = require('./points')
 const outline_lib = require('./outline')
+
+const dump_model = (model, file='model') => {
+    const assembly = m.model.originate({
+        models: u.deepcopy(model),
+        units: 'mm'
+    })
+
+    fs.mkdirpSync(path.dirname(`${file}.dxf`))
+    fs.writeFileSync(`${file}.dxf`, m.exporter.toDXF(assembly))
+    if (args.debug) {
+        fs.writeJSONSync(`${file}.json`, assembly, {spaces: 4})
+    }
+}
 
 const args = yargs
     .option('config', {
@@ -24,48 +41,20 @@ const args = yargs
         hidden: true,
         type: 'boolean'
     })
-    .option('outline', {
-        default: true,
-        describe: 'Generate 2D outlines',
-        type: 'boolean'
-    })
-    .option('pcb', {
-        default: false,
-        describe: 'Generate PCB draft',
-        type: 'boolean'
-    })
-    .option('case', {
-        default: false,
-        describe: 'Generate case files',
-        type: 'boolean'
-    })
     .argv
 
-if (!args.outline && !args.pcb && !args.case) {
-    yargs.showHelp('log')
-    console.log('Nothing to do...')
-    process.exit(0)
-}
+fs.mkdirpSync(args.o)
 
-const config = yaml.load(fs.readFileSync(args.c).toString())
-const points = points_lib.parse(config)
+const config_parser = args.c.endsWith('.yaml') ? yaml.load : JSON.parse
+const config = config_parser(fs.readFileSync(args.c).toString())
 
+const points = points_lib.parse(config.points)
 if (args.debug) {
-    points_lib.dump(points)
-}
-
-if (args.outline) {
-    outline_lib.draw(points, config)
+    fs.writeJSONSync(path.join(args.o, 'points.json'), points, {spaces: 4})
+    const size = 14
+    const rect = u.rect(size, size, [-size/2, -size/2])
+    const points_demo = outline_lib.layout(points, rect)
+    dump_model(points_demo, path.join(args.o, 'points_demo'))
 }
 
 console.log('Done.')
-
-// exports.dump_model = (model, file='model', json=false) => {
-//     const assembly = m.model.originate({
-//         models: deepcopy(model),
-//         units: 'mm'
-//     })
-
-//     if (json) fs.writeFileSync(`${file}.json`, JSON.stringify(assembly, null, '    '))
-//     fs.writeFileSync(`${file}.dxf`, m.exporter.toDXF(assembly))
-// }

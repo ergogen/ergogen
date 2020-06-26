@@ -1,7 +1,37 @@
 const m = require('makerjs')
 const u = require('./utils')
+const Point = require('./point')
 
-const push_rotation = (list, angle, origin) => {
+const extend_pair = exports._extend_pair = (to, from) => {
+    const to_type = u.type(to)
+    const from_type = u.type(from)
+    if (!from && ['array', 'object'].includes(to_type)) return to
+    if (to_type != from_type) return from
+    if (from_type == 'object') {
+        const res = {}
+        for (const key of Object.keys(from)) {
+            res[key] = extend_pair(to[key], from[key])
+        }
+        return res
+    } else if (from_type == 'array') {
+        const res = u.deepcopy(to)
+        for (const [i, val] of from.entries()) {
+            res[i] = extend_pair(res[i], val)
+        }
+        return res
+    } else return from
+}
+
+const extend = exports._extend = (...args) => {
+    let res = args[0]
+    for (const arg of args) {
+        if (res == arg) continue
+        res = extend_pair(res, arg)
+    }
+    return res
+}
+
+const push_rotation = exports._push_rotation = (list, angle, origin) => {
     let candidate = origin
     for (const r of list) {
         candidate = m.point.rotate(candidate, r.angle, r.origin)
@@ -12,9 +42,8 @@ const push_rotation = (list, angle, origin) => {
     })
 }
 
-const render_zone = (cols, rows, anchor=new Point(), reverse=false) => {
+const render_zone = exports._render_zone = (cols, rows, zone_wide_key, anchor) => {
 
-    const sign = reverse ? -1 : 1
     const points = {}
     const rotations = []
     
@@ -24,7 +53,7 @@ const render_zone = (cols, rows, anchor=new Point(), reverse=false) => {
         origin: anchor.p
     })
 
-    for (const col of cols) {
+    for (const [colname, col] of Object.entries(cols)) {
         
         anchor.y += col.stagger || 0        
         const col_anchor = anchor.clone()
@@ -33,26 +62,36 @@ const render_zone = (cols, rows, anchor=new Point(), reverse=false) => {
         col_anchor.r = 0
 
         // combine row data from zone-wide defs and col-specific defs
-        const col_specific = col.rows || []
-        const zone_wide = rows || []
-        const actual_rows = []
-        for (let i = 0; i < zone_wide.length && i < col_specific.length; ++i) {
-            actual_rows.push(Object.assign({}, zone_wide[i], col_specific[i]))
+        const col_specific_rows = col.rows || {}
+        const zone_wide_rows = rows || {}
+        const actual_rows = col_specific_rows || zone_wide_rows
+        
+        // get key config through the 4-level extension
+        const keys = []
+        for (const row of Object.keys(actual_rows)) {
+            const key = extend(zone_wide_key, col.key || {}, zone_wide_rows[row] || {}, col_specific_rows[row] || {})
+            key.col = col
+            key.row = row
+            key.name = `${colname}_${row}`
+            keys.push(key)
         }
 
-        for (const row of actual_rows) {
+        // lay out keys
+        for (const key of keys) {
             let point = col_anchor.clone()
             for (const r of rotations) {
                 point.rotate(r.angle, r.origin)
             }
-            point.r += col.angle || 0
-            const name = `${col.name}_${row.name}`
-            point.meta = {col, row, name}
-            points[name] = point
+            if (key.rotate) {
+                point.rotate(key.rotate, point.add(key.origin || [0, 0]).p)
+            }
+            point.meta = key
+            points[key.name] = point
 
-            col_anchor.y += row.padding || 19
+            col_anchor.y += key.padding || 19
         }
 
+        // apply col-level rotation for the next columns
         if (col.rotate) {
             push_rotation(
                 rotations,
@@ -61,23 +100,23 @@ const render_zone = (cols, rows, anchor=new Point(), reverse=false) => {
             )
         }
 
-        anchor.x += sign * (col.padding || 19)
+        anchor.x += col.spread || 19
     }
 
     return points
 }
 
-const anchor = (raw, points={}) => {
+const anchor = exports._anchor = (raw, points={}) => {
     let a = new Point()
     if (raw) {
         if (raw.ref && points[raw.ref]) {
             a = points[raw.ref].clone()
         }
         if (raw.shift) {
-            a.x += raw.shift[0]
-            a.y += raw.shift[1]
+            a.x += raw.shift[0] || 0
+            a.y += raw.shift[1] || 0
         }
-        a.r += raw.angle || 0
+        a.r += raw.rotate || 0
     }
     return a
 }
@@ -90,29 +129,32 @@ exports.parse = (config) => {
         points = Object.assign(points, render_zone(
             zone.columns || [],
             zone.rows || [{name: 'default'}],
-            anchor(zone.anchor, points),
-            !!zone.reverse
+            zone.key || {},
+            anchor(zone.anchor, points)
         ))
     }
 
-    if (config.angle) {
+    if (config.rotate) {
         for (const p of Object.values(points)) {
-            p.rotate(config.angle)
+            p.rotate(config.rotate)
         }
     }
 
     if (config.mirror) {
-        let axis = anchor(config.mirror, points).x
-        axis += (config.mirror.distance || 0) / 2
+        let axis = config.mirror.axis
+        if (!axis) {
+            axis = anchor(config.mirror, points).x
+            axis += (config.mirror.distance || 0) / 2
+        }
         const mirrored_points = {}
         for (const [name, p] of Object.entries(points)) {
-            if (p.meta.col.asym == 'left' || p.meta.row.asym == 'left') continue
+            if (p.meta.asym == 'left') continue
             const mp = p.clone().mirror(axis)
             mp.meta.mirrored = true
             delete mp.meta.asym
             mirrored_points[`mirror_${name}`] = mp
-            if (p.meta.col.asym == 'right' || p.meta.row.asym == 'right') {
-                p.meta.col.skip = true
+            if (p.meta.asym == 'right') {
+                p.meta.skip = true
             }
         }
         Object.assign(points, mirrored_points)
@@ -120,7 +162,7 @@ exports.parse = (config) => {
     
     const filtered = {}
     for (const [k, p] of Object.entries(points)) {
-        if (p.meta.col.skip || p.meta.row.skip) continue
+        if (p.meta.skip) continue
         filtered[k] = p
     }
 

@@ -1,6 +1,18 @@
 const m = require('makerjs')
 
+exports.assert = (exp, msg) => {
+    if (!exp) {
+        throw new Error(msg)
+    }
+}
+
 exports.deepcopy = (value) => JSON.parse(JSON.stringify(value))
+
+exports.type = (val) => {
+    if (Array.isArray(val)) return 'array'
+    if (val === null) return 'null'
+    return typeof val
+}
 
 const eq = exports.eq = (a=[], b=[]) => {
     return a[0] === b[0] && a[1] === b[1]
