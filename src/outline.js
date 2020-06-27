@@ -11,11 +11,12 @@ const layout = exports.layout = (points, shape) => {
 
 const outline = exports._outline = (points, config={}) => params => {
 
+
+
     let size = params.size || [18, 18]
     if (!Array.isArray(size)) size = [size, size]
     const corner = params.corner || 0
 
-    const global_bind = config.bind || 5
 
     let glue = {paths: {}}
     
@@ -81,8 +82,6 @@ const outline = exports._outline = (points, config={}) => params => {
 
     }
 
-    // TODO
-    jsu = require('util')
 
     let i = 0
     const keys = {}
@@ -97,7 +96,16 @@ const outline = exports._outline = (points, config={}) => params => {
 
                 let from_x = -footprint / 2, to_x = footprint / 2
                 let from_y = -footprint / 2, to_y = footprint / 2
-                const bind = p.meta.row.bind || p.meta.col.bind || global_bind
+
+                let bind = p.meta.bind || 10
+                if (!Array.isArray(bind)) {
+                    u.assert(u.type(bind) == 'number', `Incorrect "bind" field for point "${p.meta.name}"!`)
+                    bind = {top: bind, right: bind, bottom: bind, left: bind}
+                } else {
+                    u.assert([2, 4].includes(bind.length), `The "bind" field for point "${p.meta.name}" should contain 2 or 4 elements!`)
+                    bind.map(val => u.assert(u.type(val) == 'number', `The "bind" field for point "${p.meta.name}" should contain numbers!`))
+                }
+
                 const mirrored = p.meta.mirrored
                 
                 const bind_x = p.meta.row.bind_x || p.meta.col.bind_x
@@ -119,33 +127,11 @@ const outline = exports._outline = (points, config={}) => params => {
                 let key = new m.models.RoundRectangle(to_x - from_x, to_y - from_y, corner)
                 key = m.model.moveRelative(key, [from_x, from_y])
                 key = p.position(key)
-                // console.log(i+1, pname, jsu.inspect(key, true, null, true))
-                // if (i == 7) throw 7
-                keys[pname] = u.deepcopy(p.position(u.rect(14, 14, [-7, -7])))
                 if (mirrored) {
-                    // TODO running into the problem again where the right side doesn't combine properly
-                    // have to debug this at a lower level, it might be a bug in the makerjs source :/
-                    // first step is to export these inspections and create a minimal reproduction
-                    // if that fails as well, I have to dive into the combineUnion code...
-
-                    // if (pname === 'mirror_inner_top') {
-                    //     u.dump_model({a: right_keys, b: key}, `debug_bad`, true)
-                    // }
-
-
-                    right_keys = m.model.combineUnion(key, right_keys)
-                    u.dump_model({a: glue, c: right_keys}, `right_${++i}`)
+                    right_keys = m.model.combineUnion(right_keys, key)
                 } else {
-
-                    // if (pname === 'inner_top') {
-                    //     u.dump_model({a: left_keys, b: key}, `debug_good`, true)
-                    // }
-
-                    left_keys = m.model.combineUnion(key, left_keys)
-                    u.dump_model({a: glue, b: left_keys}, `left_${++i}`)
+                    left_keys = m.model.combineUnion(left_keys, key)
                 }
-
-                // u.dump_model({a: glue}, `glue_${i++}`)
             }
         }
     }
@@ -156,113 +142,3 @@ const outline = exports._outline = (points, config={}) => params => {
     u.dump_model({a: glue, b: left_keys, c: {models: right_keys}}, `all_after_left`)
     glue = m.model.combineUnion(glue, right_keys)
     u.dump_model({a: glue, b: {models: keys}}, `fullll`)
-
-
-    // glue = m.model.outline(glue, expansion)
-    // const keys = {}
-    // // let i = 1
-    // for (const zone of Object.values(config.zones)) {
-    //     // interate cols in reverse order so they can
-    //     // always overlap with the growing middle patch
-    //     for (const col of zone.columns.slice().reverse()) {
-    //         for (const [pname, p] of Object.entries(points)) {
-    //             if (p.meta.col.name != col.name) continue
-
-    //             // let key = new m.models.RoundRectangle(footprint, footprint, corner)
-    //             let key = u.rect(footprint, footprint)
-    //             key = m.model.moveRelative(key, [-footprint/2, -footprint/2])
-    //             key = p.position(key)
-    //             keys[pname] = u.deepcopy(key)
-    //             key = m.model.outline(key, expansion)
-    //             glue = m.model.combineUnion(glue, key)
-
-    //             // u.dump_model(keys, `keys_${i}`)
-    //             // u.dump_model({a: glue}, `glue_${i++}`)
-    //         }
-    //     }
-    // }
-
-    // u.dump_model({a: glue, b: {models: keys}}, `all`)
-    // glue = m.model.outline(glue, expansion, 1, true)
-    // u.dump_model({a: glue}, `glue_post`)
-
-
-
-
-
-    // u.dump_model({
-    //     a: {
-    //         models: {a: glue},
-    //         // paths: {
-    //         //     tll: tll,
-    //         //     trl: trl,
-    //         //     tip: u.circle(tip, 1),
-    //         //     tlp: u.circle(tlp, 1),
-    //         //     trp: u.circle(trp, 1),
-    //         //     bll: bll,
-    //         //     brl: brl,
-    //         //     bip: u.circle(bip, 1),
-    //         //     blp: u.circle(blp, 1),
-    //         //     brp: u.circle(brp, 1),
-    //         // }
-    //     },
-    //     b: { models: keys }
-    // }, 'valami', true)
-
-    // throw 3
-
-
-
-    // let tl = m.model.moveRelative(m.model.rotate(u.rect(a_lot, size, [-size/2, -size/2]), tlp.r), tlp.p)
-    // let tr = m.model.moveRelative(m.model.rotate(u.rect(a_lot, size, [-a_lot+size/2, -size/2]), trp.r), trp.p)
-    // tl = m.model.originate(tl)
-    // tr = m.model.originate(tr)
-    // let top_intersect = m.path.intersection(tl.paths.top, tr.paths.top).intersectionPoints
-    // if (!top_intersect) {
-    //     throw new Error('Top intersect')
-    // }
-    // console.log(tlp.p, tl, tl.paths.top, ',,,', trp.p, tr, tr.paths.top, top_intersect)
-
-    
-
-    // // create the two bottoms
-    // assert.ok(config.bottom.left)
-    // assert.ok(config.bottom.right)
-    // const blp = points[config.bottom.left]
-    // const brp = points[config.bottom.right]
-
-    // // create middle "patch"
-    // const tll = new m.paths.Line(tlp.p, tlp.add([a_lot, 0]).rotate(tlp.r, tlp.p).p)
-    // const trl = new m.paths.Line(trp.p, trp.add([a_lot, 0]).rotate(trp.r, trp.p).p)
-    
-
-    // const bll = new m.paths.Line(blp.p, blp.add([a_lot, 0]).rotate(blp.r, blp.p).p)
-    // const brl = new m.paths.Line(brp.p, brp.add([a_lot, 0]).rotate(brp.r, brp.p).p)
-    // const bottom_intersect = m.path.intersection(bll, brl).intersectionPoints[0]
-
-
-    // console.log(tll, trl, top_intersect)
-    // throw 2
-
-    // for (const p of Object.values(points)) {
-    //     const r = new m.models.RoundRectangle(size, size, config.corner || 0)
-    // }
-}
-
-exports.draw = (points, config) => {
-    // const lefts = {}
-    // const rights = {}
-    // for (const [k, p] of Object.entries(points)) {
-    //     if (p.meta.mirrored) {
-    //         rights[k] = p
-    //     } else {
-    //         lefts[k] = p
-    //     }
-    // }
-
-
-    // TODO this is just a test
-    outline(points, config)
-
-    
-}

@@ -8,7 +8,7 @@ const yargs = require('yargs')
 
 const u = require('./utils')
 const points_lib = require('./points')
-const outline_lib = require('./outline')
+// const outline_lib = require('./outline')
 
 const dump_model = (model, file='model') => {
     const assembly = m.model.originate({

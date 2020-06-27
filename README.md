@@ -101,8 +101,8 @@ points:
         my_zone_name:
             anchor:
                 ref: <point reference>
-                rotate: num # default = 0
                 shift: [x, y] # default = [0, 0]
+                rotate: num # default = 0
             columns:
                 column_name: <column def>
                 ...
@@ -114,7 +114,7 @@ points:
 ```
 
 `anchors` are used to, well, anchor the zone to something.
-It's the `[0, 0]` origin with a 0 degree orientation by default, but it can be changed to any other pre-existing point.(Consequently, the first done can't use a ref, because there isn't any yet.)
+It's the `[0, 0]` origin with a 0 degree orientation by default, but it can be changed to any other pre-existing point.(Consequently, the first zone can't use a ref, because there isn't any yet.)
 This initial position can then be changed with the `rotate` and `shift` options, adding extra rotation and translation, respectively.
 
 Once we know _where_ to start, we can describe the `columns` of our layout.
@@ -125,7 +125,7 @@ columns:
       stagger: num # default = 0
       spread: num # default = 19
       rotate: num # default = 0
-      origin: [x, y] # default = center of column's first key
+      origin: [x, y] # relative to center of column's first key, default = [0, 0]
       rows:
         row_name: <key-specific key def>
         ...
@@ -180,7 +180,6 @@ Now for the "official" key-level attributes:
 name: name_override # default = a concatenation of column and row
 shift: [x, y] # default = [0, 0]
 rotate: num # default = 0
-origin: [x, y] # default = the center of the key
 padding: num # default = 19
 skip: boolean # default = false
 asym: left | right | both # default = both
@@ -188,7 +187,7 @@ asym: left | right | both # default = both
 
 `name` is the unique identifier of this specific key.
 It defaults to a `<row>_<column>` format, but can be overridden if necessary.
-`shift` and `rotate`/`origin` declare an extra, key-level translation or rotation, respectively.
+`shift` and `rotate` declare an extra, key-level translation or rotation, respectively.
 Then we leave `padding` amount of vertical space before moving on to the next key in the column.
 `skip` signals that the point is just a "helper" and should not be included in the output.
 This can happen when a _real_ point is more easily calculable through a "stepping stone", but then we don't actually want the stepping stone to be a key itself.
@@ -308,7 +307,7 @@ We use two, key-level declarations for this:
 
 ```yaml
 neighbors: [dir_x, dir_y]
-bind: num | [num_x, num_y] | [num_t, num_r, num_b, num_l]
+bind: num | [num_x, num_y] | [num_t, num_r, num_b, num_l] # default = 10
 ```
 
 The former declares the directions we want to bind in, where `dir_x` can be one of `left`, `right`, or `both`; and `dir_y` can be one of `up`, `down`, or `both`.

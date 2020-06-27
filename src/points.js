@@ -1,11 +1,11 @@
 const m = require('makerjs')
 const u = require('./utils')
-const Point = require('./point')
+const a = require('./assert')
 
 const extend_pair = exports._extend_pair = (to, from) => {
-    const to_type = u.type(to)
-    const from_type = u.type(from)
-    if (!from && ['array', 'object'].includes(to_type)) return to
+    const to_type = a.type(to)
+    const from_type = a.type(from)
+    if (from === undefined || from === null) return to
     if (to_type != from_type) return from
     if (from_type == 'object') {
         const res = {}
@@ -42,109 +42,203 @@ const push_rotation = exports._push_rotation = (list, angle, origin) => {
     })
 }
 
-const render_zone = exports._render_zone = (cols, rows, zone_wide_key, anchor) => {
+const render_zone = exports._render_zone = (zone_name, zone, anchor) => {
+
+    // zone-wide sanitization
+
+    a.detect_unexpected(zone, `points.zones.${zone_name}`, ['anchor', 'columns', 'rows', 'key'])
+    // the anchor comes from "above", because it needs other zones too (for references)
+    const cols = a.sane(zone.columns || {}, `points.zones.${zone_name}.columns`, 'object')
+    const zone_wide_rows = a.sane(zone.rows || {'default': {}}, `points.zones.${zone_name}.rows`, 'object')
+    for (const [key, val] of Object.entries(zone_wide_rows)) {
+        zone_wide_rows[key] = a.sane(val || {}, `points.zones.${zone_name}.rows.${key}`, 'object')
+    }
+    const zone_wide_key = a.sane(zone.key || {}, `points.zones.${zone_name}.key`, 'object')
+
+    // algorithm prep
 
     const points = {}
     const rotations = []
-    
     // transferring the anchor rotation to "real" rotations
     rotations.push({
         angle: anchor.r,
         origin: anchor.p
     })
 
-    for (const [colname, col] of Object.entries(cols)) {
-        
+    // column layout
+
+    for (const [col_name, col] of Object.entries(cols)) {
+
+        // column-level sanitization
+
+        a.detect_unexpected(
+            col,
+            `points.zones.${zone_name}.columns.${col_name}`,
+            ['stagger', 'spread', 'rotate', 'origin', 'rows', 'key']
+        )
+        col.stagger = a.sane(
+            col.stagger || 0,
+            `points.zones.${zone_name}.columns.${col_name}.stagger`,
+            'number'
+        )
+        col.spread = a.sane(
+            col.spread || 19,
+            `points.zones.${zone_name}.columns.${col_name}.spread`,
+            'number'
+        )
+        col.rotate = a.sane(
+            col.rotate || 0,
+            `points.zones.${zone_name}.columns.${col_name}.rotate`,
+            'number'
+        )
+        col.origin = a.xy(
+            col.origin || [0, 0],
+            `points.zones.${zone_name}.columns.${col_name}.origin`,
+        )
+        col.rows = a.sane(
+            col.rows || {},
+            `points.zones.${zone_name}.columns.${col_name}.rows`,
+            'object'
+        )
+        for (const [key, val] of Object.entries(col.rows)) {
+            col.rows[key] = a.sane(
+                val || {},
+                `points.zones.${zone_name}.columns.${col_name}.rows.${key}`,
+                'object'
+            )
+        }
+        col.key = a.sane(
+            col.key || {},
+            `points.zones.${zone_name}.columns.${col_name}.key`,
+            'object'
+        )
+
+        // column-level prep
+
+        // propagate object key to name field
+        col.name = col_name
+        // combine row data from zone-wide defs and col-specific defs
+        const actual_rows = Object.keys(col.rows).length ? col.rows : zone_wide_rows
+
+        // setting up column-level anchor
+
         anchor.y += col.stagger || 0        
         const col_anchor = anchor.clone()
         // clear potential rotations, as they will get re-applied anyway
         // and we don't want to apply them twice...
         col_anchor.r = 0
 
-        // combine row data from zone-wide defs and col-specific defs
-        const col_specific_rows = col.rows || {}
-        const zone_wide_rows = rows || {}
-        const actual_rows = col_specific_rows || zone_wide_rows
-        
-        // get key config through the 4-level extension
+        // getting key config through the 4-level extension
+
         const keys = []
+        const default_key = {
+            shift: [0, 0],
+            rotate: 0,
+            padding: 19,
+            skip: false,
+            asym: 'both'
+        }
         for (const row of Object.keys(actual_rows)) {
-            const key = extend(zone_wide_key, col.key || {}, zone_wide_rows[row] || {}, col_specific_rows[row] || {})
+            const key = extend(
+                default_key,
+                zone_wide_key,
+                col.key,
+                zone_wide_rows[row] || {},
+                col.rows[row] || {}
+            )
+
+            require('fs-extra').writeJSONSync('arst.json', {
+                default_key,
+                zone_wide_key,
+                col_key: col.key,
+                zone_wide_rows: zone_wide_rows[row] || {},
+                col_rows: col.rows[row] || {},
+                result: key
+            }, {spaces: 4})
+            throw 28
+
+            key.name = key.name || `${col_name}_${row}`
+            key.shift = a.xy(key.shift, `${key.name}.shift`)
+            key.rotate = a.sane(key.rotate, `${key.name}.rotate`, 'number')
+            key.padding = a.sane(key.padding, `${key.name}.padding`, 'number')
+            key.skip = a.sane(key.skip, `${key.name}.skip`, 'boolean')
+            a.assert(
+                ['left', 'right', 'both'].includes(key.asym),
+                `${key.name}.asym should be one of "left", "right", or "both"!`
+            )
             key.col = col
             key.row = row
-            key.name = `${colname}_${row}`
             keys.push(key)
         }
 
-        // lay out keys
+        // actually laying out keys
+
         for (const key of keys) {
             let point = col_anchor.clone()
             for (const r of rotations) {
                 point.rotate(r.angle, r.origin)
             }
             if (key.rotate) {
-                point.rotate(key.rotate, point.add(key.origin || [0, 0]).p)
+                point.r += key.rotate
             }
             point.meta = key
             points[key.name] = point
-
-            col_anchor.y += key.padding || 19
+            col_anchor.y += key.padding
         }
 
-        // apply col-level rotation for the next columns
+        // applying col-level rotation for the next columns
+
         if (col.rotate) {
             push_rotation(
                 rotations,
                 col.rotate,
-                anchor.add(col.origin || [0, 0]).p
+                anchor.add(col.origin).p
             )
         }
 
-        anchor.x += col.spread || 19
+        // moving over and starting the next column
+
+        anchor.x += col.spread
     }
 
     return points
 }
 
-const anchor = exports._anchor = (raw, points={}) => {
-    let a = new Point()
-    if (raw) {
-        if (raw.ref && points[raw.ref]) {
-            a = points[raw.ref].clone()
-        }
-        if (raw.shift) {
-            a.x += raw.shift[0] || 0
-            a.y += raw.shift[1] || 0
-        }
-        a.r += raw.rotate || 0
-    }
-    return a
-}
+
 
 exports.parse = (config) => {
 
     let points = {}
 
-    for (const zone of Object.values(config.zones)) {
-        points = Object.assign(points, render_zone(
-            zone.columns || [],
-            zone.rows || [{name: 'default'}],
-            zone.key || {},
-            anchor(zone.anchor, points)
-        ))
+    // getting original points
+
+    const zones = a.sane(config.zones || {}, 'points.zones', 'object')
+    for (const [zone_name, zone] of Object.entries(zones)) {
+        const anchor = a.anchor(zone.anchor || new Point(), `points.zones.${zone_name}.anchor`, points)
+        points = Object.assign(points, render_zone(zone_name, zone, anchor))
     }
 
-    if (config.rotate) {
+    // applying global rotation
+
+    if (config.rotate !== undefined) {
+        const r = a.sane(config.rotate || 0, 'points.rotate', 'number')
         for (const p of Object.values(points)) {
             p.rotate(config.rotate)
         }
     }
 
-    if (config.mirror) {
-        let axis = config.mirror.axis
-        if (!axis) {
-            axis = anchor(config.mirror, points).x
-            axis += (config.mirror.distance || 0) / 2
+    // mirroring
+
+    if (config.mirror !== undefined) {
+        const mirror = a.sane(config.mirror || {}, 'points.mirror', 'object')
+        let axis = mirror.axis
+        if (axis === undefined) {
+            const distance = a.sane(mirror.distance || 0, 'points.mirror.distance', 'number')
+            delete mirror.distance
+            axis = a.anchor(mirror, 'points.mirror', points).x
+            axis += distance / 2
+        } else {
+            axis = a.sane(axis || 0, 'points.mirror.axis', 'number')
         }
         const mirrored_points = {}
         for (const [name, p] of Object.entries(points)) {
@@ -159,6 +253,8 @@ exports.parse = (config) => {
         }
         Object.assign(points, mirrored_points)
     }
+
+    // removing temporary points
     
     const filtered = {}
     for (const [k, p] of Object.entries(points)) {

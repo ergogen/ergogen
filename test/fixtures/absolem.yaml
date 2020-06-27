@@ -89,18 +89,18 @@ outline:
     top:
       left:
         ref: inner_top
-        shift: [,7]
+        shift: [,.5]
       right:
         ref: mirror_inner_top
-        shift: [,7]
+        shift: [,.5]
     bottom:
       left:
         ref: far_thumb
-        shift: [7]
+        shift: [.5]
         rotate: 90
       right:
         ref: mirror_far_thumb
-        shift: [-7]
+        shift: [-.5]
         rotate: 90
     waypoints:
       - percent: 50
