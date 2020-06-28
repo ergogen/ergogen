@@ -1,33 +1,26 @@
 #!/usr/bin/env node
 
-const m = require('makerjs')
+// libs
+
 const fs = require('fs-extra')
 const path = require('path')
 const yaml = require('js-yaml')
 const yargs = require('yargs')
 
+// internals
+
 const u = require('./utils')
+const io = require('./io')
 const points_lib = require('./points')
-// const outline_lib = require('./outline')
+const outline_lib = require('./outline')
 
-const dump_model = (model, file='model') => {
-    const assembly = m.model.originate({
-        models: u.deepcopy(model),
-        units: 'mm'
-    })
-
-    fs.mkdirpSync(path.dirname(`${file}.dxf`))
-    fs.writeFileSync(`${file}.dxf`, m.exporter.toDXF(assembly))
-    if (args.debug) {
-        fs.writeJSONSync(`${file}.json`, assembly, {spaces: 4})
-    }
-}
+// command line args
 
 const args = yargs
     .option('config', {
         alias: 'c',
         demandOption: true,
-        describe: 'Config yaml file',
+        describe: 'Config yaml/json file',
         type: 'string'
     })
     .option('output', {
@@ -37,8 +30,9 @@ const args = yargs
         type: 'string'
     })
     .option('debug', {
+        alias: 'd',
         default: false,
-        hidden: true,
+        describe: 'Debug mode',
         type: 'boolean'
     })
     .argv
@@ -46,15 +40,28 @@ const args = yargs
 fs.mkdirpSync(args.o)
 
 const config_parser = args.c.endsWith('.yaml') ? yaml.load : JSON.parse
-const config = config_parser(fs.readFileSync(args.c).toString())
+let config
+try {
+    config = config_parser(fs.readFileSync(args.c).toString())
+} catch (err) {
+    throw new Error(`Malformed input "${args.c}": ${err}`)
+}
 
+// points
+
+console.log('Parsing points...')
 const points = points_lib.parse(config.points)
 if (args.debug) {
     fs.writeJSONSync(path.join(args.o, 'points.json'), points, {spaces: 4})
-    const size = 14
-    const rect = u.rect(size, size, [-size/2, -size/2])
-    const points_demo = outline_lib.layout(points, rect)
-    dump_model(points_demo, path.join(args.o, 'points_demo'))
+    const rect = u.rect(18, 18, [-9, -9])
+    const points_demo = points_lib.position(points, rect)
+    io.dump_model(points_demo, path.join(args.o, 'points_demo'), args.debug)
 }
+
+// outlines
+
+// console.log('Generating outlines...')
+
+// goodbye
 
 console.log('Done.')

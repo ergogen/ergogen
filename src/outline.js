@@ -1,20 +1,14 @@
 const m = require('makerjs')
 const u = require('./utils')
-
-const layout = exports.layout = (points, shape) => {
-    const shapes = {}
-    for (const [pname, p] of Object.entries(points)) {
-        shapes[pname] = p.position(u.deepcopy(shape))
-    }
-    return {layout: {models: shapes}}
-}
+const a = require('./assert')
 
 const outline = exports._outline = (points, config={}) => params => {
 
 
 
-    let size = params.size || [18, 18]
+    const size = a.wh(params.size || [18, 18], '')
     if (!Array.isArray(size)) size = [size, size]
+    size = a.xy(size, `outline.exports.${params.name}.size`)
     const corner = params.corner || 0
 
 
@@ -142,3 +136,39 @@ const outline = exports._outline = (points, config={}) => params => {
     u.dump_model({a: glue, b: left_keys, c: {models: right_keys}}, `all_after_left`)
     glue = m.model.combineUnion(glue, right_keys)
     u.dump_model({a: glue, b: {models: keys}}, `fullll`)
+}
+
+
+
+
+
+
+
+
+
+const parse_glue = exports._parse_glue = (config = {}, points = {}) => {
+
+    a.detect_unexpected(config, 'outline.glue', ['top', 'bottom', 'waypoints', 'extra'])
+
+    for (const y in ['top', 'bottom']) {
+        a.detect_unexpected(config[y], `outline.glue.${y}`, ['left', 'right'])
+        config[y].left = a.anchor(config[y].left, `outline.glue.${y}.left`, points)
+        if (a.type(config[y].right) != 'number') {
+            config[y].right = a.anchor(config[y].right, `outline.glue.${y}.right`, points)
+        }
+    }
+
+    
+
+    config.bottom = a.sane(config.bottom, 'outline.glue.bottom', 'object')
+    config.bottom.left = a.anchor(config.bottom.left, 'outline.glue.bottom.left', points)
+    if (a.type(config.bottom.right) != 'number') {
+        config.bottom.right = a.anchor(config.bottom.right, 'outline.glue.bottom.right', points)
+    }
+
+}
+
+exports.parse = (config = {}, points = {}) => {
+    a.detect_unexpected(config, 'outline', ['glue', 'exports'])
+    const glue = parse_glue(config.glue, points)
+}

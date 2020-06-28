@@ -8,7 +8,7 @@ const extend_pair = exports._extend_pair = (to, from) => {
     if (from === undefined || from === null) return to
     if (to_type != from_type) return from
     if (from_type == 'object') {
-        const res = {}
+        const res = u.deepcopy(to)
         for (const key of Object.keys(from)) {
             res[key] = extend_pair(to[key], from[key])
         }
@@ -147,16 +147,6 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor) => {
                 col.rows[row] || {}
             )
 
-            require('fs-extra').writeJSONSync('arst.json', {
-                default_key,
-                zone_wide_key,
-                col_key: col.key,
-                zone_wide_rows: zone_wide_rows[row] || {},
-                col_rows: col.rows[row] || {},
-                result: key
-            }, {spaces: 4})
-            throw 28
-
             key.name = key.name || `${col_name}_${row}`
             key.shift = a.xy(key.shift, `${key.name}.shift`)
             key.rotate = a.sane(key.rotate, `${key.name}.rotate`, 'number')
@@ -206,7 +196,9 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor) => {
 
 
 
-exports.parse = (config) => {
+exports.parse = (config = {}) => {
+
+    a.detect_unexpected(config, 'points', ['zones', 'rotate', 'mirror'])
 
     let points = {}
 
@@ -263,4 +255,12 @@ exports.parse = (config) => {
     }
 
     return filtered
+}
+
+exports.position = (points, shape) => {
+    const shapes = {}
+    for (const [pname, p] of Object.entries(points)) {
+        shapes[pname] = p.position(u.deepcopy(shape))
+    }
+    return {layout: {models: shapes}}
 }

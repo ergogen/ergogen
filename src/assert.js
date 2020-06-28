@@ -24,16 +24,28 @@ const detect_unexpected = exports.detect_unexpected = (obj, name, expected) => {
     }
 }
 
-const xy = exports.xy = (raw, name) => {
-    assert(type(raw) == 'array' && raw.length == 2, `Field "${name}" should be an array of length 2!`)
-    const x = raw[0] || 0
-    const y = raw[1] || 0
-    assert(type(x) == 'number' && type(y) == 'number', `Field "${name}" should contain numbers!`)
-    return {x, y}
+const numarr = exports.numarr = (raw, name, length) => {
+    assert(type(raw) == 'array' && raw.length == length, `Field "${name}" should be an array of length ${length}!`)
+    raw = raw.map(val => val || 0)
+    raw.map(val => assert(type(val) == 'number', `Field "${name}" should contain numbers!`))
+    return raw
 }
 
-exports.anchor = (raw, name, points={}) => {
-    detect_unexpected(raw, name, ['ref', 'shift', 'rotate'])
+const xy = exports.xy = (raw, name) => numarr(raw, name, 2)
+
+exports.wh = (raw, name) => {
+    if (!Array.isArray(raw)) raw = [raw, raw]
+    return a.xy(raw, name)
+}
+
+exports.trbl = (raw, name) => {
+    if (!Array.isArray(raw)) raw = [raw, raw, raw, raw]
+    if (raw.length == 2) raw = [raw[1], raw[0], raw[1], raw[0]]
+    return numarr(raw, name, 4)
+}
+
+exports.anchor = (raw, name, points={}, check_unexpected=true) => {
+    if (check_unexpected) detect_unexpected(raw, name, ['ref', 'shift', 'rotate'])
     let a = new Point()
     if (raw.ref !== undefined) {
         assert(points[raw.ref], `Unknown point reference "${raw.ref}" in anchor "${name}"!`)
@@ -41,8 +53,8 @@ exports.anchor = (raw, name, points={}) => {
     }
     if (raw.shift !== undefined) {
         const xyval = xy(raw.shift, name + '.shift')
-        a.x += xyval.x
-        a.y += xyval.y
+        a.x += xyval[0]
+        a.y += xyval[1]
     }
     if (raw.rotate !== undefined) {
         a.r += sane(raw.rotate || 0, name + '.rotate', 'number')

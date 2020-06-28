@@ -310,7 +310,9 @@ neighbors: [dir_x, dir_y]
 bind: num | [num_x, num_y] | [num_t, num_r, num_b, num_l] # default = 10
 ```
 
-The former declares the directions we want to bind in, where `dir_x` can be one of `left`, `right`, or `both`; and `dir_y` can be one of `up`, `down`, or `both`.
+Again, key-level declaration means that both of these should be specified in the `points` section, benefiting from the same extension process every key-level setting does.
+The former declares the directions we want to bind in, where `dir_x` can be one of `left`, `right`, `both` or `neither`; and `dir_y` can be one of `up`, `down`, `both` or `neither`.
+(If left empty, `neither` will be assumed.)
 The latter declares how much we want to bind, i.e., the amount of overlap we want in that direction to make sure that we can reach the neighbor (`num` applies to all directions, `num_x` horizontally, `num_y` vertically, and the t/r/b/l versions to top/right/bottom/left, respectively).
 
 If it's a one-piece design, we also need to "glue" the halves together (or we might want to leave some extra space for the controller on the inner side for splits).
@@ -319,11 +321,11 @@ This is where the following section comes into play:
 ```yaml
 glue:
     top:
-        left: <line def>
-        right: <line def> | num
+        left: <anchor>
+        right: <anchor> | num
     bottom:
-        left: <line def>
-        right: <line def> | num
+        left: <anchor>
+        right: <anchor> | num
     waypoints:
         - percent: num
           width: num | [num_left, num_right]
@@ -333,13 +335,12 @@ glue:
         - ...
 ```
 
-...where a `<line def>` looks like:
+...where an `<anchor>` is the same as it was for points:
 
 ```yaml
 ref: <point reference>
-shift: [x, y]
-rotate: num
-origin: [x, y]
+shift: [x, y] # default = [0, 0]
+rotate: num # default = 0
 ```
 
 The section's `top` and `bottom` are both formatted the same, and describe the center line's top and bottom intersections, respectively.
@@ -359,6 +360,7 @@ If this is insufficient (maybe because it would leave holes), the `waypoints` ca
 Here, `percent` means the y coordinate along the centerline (going from the top intersection to the bottom intersection), and `width` means the offset on the x axis.
 
 If this is somehow _still_ insufficient (or there were problems with the binding phase), we can specify additional primitive shapes under the `extra` key (similarly to how we would use them in the exports; see below).
+These are then added to what we have so far to finish out the glue.
 
 <hr />
 
@@ -376,7 +378,9 @@ Now we can configure what we want to "export" as outlines from this phase, given
     - `side: left | right` : the side we want
 - `glue` : just the glue, but the "ideal" version of it. This means that instead of the `glue` we defined above, we get `all` - `left` - `right`, so the _exact_ middle piece we would have needed to glue everything together. Parameters:
     - everything we could specify for `all` (since those are needed for the calculation)
-    - `side: left | right | both # default = both)` : optionally, we could choose only one side of the glue as well
+    - `raw: boolean # default = false)` : optionally, we could choose to get the "raw" (i.e., the non-idealized) glue as well
+- `ref` : a previously defined outline, see below.
+    - `name: outline_name` : the name of the referenced outline
 
 Additionally, we can use primitive shapes:
     
@@ -384,8 +388,7 @@ Additionally, we can use primitive shapes:
     - `ref: <point reference>` : what position and rotation to consider as the origin
     - `rotate: num` : extra rotation
     - `shift: [x, y]` : extra translation
-    - `width: num` : the width of the rectangle
-    - `height: num` : the height of the rectangle
+    - `size: num | [width, height]` : the size of the rectangle
 - `circle` : an independent circle primitive. Parameters:
     - `ref`, `rotate`, and `shift` are the same as above
     - `radius: num` : the radius of the circle
@@ -405,7 +408,7 @@ exports:
 ```
 
 Operations are performed in order, and the resulting shape is exported as an output.
-Additionally, it is going to be available to further export declarations under the name specified (`my_name`, in this case).
+Additionally, it is going to be available to further export declarations (using the `ref` type) under the name specified (`my_name`, in this case).
 If we only want to use it as a building block for further exports, we can start the name with an underscore (e.g., `_my_name`) to prevent it from being actually exported.
 
 
