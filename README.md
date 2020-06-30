@@ -369,21 +369,15 @@ Note that this outline is still parametric, so that we can specify different wid
 
 Now we can configure what we want to "export" as outlines from this phase, given by the combination/subtraction of the following primitives:
 
-- `all` : the combined outline that we've just created. Its parameters include:
+- `keys` : the combined outline that we've just created. Its parameters include:
+    - `side: left | right | both | glue | raw` : the part we want to use
+        - `left` and `right` are just the appropriate side of the laid out keys, without the glue.
+        - `both` means both sides, held together by the glue
+        - `glue` means an "ideal" version of the glue (meaning that instead of the `outline.glue` we defined above, we get `both` - `left` - `right`, so the _exact_ middle piece we would have needed to glue everything together
+        - `raw` is the raw glue shape we defined above under `outline.glue`
     - `size: num | [num_x, num_y]` : the width/height of the rectangles to lay onto the points
-    - `corner: num # default = 0)` : corner radius of the rectangle
-    - `bevel: num # default = 0)` : corner bevel of the rectangle, can be combined with rounding
-- `keys` : only one side of the laid out keys, without the glue. Parameters:
-    - everything we could specify for `all`
-    - `side: left | right` : the side we want
-- `glue` : just the glue, but the "ideal" version of it. This means that instead of the `glue` we defined above, we get `all` - `left` - `right`, so the _exact_ middle piece we would have needed to glue everything together. Parameters:
-    - everything we could specify for `all` (since those are needed for the calculation)
-    - `raw: boolean # default = false)` : optionally, we could choose to get the "raw" (i.e., the non-idealized) glue as well
-- `ref` : a previously defined outline, see below.
-    - `name: outline_name` : the name of the referenced outline
-
-Additionally, we can use primitive shapes:
-    
+    - `corner: num # default = 0)` : corner radius of the rectangles
+    - `bevel: num # default = 0)` : corner bevel of the rectangles, can be combined with rounding
 - `rectangle` : an independent rectangle primitive. Parameters:
     - `ref: <point reference>` : what position and rotation to consider as the origin
     - `rotate: num` : extra rotation
@@ -395,6 +389,8 @@ Additionally, we can use primitive shapes:
 - `polygon` : an independent polygon primitive. Parameters:
     - `ref`, `rotate`, and `shift` are the same as above
     - `points: [[x, y], ...]` : the points of the polygon
+- `ref` : a previously defined outline, see below.
+    - `name: outline_name` : the name of the referenced outline
 
 Using these, we define exports as follows:
 
@@ -408,7 +404,7 @@ exports:
 ```
 
 Operations are performed in order, and the resulting shape is exported as an output.
-Additionally, it is going to be available to further export declarations (using the `ref` type) under the name specified (`my_name`, in this case).
+Additionally, it is going to be available for further export declarations to use (through the `ref` type) under the name specified (`my_name`, in this case).
 If we only want to use it as a building block for further exports, we can start the name with an underscore (e.g., `_my_name`) to prevent it from being actually exported.
 
 

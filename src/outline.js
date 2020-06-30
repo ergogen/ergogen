@@ -158,17 +158,103 @@ const parse_glue = exports._parse_glue = (config = {}, points = {}) => {
         }
     }
 
+    config.waypoints = a.sane(config.waypoints || [], 'outline.glue.waypoints', 'array')
+    let wi = 0
+    config.waypoints = config.waypoints.map(w => {
+        const name = `outline.glue.waypoints[${++wi}]`
+        a.detect_unexpected(w, name, ['percent', 'width'])
+        w.percent = a.sane(w.percent, name + '.percent', 'number')
+        w.width = a.wh(w.width, name + '.width')
+        return w
+    })
+
+    // TODO: handle glue.extra (or revoke it from the docs)
+
+    return (export_name, params) => {
+
+        a.detect_unexpected(params, `outline.exports.${export_name}`, ['side', 'size', 'corner', 'bevel'])
+        params.side = a.in(params.side, `outline.exports.${export_name}.side`, ['left', 'right', 'both', 'glue', 'raw'])
+        params.size = a.wh(params.size, `outline.exports.${export_name}.size`)
+        params.corner = a.sane(params.corner || 0, `outline.exports.${export_name}.corner`, 'number')
+        params.bevel = a.sane(params.bevel || 0, `outline.exports.${export_name}.bevel`, 'number')
+
+        let glue
+        if (['both', 'glue', 'raw'].includes(params.side)) {
+
+            const get_line = (anchor) => {
+                if (a.type(anchor) == 'number') {
+                    return u.line([anchor, -1000], [anchor, 1000])
+                }
     
+                let from = anchor.clone()
+                let to = anchor.add([anchor.meta.mirrored ? -1 : 1, 0])
+                to = to.rotate(anchor.r, anchor.p).p
 
-    config.bottom = a.sane(config.bottom, 'outline.glue.bottom', 'object')
-    config.bottom.left = a.anchor(config.bottom.left, 'outline.glue.bottom.left', points)
-    if (a.type(config.bottom.right) != 'number') {
-        config.bottom.right = a.anchor(config.bottom.right, 'outline.glue.bottom.right', points)
+                return u.line(from, to)
+            }
+    
+            const tll = get_line(config.top.left)
+            const trl = get_line(config.top.right)
+            const tip = m.path.converge(tll, trl)
+            const tlp = u.eq(tll.origin, tip) ? tll.end : tll.origin
+            const trp = u.eq(trl.origin, tip) ? trl.end : trl.origin
+    
+            const bll = get_line(config.bottom.left)
+            const brl = get_line(config.bottom.right)
+            const bip = m.path.converge(bll, brl)
+            const blp = u.eq(bll.origin, bip) ? bll.end : bll.origin
+            const brp = u.eq(brl.origin, bip) ? brl.end : brl.origin
+    
+            const left_waypoints = []
+            const right_waypoints = []
+    
+            for (const w of config.waypoints) {
+                const percent = w.percent / 100
+                const center_x = tip[0] + percent * (bip[0] - tip[0])
+                const center_y = tip[1] + percent * (bip[1] - tip[1])
+                const left_x = center_x - (w.left || w.width / 2)
+                const right_x = center_x + (w.right || w.width / 2)
+                left_waypoints.push([left_x, center_y])
+                right_waypoints.unshift([right_x, center_y])
+            }
+            
+            let waypoints
+            const is_split = a.type(config.top.right) == 'number'
+            if (is_split) {
+                waypoints = [tip, tlp]
+                .concat(left_waypoints)
+                .concat([blp, bip])
+            } else {
+                waypoints = [trp, tip, tlp]
+                .concat(left_waypoints)
+                .concat([blp, bip, brp])
+                .concat(right_waypoints)
+            }
+    
+            glue = u.poly(waypoints)
+        }
+        
     }
+}
 
+
+
+const parse_exports = exports._parse_exports = (config = {}, points = {}) => {
+
+    config = a.sane(config, 'outline.exports', 'object')
+    for (const [key, val] of Object.entries(config)) {
+        params.op = a.in(params.op || 'add', `outline.exports.${key}.op`, ['add', 'sub', 'diff'])
+        params.type = a.in(params.type, `outline.exports.${key}.type`, ['add', 'sub', 'diff'])
+    }
 }
 
 exports.parse = (config = {}, points = {}) => {
     a.detect_unexpected(config, 'outline', ['glue', 'exports'])
     const glue = parse_glue(config.glue, points)
+
+    config = a.sane(config, 'outline.exports', 'object')
+    for (const [key, val] of Object.entries(config)) {
+        params.op = a.in(params.op || 'add', `outline.exports.${key}.op`, ['add', 'sub', 'diff'])
+        params.type = a.in(params.type, `outline.exports.${key}.type`, ['add', 'sub', 'diff'])
+    }
 }

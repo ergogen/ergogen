@@ -24,6 +24,11 @@ const detect_unexpected = exports.detect_unexpected = (obj, name, expected) => {
     }
 }
 
+exports.in = (raw, name, arr) => {
+    assert(arr.includes(raw), `Field "${name}" should be one of [${arr.join(', ')}]!`)
+    return raw
+}
+
 const numarr = exports.numarr = (raw, name, length) => {
     assert(type(raw) == 'array' && raw.length == length, `Field "${name}" should be an array of length ${length}!`)
     raw = raw.map(val => val || 0)
