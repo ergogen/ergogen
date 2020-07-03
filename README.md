@@ -303,17 +303,14 @@ TODO: Absolem points here, with pics
 Once the raw points are available, we want to turn them into solid, continuous outlines.
 The points are enough to create properly positioned and rotated rectangles (with parametric side lengths), but they won't combine since there won't be any overlap.
 So the first part of the outline generation is "binding", where we make the individual holes _bind_ to each other.
-We use two, key-level declarations for this:
+We use a key-level declarations for this:
 
 ```yaml
-neighbors: [dir_x, dir_y]
-bind: num | [num_x, num_y] | [num_t, num_r, num_b, num_l] # default = 10
+bind: num | [num_x, num_y] | [num_t, num_r, num_b, num_l] # default = 0
 ```
 
 Again, key-level declaration means that both of these should be specified in the `points` section, benefiting from the same extension process every key-level setting does.
-The former declares the directions we want to bind in, where `dir_x` can be one of `left`, `right`, `both` or `neither`; and `dir_y` can be one of `up`, `down`, `both` or `neither`.
-(If left empty, `neither` will be assumed.)
-The latter declares how much we want to bind, i.e., the amount of overlap we want in that direction to make sure that we can reach the neighbor (`num` applies to all directions, `num_x` horizontally, `num_y` vertically, and the t/r/b/l versions to top/right/bottom/left, respectively).
+This field declares how much we want to bind in each direction, i.e., the amount of overlap we want to make sure that we can reach the neighbor (`num` applies to all directions, `num_x` horizontally, `num_y` vertically, and the t/r/b/l versions to top/right/bottom/left, respectively).
 
 If it's a one-piece design, we also need to "glue" the halves together (or we might want to leave some extra space for the controller on the inner side for splits).
 This is where the following section comes into play:
@@ -370,11 +367,11 @@ Note that this outline is still parametric, so that we can specify different wid
 Now we can configure what we want to "export" as outlines from this phase, given by the combination/subtraction of the following primitives:
 
 - `keys` : the combined outline that we've just created. Its parameters include:
-    - `side: left | right | both | glue | raw` : the part we want to use
+    - `side: left | right | middle | both | glue` : the part we want to use
         - `left` and `right` are just the appropriate side of the laid out keys, without the glue.
+        - `middle` means an "ideal" version of the glue (meaning that instead of the `outline.glue` we defined above, we get `both` - `left` - `right`, so the _exact_ middle piece we would have needed to glue everything together
         - `both` means both sides, held together by the glue
-        - `glue` means an "ideal" version of the glue (meaning that instead of the `outline.glue` we defined above, we get `both` - `left` - `right`, so the _exact_ middle piece we would have needed to glue everything together
-        - `raw` is the raw glue shape we defined above under `outline.glue`
+        - `glue` is just the raw glue shape we defined above under `outline.glue`
     - `size: num | [num_x, num_y]` : the width/height of the rectangles to lay onto the points
     - `corner: num # default = 0)` : corner radius of the rectangles
     - `bevel: num # default = 0)` : corner bevel of the rectangles, can be combined with rounding
@@ -382,7 +379,7 @@ Now we can configure what we want to "export" as outlines from this phase, given
     - `ref: <point reference>` : what position and rotation to consider as the origin
     - `rotate: num` : extra rotation
     - `shift: [x, y]` : extra translation
-    - `size: num | [width, height]` : the size of the rectangle
+    - `size`, `corner` and `bevel`, just like for `keys`
 - `circle` : an independent circle primitive. Parameters:
     - `ref`, `rotate`, and `shift` are the same as above
     - `radius: num` : the radius of the circle
