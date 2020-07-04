@@ -42,7 +42,7 @@ const push_rotation = exports._push_rotation = (list, angle, origin) => {
     })
 }
 
-const render_zone = exports._render_zone = (zone_name, zone, anchor) => {
+const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key) => {
 
     // zone-wide sanitization
 
@@ -141,6 +141,7 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor) => {
         for (const row of Object.keys(actual_rows)) {
             const key = extend(
                 default_key,
+                global_key,
                 zone_wide_key,
                 col.key,
                 zone_wide_rows[row] || {},
@@ -198,16 +199,17 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor) => {
 
 exports.parse = (config = {}) => {
 
-    a.detect_unexpected(config, 'points', ['zones', 'rotate', 'mirror'])
+    a.detect_unexpected(config, 'points', ['zones', 'key', 'rotate', 'mirror'])
 
     let points = {}
 
     // getting original points
 
     const zones = a.sane(config.zones || {}, 'points.zones', 'object')
+    const global_key = a.sane(config.key || {}, 'points.key', 'object')
     for (const [zone_name, zone] of Object.entries(zones)) {
-        const anchor = a.anchor(zone.anchor || new Point(), `points.zones.${zone_name}.anchor`, points)
-        points = Object.assign(points, render_zone(zone_name, zone, anchor))
+        const anchor = a.anchor(zone.anchor || {}, `points.zones.${zone_name}.anchor`, points)
+        points = Object.assign(points, render_zone(zone_name, zone, anchor, global_key))
     }
 
     // applying global rotation

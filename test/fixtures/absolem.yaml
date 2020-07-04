@@ -10,48 +10,48 @@ points:
           rows:
             bottom:
             home:
-              neighbors: [right]
+              bind: [,10]
             top:
-              neighbors: [right]
+              bind: [,10]
         ring:
           stagger: 12
           rows:
             bottom:
-              neighbors: [left]
+              bind: [,,,10]
             home:
-              neighbors: [right]
+              bind: [,10]
             top:
-              neighbors: [right]
+              bind: [,10]
         middle:
           stagger: 5
           rows:
             bottom:
-              neighbors: [both]
+              bind: [,10,,10]
             home:
-              neighbors: [both]
+              bind: [,10,,10]
             top:
         index:
           stagger: -6
           rows:
             bottom:
-              neighbors: [right]
+              bind: [,10]
             home:
-              neighbors: [left]
+              bind: [,,,10]
             top:
-              neighbors: [left]
+              bind: [,,,10]
         inner:
           stagger: -2
           rows:
             bottom:
             home:
-              neighbors: [left]
+              bind: [,,,10]
             top:
-              neighbors: [left]
+              bind: [,,,10]
       rows:
         bottom:
-          neighbors: [,up]
+          bind: [10]
         home:
-          neighbors: [,up]
+          bind: [10]
         top:
     thumbfan:
       anchor:
@@ -64,46 +64,53 @@ points:
           origin: [9.5, -9]
           rows:
             thumb:
-              neighbors: [right]
+              bind: [,10]
         home:
           spread: 21.25
           rotate: -28
           origin: [11.75, -9]
           rows:
             thumb:
-              neighbors: [both]
+              bind: [,10,,10]
         far:
           rows:
             thumb:
-              neighbors: [left]
+              bind: [,,,10]
       rows:
         thumb:
-          neighbors: [,up]
+          bind: [10]
+  key:
+    bind: [0, 0, 0, 0]
   rotate: -20
   mirror:
     ref: pinky_home
     distance: 223.7529778
 outline:
-  bind: 10
   glue:
     top:
       left:
         ref: inner_top
-        shift: [,.5]
+        shift: [, 0.5]
       right:
         ref: mirror_inner_top
-        shift: [,.5]
+        shift: [, 0.5]
     bottom:
       left:
         ref: far_thumb
-        shift: [.5]
+        shift: [0.5, 0]
         rotate: 90
       right:
         ref: mirror_far_thumb
-        shift: [-.5]
+        shift: [-0.5, 0]
         rotate: 90
     waypoints:
       - percent: 50
         width: 100
       - percent: 90
         width: 50
+  exports:
+    basic:
+      - type: keys
+        side: both
+        size: 18
+        corner: .5

@@ -38,9 +38,9 @@ const numarr = exports.numarr = (raw, name, length) => {
 
 const xy = exports.xy = (raw, name) => numarr(raw, name, 2)
 
-exports.wh = (raw, name) => {
+const wh = exports.wh = (raw, name) => {
     if (!Array.isArray(raw)) raw = [raw, raw]
-    return a.xy(raw, name)
+    return xy(raw, name)
 }
 
 exports.trbl = (raw, name) => {
@@ -49,15 +49,15 @@ exports.trbl = (raw, name) => {
     return numarr(raw, name, 4)
 }
 
-exports.anchor = (raw, name, points={}, check_unexpected=true) => {
+exports.anchor = (raw, name, points={}, check_unexpected=true, default_point=new Point()) => {
     if (check_unexpected) detect_unexpected(raw, name, ['ref', 'shift', 'rotate'])
-    let a = new Point()
+    let a = default_point.clone()
     if (raw.ref !== undefined) {
         assert(points[raw.ref], `Unknown point reference "${raw.ref}" in anchor "${name}"!`)
         a = points[raw.ref].clone()
     }
     if (raw.shift !== undefined) {
-        const xyval = xy(raw.shift, name + '.shift')
+        const xyval = wh(raw.shift || [0, 0], name + '.shift')
         a.x += xyval[0]
         a.y += xyval[1]
     }

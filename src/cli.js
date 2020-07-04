@@ -52,15 +52,20 @@ try {
 console.log('Parsing points...')
 const points = points_lib.parse(config.points)
 if (args.debug) {
-    fs.writeJSONSync(path.join(args.o, 'points.json'), points, {spaces: 4})
     const rect = u.rect(18, 18, [-9, -9])
     const points_demo = points_lib.position(points, rect)
-    io.dump_model(points_demo, path.join(args.o, 'points_demo'), args.debug)
+    io.dump_model(points_demo, path.join(args.o, 'points/points_demo'), args.debug)
+    fs.writeJSONSync(path.join(args.o, 'points/points.json'), points, {spaces: 4})
 }
 
 // outlines
 
-// console.log('Generating outlines...')
+console.log('Generating outlines...')
+const outlines = outline_lib.parse(config.outline, points)
+for (const [name, outline] of Object.entries(outlines)) {
+    if (!args.debug && name.startsWith('_')) continue
+    io.dump_model(outline, path.join(args.o, `outline/${name}`), args.debug)
+}
 
 // goodbye
 

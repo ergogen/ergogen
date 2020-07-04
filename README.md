@@ -154,12 +154,13 @@ That's where `column.rows` can help, specifying a row-override for just that col
 Easy.
 
 Now for the trickier part: keys.
-There are four ways to set key-related options (again, to minimize the need for repetition):
+There are five ways to set key-related options (again, to minimize the need for repetition):
 
-1. at the zone-level
-2. at the column-level
-3. at the row-level
-4. at the key-level
+1. at the global-level (affecting all zones)
+2. at the zone-level
+3. at the column-level
+4. at the row-level
+5. at the key-level
 
 These "extend" each other in this order so by the time we reach a specific key, every level had an opportunity to modify something.
 Note that unlike the overriding for rows, key-related extension is additive.
@@ -172,7 +173,7 @@ But if `key = {a: 1}` is extended by `key = {b: 2}`, the result is `key = {a: 1,
 
 Lastly, while there are a few key-specific attributes that have special meaning in the context of points (listed below), any key with any data can be specified here.
 This can be useful for storing arbitrary meta-info about the keys, or just configuring later stages with key-level parameters.
-So, for example, when the outline phase specifies `bind` as a key-level parameter (see below), it means that the global value can be extended just like any other key-level attribute.
+So, for example, when the outline phase specifies `bind` as a key-level parameter (see below), it means that it can be specified just like any other key-level attribute.
 
 Now for the "official" key-level attributes:
 
@@ -201,6 +202,7 @@ Indeed:
 ```yaml
 points:
     zones: <what we talked about so far...>
+    key: <global key def>
     rotate: num # default = 0
     mirror:
         axis: num # default = 0
@@ -384,8 +386,7 @@ Now we can configure what we want to "export" as outlines from this phase, given
     - `ref`, `rotate`, and `shift` are the same as above
     - `radius: num` : the radius of the circle
 - `polygon` : an independent polygon primitive. Parameters:
-    - `ref`, `rotate`, and `shift` are the same as above
-    - `points: [[x, y], ...]` : the points of the polygon
+    - `points: [<point_def>, ...]` : the points of the polygon. Each `<point_def>` can have its own `ref` and `shift`, all of which are still the same as above. If `ref` is unspecified, the previous point's will be assumed. For the first, it's `[0, 0]` by default.
 - `ref` : a previously defined outline, see below.
     - `name: outline_name` : the name of the referenced outline
 
@@ -394,7 +395,7 @@ Using these, we define exports as follows:
 ```yaml
 exports:
     my_name:
-        - op: add | sub | diff # default = add
+        - operation: add | subtract | intersect # default = add
           type: <one of the types>
           <type-specific params>
         - ...
@@ -481,13 +482,13 @@ case:
           extrude: num # default = 1
           translate: [x, y, z] # default = [0, 0, 0]
           rotate: [ax, ay, az] # default = [0, 0, 0]
-          op: add | sub | diff # default = add
+          operation: add | subtract | intersect # default = add
         - ...
     ...
 ```
 
 `outline` specifies which outline to import onto the xy plane, while `extrude` specifies how much it should be extruded along the z axis.
-After that, the object is `translate`d, `rotate`d, and combined with what we have so far according to `op`.
+After that, the object is `translate`d, `rotate`d, and combined with what we have so far according to `operation`.
 If we only want to use an object as a building block for further objects, we can employ the same "start with an underscore" trick we learned at the outlines section to make it "private".
 
 

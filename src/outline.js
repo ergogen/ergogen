@@ -1,6 +1,7 @@
 const m = require('makerjs')
 const u = require('./utils')
 const a = require('./assert')
+const Point = require('./point')
 
 const rectangle = (w, h, corner, bevel, name='') => {
     const error = (dim, val) => `Rectangle for "${name}" isn't ${dim} enough for its corner and bevel (${val} - ${corner} - ${bevel} <= 0)!`
@@ -19,7 +20,7 @@ const parse_glue = exports._parse_glue = (config = {}, points = {}) => {
 
     a.detect_unexpected(config, 'outline.glue', ['top', 'bottom', 'waypoints', 'extra'])
 
-    for (const y in ['top', 'bottom']) {
+    for (const y of ['top', 'bottom']) {
         a.detect_unexpected(config[y], `outline.glue.${y}`, ['left', 'right'])
         config[y].left = a.anchor(config[y].left, `outline.glue.${y}.left`, points)
         if (a.type(config[y].right) != 'number') {
@@ -39,17 +40,17 @@ const parse_glue = exports._parse_glue = (config = {}, points = {}) => {
 
     // TODO: handle glue.extra (or revoke it from the docs)
 
-    return (export_name, params) => {
+    return (params, export_name, expected) => {
 
-        a.detect_unexpected(params, `${export_name}`, ['side', 'size', 'corner', 'bevel'])
+        a.detect_unexpected(params, `${export_name}`, expected.concat(['side', 'size', 'corner', 'bevel']))
         const side = a.in(params.side, `${export_name}.side`, ['left', 'right', 'middle', 'both', 'glue'])
         const size = a.wh(params.size, `${export_name}.size`)
         const corner = a.sane(params.corner || 0, `${export_name}.corner`, 'number')
         const bevel = a.sane(params.bevel || 0, `${export_name}.bevel`, 'number')
 
-        let left = {paths: {}}
-        let right = {paths: {}}
-        if (['left', 'right', 'middle', 'both'].includes(params.side)) {
+        let left = {models: {}}
+        let right = {models: {}}
+        if (['left', 'right', 'middle', 'both'].includes(side)) {
             for (const [pname, p] of Object.entries(points)) {
 
                 let from_x = -size[0] / 2, to_x = size[0] / 2
@@ -77,11 +78,11 @@ const parse_glue = exports._parse_glue = (config = {}, points = {}) => {
                 }
             }
         }
-        if (params.side == 'left') return left
-        if (params.side == 'right') return right
+        if (side == 'left') return left
+        if (side == 'right') return right
 
-        let glue = {paths: {}}
-        if (['middle', 'both', 'glue'].includes(params.side)) {
+        let glue = {models: {}}
+        if (['middle', 'both', 'glue'].includes(side)) {
 
             const get_line = (anchor) => {
                 if (a.type(anchor) == 'number') {
@@ -135,11 +136,11 @@ const parse_glue = exports._parse_glue = (config = {}, points = {}) => {
     
             glue = u.poly(waypoints)
         }
-        if (params.side == 'glue') return glue
+        if (side == 'glue') return glue
 
         let both = m.model.combineUnion(u.deepcopy(left), glue)
         both = m.model.combineUnion(both, u.deepcopy(right))
-        if (params.side == 'both') return both
+        if (side == 'both') return both
 
         let middle = m.model.combineSubtraction(both, left)
         middle = m.model.combineSubtraction(both, right)
@@ -151,14 +152,68 @@ exports.parse = (config = {}, points = {}) => {
     a.detect_unexpected(config, 'outline', ['glue', 'exports'])
     const glue = parse_glue(config.glue, points)
 
-    config = a.sane(config, 'outline.exports', 'object')
-    for (const [key, parts] of Object.entries(config)) {
+    const outlines = {}
+
+    const ex = a.sane(config.exports, 'outline.exports', 'object')
+    for (const [key, parts] of Object.entries(ex)) {
         let index = 0
+        let result = {models: {}}
         for (const part of parts) {
             const name = `outline.exports.${key}[${++index}]`
-            part.op = a.in(part.op || 'add', `${name}.op`, ['add', 'sub', 'diff'])
+            const expected = ['type', 'operation']
             part.type = a.in(part.type, `${name}.type`, ['keys', 'rectangle', 'circle', 'polygon', 'ref'])
+            part.operation = a.in(part.operation || 'add', `${name}.operation`, ['add', 'subtract', 'intersect'])
 
+            let op = m.model.combineUnion
+            if (part.operation == 'subtract') op = m.model.combineSubtraction
+            else if (part.operation == 'intersect') op = m.model.combineIntersection
+
+            let arg
+            let anchor
+            switch (part.type) {
+                case 'keys':
+                    arg = glue(part, name, expected)
+                    break
+                case 'rectangle':
+                    a.detect_unexpected(part, name, expected.concat(['ref', 'shift', 'rotate', 'size', 'corner', 'bevel']))
+                    anchor = a.anchor(part, name, points, false)
+                    const size = a.wh(part.size, `${name}.size`)
+                    const corner = a.sane(part.corner || 0, `${name}.corner`, 'number')
+                    const bevel = a.sane(part.bevel || 0, `${name}.bevel`, 'number')
+                    arg = rectangle(size[0], size[1], corner, bevel, name)
+                    arg = m.model.move(arg, [-size[0]/2, -size[1]/2]) // center
+                    arg = anchor.position(arg)
+                    break
+                case 'circle':
+                    a.detect_unexpected(part, name, expected.concat(['ref', 'shift', 'rotate', 'radius']))
+                    anchor = a.anchor(part, name, points, false)
+                    const radius = a.sane(part.radius, `${name}.radius`, 'number')
+                    arg = u.circle(anchor.p, radius)
+                    break
+                case 'polygon':
+                    a.detect_unexpected(part, name, expected.concat(['points']))
+                    const poly_points = a.sane(part.points, `${name}.points`, 'array')
+                    const parsed_points = []
+                    let last_anchor = new Point()
+                    let poly_index = 0
+                    for (const poly_point of poly_points) {
+                        const poly_name = `${name}.points[${++poly_index}]`
+                        const anchor = a.anchor(point, point_name, points, true, last_anchor)
+                        parsed_points.push(anchor.p)
+                    }
+                    arg = u.poly(parsed_points)
+                    break
+                case 'ref':
+                    a.assert(outlines[part.name], `Field "${name}.name" does not name an existing outline!`)
+                    arg = outlines[part.name]
+                    break
+            }
+
+            result = op(result, arg)
         }
+
+        outlines[key] = result
     }
+
+    return outlines
 }
