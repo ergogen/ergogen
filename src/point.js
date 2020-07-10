@@ -24,14 +24,10 @@ module.exports = class Point {
         [this.x, this.y] = val
     }
 
-    add(a) {
-        const res = this.clone()
-        res.x += a[0]
-        res.y += a[1]
-        return res
-    }
-
-    shift(s) {
+    shift(s, relative=true) {
+        if (relative) {
+            s = m.point.rotate(s, this.r)
+        }
         this.x += s[0]
         this.y += s[1]
         return this

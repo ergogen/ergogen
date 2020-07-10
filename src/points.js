@@ -183,7 +183,7 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key)
             push_rotation(
                 rotations,
                 col.rotate,
-                anchor.add(col.origin).p
+                anchor.clone().shift(col.origin, false).p
             )
         }
 
@@ -264,5 +264,5 @@ exports.position = (points, shape) => {
     for (const [pname, p] of Object.entries(points)) {
         shapes[pname] = p.position(u.deepcopy(shape))
     }
-    return {layout: {models: shapes}}
+    return {models: shapes}
 }

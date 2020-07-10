@@ -43,6 +43,7 @@ points:
           stagger: -2
           rows:
             bottom:
+              bind: [,,10,]
             home:
               bind: [,,,10]
             top:
@@ -64,21 +65,18 @@ points:
           origin: [9.5, -9]
           rows:
             thumb:
-              bind: [,10]
+              bind: [10,1,,]
         home:
           spread: 21.25
           rotate: -28
           origin: [11.75, -9]
           rows:
             thumb:
-              bind: [,10,,10]
+              bind: [,10,,15]
         far:
           rows:
             thumb:
-              bind: [,,,10]
-      rows:
-        thumb:
-          bind: [10]
+              bind: [-1,,,5]
   key:
     bind: [0, 0, 0, 0]
   rotate: -20
@@ -105,12 +103,51 @@ outline:
         rotate: 90
     waypoints:
       - percent: 50
-        width: 100
-      - percent: 90
         width: 50
+      - percent: 90
+        width: 25
   exports:
-    basic:
+    outline:
       - type: keys
         side: both
         size: 18
         corner: .5
+    holes:
+      - type: keys
+        operation: stack
+        side: both
+        size: 14
+        bound: false
+    middle:
+      - type: keys
+        operation: stack
+        side: middle
+        size: 24
+      - type: rectangle
+        size: [25, 5]
+        ref: home_thumb
+        shift: [0, 12]
+      - type: rectangle
+        size: [25, 5]
+        ref: far_thumb
+        shift: [-25, 12]
+      - type: rectangle
+        size: [25, 5]
+        ref: mirror_home_thumb
+        shift: [-25, 12]
+      - type: rectangle
+        size: [25, 5]
+        ref: mirror_far_thumb
+        shift: [0, 12]
+      - type: ref
+        name: outline
+        operation: intersect
+    complex:
+      - type: ref
+        name: outline
+      - type: ref
+        name: holes
+        operation: stack
+      - type: ref
+        name: middle
+        operation: stack

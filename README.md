@@ -334,17 +334,19 @@ glue:
         - ...
 ```
 
-...where an `<anchor>` is the same as it was for points:
+...where an `<anchor>` is (mostly) the same as it was for points:
 
 ```yaml
 ref: <point reference>
 shift: [x, y] # default = [0, 0]
 rotate: num # default = 0
+relative: boolean # default = true
 ```
 
 The section's `top` and `bottom` are both formatted the same, and describe the center line's top and bottom intersections, respectively.
 In a one-piece case, this means that we project a line from a left-side reference point (optionally rotated and translated), another from the right, and converge them to where they meet.
 Split designs can specify `right` as a single number to mean the x coordinate where the side should be "cut off".
+The `relative` flag means that the `shift` is interpreted in layout size units instead of mms (see below).
 
 This leads to a gluing middle patch that can be used to meld the left and right sides together, given by the counter-clockwise polygon:
 
@@ -374,9 +376,10 @@ Now we can configure what we want to "export" as outlines from this phase, given
         - `middle` means an "ideal" version of the glue (meaning that instead of the `outline.glue` we defined above, we get `both` - `left` - `right`, so the _exact_ middle piece we would have needed to glue everything together
         - `both` means both sides, held together by the glue
         - `glue` is just the raw glue shape we defined above under `outline.glue`
-    - `size: num | [num_x, num_y]` : the width/height of the rectangles to lay onto the points
+    - `size: num | [num_x, num_y]` : the width/height of the rectangles to lay onto the points. Note that the `relative` flag for the glue declaration above meant this size as the basis of the shift. So during a `keys` layout with a size of 18, for example, a relative shift of `[.5, .5]` actually means `[9, 9]` in mms.
     - `corner: num # default = 0)` : corner radius of the rectangles
     - `bevel: num # default = 0)` : corner bevel of the rectangles, can be combined with rounding
+    - `bound: boolean # default = true` : whether to use the binding declared previously
 - `rectangle` : an independent rectangle primitive. Parameters:
     - `ref: <point reference>` : what position and rotation to consider as the origin
     - `rotate: num` : extra rotation
@@ -395,7 +398,7 @@ Using these, we define exports as follows:
 ```yaml
 exports:
     my_name:
-        - operation: add | subtract | intersect # default = add
+        - operation: add | subtract | intersect | stack # default = add
           type: <one of the types>
           <type-specific params>
         - ...

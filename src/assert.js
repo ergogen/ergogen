@@ -1,3 +1,4 @@
+const m = require('makerjs')
 const Point = require('./point')
 
 const assert = exports.assert = (exp, msg) => {
@@ -57,9 +58,8 @@ exports.anchor = (raw, name, points={}, check_unexpected=true, default_point=new
         a = points[raw.ref].clone()
     }
     if (raw.shift !== undefined) {
-        const xyval = wh(raw.shift || [0, 0], name + '.shift')
-        a.x += xyval[0]
-        a.y += xyval[1]
+        let xyval = wh(raw.shift || [0, 0], name + '.shift')
+        a.shift(xyval, true)
     }
     if (raw.rotate !== undefined) {
         a.r += sane(raw.rotate || 0, name + '.rotate', 'number')

@@ -14,17 +14,12 @@ exports.circle = (p, r) => {
     return new m.paths.Circle(p, r)
 }
 
-exports.rect = (w, h, o=[0, 0], mirrored=false) => {
+exports.rect = (w, h, o=[0, 0]) => {
     const res = {
         top:    line([0, h], [w, h]),
         right:  line([w, h], [w, 0]),
         bottom: line([w, 0], [0, 0]),
         left:   line([0, 0], [0, h])
-    }
-    if (mirrored) {
-        for (const segment of Object.values(res)) {
-            [segment.origin, segment.end] = [segment.end, segment.origin] 
-        }
     }
     return m.model.move({paths: res}, o)
 }
@@ -41,4 +36,32 @@ exports.poly = (arr) => {
         prev = p
     }
     return res
+}
+
+const farPoint = [1234.1234, 2143.56789]
+
+exports.union = (a, b) => {
+    return m.model.combine(a, b, false, true, false, true, {
+        farPoint
+    })
+}
+
+exports.subtract = (a, b) => {
+    return m.model.combine(a, b, false, true, true, false, {
+        farPoint
+    })
+}
+
+exports.intersect = (a, b) => {
+    return m.model.combine(a, b, true, false, true, false, {
+        farPoint
+    })
+}
+
+exports.stack = (a, b) => {
+    return {
+        models: {
+            a, b
+        }
+    }
 }

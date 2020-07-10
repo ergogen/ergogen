@@ -4,27 +4,46 @@ const a = require('./assert')
 const Point = require('./point')
 
 const rectangle = (w, h, corner, bevel, name='') => {
-    const error = (dim, val) => `Rectangle for "${name}" isn't ${dim} enough for its corner and bevel (${val} - ${corner} - ${bevel} <= 0)!`
-    const cw = w - corner - bevel
+    const error = (dim, val) => `Rectangle for "${name}" isn't ${dim} enough for its corner and bevel (${val} - 2 * ${corner} - 2 * ${bevel} <= 0)!`
+    const mod = 2 * (corner + bevel)
+    const cw = w - mod
     a.assert(cw >= 0, error('wide', w))
-    ch = h - corner - bevel
+    const ch = h - mod
     a.assert(ch >= 0, error('tall', h))
 
-    let res = m.models.Rectangle(w, h)
-    res = m.model.outline(res, bevel, 2)
-    res = m.model.outline(res, corner, 0)
+    let res = new m.models.Rectangle(cw, ch)
+    if (bevel > 0) res = m.model.outline(res, bevel, 2)
+    if (corner > 0) res = m.model.outline(res, corner, 0)
     return m.model.moveRelative(res, [corner + bevel, corner + bevel])
 }
 
-const parse_glue = exports._parse_glue = (config = {}, points = {}) => {
+const relative_anchor = (decl, name, points={}, check_unexpected=true, default_point=new Point()) => {
+    decl.shift = a.wh(decl.shift || [0, 0], name + '.shift')
+    const relative = a.sane(decl.relative === undefined ? true : decl.relative, `${name}.relative`, 'boolean')
+    delete decl.relative
+    if (relative) {
+        return size => {
+            const copy = u.deepcopy(decl)
+            copy.shift = [copy.shift[0] * size[0], copy.shift[1] * size[1]]
+            return a.anchor(copy, name, points, check_unexpected, default_point)
+        }
+    }
+    return () => a.anchor(decl, name, points, check_unexpected, default_point)
+}
+
+const layout = exports._layout = (config = {}, points = {}) => {
+
+    // Glue config sanitization
 
     a.detect_unexpected(config, 'outline.glue', ['top', 'bottom', 'waypoints', 'extra'])
 
+    
+
     for (const y of ['top', 'bottom']) {
         a.detect_unexpected(config[y], `outline.glue.${y}`, ['left', 'right'])
-        config[y].left = a.anchor(config[y].left, `outline.glue.${y}.left`, points)
+        config[y].left = relative_anchor(config[y].left, `outline.glue.${y}.left`, points)
         if (a.type(config[y].right) != 'number') {
-            config[y].right = a.anchor(config[y].right, `outline.glue.${y}.right`, points)
+            config[y].right = relative_anchor(config[y].right, `outline.glue.${y}.right`, points)
         }
     }
 
@@ -42,11 +61,16 @@ const parse_glue = exports._parse_glue = (config = {}, points = {}) => {
 
     return (params, export_name, expected) => {
 
-        a.detect_unexpected(params, `${export_name}`, expected.concat(['side', 'size', 'corner', 'bevel']))
+        // Layout params sanitization
+
+        a.detect_unexpected(params, `${export_name}`, expected.concat(['side', 'size', 'corner', 'bevel', 'bound']))
         const side = a.in(params.side, `${export_name}.side`, ['left', 'right', 'middle', 'both', 'glue'])
         const size = a.wh(params.size, `${export_name}.size`)
         const corner = a.sane(params.corner || 0, `${export_name}.corner`, 'number')
         const bevel = a.sane(params.bevel || 0, `${export_name}.bevel`, 'number')
+        const bound = a.sane(params.bound === undefined ? true : params.bound, `${export_name}.bound`, 'boolean')
+
+        // Actual layout
 
         let left = {models: {}}
         let right = {models: {}}
@@ -56,25 +80,35 @@ const parse_glue = exports._parse_glue = (config = {}, points = {}) => {
                 let from_x = -size[0] / 2, to_x = size[0] / 2
                 let from_y = -size[1] / 2, to_y = size[1] / 2
 
-                let bind = a.trbl(p.meta.bind || 0, `${pname}.bind`)
-                // if it's a mirrored key, we swap the left and right bind values
-                if (p.meta.mirrored) {
-                    bind = [bind[0], bind[3], bind[2], bind[1]]
-                }
-
-                from_x -= bind[3]
-                to_x += bind[1]
-
-                from_y -= bind[2]
-                to_y += bind[0]
-
+                // the original position
                 let rect = rectangle(to_x - from_x, to_y - from_y, corner, bevel, `${export_name}.size`)
-                rect = m.model.move(rect, [from_x, from_y])
+                rect = m.model.moveRelative(rect, [from_x, from_y])
+
+                // extra binding "material", if necessary
+                if (bound) {
+                    let bind = a.trbl(p.meta.bind || 0, `${pname}.bind`)
+                    // if it's a mirrored key, we swap the left and right bind values
+                    if (p.meta.mirrored) {
+                        bind = [bind[0], bind[3], bind[2], bind[1]]
+                    }
+    
+                    const bt = to_y + Math.max(bind[0], 0)
+                    const br = to_x + Math.max(bind[1], 0)
+                    const bd = from_y - Math.max(bind[2], 0)
+                    const bl = from_x - Math.max(bind[3], 0)
+    
+                    if (bind[0] || bind[1]) rect = u.union(rect, u.rect(br, bt))
+                    if (bind[1] || bind[2]) rect = u.union(rect, u.rect(br, -bd, [0, bd]))
+                    if (bind[2] || bind[3]) rect = u.union(rect, u.rect(-bl, -bd, [bl, bd]))
+                    if (bind[3] || bind[0]) rect = u.union(rect, u.rect(-bl, bt, [bl, 0]))
+                }
+                
+                // positioning and unioning the resulting shape
                 rect = p.position(rect)
                 if (p.meta.mirrored) {
-                    right = m.model.combineUnion(right, rect)
+                    right = u.union(right, rect)
                 } else {
-                    left = m.model.combineUnion(left, rect)
+                    left = u.union(left, rect)
                 }
             }
         }
@@ -82,18 +116,19 @@ const parse_glue = exports._parse_glue = (config = {}, points = {}) => {
         if (side == 'right') return right
 
         let glue = {models: {}}
-        if (['middle', 'both', 'glue'].includes(side)) {
+        if (bound && ['middle', 'both', 'glue'].includes(side)) {
 
             const get_line = (anchor) => {
                 if (a.type(anchor) == 'number') {
                     return u.line([anchor, -1000], [anchor, 1000])
                 }
-    
-                let from = anchor.clone()
-                let to = anchor.add([anchor.meta.mirrored ? -1 : 1, 0])
-                to = to.rotate(anchor.r, anchor.p).p
 
-                return u.line(from, to)
+                // if it wasn't a number, then it's a function returning an achor
+                // have to feed it `size` first in case it's relative
+                const from = anchor(size).clone()
+                const to = from.clone().shift([from.meta.mirrored ? -1 : 1, 0])
+
+                return u.line(from.p, to.p)
             }
     
             const tll = get_line(config.top.left)
@@ -110,13 +145,13 @@ const parse_glue = exports._parse_glue = (config = {}, points = {}) => {
     
             const left_waypoints = []
             const right_waypoints = []
-    
+
             for (const w of config.waypoints) {
                 const percent = w.percent / 100
                 const center_x = tip[0] + percent * (bip[0] - tip[0])
                 const center_y = tip[1] + percent * (bip[1] - tip[1])
-                const left_x = center_x - (w.left || w.width / 2)
-                const right_x = center_x + (w.right || w.width / 2)
+                const left_x = center_x - w.width[0]
+                const right_x = center_x + w.width[1]
                 left_waypoints.push([left_x, center_y])
                 right_waypoints.unshift([right_x, center_y])
             }
@@ -133,24 +168,26 @@ const parse_glue = exports._parse_glue = (config = {}, points = {}) => {
                 .concat([blp, bip, brp])
                 .concat(right_waypoints)
             }
-    
+
             glue = u.poly(waypoints)
         }
         if (side == 'glue') return glue
 
-        let both = m.model.combineUnion(u.deepcopy(left), glue)
-        both = m.model.combineUnion(both, u.deepcopy(right))
-        if (side == 'both') return both
+        if (side == 'middle') {
+            let middle = u.subtract(glue, left)
+            middle = u.subtract(middle, right)
+            return middle
+        }
 
-        let middle = m.model.combineSubtraction(both, left)
-        middle = m.model.combineSubtraction(both, right)
-        return middle
+        let both = u.union(u.deepcopy(left), glue)
+        both = u.union(both, u.deepcopy(right))
+        return both
     }
 }
 
 exports.parse = (config = {}, points = {}) => {
     a.detect_unexpected(config, 'outline', ['glue', 'exports'])
-    const glue = parse_glue(config.glue, points)
+    const layout_fn = layout(config.glue, points)
 
     const outlines = {}
 
@@ -162,17 +199,18 @@ exports.parse = (config = {}, points = {}) => {
             const name = `outline.exports.${key}[${++index}]`
             const expected = ['type', 'operation']
             part.type = a.in(part.type, `${name}.type`, ['keys', 'rectangle', 'circle', 'polygon', 'ref'])
-            part.operation = a.in(part.operation || 'add', `${name}.operation`, ['add', 'subtract', 'intersect'])
+            part.operation = a.in(part.operation || 'add', `${name}.operation`, ['add', 'subtract', 'intersect', 'stack'])
 
-            let op = m.model.combineUnion
-            if (part.operation == 'subtract') op = m.model.combineSubtraction
-            else if (part.operation == 'intersect') op = m.model.combineIntersection
+            let op = u.union
+            if (part.operation == 'subtract') op = u.subtract
+            else if (part.operation == 'intersect') op = u.intersect
+            else if (part.operation == 'stack') op = u.stack
 
             let arg
             let anchor
             switch (part.type) {
                 case 'keys':
-                    arg = glue(part, name, expected)
+                    arg = layout_fn(part, name, expected)
                     break
                 case 'rectangle':
                     a.detect_unexpected(part, name, expected.concat(['ref', 'shift', 'rotate', 'size', 'corner', 'bevel']))
@@ -181,7 +219,6 @@ exports.parse = (config = {}, points = {}) => {
                     const corner = a.sane(part.corner || 0, `${name}.corner`, 'number')
                     const bevel = a.sane(part.bevel || 0, `${name}.bevel`, 'number')
                     arg = rectangle(size[0], size[1], corner, bevel, name)
-                    arg = m.model.move(arg, [-size[0]/2, -size[1]/2]) // center
                     arg = anchor.position(arg)
                     break
                 case 'circle':
@@ -198,14 +235,14 @@ exports.parse = (config = {}, points = {}) => {
                     let poly_index = 0
                     for (const poly_point of poly_points) {
                         const poly_name = `${name}.points[${++poly_index}]`
-                        const anchor = a.anchor(point, point_name, points, true, last_anchor)
+                        const anchor = a.anchor(poly_point, poly_name, points, true, last_anchor)
                         parsed_points.push(anchor.p)
                     }
                     arg = u.poly(parsed_points)
                     break
                 case 'ref':
                     a.assert(outlines[part.name], `Field "${name}.name" does not name an existing outline!`)
-                    arg = outlines[part.name]
+                    arg = u.deepcopy(outlines[part.name])
                     break
             }
 
