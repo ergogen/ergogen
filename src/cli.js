@@ -13,6 +13,7 @@ const u = require('./utils')
 const io = require('./io')
 const points_lib = require('./points')
 const outline_lib = require('./outline')
+const pcb_lib = require('./pcb')
 
 // command line args
 
@@ -66,6 +67,12 @@ for (const [name, outline] of Object.entries(outlines)) {
     if (!args.debug && name.startsWith('_')) continue
     io.dump_model(outline, path.join(args.o, `outline/${name}`), args.debug)
 }
+
+// pcb
+
+console.log('Scaffolding PCB...')
+const pcb = pcb_lib.parse(config.pcb, points, outlines)
+fs.writeFileSync(path.join(args.o, `pcb/pcb.kicad_pcb`, pcb))
 
 // goodbye
 

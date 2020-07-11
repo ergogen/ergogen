@@ -151,3 +151,5 @@ outline:
       - type: ref
         name: middle
         operation: stack
+pcb:
+  edge: outline

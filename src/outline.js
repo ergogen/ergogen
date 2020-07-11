@@ -249,6 +249,8 @@ exports.parse = (config = {}, points = {}) => {
             result = op(result, arg)
         }
 
+        m.model.originate(result)
+        m.model.simplify(result)
         outlines[key] = result
     }
 

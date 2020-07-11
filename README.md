@@ -570,3 +570,57 @@ If we only want to use an object as a building block for further objects, we can
 
 Everything should be ready for a handwire, but if you'd like the design to be more accessible and easily replicable, you probably want a PCB as well.
 To help you get started, the necessary footprints and an edge cut can be automatically positioned so that all you need to do manually is the routing.
+
+Footprints can be specified at the key-level (under the `points` section, like we discussed above), or here with manually given anchors.
+The only difference between the two footprint types is that an omitted `ref` in the anchor means the current key for key-level declarations, while here it defaults to `[0, 0]`.
+Additionally, the edge cut of the PCB can be specified using a previously defined outline name under the `edge` key.
+
+```yaml
+pcb:
+    edge: <outline reference>
+    footprints:
+        - type: <footprint type>
+          anchor: <anchor declaration>
+          params: <type-specific footprint params>
+        - ...
+```
+
+Currently, the following footprint types are supported:
+
+- **`mx`**, **`alps`**, **`choc`**: mechanical switch footprints. Common parameters:
+    - `from`, `to`: nets to connect
+
+- **`diode`**: a combined THT+SMD diode footprint. Parameters:
+    - `from`, `to`: nets to connect
+
+- **`promicro`**: a controller to drive the keyboard. Available pins are `RAW`, `VCC`, `GND`, `RST`, and 18 GPIOs `P01` through `P18`. No parameters.
+
+- **`slider`**: an SMD slider switch (part no. here), ideal for on/off operation. Parameters:
+    - `from`, `to`: nets to connect
+
+- **`button`**: an SMD button (part no. here), ideal for momentary toggles (like a reset switch). Parameters:
+    - `from`, `to`: nets to connect
+
+- **`rgb`**: an RGB led (part no. here), for per-key illumination, underglow, or feedback. Parameters:
+    - `din`, `dout`: input and output nets of the data line
+    - VCC and GND nets are assumed to be called `VCC` and `GND`...
+
+- **`jstph`**: a two-pin JST-PH battery header footprint. Parameters:
+    - `pos`, `neg`: nets to connect to the positive and negative terminals, respectively.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## A concrete PCB example
+
