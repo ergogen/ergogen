@@ -54,6 +54,10 @@ points:
         home:
           bind: [10]
         top:
+      key:
+        footprints:
+          - type: mx
+          
     thumbfan:
       anchor:
         ref: inner_bottom
@@ -153,3 +157,8 @@ outline:
         operation: stack
 pcb:
   edge: outline
+  footprints:
+    - type: promicro
+      between:
+        - ref: inner_top
+        - ref: mirror_inner_top

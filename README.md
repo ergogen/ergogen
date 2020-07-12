@@ -572,7 +572,12 @@ Everything should be ready for a handwire, but if you'd like the design to be mo
 To help you get started, the necessary footprints and an edge cut can be automatically positioned so that all you need to do manually is the routing.
 
 Footprints can be specified at the key-level (under the `points` section, like we discussed above), or here with manually given anchors.
-The only difference between the two footprint types is that an omitted `ref` in the anchor means the current key for key-level declarations, while here it defaults to `[0, 0]`.
+The differences between the two footprint types are:
+
+- an omitted `ref` in the anchor means the current key for key-level declarations, while here it defaults to `[0, 0]`
+- a parameter starting with an exclamation point is an indirect reference to an eponymous key-level attribute -- so, for example, `from = !col_wire` would mean that the key's `col_wire` attribute is read there.
+
+Another alternative to `anchor` here (here being under the `pcb` declaration) is to use the `between` key and place the footprint at the average of multiple anchors -- mostly useful for anchoring to the center, by averaging a key and its mirror.
 Additionally, the edge cut of the PCB can be specified using a previously defined outline name under the `edge` key.
 
 ```yaml
@@ -581,6 +586,9 @@ pcb:
     footprints:
         - type: <footprint type>
           anchor: <anchor declaration>
+          between:
+            - <anchor declaration>
+            - ...
           params: <type-specific footprint params>
         - ...
 ```

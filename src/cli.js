@@ -36,8 +36,14 @@ const args = yargs
         describe: 'Debug mode',
         type: 'boolean'
     })
+    .option('clean', {
+        default: false,
+        describe: 'Clean output dir before parsing',
+        type: 'boolean'
+    })
     .argv
 
+if (args.clean) fs.removeSync(args.o)
 fs.mkdirpSync(args.o)
 
 const config_parser = args.c.endsWith('.yaml') ? yaml.load : JSON.parse
@@ -72,7 +78,9 @@ for (const [name, outline] of Object.entries(outlines)) {
 
 console.log('Scaffolding PCB...')
 const pcb = pcb_lib.parse(config.pcb, points, outlines)
-fs.writeFileSync(path.join(args.o, `pcb/pcb.kicad_pcb`, pcb))
+const pcb_file = path.join(args.o, `pcb/pcb.kicad_pcb`)
+fs.mkdirpSync(path.dirname(pcb_file))
+fs.writeFileSync(pcb_file, pcb)
 
 // goodbye
 
