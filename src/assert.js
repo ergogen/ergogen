@@ -52,17 +52,38 @@ exports.trbl = (raw, name) => {
 
 exports.anchor = (raw, name, points={}, check_unexpected=true, default_point=new Point()) => {
     if (check_unexpected) detect_unexpected(raw, name, ['ref', 'shift', 'rotate'])
-    let a = default_point.clone()
+    let point = default_point.clone()
     if (raw.ref !== undefined) {
-        assert(points[raw.ref], `Unknown point reference "${raw.ref}" in anchor "${name}"!`)
-        a = points[raw.ref].clone()
+        if (type(raw.ref) == 'array') {
+            // averaging multiple anchors
+            let x = 0, y = 0, r = 0
+            const len = raw.ref.length
+            for (const ref of raw.ref) {
+                assert(points[ref], `Unknown point reference "${ref}" in anchor "${name}"!`)
+                const resolved = points[ref]
+                x += resolved.x
+                y += resolved.y
+                r += resolved.r
+            }
+            point = new Point(x / len, y / len, r / len)
+        } else {
+            assert(points[raw.ref], `Unknown point reference "${raw.ref}" in anchor "${name}"!`)
+            point = points[raw.ref].clone()
+        }
     }
     if (raw.shift !== undefined) {
         let xyval = wh(raw.shift || [0, 0], name + '.shift')
-        a.shift(xyval, true)
+        if (point.meta.mirrored) {
+            xyval[0] = -xyval[0]
+        }
+        point.shift(xyval, true)
     }
     if (raw.rotate !== undefined) {
-        a.r += sane(raw.rotate || 0, name + '.rotate', 'number')
+        let rot = sane(raw.rotate || 0, name + '.rotate', 'number')
+        if (point.meta.mirrored) {
+            rot = -rot
+        }
+        point.r += rot
     }
-    return a
+    return point
 }

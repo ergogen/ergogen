@@ -1,5 +1,5 @@
 module.exports = {
-  nets: [
+  static_nets: [
     'RAW', 'GND', 'RST', 'VCC',
     'P21', 'P20', 'P19', 'P18',
     'P15', 'P14', 'P16', 'P10',
@@ -31,34 +31,34 @@ module.exports = {
       (fp_line (start -12.7 6.35) (end -12.7 8.89) (layer F.SilkS) (width 0.381))
     
       ${''/* pin names */}
-      (fp_text user RAW (at -13.97 5.0) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-      (fp_text user GND (at -11.43 5.0) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-      (fp_text user RST (at -8.89 5.0) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-      (fp_text user VCC (at -6.35 5.0) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-      (fp_text user 21 (at -3.81 5.461) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-      (fp_text user 20 (at -1.27 5.461) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-      (fp_text user 19 (at 1.27 5.461) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-      (fp_text user 18 (at 3.81 5.461) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-      (fp_text user 15 (at 6.35 5.461) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-      (fp_text user 14 (at 8.89 5.461) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-      (fp_text user 16 (at 11.43 5.461) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-      (fp_text user 10 (at 13.97 5.461) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+      (fp_text user RAW (at -13.97 5.0 __ROT(90)) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+      (fp_text user GND (at -11.43 5.0 __ROT(90)) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+      (fp_text user RST (at -8.89 5.0 __ROT(90)) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+      (fp_text user VCC (at -6.35 5.0 __ROT(90)) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+      (fp_text user 21 (at -3.81 5.461 __ROT(90)) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+      (fp_text user 20 (at -1.27 5.461 __ROT(90)) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+      (fp_text user 19 (at 1.27 5.461 __ROT(90)) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+      (fp_text user 18 (at 3.81 5.461 __ROT(90)) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+      (fp_text user 15 (at 6.35 5.461 __ROT(90)) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+      (fp_text user 14 (at 8.89 5.461 __ROT(90)) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+      (fp_text user 16 (at 11.43 5.461 __ROT(90)) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+      (fp_text user 10 (at 13.97 5.461 __ROT(90)) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
     
-      (fp_text user 1 (at -13.97 -5.461) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-      (fp_text user 0 (at -11.43 -5.461) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-      (fp_text user GND (at -8.89 -5.0) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-      (fp_text user GND (at -6.35 -5.0) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-      (fp_text user 2 (at -3.81 -5.461) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-      (fp_text user 3 (at -1.27 -5.461) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-      (fp_text user 4 (at 1.27 -5.461) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-      (fp_text user 5 (at 3.81 -5.461) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-      (fp_text user 6 (at 6.35 -5.461) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-      (fp_text user 7 (at 8.89 -5.461) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-      (fp_text user 8 (at 11.43 -5.461) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-      (fp_text user 9 (at 13.97 -5.461) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+      (fp_text user 1 (at -13.97 -5.461 __ROT(90)) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+      (fp_text user 0 (at -11.43 -5.461 __ROT(90)) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+      (fp_text user GND (at -8.89 -5.0 __ROT(90)) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+      (fp_text user GND (at -6.35 -5.0 __ROT(90)) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+      (fp_text user 2 (at -3.81 -5.461 __ROT(90)) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+      (fp_text user 3 (at -1.27 -5.461 __ROT(90)) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+      (fp_text user 4 (at 1.27 -5.461 __ROT(90)) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+      (fp_text user 5 (at 3.81 -5.461 __ROT(90)) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+      (fp_text user 6 (at 6.35 -5.461 __ROT(90)) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+      (fp_text user 7 (at 8.89 -5.461 __ROT(90)) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+      (fp_text user 8 (at 11.43 -5.461 __ROT(90)) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+      (fp_text user 9 (at 13.97 -5.461 __ROT(90)) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
     
       ${''/* and now the actual pins */}
-      (pad 1 thru_hole rect (at -13.97 7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) __NET_RAW)
+      (pad 1 thru_hole rect (at -13.97 7.62 __ROT(0)) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) __NET_RAW)
       (pad 2 thru_hole circle (at -11.43 7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) __NET_GND)
       (pad 3 thru_hole circle (at -8.89 7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) __NET_RST)
       (pad 4 thru_hole circle (at -6.35 7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) __NET_VCC)

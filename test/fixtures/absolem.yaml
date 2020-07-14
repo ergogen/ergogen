@@ -13,6 +13,8 @@ points:
               bind: [,10]
             top:
               bind: [,10]
+          key:
+            column_net: P1
         ring:
           stagger: 12
           rows:
@@ -22,6 +24,8 @@ points:
               bind: [,10]
             top:
               bind: [,10]
+          key:
+            column_net: P0
         middle:
           stagger: 5
           rows:
@@ -30,6 +34,8 @@ points:
             home:
               bind: [,10,,10]
             top:
+          key:
+            column_net: P2
         index:
           stagger: -6
           rows:
@@ -39,6 +45,8 @@ points:
               bind: [,,,10]
             top:
               bind: [,,,10]
+          key:
+            column_net: P3
         inner:
           stagger: -2
           rows:
@@ -48,16 +56,23 @@ points:
               bind: [,,,10]
             top:
               bind: [,,,10]
+          key:
+            column_net: P4
       rows:
         bottom:
           bind: [10]
+          row_net: P7
+          mirror:
+            row_net: P16
         home:
           bind: [10]
+          row_net: P6
+          mirror:
+            row_net: P14
         top:
-      key:
-        footprints:
-          - type: mx
-          
+          row_net: P5
+          mirror:
+            row_net: P15
     thumbfan:
       anchor:
         ref: inner_bottom
@@ -70,6 +85,8 @@ points:
           rows:
             thumb:
               bind: [10,1,,]
+          key:
+            column_net: P2
         home:
           spread: 21.25
           rotate: -28
@@ -77,12 +94,35 @@ points:
           rows:
             thumb:
               bind: [,10,,15]
+          key:
+            column_net: P3
         far:
           rows:
             thumb:
               bind: [-1,,,5]
+          key:
+            column_net: P4
+      rows:
+        thumb:
+          row_net: P8
+          mirror:
+            row_net: P10
   key:
-    bind: [0, 0, 0, 0]
+    bind: [0,0,0,0]
+    footprints:
+      mx:
+        type: mx
+        nets:
+          from: '!column_net'
+          to: '!name'
+      diode:
+        type: diode
+        anchor:
+          rotate: 90
+          shift: [-8, 0]
+        nets:
+          from: '!name'
+          to: '!row_net'
   rotate: -20
   mirror:
     ref: pinky_home
@@ -103,7 +143,7 @@ outline:
         rotate: 90
       right:
         ref: mirror_far_thumb
-        shift: [-0.5, 0]
+        shift: [0.5, 0]
         rotate: 90
     waypoints:
       - percent: 50
@@ -134,11 +174,11 @@ outline:
       - type: rectangle
         size: [25, 5]
         ref: far_thumb
-        shift: [-25, 12]
+        shift: [25, 12]
       - type: rectangle
         size: [25, 5]
         ref: mirror_home_thumb
-        shift: [-25, 12]
+        shift: [25, 12]
       - type: rectangle
         size: [25, 5]
         ref: mirror_far_thumb
@@ -158,7 +198,11 @@ outline:
 pcb:
   edge: outline
   footprints:
-    - type: promicro
-      between:
-        - ref: inner_top
-        - ref: mirror_inner_top
+    mcu:
+      type: promicro
+      anchor:
+        ref:
+          - inner_top
+          - mirror_inner_top
+        shift: [0, -20]
+        rotate: 270

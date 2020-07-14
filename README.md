@@ -115,6 +115,7 @@ points:
 
 `anchors` are used to, well, anchor the zone to something.
 It's the `[0, 0]` origin with a 0 degree orientation by default, but it can be changed to any other pre-existing point.(Consequently, the first zone can't use a ref, because there isn't any yet.)
+The `ref` field can also be an array of references, in which case their average is used -- mostly useful for anchoring to the center, by averaging a key and its mirror; see later.
 This initial position can then be changed with the `rotate` and `shift` options, adding extra rotation and translation, respectively.
 
 Once we know _where_ to start, we can describe the `columns` of our layout.
@@ -184,6 +185,7 @@ rotate: num # default = 0
 padding: num # default = 19
 skip: boolean # default = false
 asym: left | right | both # default = both
+mirror: <arbitrary key-level data>
 ```
 
 `name` is the unique identifier of this specific key.
@@ -192,7 +194,7 @@ It defaults to a `<row>_<column>` format, but can be overridden if necessary.
 Then we leave `padding` amount of vertical space before moving on to the next key in the column.
 `skip` signals that the point is just a "helper" and should not be included in the output.
 This can happen when a _real_ point is more easily calculable through a "stepping stone", but then we don't actually want the stepping stone to be a key itself.
-Finally, `asym` relates to mirroring, which we'll cover in a second.
+Finally, `asym` and `mirror` relate to mirroring, which we'll cover in a second.
 
 <hr />
 
@@ -220,6 +222,9 @@ Otherwise, we need to use the `asym` key-level attribute to indicate which side 
 If it's set as `left`, mirroring will simply skip this key.
 If it's `right`, mirroring will "move" the point instead of copying it.
 The default `both` assumes symmetry.
+
+Using the _key-level_ `mirror` key (not to be confused with the global `mirror` setting we just discussed above), we can set additional data for the mirrored version of the key.
+It will use the same extension mechanism as it did for the 5 levels before.
 
 And this concludes point definitions.
 This should be generic enough to describe any ergo layout, yet easy enough so that you'll appreciate not having to work in raw CAD.
@@ -575,9 +580,8 @@ Footprints can be specified at the key-level (under the `points` section, like w
 The differences between the two footprint types are:
 
 - an omitted `ref` in the anchor means the current key for key-level declarations, while here it defaults to `[0, 0]`
-- a parameter starting with an exclamation point is an indirect reference to an eponymous key-level attribute -- so, for example, `from = !col_wire` would mean that the key's `col_wire` attribute is read there.
+- a parameter starting with an exclamation point is an indirect reference to an eponymous key-level attribute -- so, for example, `from = !column_net` would mean that the key's `column_net` attribute is read there.
 
-Another alternative to `anchor` here (here being under the `pcb` declaration) is to use the `between` key and place the footprint at the average of multiple anchors -- mostly useful for anchoring to the center, by averaging a key and its mirror.
 Additionally, the edge cut of the PCB can be specified using a previously defined outline name under the `edge` key.
 
 ```yaml
@@ -586,35 +590,43 @@ pcb:
     footprints:
         - type: <footprint type>
           anchor: <anchor declaration>
-          between:
-            - <anchor declaration>
-            - ...
-          params: <type-specific footprint params>
+          nets: <type-specific net params>
+          params: <type-specific (non-net) footprint params>
         - ...
 ```
 
 Currently, the following footprint types are supported:
 
-- **`mx`**, **`alps`**, **`choc`**: mechanical switch footprints. Common parameters:
+- **`mx`**, **`alps`**, **`choc`**: mechanical switch footprints. Common nets:
     - `from`, `to`: nets to connect
 
-- **`diode`**: a combined THT+SMD diode footprint. Parameters:
+- **`diode`**: a combined THT+SMD diode footprint. Nets:
     - `from`, `to`: nets to connect
 
-- **`promicro`**: a controller to drive the keyboard. Available pins are `RAW`, `VCC`, `GND`, `RST`, and 18 GPIOs `P01` through `P18`. No parameters.
+- **`promicro`**: a controller to drive the keyboard. Available pins are `RAW`, `VCC`, `GND`, `RST`, and 18 GPIOs `P01` through `P18`. No Nets.
 
-- **`slider`**: an SMD slider switch (part no. here), ideal for on/off operation. Parameters:
+- **`slider`**: an SMD slider switch (part no. here), ideal for on/off operation. Nets:
     - `from`, `to`: nets to connect
 
-- **`button`**: an SMD button (part no. here), ideal for momentary toggles (like a reset switch). Parameters:
+- **`button`**: an SMD button (part no. here), ideal for momentary toggles (like a reset switch). Nets:
     - `from`, `to`: nets to connect
 
-- **`rgb`**: an RGB led (part no. here), for per-key illumination, underglow, or feedback. Parameters:
+- **`rgb`**: an RGB led (part no. here), for per-key illumination, underglow, or feedback. Nets:
     - `din`, `dout`: input and output nets of the data line
     - VCC and GND nets are assumed to be called `VCC` and `GND`...
 
-- **`jstph`**: a two-pin JST-PH battery header footprint. Parameters:
+- **`jstph`**: a two-pin JST-PH battery header footprint. Nets:
     - `pos`, `neg`: nets to connect to the positive and negative terminals, respectively.
+
+- **`pin`**: a single pin.
+    - Nets:
+        - `net`: the net it should connect to
+    - Parameters:
+        - `diameter`: the larger diameter of the hole, including the copper ring
+        - `drill`: the smaller diameter of the actual hole
+
+- **`hole`**: a simple circular hole. Parameters:
+    - `diameter`: the diameter of the (non-plated!) hole
 
 
 

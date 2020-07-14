@@ -238,8 +238,8 @@ exports.parse = (config = {}) => {
         for (const [name, p] of Object.entries(points)) {
             if (p.meta.asym == 'left') continue
             const mp = p.clone().mirror(axis)
+            mp.meta = extend(mp.meta, mp.meta.mirror || {})
             mp.meta.mirrored = true
-            delete mp.meta.asym
             mirrored_points[`mirror_${name}`] = mp
             if (p.meta.asym == 'right') {
                 p.meta.skip = true

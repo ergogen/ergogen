@@ -116,7 +116,7 @@ const kicad_netclass = `
 
 const makerjs2kicad = exports._makerjs2kicad = (model, layer='Edge.Cuts') => {
     const grs = []
-    const xy = val => `${val[0]} ${val[1]}`
+    const xy = val => `${val[0]} ${-val[1]}`
     m.model.walk(model, {
         onPath: wp => {
             const p = wp.pathContext
@@ -129,7 +129,7 @@ const makerjs2kicad = exports._makerjs2kicad = (model, layer='Edge.Cuts') => {
                     const angle_start = p.startAngle > p.endAngle ? p.startAngle - 360 : p.startAngle
                     const angle_diff = Math.abs(p.endAngle - angle_start)
                     const end = m.point.rotate(m.point.add(center, [p.radius, 0]), angle_start, center)
-                    grs.push(`(gr_arc (start ${xy(center)}) (end ${xy(end)}) (angle ${angle_diff}) (layer ${layer}) (width 0.15))`)
+                    grs.push(`(gr_arc (start ${xy(center)}) (end ${xy(end)}) (angle ${-angle_diff}) (layer ${layer}) (width 0.15))`)
                     break
                 case 'circle':
                     break
@@ -138,52 +138,63 @@ const makerjs2kicad = exports._makerjs2kicad = (model, layer='Edge.Cuts') => {
             }
         }
     })
-    return grs
+    return grs.join('\n')
 }
 
 const footprint_types = require('./footprints')
-const footprint = exports._footprint = (config, name, points, net_indexer, default_anchor) => {
+const footprint = exports._footprint = (config, name, points, net_indexer, point) => {
     
     // config sanitization
-    a.detect_unexpected(config, name, ['type', 'anchor', 'between', 'params'])
+    a.detect_unexpected(config, name, ['type', 'anchor', 'nets', 'params'])
     const type = a.in(config.type, `${name}.type`, Object.keys(footprint_types))
-    let anchor = a.anchor(config.anchor, `${name}.anchor`, points, true, default_anchor)
-    const params = a.sane(config.params, `${name}.params`, 'object')
-
-    // averaging multiple anchors, if necessary
-    if (config.between) {
-        const between = a.sane(config.between, `${name}.between`, 'array')
-        let x = 0, y = 0, r = 0, bi = 0
-        const len = between.length
-        for (const b of between) {
-            ba = a.anchor(b, `${name}.between[${++bi}]`, points, true)
-            x += ba.x
-            y += ba.y
-            r += ba.r
-        }
-        anchor = new Point(x / len, y / len, r / len)
-    }
+    let anchor = a.anchor(config.anchor || {}, `${name}.anchor`, points, true, point)
+    const nets = a.sane(config.nets || {}, `${name}.nets`, 'object')
+    const params = a.sane(config.params || {}, `${name}.params`, 'object')
 
     // basic setup
     const fp = footprint_types[type]
     let result = fp.body
 
     // footprint positioning
-    const at = `(at ${anchor.x} ${anchor.y} ${anchor.r})`
-    result = result.replace('__AT', at)
+    const at = `(at ${anchor.x} ${-anchor.y} ${anchor.r})`
+    result = result.replace(new RegExp('__AT', 'g'), at)
+    // fix rotations within footprints
+    const rot_regex = /__ROT\((\d+)\)/g
+    const matches = [...result.matchAll(rot_regex)]
+    for (const match of matches) {
+        const angle = parseFloat(match[1])
+        result = result.replace(match[0], (anchor.r + angle) + '')
+    }
 
     // connecting static nets
-    for (const net of (fp.nets || [])) {
+    for (const net of (fp.static_nets || [])) {
         const index = net_indexer(net)
-        result = result.replace('__NET_' + net.toUpperCase(), `(net ${index} "${net}")`)
+        result = result.replace(new RegExp('__NET_' + net.toUpperCase(), 'g'), `(net ${index} "${net}")`)
     }
 
     // connecting parametric nets
-    for (const param of (fp.params || [])) {
-        const net = params[param]
-        a.sane(net, `${name}.params.${param}`, 'string')
+    for (const net_ref of (fp.nets || [])) {
+        let net = nets[net_ref]
+        a.sane(net, `${name}.nets.${net_ref}`, 'string')
+        if (net.startsWith('!') && point) {
+            const indirect = net.substring(1)
+            net = point.meta[indirect]
+            a.sane(net, `${name}.nets.${net_ref} --> ${point.meta.name}.${indirect}`, 'string')
+        }
         const index = net_indexer(net)
-        result = result.replace('__PARAM_' + net.toUpperCase(), `(net ${index} "${net}")`)
+        result = result.replace(new RegExp('__NET_' + net_ref.toUpperCase(), 'g'), `(net ${index} "${net}")`)
+    }
+
+    // connecting other, non-net parameters
+    for (const param of (fp.params || [])) {
+        let value = params[param]
+        if (value === undefined) throw new Error(`Field "${name}.params.${param}" is missing!`)
+        if (a.type(value) == 'string' && value.startsWith('!') && point) {
+            const indirect = value.substring(1)
+            value = point.meta[indirect]
+            if (value === undefined) throw new Error(`Field "${name}.params.${param} --> ${point.meta.name}.${indirect}" is missing!`)
+        }
+        result = result.replace(new RegExp('__PARAM_' + param.toUpperCase(), 'g'), value)
     }
 
     return result
@@ -200,9 +211,9 @@ exports.parse = (config, points, outlines) => {
     const kicad_edge = makerjs2kicad(edge)
 
     // making a global net index registry
-    const nets = {}
+    const nets = {"": 0}
     const net_indexer = net => {
-        if (nets[net]) return nets[net]
+        if (nets[net] !== undefined) return nets[net]
         const index = Object.keys(nets).length
         return nets[net] = index
     }
@@ -211,17 +222,15 @@ exports.parse = (config, points, outlines) => {
 
     // key-level footprints
     for (const [pname, point] of Object.entries(points)) {
-        let f_index = 0
-        for (const f of (point.meta.footprints || [])) {
-            footprints.push(footprint(f, `${pname}.footprints[${++f_index}]`, points, net_indexer, point))
+        for (const [f_name, f] of Object.entries(point.meta.footprints || {})) {
+            footprints.push(footprint(f, `${pname}.footprints.${f_name}`, points, net_indexer, point))
         }
     }
 
     // global one-off footprints
-    const global_footprints = a.sane(config.footprints || [], 'pcb.footprints', 'array')
-    let gf_index = 0
-    for (const gf of global_footprints) {
-        footprints.push(footprint(gf, `pcb.footprints[${++gf_index}]`, points, net_indexer))
+    const global_footprints = a.sane(config.footprints || {}, 'pcb.footprints', 'object')
+    for (const [gf_name, gf] of Object.entries(global_footprints)) {
+        footprints.push(footprint(gf, `pcb.footprints.${gf_name}`, points, net_indexer))
     }
 
     // finalizing nets
@@ -241,6 +250,7 @@ exports.parse = (config, points, outlines) => {
         ${nets_text}
         ${netclass}
         ${footprint_text}
+        ${kicad_edge}
         ${kicad_suffix}
     
     `
