@@ -35,27 +35,32 @@ const layout = exports._layout = (config = {}, points = {}) => {
 
     // Glue config sanitization
 
-    a.detect_unexpected(config, 'outline.glue', ['top', 'bottom', 'waypoints', 'extra'])
-
+    const parsed_glue = u.deepcopy(a.sane(config, 'outline.glue', 'object'))
+    for (let [gkey, gval] of Object.entries(parsed_glue)) {
+        gval = a.inherit(gval, 'outline.glue', gkey, config)
+        a.detect_unexpected(gval, `outline.glue.${gkey}`, ['top', 'bottom', 'waypoints', 'extra'])
     
-
-    for (const y of ['top', 'bottom']) {
-        a.detect_unexpected(config[y], `outline.glue.${y}`, ['left', 'right'])
-        config[y].left = relative_anchor(config[y].left, `outline.glue.${y}.left`, points)
-        if (a.type(config[y].right) != 'number') {
-            config[y].right = relative_anchor(config[y].right, `outline.glue.${y}.right`, points)
+        for (const y of ['top', 'bottom']) {
+            a.detect_unexpected(gval[y], `outline.glue.${gkey}.${y}`, ['left', 'right'])
+            gval[y].left = relative_anchor(gval[y].left, `outline.glue.${gkey}.${y}.left`, points)
+            if (a.type(gval[y].right) != 'number') {
+                gval[y].right = relative_anchor(gval[y].right, `outline.glue.${gkey}.${y}.right`, points)
+            }
         }
+    
+        gval.waypoints = a.sane(gval.waypoints || [], `outline.glue.${gkey}.waypoints`, 'array')
+        let wi = 0
+        gval.waypoints = gval.waypoints.map(w => {
+            const name = `outline.glue.${gkey}.waypoints[${++wi}]`
+            a.detect_unexpected(w, name, ['percent', 'width'])
+            w.percent = a.sane(w.percent, name + '.percent', 'number')
+            w.width = a.wh(w.width, name + '.width')
+            return w
+        })
+
+        parsed_glue[gkey] = gval
     }
 
-    config.waypoints = a.sane(config.waypoints || [], 'outline.glue.waypoints', 'array')
-    let wi = 0
-    config.waypoints = config.waypoints.map(w => {
-        const name = `outline.glue.waypoints[${++wi}]`
-        a.detect_unexpected(w, name, ['percent', 'width'])
-        w.percent = a.sane(w.percent, name + '.percent', 'number')
-        w.width = a.wh(w.width, name + '.width')
-        return w
-    })
 
     // TODO: handle glue.extra (or revoke it from the docs)
 
@@ -63,8 +68,12 @@ const layout = exports._layout = (config = {}, points = {}) => {
 
         // Layout params sanitization
 
-        a.detect_unexpected(params, `${export_name}`, expected.concat(['side', 'size', 'corner', 'bevel', 'bound']))
+        a.detect_unexpected(params, `${export_name}`, expected.concat(['side', 'tags', 'glue', 'size', 'corner', 'bevel', 'bound']))
         const side = a.in(params.side, `${export_name}.side`, ['left', 'right', 'middle', 'both', 'glue'])
+        const tags = a.sane(params.tags || [], `${export_name}.tags`, 'array')
+        const default_glue_name = Object.keys(parsed_glue)[0]
+        const glue_def = parsed_glue[a.sane(params.glue || default_glue_name, `${export_name}.glue`, 'string')]
+        a.assert(glue_def, `Field "${export_name}.glue" does not name a valid glue!`)
         const size = a.wh(params.size, `${export_name}.size`)
         const corner = a.sane(params.corner || 0, `${export_name}.corner`, 'number')
         const bevel = a.sane(params.bevel || 0, `${export_name}.bevel`, 'number')
@@ -76,6 +85,14 @@ const layout = exports._layout = (config = {}, points = {}) => {
         let right = {models: {}}
         if (['left', 'right', 'middle', 'both'].includes(side)) {
             for (const [pname, p] of Object.entries(points)) {
+
+                // filter by tags, if necessary
+                if (tags.length) {
+                    const source = p.meta.tags || {}
+                    const point_tags = Object.keys(source).filter(t => !!source[t])
+                    const relevant = point_tags.some(pt => tags.includes(pt))
+                    if (!relevant) continue
+                }
 
                 let from_x = -size[0] / 2, to_x = size[0] / 2
                 let from_y = -size[1] / 2, to_y = size[1] / 2
@@ -130,15 +147,15 @@ const layout = exports._layout = (config = {}, points = {}) => {
 
                 return u.line(from.p, to.p)
             }
-    
-            const tll = get_line(config.top.left)
-            const trl = get_line(config.top.right)
+
+            const tll = get_line(glue_def.top.left)
+            const trl = get_line(glue_def.top.right)
             const tip = m.path.converge(tll, trl)
             const tlp = u.eq(tll.origin, tip) ? tll.end : tll.origin
             const trp = u.eq(trl.origin, tip) ? trl.end : trl.origin
     
-            const bll = get_line(config.bottom.left)
-            const brl = get_line(config.bottom.right)
+            const bll = get_line(glue_def.bottom.left)
+            const brl = get_line(glue_def.bottom.right)
             const bip = m.path.converge(bll, brl)
             const blp = u.eq(bll.origin, bip) ? bll.end : bll.origin
             const brp = u.eq(brl.origin, bip) ? brl.end : brl.origin
@@ -146,7 +163,7 @@ const layout = exports._layout = (config = {}, points = {}) => {
             const left_waypoints = []
             const right_waypoints = []
 
-            for (const w of config.waypoints) {
+            for (const w of glue_def.waypoints) {
                 const percent = w.percent / 100
                 const center_x = tip[0] + percent * (bip[0] - tip[0])
                 const center_y = tip[1] + percent * (bip[1] - tip[1])
@@ -157,7 +174,7 @@ const layout = exports._layout = (config = {}, points = {}) => {
             }
             
             let waypoints
-            const is_split = a.type(config.top.right) == 'number'
+            const is_split = a.type(glue_def.top.right) == 'number'
             if (is_split) {
                 waypoints = [tip, tlp]
                 .concat(left_waypoints)
@@ -198,7 +215,7 @@ exports.parse = (config = {}, points = {}) => {
         for (const part of parts) {
             const name = `outline.exports.${key}[${++index}]`
             const expected = ['type', 'operation']
-            part.type = a.in(part.type, `${name}.type`, ['keys', 'rectangle', 'circle', 'polygon', 'ref'])
+            part.type = a.in(part.type, `${name}.type`, ['keys', 'rectangle', 'circle', 'polygon', 'outline'])
             part.operation = a.in(part.operation || 'add', `${name}.operation`, ['add', 'subtract', 'intersect', 'stack'])
 
             let op = u.union
@@ -240,10 +257,12 @@ exports.parse = (config = {}, points = {}) => {
                     }
                     arg = u.poly(parsed_points)
                     break
-                case 'ref':
+                case 'outline':
                     a.assert(outlines[part.name], `Field "${name}.name" does not name an existing outline!`)
                     arg = u.deepcopy(outlines[part.name])
                     break
+                default:
+                    throw new Error(`Field "${name}.type" (${part.type}) does not name a valid outline part type!`)
             }
 
             result = op(result, arg)

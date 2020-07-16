@@ -10,9 +10,9 @@ points:
           rows:
             bottom:
             home:
-              bind: [,10]
+              bind: [,15]
             top:
-              bind: [,10]
+              bind: [,15]
           key:
             column_net: P1
         ring:
@@ -61,21 +61,35 @@ points:
       rows:
         bottom:
           bind: [10]
-          row_net: P7
+          row_net: P16
           mirror:
-            row_net: P16
+            row_net: P7
         home:
           bind: [10]
-          row_net: P6
+          row_net: P14
           mirror:
-            row_net: P14
+            row_net: P6
         top:
-          row_net: P5
+          row_net: P15
           mirror:
-            row_net: P15
+            row_net: P5
+      key:
+        tags:
+          s19: true
+    choc:
+      extends: matrix
+      columns:
+        pinky:
+          stagger: 1
+          origin: [7, -8]
+      key:
+        padding: 18
+        tags:
+          s19: false
+          s18: true
     thumbfan:
       anchor:
-        ref: inner_bottom
+        ref: matrix_inner_bottom
         shift: [-7, -19]
       columns:
         near:
@@ -84,9 +98,11 @@ points:
           origin: [9.5, -9]
           rows:
             thumb:
-              bind: [10,1,,]
+              bind: [10,5,,]
           key:
             column_net: P2
+            tags:
+              classic: true
         home:
           spread: 21.25
           rotate: -28
@@ -96,17 +112,71 @@ points:
               bind: [,10,,15]
           key:
             column_net: P3
+            tags:
+              classic: true
+              uniform: true
         far:
           rows:
             thumb:
               bind: [-1,,,5]
           key:
             column_net: P4
+            tags:
+              classic: true
       rows:
         thumb:
-          row_net: P8
+          row_net: P10
           mirror:
-            row_net: P10
+            row_net: P8
+    unifar:
+      anchor:
+        ref: thumbfan_home_thumb
+      columns:
+        home_again:
+          rotate: -28
+          origin: [9.5, -9]
+          key:
+            skip: true
+        far1u:
+          rows:
+            thumb:
+              bind: [-1,,,5]
+          key:
+            column_net: P4
+            footprints:
+              diode: false
+            tags:
+              uniform: true
+      rows:
+        thumb:
+          row_net: P10
+          mirror:
+            row_net: P8
+    uninear:
+      anchor:
+        ref: thumbfan_home_thumb
+      columns:
+        home_again:
+          spread: -19
+          rotate: 28
+          origin: [-9.5, -9]
+          key:
+            skip: true
+        near1u:
+          rows:
+            thumb:
+              bind: [10,5,,]
+          key:
+            column_net: P2
+            footprints:
+              diode: false
+            tags:
+              uniform: true
+      rows:
+        thumb:
+          row_net: P10
+          mirror:
+            row_net: P8
   key:
     bind: [0,0,0,0]
     footprints:
@@ -114,95 +184,145 @@ points:
         type: mx
         nets:
           from: '!column_net'
-          to: '!name'
+          to: '!colrow'
       diode:
         type: diode
         anchor:
           rotate: 90
-          shift: [-8, 0]
+          shift: [8, 0]
         nets:
           from: '!name'
           to: '!row_net'
+    mirror:
+      footprints:
+        mx:
+          nets:
+            from: '!colrow'
+            to: '!column_net'
   rotate: -20
   mirror:
-    ref: pinky_home
+    ref: matrix_pinky_home
     distance: 223.7529778
 outline:
   glue:
-    top:
-      left:
-        ref: inner_top
-        shift: [, 0.5]
-      right:
-        ref: mirror_inner_top
-        shift: [, 0.5]
-    bottom:
-      left:
-        ref: far_thumb
-        shift: [0.5, 0]
-        rotate: 90
-      right:
-        ref: mirror_far_thumb
-        shift: [0.5, 0]
-        rotate: 90
-    waypoints:
-      - percent: 50
-        width: 50
-      - percent: 90
-        width: 25
+    classic:
+      top:
+        left:
+          ref: matrix_inner_top
+          shift: [, 0.5]
+        right:
+          ref: mirror_matrix_inner_top
+          shift: [, 0.5]
+      bottom:
+        left:
+          ref: thumbfan_far_thumb
+          shift: [0.5, 0]
+          rotate: 90
+        right:
+          ref: mirror_thumbfan_far_thumb
+          shift: [0.5, 0]
+          rotate: 90
+      waypoints:
+        - percent: 50
+          width: 50
+        - percent: 90
+          width: 25
+    uniform:
+      extends: classic
+      bottom:
+        left:
+          ref: unifar_far1u_thumb
+        right:
+          ref: mirror_unifar_far1u_thumb
+    choc:
+      extends: classic
+      top:
+        left:
+          ref: choc_inner_top
+        right:
+          ref: mirror_choc_inner_top
+    uniform_choc:
+      extends:
+        - uniform
+        - choc
   exports:
-    outline:
+    classic_outline:
       - type: keys
         side: both
-        size: 18
+        tags:
+          - s19
+          - classic
+        glue: classic
+        size: 13.5
         corner: .5
-    holes:
+    uniform_outline:
       - type: keys
-        operation: stack
         side: both
+        tags:
+          - s19
+          - uniform
+        glue: uniform
+        size: 13.5
+        corner: .5
+    intersected_outline:
+      - type: outline
+        name: classic_outline
+      - type: outline
+        name: uniform_outline
+        operation: intersect
+    classic_holes:
+      - type: keys
+        side: both
+        tags:
+          - s19
+          - classic
+        glue: classic
         size: 14
         bound: false
-    middle:
+    classic_middle:
       - type: keys
-        operation: stack
         side: middle
+        tags:
+          - s19
+          - classic
+        glue: classic
         size: 24
       - type: rectangle
         size: [25, 5]
-        ref: home_thumb
+        ref: thumbfan_home_thumb
         shift: [0, 12]
       - type: rectangle
         size: [25, 5]
-        ref: far_thumb
+        ref: thumbfan_far_thumb
         shift: [25, 12]
       - type: rectangle
         size: [25, 5]
-        ref: mirror_home_thumb
+        ref: mirror_thumbfan_home_thumb
         shift: [25, 12]
       - type: rectangle
         size: [25, 5]
-        ref: mirror_far_thumb
+        ref: mirror_thumbfan_far_thumb
         shift: [0, 12]
-      - type: ref
-        name: outline
+      - type: outline
+        name: classic_outline
         operation: intersect
     complex:
-      - type: ref
-        name: outline
-      - type: ref
-        name: holes
+      - type: outline
+        name: classic_outline
+      - type: outline
+        name: classic_holes
         operation: stack
-      - type: ref
-        name: middle
+      - type: outline
+        name: classic_middle
         operation: stack
 pcb:
-  edge: outline
+  edge: intersected_outline
   footprints:
     mcu:
       type: promicro
       anchor:
         ref:
-          - inner_top
-          - mirror_inner_top
+          - choc_inner_top
+          - mirror_choc_inner_top
         shift: [0, -20]
         rotate: 270

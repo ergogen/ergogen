@@ -143,6 +143,8 @@ const makerjs2kicad = exports._makerjs2kicad = (model, layer='Edge.Cuts') => {
 
 const footprint_types = require('./footprints')
 const footprint = exports._footprint = (config, name, points, net_indexer, point) => {
+
+    if (config === false) return ''
     
     // config sanitization
     a.detect_unexpected(config, name, ['type', 'anchor', 'nets', 'params'])

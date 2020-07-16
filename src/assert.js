@@ -1,4 +1,5 @@
 const m = require('makerjs')
+const u = require('./utils')
 const Point = require('./point')
 
 const assert = exports.assert = (exp, msg) => {
@@ -79,11 +80,53 @@ exports.anchor = (raw, name, points={}, check_unexpected=true, default_point=new
         point.shift(xyval, true)
     }
     if (raw.rotate !== undefined) {
-        let rot = sane(raw.rotate || 0, name + '.rotate', 'number')
-        if (point.meta.mirrored) {
-            rot = -rot
-        }
-        point.r += rot
+        point.r += sane(raw.rotate || 0, name + '.rotate', 'number')
     }
     return point
+}
+
+const extend_pair = exports.extend_pair = (to, from) => {
+    const to_type = type(to)
+    const from_type = type(from)
+    if (from === undefined || from === null) return to
+    if (from === '!!unset') return undefined
+    if (to_type != from_type) return from
+    if (from_type == 'object') {
+        const res = u.deepcopy(to)
+        for (const key of Object.keys(from)) {
+            res[key] = extend_pair(to[key], from[key])
+        }
+        return res
+    } else if (from_type == 'array') {
+        const res = u.deepcopy(to)
+        for (const [i, val] of from.entries()) {
+            res[i] = extend_pair(res[i], val)
+        }
+        return res
+    } else return from
+}
+
+exports.extend = (...args) => {
+    let res = args[0]
+    for (const arg of args) {
+        if (res == arg) continue
+        res = extend_pair(res, arg)
+    }
+    return res
+}
+
+const inherit = exports.inherit = (config, name_prefix, name, set) => {
+    let result = u.deepcopy(config)
+    if (config.extends !== undefined) {
+        let list = config.extends
+        if (type(list) !== 'array') list = [list]
+        for (const item of list) {
+            const other = set[item]
+            assert(other, `Field "${name_prefix}.${name}" does not name a valid target!`)
+            result = extend_pair(inherit(other, name_prefix, config.extends, set), result)
+
+        }
+        delete result.extends
+    }
+    return result
 }

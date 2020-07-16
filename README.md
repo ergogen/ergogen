@@ -324,19 +324,21 @@ This is where the following section comes into play:
 
 ```yaml
 glue:
-    top:
-        left: <anchor>
-        right: <anchor> | num
-    bottom:
-        left: <anchor>
-        right: <anchor> | num
-    waypoints:
-        - percent: num
-          width: num | [num_left, num_right]
-        - ...
-    extra:
-        - <primitive shape>
-        - ...
+    glue_name:
+        top:
+            left: <anchor>
+            right: <anchor> | num
+        bottom:
+            left: <anchor>
+            right: <anchor> | num
+        waypoints:
+            - percent: num
+            width: num | [num_left, num_right]
+            - ...
+        extra:
+            - <primitive shape>
+            - ...
+    ...
 ```
 
 ...where an `<anchor>` is (mostly) the same as it was for points:
@@ -348,7 +350,7 @@ rotate: num # default = 0
 relative: boolean # default = true
 ```
 
-The section's `top` and `bottom` are both formatted the same, and describe the center line's top and bottom intersections, respectively.
+The `top` and `bottom` fields in each glue's section are both formatted the same, and describe the center line's top and bottom intersections, respectively.
 In a one-piece case, this means that we project a line from a left-side reference point (optionally rotated and translated), another from the right, and converge them to where they meet.
 Split designs can specify `right` as a single number to mean the x coordinate where the side should be "cut off".
 The `relative` flag means that the `shift` is interpreted in layout size units instead of mms (see below).
@@ -366,7 +368,7 @@ If this is insufficient (maybe because it would leave holes), the `waypoints` ca
 Here, `percent` means the y coordinate along the centerline (going from the top intersection to the bottom intersection), and `width` means the offset on the x axis.
 
 If this is somehow _still_ insufficient (or there were problems with the binding phase), we can specify additional primitive shapes under the `extra` key (similarly to how we would use them in the exports; see below).
-These are then added to what we have so far to finish out the glue.
+These are then added to what we have so far to finish out the glue. TODO!
 
 <hr />
 
@@ -381,6 +383,8 @@ Now we can configure what we want to "export" as outlines from this phase, given
         - `middle` means an "ideal" version of the glue (meaning that instead of the `outline.glue` we defined above, we get `both` - `left` - `right`, so the _exact_ middle piece we would have needed to glue everything together
         - `both` means both sides, held together by the glue
         - `glue` is just the raw glue shape we defined above under `outline.glue`
+    - `tag: <array of tags>` : optional tags to filter which points to consider in this step, where tags can be specified as key-level attributes.
+    - `glue: <glue_name>` : the name of the glue to use, if applicable
     - `size: num | [num_x, num_y]` : the width/height of the rectangles to lay onto the points. Note that the `relative` flag for the glue declaration above meant this size as the basis of the shift. So during a `keys` layout with a size of 18, for example, a relative shift of `[.5, .5]` actually means `[9, 9]` in mms.
     - `corner: num # default = 0)` : corner radius of the rectangles
     - `bevel: num # default = 0)` : corner bevel of the rectangles, can be combined with rounding
@@ -395,7 +399,7 @@ Now we can configure what we want to "export" as outlines from this phase, given
     - `radius: num` : the radius of the circle
 - `polygon` : an independent polygon primitive. Parameters:
     - `points: [<point_def>, ...]` : the points of the polygon. Each `<point_def>` can have its own `ref` and `shift`, all of which are still the same as above. If `ref` is unspecified, the previous point's will be assumed. For the first, it's `[0, 0]` by default.
-- `ref` : a previously defined outline, see below.
+- `outline` : a previously defined outline, see below.
     - `name: outline_name` : the name of the referenced outline
 
 Using these, we define exports as follows:

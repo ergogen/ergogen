@@ -2,35 +2,6 @@ const m = require('makerjs')
 const u = require('./utils')
 const a = require('./assert')
 
-const extend_pair = exports._extend_pair = (to, from) => {
-    const to_type = a.type(to)
-    const from_type = a.type(from)
-    if (from === undefined || from === null) return to
-    if (to_type != from_type) return from
-    if (from_type == 'object') {
-        const res = u.deepcopy(to)
-        for (const key of Object.keys(from)) {
-            res[key] = extend_pair(to[key], from[key])
-        }
-        return res
-    } else if (from_type == 'array') {
-        const res = u.deepcopy(to)
-        for (const [i, val] of from.entries()) {
-            res[i] = extend_pair(res[i], val)
-        }
-        return res
-    } else return from
-}
-
-const extend = exports._extend = (...args) => {
-    let res = args[0]
-    for (const arg of args) {
-        if (res == arg) continue
-        res = extend_pair(res, arg)
-    }
-    return res
-}
-
 const push_rotation = exports._push_rotation = (list, angle, origin) => {
     let candidate = origin
     for (const r of list) {
@@ -139,7 +110,7 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key)
             asym: 'both'
         }
         for (const row of Object.keys(actual_rows)) {
-            const key = extend(
+            const key = a.extend(
                 default_key,
                 global_key,
                 zone_wide_key,
@@ -148,7 +119,8 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key)
                 col.rows[row] || {}
             )
 
-            key.name = key.name || `${col_name}_${row}`
+            key.name = key.name || `${zone_name}_${col_name}_${row}`
+            key.colrow = `${col_name}_${row}`
             key.shift = a.xy(key.shift, `${key.name}.shift`)
             key.rotate = a.sane(key.rotate, `${key.name}.rotate`, 'number')
             key.padding = a.sane(key.padding, `${key.name}.padding`, 'number')
@@ -195,8 +167,6 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key)
     return points
 }
 
-
-
 exports.parse = (config = {}) => {
 
     a.detect_unexpected(config, 'points', ['zones', 'key', 'rotate', 'mirror'])
@@ -207,7 +177,11 @@ exports.parse = (config = {}) => {
 
     const zones = a.sane(config.zones || {}, 'points.zones', 'object')
     const global_key = a.sane(config.key || {}, 'points.key', 'object')
-    for (const [zone_name, zone] of Object.entries(zones)) {
+    for (let [zone_name, zone] of Object.entries(zones)) {
+
+        // handle zone-level `extends` clauses
+        zone = a.inherit(zone, 'points.zones', zone_name, zones)
+
         const anchor = a.anchor(zone.anchor || {}, `points.zones.${zone_name}.anchor`, points)
         points = Object.assign(points, render_zone(zone_name, zone, anchor, global_key))
     }
@@ -238,9 +212,11 @@ exports.parse = (config = {}) => {
         for (const [name, p] of Object.entries(points)) {
             if (p.meta.asym == 'left') continue
             const mp = p.clone().mirror(axis)
-            mp.meta = extend(mp.meta, mp.meta.mirror || {})
+            mp.meta = a.extend(mp.meta, mp.meta.mirror || {})
             mp.meta.mirrored = true
-            mirrored_points[`mirror_${name}`] = mp
+            const new_name = `mirror_${name}`
+            mp.meta.name = new_name
+            mirrored_points[new_name] = mp
             if (p.meta.asym == 'right') {
                 p.meta.skip = true
             }
