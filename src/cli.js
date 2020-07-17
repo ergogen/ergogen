@@ -12,8 +12,8 @@ const yargs = require('yargs')
 const u = require('./utils')
 const io = require('./io')
 const points_lib = require('./points')
-const outline_lib = require('./outline')
-const pcb_lib = require('./pcb')
+const outlines_lib = require('./outlines')
+const pcbs_lib = require('./pcbs')
 
 // command line args
 
@@ -68,19 +68,21 @@ if (args.debug) {
 // outlines
 
 console.log('Generating outlines...')
-const outlines = outline_lib.parse(config.outline, points)
+const outlines = outlines_lib.parse(config.outlines, points)
 for (const [name, outline] of Object.entries(outlines)) {
     if (!args.debug && name.startsWith('_')) continue
-    io.dump_model(outline, path.join(args.o, `outline/${name}`), args.debug)
+    io.dump_model(outline, path.join(args.o, `outlines/${name}`), args.debug)
 }
 
-// pcb
+// pcbs
 
-console.log('Scaffolding PCB...')
-const pcb = pcb_lib.parse(config.pcb, points, outlines)
-const pcb_file = path.join(args.o, `pcb/pcb.kicad_pcb`)
-fs.mkdirpSync(path.dirname(pcb_file))
-fs.writeFileSync(pcb_file, pcb)
+console.log('Scaffolding PCBs...')
+const pcbs = pcbs_lib.parse(config.pcbs, points, outlines)
+for (const [pcb_name, pcb_text] of Object.entries(pcbs)) {
+    const pcb_file = path.join(args.o, `pcbs/${pcb_name}.kicad_pcb`)
+    fs.mkdirpSync(path.dirname(pcb_file))
+    fs.writeFileSync(pcb_file, pcb_text)
+}
 
 // goodbye
 

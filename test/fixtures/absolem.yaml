@@ -10,9 +10,9 @@ points:
           rows:
             bottom:
             home:
-              bind: [,15]
+              bind: [,15,-1]
             top:
-              bind: [,15]
+              bind: [,15,-1]
           key:
             column_net: P1
         ring:
@@ -70,6 +70,10 @@ points:
           mirror:
             row_net: P6
         top:
+          footprints:
+            mx:
+              anchor:
+                rotate: 180
           row_net: P15
           mirror:
             row_net: P5
@@ -87,6 +91,8 @@ points:
         tags:
           s19: false
           s18: true
+        footprints:
+          diode: '!!unset'
     thumbfan:
       anchor:
         ref: matrix_inner_bottom
@@ -203,9 +209,9 @@ points:
   mirror:
     ref: matrix_pinky_home
     distance: 223.7529778
-outline:
+outlines:
   glue:
-    classic:
+    classic_s19:
       top:
         left:
           ref: matrix_inner_top
@@ -227,102 +233,117 @@ outline:
           width: 50
         - percent: 90
           width: 25
-    uniform:
-      extends: classic
+    uniform_s19:
+      extends: classic_s19
       bottom:
         left:
           ref: unifar_far1u_thumb
         right:
           ref: mirror_unifar_far1u_thumb
-    choc:
-      extends: classic
+    classic_s18:
+      extends: classic_s19
       top:
         left:
           ref: choc_inner_top
         right:
           ref: mirror_choc_inner_top
-    uniform_choc:
+    uniform_s18:
       extends:
-        - uniform
-        - choc
+        - uniform_s19
+        - classic_s18
   exports:
-    classic_outline:
-      - type: keys
+    classic_s19_outline:
+      main:
+        type: keys
         side: both
         tags:
           - s19
           - classic
-        glue: classic
+        glue: classic_s19
         size: 13.5
         corner: .5
-    uniform_outline:
-      - type: keys
-        side: both
+    uniform_s19_outline:
+      extends: classic_s19_outline
+      main:
         tags:
           - s19
           - uniform
-        glue: uniform
-        size: 13.5
-        corner: .5
+        glue: uniform_s19
+    uniform_s18_outline:
+      extends: uniform_s19_outline
+      main:
+        tags:
+          - s18
+          - uniform
+        glue: uniform_s18
     intersected_outline:
-      - type: outline
-        name: classic_outline
-      - type: outline
-        name: uniform_outline
+      one:
+        type: outline
+        name: classic_s19_outline
+      two:
+        type: outline
+        name: uniform_s18_outline
         operation: intersect
-    classic_holes:
-      - type: keys
+    classic_s19_switches:
+      main:
+        type: keys
         side: both
         tags:
-          - s19
           - classic
-        glue: classic
+        glue: classic_s19
         size: 14
         bound: false
-    classic_middle:
-      - type: keys
+    uniform_s19_switches:
+      main:
+        type: keys
+        side: both
+        tags:
+          - uniform
+        glue: uniform_s19
+        size: 14
+        bound: false
+    classic_s19_middle:
+      raw:
+        type: keys
         side: middle
         tags:
           - s19
           - classic
-        glue: classic
+        glue: classic_s19
         size: 24
-      - type: rectangle
+      helper1:
+        type: rectangle
         size: [25, 5]
         ref: thumbfan_home_thumb
         shift: [0, 12]
-      - type: rectangle
+      helper2:
+        type: rectangle
         size: [25, 5]
         ref: thumbfan_far_thumb
-        shift: [25, 12]
-      - type: rectangle
+        shift: [-25, 12]
+      helper3:
+        type: rectangle
         size: [25, 5]
         ref: mirror_thumbfan_home_thumb
         shift: [25, 12]
-      - type: rectangle
+      helper4:
+        type: rectangle
         size: [25, 5]
         ref: mirror_thumbfan_far_thumb
         shift: [0, 12]
-      - type: outline
-        name: classic_outline
+      outer_bounds:
+        type: outline
+        name: classic_s19_outline
         operation: intersect
-    complex:
-      - type: outline
-        name: classic_outline
-      - type: outline
-        name: classic_holes
-        operation: stack
-      - type: outline
-        name: classic_middle
-        operation: stack
-pcb:
-  edge: intersected_outline
-  footprints:
-    mcu:
-      type: promicro
-      anchor:
-        ref:
-          - choc_inner_top
-          - mirror_choc_inner_top
-        shift: [0, -20]
-        rotate: 270
+pcbs:
+  main:
+    edge: intersected_outline
+    footprints:
+      mcu:
+        type: promicro
+        anchor:
+          ref:
+            - choc_inner_top
+            - mirror_choc_inner_top
+          shift: [0, -20]
+          rotate: 270

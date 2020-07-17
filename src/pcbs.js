@@ -204,56 +204,62 @@ const footprint = exports._footprint = (config, name, points, net_indexer, point
 
 exports.parse = (config, points, outlines) => {
 
-    // config sanitization
-    a.detect_unexpected(config, 'pcb', ['edge', 'footprints'])
-    const edge = outlines[config.edge]
-    if (!edge) throw new Error(`Field "pcb.edge" doesn't name a valid outline!`)
+    const pcbs = a.sane(config, 'pcb', 'object')
+    const results = {}
 
-    // Edge.Cuts conversion
-    const kicad_edge = makerjs2kicad(edge)
+    for (const [pcb_name, pcb_config] of Object.entries(pcbs)) {
 
-    // making a global net index registry
-    const nets = {"": 0}
-    const net_indexer = net => {
-        if (nets[net] !== undefined) return nets[net]
-        const index = Object.keys(nets).length
-        return nets[net] = index
-    }
+        // config sanitization
+        a.detect_unexpected(pcb_config, `pcb.${pcb_name}`, ['edge', 'footprints'])
+        const edge = outlines[pcb_config.edge]
+        if (!edge) throw new Error(`Field "pcb.${pcb_name}.edge" doesn't name a valid outline!`)
 
-    const footprints = []
+        // Edge.Cuts conversion
+        const kicad_edge = makerjs2kicad(edge)
 
-    // key-level footprints
-    for (const [pname, point] of Object.entries(points)) {
-        for (const [f_name, f] of Object.entries(point.meta.footprints || {})) {
-            footprints.push(footprint(f, `${pname}.footprints.${f_name}`, points, net_indexer, point))
+        // making a global net index registry
+        const nets = {"": 0}
+        const net_indexer = net => {
+            if (nets[net] !== undefined) return nets[net]
+            const index = Object.keys(nets).length
+            return nets[net] = index
         }
+
+        const footprints = []
+
+        // key-level footprints
+        for (const [p_name, point] of Object.entries(points)) {
+            for (const [f_name, f] of Object.entries(point.meta.footprints || {})) {
+                footprints.push(footprint(f, `${p_name}.footprints.${f_name}`, points, net_indexer, point))
+            }
+        }
+
+        // global one-off footprints
+        const global_footprints = a.sane(pcb_config.footprints || {}, `pcb.${pcb_name}.footprints`, 'object')
+        for (const [gf_name, gf] of Object.entries(global_footprints)) {
+            footprints.push(footprint(gf, `pcb.${pcb_name}.footprints.${gf_name}`, points, net_indexer))
+        }
+
+        // finalizing nets
+        const nets_arr = []
+        const add_nets_arr = []
+        for (const [net, index] of Object.entries(nets)) {
+            nets_arr.push(`(net ${index} "${net}")`)
+            add_nets_arr.push(`(add_net "${net}")`)
+        }
+
+        const netclass = kicad_netclass.replace('__ADD_NET', add_nets_arr.join('\n'))
+        const nets_text = nets_arr.join('\n')
+        const footprint_text = footprints.join('\n')
+        results[pcb_name] = `
+            ${kicad_prefix}
+            ${nets_text}
+            ${netclass}
+            ${footprint_text}
+            ${kicad_edge}
+            ${kicad_suffix}
+        `
     }
 
-    // global one-off footprints
-    const global_footprints = a.sane(config.footprints || {}, 'pcb.footprints', 'object')
-    for (const [gf_name, gf] of Object.entries(global_footprints)) {
-        footprints.push(footprint(gf, `pcb.footprints.${gf_name}`, points, net_indexer))
-    }
-
-    // finalizing nets
-    const nets_arr = []
-    const add_nets_arr = []
-    for (const [net, index] of Object.entries(nets)) {
-        nets_arr.push(`(net ${index} "${net}")`)
-        add_nets_arr.push(`(add_net "${net}")`)
-    }
-
-    const netclass = kicad_netclass.replace('__ADD_NET', add_nets_arr.join('\n'))
-    const nets_text = nets_arr.join('\n')
-    const footprint_text = footprints.join('\n')
-    return `
-    
-        ${kicad_prefix}
-        ${nets_text}
-        ${netclass}
-        ${footprint_text}
-        ${kicad_edge}
-        ${kicad_suffix}
-    
-    `
+    return results
 }

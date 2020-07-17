@@ -180,7 +180,7 @@ exports.parse = (config = {}) => {
     for (let [zone_name, zone] of Object.entries(zones)) {
 
         // handle zone-level `extends` clauses
-        zone = a.inherit(zone, 'points.zones', zone_name, zones)
+        zone = a.inherit('points.zones', zone_name, zones)
 
         const anchor = a.anchor(zone.anchor || {}, `points.zones.${zone_name}.anchor`, points)
         points = Object.assign(points, render_zone(zone_name, zone, anchor, global_key))

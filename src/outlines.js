@@ -35,23 +35,23 @@ const layout = exports._layout = (config = {}, points = {}) => {
 
     // Glue config sanitization
 
-    const parsed_glue = u.deepcopy(a.sane(config, 'outline.glue', 'object'))
+    const parsed_glue = u.deepcopy(a.sane(config, 'outlines.glue', 'object'))
     for (let [gkey, gval] of Object.entries(parsed_glue)) {
-        gval = a.inherit(gval, 'outline.glue', gkey, config)
-        a.detect_unexpected(gval, `outline.glue.${gkey}`, ['top', 'bottom', 'waypoints', 'extra'])
+        gval = a.inherit('outlines.glue', gkey, config)
+        a.detect_unexpected(gval, `outlines.glue.${gkey}`, ['top', 'bottom', 'waypoints', 'extra'])
     
         for (const y of ['top', 'bottom']) {
-            a.detect_unexpected(gval[y], `outline.glue.${gkey}.${y}`, ['left', 'right'])
-            gval[y].left = relative_anchor(gval[y].left, `outline.glue.${gkey}.${y}.left`, points)
+            a.detect_unexpected(gval[y], `outlines.glue.${gkey}.${y}`, ['left', 'right'])
+            gval[y].left = relative_anchor(gval[y].left, `outlines.glue.${gkey}.${y}.left`, points)
             if (a.type(gval[y].right) != 'number') {
-                gval[y].right = relative_anchor(gval[y].right, `outline.glue.${gkey}.${y}.right`, points)
+                gval[y].right = relative_anchor(gval[y].right, `outlines.glue.${gkey}.${y}.right`, points)
             }
         }
     
-        gval.waypoints = a.sane(gval.waypoints || [], `outline.glue.${gkey}.waypoints`, 'array')
+        gval.waypoints = a.sane(gval.waypoints || [], `outlines.glue.${gkey}.waypoints`, 'array')
         let wi = 0
         gval.waypoints = gval.waypoints.map(w => {
-            const name = `outline.glue.${gkey}.waypoints[${++wi}]`
+            const name = `outlines.glue.${gkey}.waypoints[${++wi}]`
             a.detect_unexpected(w, name, ['percent', 'width'])
             w.percent = a.sane(w.percent, name + '.percent', 'number')
             w.width = a.wh(w.width, name + '.width')
@@ -208,12 +208,12 @@ exports.parse = (config = {}, points = {}) => {
 
     const outlines = {}
 
-    const ex = a.sane(config.exports, 'outline.exports', 'object')
-    for (const [key, parts] of Object.entries(ex)) {
-        let index = 0
+    const ex = a.sane(config.exports, 'outlines.exports', 'object')
+    for (let [key, parts] of Object.entries(ex)) {
+        parts = a.inherit('outlines.exports', key, ex)
         let result = {models: {}}
-        for (const part of parts) {
-            const name = `outline.exports.${key}[${++index}]`
+        for (const [part_name, part] of Object.entries(parts)) {
+            const name = `outlines.exports.${key}.${part_name}`
             const expected = ['type', 'operation']
             part.type = a.in(part.type, `${name}.type`, ['keys', 'rectangle', 'circle', 'polygon', 'outline'])
             part.operation = a.in(part.operation || 'add', `${name}.operation`, ['add', 'subtract', 'intersect', 'stack'])

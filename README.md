@@ -36,15 +36,15 @@ The important thing is that the data should contain the following keys:
 
 ```yaml
 points: <points config...>
-outline: <outline config...>
-case: <case config...>
-pcb: <pcb config...>
+outlines: <outline config...>
+cases: <case config...>
+pcbs: <pcb config...>
 ```
 
 The `points` section describes the core of the layout: the positions of the keys.
-The `outline` section then uses these points to generate plate, case, and PCB outlines.
-The `case` section details how the case outlines are to be 3D-ized to form a 3D-printable object.
-Finally, the `pcb` section is used to configure a KiCAD PCB template.
+The `outlines` section then uses these points to generate plate, case, and PCB outlines.
+The `cases` section details how the case outlines are to be 3D-ized to form a 3D-printable object.
+Finally, the `pcbs` section is used to configure KiCAD PCB templates.
 
 In the following, we'll have an in-depth discussion about each of these, with an additional running example of how the [Absolem](#TODO-link-to-config-yaml)'s config was created.
 
@@ -305,7 +305,7 @@ TODO: Absolem points here, with pics
 
 
 
-## Outline
+## Outlines
 
 Once the raw points are available, we want to turn them into solid, continuous outlines.
 The points are enough to create properly positioned and rotated rectangles (with parametric side lengths), but they won't combine since there won't be any overlap.
@@ -480,7 +480,7 @@ If we only want to use it as a building block for further exports, we can start 
 
 
 
-## Case
+## Cases
 
 Cases add a pretty basic and minimal 3D aspect to the generation process.
 In this phase, we take different outlines (exported from the above section, even the "private" ones), extrude and position them in space, and combine them into one 3D-printable object.
@@ -488,7 +488,7 @@ That's it.
 Declarations might look like this:
 
 ```yaml
-case:
+cases:
     case_name:
         - outline: <outline ref>
           extrude: num # default = 1
@@ -575,7 +575,7 @@ If we only want to use an object as a building block for further objects, we can
 
 
 
-## PCB
+## PCBs
 
 Everything should be ready for a handwire, but if you'd like the design to be more accessible and easily replicable, you probably want a PCB as well.
 To help you get started, the necessary footprints and an edge cut can be automatically positioned so that all you need to do manually is the routing.
@@ -589,14 +589,16 @@ The differences between the two footprint types are:
 Additionally, the edge cut of the PCB can be specified using a previously defined outline name under the `edge` key.
 
 ```yaml
-pcb:
-    edge: <outline reference>
-    footprints:
-        - type: <footprint type>
-          anchor: <anchor declaration>
-          nets: <type-specific net params>
-          params: <type-specific (non-net) footprint params>
-        - ...
+pcbs:
+    pcb_name:
+        edge: <outline reference>
+        footprints:
+            - type: <footprint type>
+            anchor: <anchor declaration>
+            nets: <type-specific net params>
+            params: <type-specific (non-net) footprint params>
+            - ...
+    ...
 ```
 
 Currently, the following footprint types are supported:

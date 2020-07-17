@@ -106,7 +106,7 @@ const extend_pair = exports.extend_pair = (to, from) => {
     } else return from
 }
 
-exports.extend = (...args) => {
+const extend = exports.extend = (...args) => {
     let res = args[0]
     for (const arg of args) {
         if (res == arg) continue
@@ -115,18 +115,22 @@ exports.extend = (...args) => {
     return res
 }
 
-const inherit = exports.inherit = (config, name_prefix, name, set) => {
-    let result = u.deepcopy(config)
-    if (config.extends !== undefined) {
-        let list = config.extends
-        if (type(list) !== 'array') list = [list]
-        for (const item of list) {
-            const other = set[item]
-            assert(other, `Field "${name_prefix}.${name}" does not name a valid target!`)
-            result = extend_pair(inherit(other, name_prefix, config.extends, set), result)
-
+const inherit = exports.inherit = (name_prefix, name, set) => {
+    let result = u.deepcopy(set[name])
+    if (result.extends !== undefined) {
+        let candidates = [name]
+        const list = []
+        while (candidates.length) {
+            const item = candidates.shift()
+            const other = u.deepcopy(set[item])
+            assert(other, `"${item}" (reached from "${name_prefix}.${name}.extends") does not name a valid target!`)
+            let parents = other.extends || []
+            if (type(parents) !== 'array') parents = [parents]
+            candidates = candidates.concat(parents)
+            delete other.extends
+            list.unshift(other)
         }
-        delete result.extends
+        result = extend.apply(this, list)
     }
     return result
 }
