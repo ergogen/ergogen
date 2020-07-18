@@ -11,7 +11,7 @@ const line = exports.line = (a, b) => {
 }
 
 exports.circle = (p, r) => {
-    return new m.paths.Circle(p, r)
+    return {paths: {circle: new m.paths.Circle(p, r)}}
 }
 
 exports.rect = (w, h, o=[0, 0]) => {

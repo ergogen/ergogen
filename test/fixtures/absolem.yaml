@@ -70,29 +70,192 @@ points:
           mirror:
             row_net: P6
         top:
+          row_net: P15
+          mirror:
+            row_net: P5
+    s19:
+      extends: matrix
+      columns:
+        pinky:
+          rows:
+            bottom:
+              footprints:
+                diode:
+                  anchor:
+                    shift: [,12]
+            home:
+              footprints:
+                diode:
+                  anchor:
+                    shift: [,6]
+            top:
+              footprints:
+                row_ext:
+                  anchor:
+                    shift: [, -10]
+                extra_column:
+                  type: pad
+                  anchor:
+                    shift: [-4, 4]
+                  nets:
+                    net: 'P19'
+                  params:
+                    width: 2
+                    height: 2
+                    front: false
+          key:
+            footprints:
+              row_ext:
+                type: pad
+                anchor:
+                  shift: [-4, -4]
+                nets:
+                  net: '!row_net'
+                params:
+                  width: 2
+                  height: 2
+                  front: false
+
+        ring:
+          rows:
+            bottom:
+              footprints:
+                diode:
+                  anchor:
+                    shift: [,5]
+            home:
+              footprints:
+                diode:
+                  anchor:
+                    shift: [,2.5]
+        middle:
+          rows:
+            top:
+              footprints:
+                diode:
+                  anchor:
+                    shift: [,-6]
+            home:
+              footprints:
+                diode:
+                  anchor:
+                    shift: [,-3]
+        index:
+          rows:
+            bottom:
+              footprints:
+                diode:
+                  anchor:
+                    shift: [-8.25,6]
+            home:
+              footprints:
+                diode:
+                  anchor:
+                    shift: [-8.25,3]
+            top:
+              footprints:
+                diode:
+                  anchor:
+                    shift: [-8.25,]
+      rows:
+        top:
           footprints:
             mx:
               anchor:
                 rotate: 180
-          row_net: P15
-          mirror:
-            row_net: P5
+            alps:
+              anchor:
+                rotate: 180
+            choc:
+              anchor:
+                rotate: 180
+            col_ext:
+              type: pad
+              anchor:
+                shift: [4, 4]
+              nets:
+                net: '!column_net'
+              params:
+                width: 2
+                height: 2
+                front: false
+        bottom:
+          footprints:
+            diode:
+              anchor:
+                rotate: 270
+            col_ext:
+              type: pad
+              anchor:
+                shift: [4, -4]
+              nets:
+                net: '!column_net'
+              params:
+                width: 2
+                height: 2
+                front: false
       key:
         tags:
           s19: true
-    choc:
+        footprints: &quad
+          mx:
+            type: mx
+            nets:
+              from: '!colrow'
+              to: '!column_net'
+          alps:
+            type: alps
+            nets:
+              from: '!colrow'
+              to: '!column_net'
+          <<: &choc
+            choc:
+              type: choc
+              nets:
+                from: '!colrow'
+                to: '!column_net'
+          diode:
+            type: diode
+            anchor:
+              rotate: 90
+              shift: [8.25, 0]
+            nets:
+              from: '!colrow'
+              to: '!row_net'
+        mirror:
+          footprints: &quad_mirror
+            mx:
+              nets:
+                from: '!column_net'
+                to: '!colrow'
+            alps:
+              nets:
+                from: '!column_net'
+                to: '!colrow'
+            <<: &choc_mirror
+              choc:
+                nets:
+                  from: '!column_net'
+                  to: '!colrow'
+    s18:
       extends: matrix
       columns:
         pinky:
           stagger: 1
           origin: [7, -8]
+      rows:
+        top:
+          footprints:
+            choc:
+              anchor:
+                rotate: 180
       key:
         padding: 18
         tags:
-          s19: false
           s18: true
-        footprints:
-          diode: '!!unset'
+        footprints: *choc
+        mirror:
+          footprints: *choc_mirror
     thumbfan:
       anchor:
         ref: matrix_inner_bottom
@@ -105,10 +268,27 @@ points:
           rows:
             thumb:
               bind: [10,5,,]
-          key:
-            column_net: P2
-            tags:
-              classic: true
+              column_net: P2
+              tags:
+                classic: true
+              footprints:
+                choc:
+                  anchor:
+                    rotate: 180
+                diode:
+                  anchor:
+                    shift: [8,]
+                row_ext:
+                  type: pad
+                  anchor:
+                    shift: [-3, 9]
+                  nets:
+                    net: '!row_net'
+                  params:
+                    width: 2
+                    height: 2
+                    front: false
+
         home:
           spread: 21.25
           rotate: -28
@@ -125,15 +305,33 @@ points:
           rows:
             thumb:
               bind: [-1,,,5]
-          key:
-            column_net: P4
-            tags:
-              classic: true
+              column_net: P4
+              tags:
+                classic: true
+              footprints:
+                choc:
+                  anchor:
+                    rotate: 180
+                diode:
+                  anchor:
+                    shift: [-4,]
       rows:
         thumb:
           row_net: P10
+          footprints:
+            diode:
+              anchor:
+                shift: [0, 9]
+                rotate: 180
           mirror:
             row_net: P8
+            footprints:
+              diode:
+                anchor:
+                  rotate: 0
+      key:
+        footprints: *quad
+        mirror: *quad_mirror
     unifar:
       anchor:
         ref: thumbfan_home_thumb
@@ -143,14 +341,20 @@ points:
           origin: [9.5, -9]
           key:
             skip: true
-        far1u:
+        far:
           rows:
             thumb:
               bind: [-1,,,5]
           key:
             column_net: P4
             footprints:
-              diode: false
+              choc:
+                anchor:
+                  rotate: 180
+              diode: '!!unset'
+            mirror:
+              footprints:
+                diode: '!!unset'
             tags:
               uniform: true
       rows:
@@ -158,6 +362,9 @@ points:
           row_net: P10
           mirror:
             row_net: P8
+      key:
+        footprints: *quad
+        mirror: *quad_mirror
     uninear:
       anchor:
         ref: thumbfan_home_thumb
@@ -168,14 +375,20 @@ points:
           origin: [-9.5, -9]
           key:
             skip: true
-        near1u:
+        near:
           rows:
             thumb:
               bind: [10,5,,]
           key:
             column_net: P2
             footprints:
-              diode: false
+              choc:
+                anchor:
+                  rotate: 180
+              diode: '!!unset'
+            mirror:
+              footprints:
+                diode: '!!unset'
             tags:
               uniform: true
       rows:
@@ -183,28 +396,11 @@ points:
           row_net: P10
           mirror:
             row_net: P8
+      key:
+        footprints: *quad
+        mirror: *quad_mirror
   key:
     bind: [0,0,0,0]
-    footprints:
-      mx:
-        type: mx
-        nets:
-          from: '!column_net'
-          to: '!colrow'
-      diode:
-        type: diode
-        anchor:
-          rotate: 90
-          shift: [8, 0]
-        nets:
-          from: '!name'
-          to: '!row_net'
-    mirror:
-      footprints:
-        mx:
-          nets:
-            from: '!colrow'
-            to: '!column_net'
   rotate: -20
   mirror:
     ref: matrix_pinky_home
@@ -237,16 +433,16 @@ outlines:
       extends: classic_s19
       bottom:
         left:
-          ref: unifar_far1u_thumb
+          ref: unifar_far_thumb
         right:
-          ref: mirror_unifar_far1u_thumb
+          ref: mirror_unifar_far_thumb
     classic_s18:
       extends: classic_s19
       top:
         left:
-          ref: choc_inner_top
+          ref: s18_inner_top
         right:
-          ref: mirror_choc_inner_top
+          ref: mirror_s18_inner_top
     uniform_s18:
       extends:
         - uniform_s19
@@ -276,6 +472,55 @@ outlines:
           - s18
           - uniform
         glue: uniform_s18
+    mounting_holes:
+      ring_top:
+        type: circle
+        ref: matrix_ring_home
+        shift: [-10, 5]
+        radius: 2.25
+        mirror: true
+      ring_bottom:
+        type: circle
+        ref: matrix_ring_home
+        shift: [-9, -9]
+        radius: 2.25
+        mirror: true
+        operation: stack
+      index_top:
+        type: circle
+        ref: matrix_index_home
+        shift: [9.5, 9.5]
+        radius: 2.25
+        mirror: true
+        operation: stack
+      index_bottom:
+        type: circle
+        ref: matrix_index_home
+        shift: [9.5, -9.5]
+        radius: 2.25
+        mirror: true
+        operation: stack
+      thumb_near:
+        type: circle
+        ref: thumbfan_home_thumb
+        shift: [-12, 2]
+        radius: 2.25
+        mirror: true
+        operation: stack
+      thumb_far:
+        type: circle
+        ref: thumbfan_home_thumb
+        shift: [12, 2]
+        radius: 2.25
+        mirror: true
+        operation: stack
+      middle:
+        type: circle
+        ref: thumbfan_home_thumb
+        shift: [-8, 19]
+        radius: 2.25
+        mirror: true
+        operation: stack
     intersected_outline:
       one:
         type: outline
@@ -284,6 +529,18 @@ outlines:
         type: outline
         name: uniform_s18_outline
         operation: intersect
+      controller_cutout:
+        type: rectangle
+        ref:
+          - s18_inner_top
+          - mirror_s18_inner_top
+        shift: [-10, -5]
+        size: [20, 10]
+        operation: subtract
+      mounting_holes:
+        type: outline
+        name: mounting_holes
+        operation: subtract
     classic_s19_switches:
       main:
         type: keys
@@ -335,6 +592,10 @@ outlines:
         type: outline
         name: classic_s19_outline
         operation: intersect
+      mounting_holes:
+        type: outline
+        name: mounting_holes
+        operation: stack
 pcbs:
   main:
     edge: intersected_outline
@@ -343,7 +604,33 @@ pcbs:
         type: promicro
         anchor:
           ref:
-            - choc_inner_top
-            - mirror_choc_inner_top
-          shift: [0, -20]
+            - s18_inner_top
+            - mirror_s18_inner_top
+          shift: [0, -23]
           rotate: 270
+      extra_row_left:
+        type: pad
+        anchor:
+          ref:
+            - s18_inner_top
+            - mirror_s18_inner_top
+          shift: [-15, -10]
+        nets:
+          net: 'P20'
+        params:
+          width: 3
+          height: 3
+          front: false
+      extra_row_right:
+        type: pad
+        anchor:
+          ref:
+            - s18_inner_top
+            - mirror_s18_inner_top
+          shift: [15, -10]
+        nets:
+          net: 'P21'
+        params:
+          width: 3
+          height: 3
+          front: false

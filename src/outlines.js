@@ -230,19 +230,35 @@ exports.parse = (config = {}, points = {}) => {
                     arg = layout_fn(part, name, expected)
                     break
                 case 'rectangle':
-                    a.detect_unexpected(part, name, expected.concat(['ref', 'shift', 'rotate', 'size', 'corner', 'bevel']))
+                    a.detect_unexpected(part, name, expected.concat(['ref', 'shift', 'rotate', 'size', 'corner', 'bevel', 'mirror']))
                     anchor = a.anchor(part, name, points, false)
                     const size = a.wh(part.size, `${name}.size`)
                     const corner = a.sane(part.corner || 0, `${name}.corner`, 'number')
                     const bevel = a.sane(part.bevel || 0, `${name}.bevel`, 'number')
-                    arg = rectangle(size[0], size[1], corner, bevel, name)
-                    arg = anchor.position(arg)
+                    const rect_mirror = a.sane(part.mirror || false, `${name}.mirror`, 'boolean')
+                    const rect = rectangle(size[0], size[1], corner, bevel, name)
+                    arg = anchor.position(rect)
+                    if (rect_mirror) {
+                        const mirror_part = u.deepcopy(part)
+                        a.assert(mirror_part.ref, `Field "${name}.ref" must be speficied if mirroring is required!`)
+                        mirror_part.ref = `mirror_${mirror_part.ref}`
+                        anchor = a.anchor(mirror_part, name, points, false)
+                        arg = u.stack(arg, anchor.position(rect))
+                    }
                     break
                 case 'circle':
-                    a.detect_unexpected(part, name, expected.concat(['ref', 'shift', 'rotate', 'radius']))
+                    a.detect_unexpected(part, name, expected.concat(['ref', 'shift', 'rotate', 'radius', 'mirror']))
                     anchor = a.anchor(part, name, points, false)
                     const radius = a.sane(part.radius, `${name}.radius`, 'number')
+                    const circle_mirror = a.sane(part.mirror || false, `${name}.mirror`, 'boolean')
                     arg = u.circle(anchor.p, radius)
+                    if (circle_mirror) {
+                        const mirror_part = u.deepcopy(part)
+                        a.assert(mirror_part.ref, `Field "${name}.ref" must be speficied if mirroring is required!`)
+                        mirror_part.ref = `mirror_${mirror_part.ref}`
+                        anchor = a.anchor(mirror_part, name, points, false)
+                        arg = u.stack(arg, u.circle(anchor.p, radius))
+                    }
                     break
                 case 'polygon':
                     a.detect_unexpected(part, name, expected.concat(['points']))

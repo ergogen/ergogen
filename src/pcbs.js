@@ -125,13 +125,16 @@ const makerjs2kicad = exports._makerjs2kicad = (model, layer='Edge.Cuts') => {
                     grs.push(`(gr_line (start ${xy(p.origin)}) (end ${xy(p.end)}) (angle 90) (layer ${layer}) (width 0.15))`)
                     break
                 case 'arc':
-                    const center = p.origin
+                    const arc_center = p.origin
                     const angle_start = p.startAngle > p.endAngle ? p.startAngle - 360 : p.startAngle
                     const angle_diff = Math.abs(p.endAngle - angle_start)
-                    const end = m.point.rotate(m.point.add(center, [p.radius, 0]), angle_start, center)
-                    grs.push(`(gr_arc (start ${xy(center)}) (end ${xy(end)}) (angle ${-angle_diff}) (layer ${layer}) (width 0.15))`)
+                    const arc_end = m.point.rotate(m.point.add(arc_center, [p.radius, 0]), angle_start, arc_center)
+                    grs.push(`(gr_arc (start ${xy(arc_center)}) (end ${xy(arc_end)}) (angle ${-angle_diff}) (layer ${layer}) (width 0.15))`)
                     break
                 case 'circle':
+                    const circle_center = p.origin
+                    const circle_end = m.point.add(circle_center, [p.radius, 0])
+                    grs.push(`(gr_circle (center ${xy(circle_center)}) (end ${xy(circle_end)}) (layer ${layer}) (width 0.15))`)
                     break
                 default:
                     throw new Error(`Can't convert path type "${p.type}" to kicad!`)
@@ -155,23 +158,16 @@ const footprint = exports._footprint = (config, name, points, net_indexer, point
 
     // basic setup
     const fp = footprint_types[type]
-    let result = fp.body
+    const parsed_params = {}
 
     // footprint positioning
-    const at = `(at ${anchor.x} ${-anchor.y} ${anchor.r})`
-    result = result.replace(new RegExp('__AT', 'g'), at)
-    // fix rotations within footprints
-    const rot_regex = /__ROT\((\d+)\)/g
-    const matches = [...result.matchAll(rot_regex)]
-    for (const match of matches) {
-        const angle = parseFloat(match[1])
-        result = result.replace(match[0], (anchor.r + angle) + '')
-    }
+    parsed_params.at = `(at ${anchor.x} ${-anchor.y} ${anchor.r})`
+    parsed_params.rot = anchor.r
 
     // connecting static nets
     for (const net of (fp.static_nets || [])) {
         const index = net_indexer(net)
-        result = result.replace(new RegExp('__NET_' + net.toUpperCase(), 'g'), `(net ${index} "${net}")`)
+        parsed_params['net_' + net] = `(net ${index} "${net}")`
     }
 
     // connecting parametric nets
@@ -184,22 +180,22 @@ const footprint = exports._footprint = (config, name, points, net_indexer, point
             a.sane(net, `${name}.nets.${net_ref} --> ${point.meta.name}.${indirect}`, 'string')
         }
         const index = net_indexer(net)
-        result = result.replace(new RegExp('__NET_' + net_ref.toUpperCase(), 'g'), `(net ${index} "${net}")`)
+        parsed_params['net_' + net_ref] = `(net ${index} "${net}")`
     }
 
     // connecting other, non-net parameters
-    for (const param of (fp.params || [])) {
-        let value = params[param]
+    for (const param of (Object.keys(fp.params || {}))) {
+        let value = params[param] === undefined ? fp.params[param] : params[param]
         if (value === undefined) throw new Error(`Field "${name}.params.${param}" is missing!`)
         if (a.type(value) == 'string' && value.startsWith('!') && point) {
             const indirect = value.substring(1)
             value = point.meta[indirect]
             if (value === undefined) throw new Error(`Field "${name}.params.${param} --> ${point.meta.name}.${indirect}" is missing!`)
         }
-        result = result.replace(new RegExp('__PARAM_' + param.toUpperCase(), 'g'), value)
+        parsed_params['param_' + param] = value
     }
 
-    return result
+    return fp.body(parsed_params)
 }
 
 exports.parse = (config, points, outlines) => {

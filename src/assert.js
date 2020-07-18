@@ -95,6 +95,7 @@ const extend_pair = exports.extend_pair = (to, from) => {
         const res = u.deepcopy(to)
         for (const key of Object.keys(from)) {
             res[key] = extend_pair(to[key], from[key])
+            if (res[key] === undefined) delete res[key]
         }
         return res
     } else if (from_type == 'array') {
