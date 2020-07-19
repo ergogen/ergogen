@@ -4,5 +4,6 @@ module.exports = {
     choc: require('./choc'),
     diode: require('./diode'),
     promicro: require('./promicro'),
+    rgb: require('./rgb'),
     pad: require('./pad')
 }

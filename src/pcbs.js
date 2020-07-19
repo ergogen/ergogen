@@ -206,12 +206,16 @@ exports.parse = (config, points, outlines) => {
     for (const [pcb_name, pcb_config] of Object.entries(pcbs)) {
 
         // config sanitization
-        a.detect_unexpected(pcb_config, `pcb.${pcb_name}`, ['edge', 'footprints'])
-        const edge = outlines[pcb_config.edge]
-        if (!edge) throw new Error(`Field "pcb.${pcb_name}.edge" doesn't name a valid outline!`)
+        a.detect_unexpected(pcb_config, `pcb.${pcb_name}`, ['outlines', 'footprints'])
 
-        // Edge.Cuts conversion
-        const kicad_edge = makerjs2kicad(edge)
+        // outline conversion
+        const config_outlines = a.sane(pcb_config.outlines, `pcb.${pcb_name}.outlines`, 'object')
+        const kicad_outlines = {}
+        for (const [outline_name, outline] of Object.entries(config_outlines)) {
+            const ref = a.in(outline.outline, `pcb.${pcb_name}.outlines.${outline_name}.outline`, Object.keys(outlines))
+            const layer = a.sane(outline.layer || 'Edge.Cuts', `pcb.${pcb_name}.outlines.${outline_name}.outline`, 'string')
+            kicad_outlines[outline_name] = makerjs2kicad(outlines[ref], layer)
+        }
 
         // making a global net index registry
         const nets = {"": 0}
@@ -247,12 +251,13 @@ exports.parse = (config, points, outlines) => {
         const netclass = kicad_netclass.replace('__ADD_NET', add_nets_arr.join('\n'))
         const nets_text = nets_arr.join('\n')
         const footprint_text = footprints.join('\n')
+        const outline_text = Object.values(kicad_outlines).join('\n')
         results[pcb_name] = `
             ${kicad_prefix}
             ${nets_text}
             ${netclass}
             ${footprint_text}
-            ${kicad_edge}
+            ${outline_text}
             ${kicad_suffix}
         `
     }

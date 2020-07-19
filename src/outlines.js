@@ -237,13 +237,14 @@ exports.parse = (config = {}, points = {}) => {
                     const bevel = a.sane(part.bevel || 0, `${name}.bevel`, 'number')
                     const rect_mirror = a.sane(part.mirror || false, `${name}.mirror`, 'boolean')
                     const rect = rectangle(size[0], size[1], corner, bevel, name)
-                    arg = anchor.position(rect)
+                    arg = anchor.position(u.deepcopy(rect))
                     if (rect_mirror) {
                         const mirror_part = u.deepcopy(part)
                         a.assert(mirror_part.ref, `Field "${name}.ref" must be speficied if mirroring is required!`)
                         mirror_part.ref = `mirror_${mirror_part.ref}`
                         anchor = a.anchor(mirror_part, name, points, false)
-                        arg = u.stack(arg, anchor.position(rect))
+                        const mirror_rect = m.model.moveRelative(u.deepcopy(rect), [-size[0], 0])
+                        arg = u.union(arg, anchor.position(mirror_rect))
                     }
                     break
                 case 'circle':
@@ -257,7 +258,7 @@ exports.parse = (config = {}, points = {}) => {
                         a.assert(mirror_part.ref, `Field "${name}.ref" must be speficied if mirroring is required!`)
                         mirror_part.ref = `mirror_${mirror_part.ref}`
                         anchor = a.anchor(mirror_part, name, points, false)
-                        arg = u.stack(arg, u.circle(anchor.p, radius))
+                        arg = u.union(arg, u.circle(anchor.p, radius))
                     }
                     break
                 case 'polygon':

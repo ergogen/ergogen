@@ -559,7 +559,7 @@ outlines:
         glue: uniform_s19
         size: 14
         bound: false
-    classic_s19_middle:
+    pcb_middle:
       raw:
         type: keys
         side: middle
@@ -573,32 +573,26 @@ outlines:
         size: [25, 5]
         ref: thumbfan_home_thumb
         shift: [0, 12]
+        mirror: true
       helper2:
         type: rectangle
         size: [25, 5]
         ref: thumbfan_far_thumb
         shift: [-25, 12]
-      helper3:
-        type: rectangle
-        size: [25, 5]
-        ref: mirror_thumbfan_home_thumb
-        shift: [25, 12]
-      helper4:
-        type: rectangle
-        size: [25, 5]
-        ref: mirror_thumbfan_far_thumb
-        shift: [0, 12]
+        mirror: true
       outer_bounds:
         type: outline
         name: classic_s19_outline
         operation: intersect
-      mounting_holes:
-        type: outline
-        name: mounting_holes
-        operation: stack
 pcbs:
   main:
-    edge: intersected_outline
+    outlines:
+      edge:
+        outline: intersected_outline
+        layer: Edge.Cuts
+      middle:
+        outline: pcb_middle
+        layer: F.SilkS
     footprints:
       mcu:
         type: promicro
@@ -634,3 +628,13 @@ pcbs:
           width: 3
           height: 3
           front: false
+      led:
+        type: rgb
+        anchor:
+          ref:
+            - matrix_inner_bottom
+            - mirror_matrix_inner_bottom
+          shift: [0, -48]
+        nets:
+          din: 'P9'
+          dout: ''
