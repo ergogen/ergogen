@@ -214,6 +214,7 @@ exports.parse = (config = {}) => {
             const mp = p.clone().mirror(axis)
             mp.meta = a.extend(mp.meta, mp.meta.mirror || {})
             mp.meta.mirrored = true
+            p.meta.mirrored = false
             const new_name = `mirror_${name}`
             mp.meta.name = new_name
             mirrored_points[new_name] = mp

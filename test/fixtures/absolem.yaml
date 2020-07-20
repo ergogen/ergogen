@@ -15,6 +15,7 @@ points:
               bind: [,15,-1]
           key:
             column_net: P1
+            column_mark: P
         ring:
           stagger: 12
           rows:
@@ -26,6 +27,7 @@ points:
               bind: [,10]
           key:
             column_net: P0
+            column_mark: R
         middle:
           stagger: 5
           rows:
@@ -36,6 +38,7 @@ points:
             top:
           key:
             column_net: P2
+            column_mark: M
         index:
           stagger: -6
           rows:
@@ -47,6 +50,7 @@ points:
               bind: [,,,10]
           key:
             column_net: P3
+            column_mark: X
         inner:
           stagger: -2
           rows:
@@ -58,21 +62,28 @@ points:
               bind: [,,,10]
           key:
             column_net: P4
+            column_mark: I
       rows:
         bottom:
           bind: [10]
           row_net: P16
+          row_mark: LB
           mirror:
             row_net: P7
+            row_mark: RB
         home:
           bind: [10]
           row_net: P14
+          row_mark: LH
           mirror:
             row_net: P6
+            row_mark: RH
         top:
           row_net: P15
+          row_mark: LT
           mirror:
             row_net: P5
+            row_mark: RT
     s19:
       extends: matrix
       columns:
@@ -103,6 +114,8 @@ points:
                     width: 2
                     height: 2
                     front: false
+                    text: 'E'
+                    align: right
           key:
             footprints:
               row_ext:
@@ -115,6 +128,8 @@ points:
                   width: 2
                   height: 2
                   front: false
+                  text: '!row_mark'
+                  align: right
 
         ring:
           rows:
@@ -179,6 +194,7 @@ points:
                 width: 2
                 height: 2
                 front: false
+                text: '!column_mark'
         bottom:
           footprints:
             diode:
@@ -194,6 +210,7 @@ points:
                 width: 2
                 height: 2
                 front: false
+                text: '!column_mark'
       key:
         tags:
           s19: true
@@ -288,6 +305,8 @@ points:
                     width: 2
                     height: 2
                     front: false
+                    text: '!row_mark'
+                    align: right
 
         home:
           spread: 21.25
@@ -318,6 +337,7 @@ points:
       rows:
         thumb:
           row_net: P10
+          row_mark: LF
           footprints:
             diode:
               anchor:
@@ -325,6 +345,7 @@ points:
                 rotate: 180
           mirror:
             row_net: P8
+            row_mark: RF
             footprints:
               diode:
                 anchor:
@@ -602,6 +623,31 @@ pcbs:
             - mirror_s18_inner_top
           shift: [0, -23]
           rotate: 270
+      slider:
+        type: slider
+        anchor:
+          ref:
+            - s18_inner_top
+            - mirror_s18_inner_top
+          shift: [0, -7.5]
+        nets:
+          from: RAWER
+          to: RAW
+        params:
+          side: B
+      reset:
+        type: reset
+        anchor:
+          ref:
+            - s18_inner_top
+            - mirror_s18_inner_top
+          shift: [0, -17]
+          rotate: 90
+        nets:
+          from: RST
+          to: GND
+        params:
+          side: B
       extra_row_left:
         type: pad
         anchor:
@@ -615,6 +661,8 @@ pcbs:
           width: 3
           height: 3
           front: false
+          text: 'LN'
+          align: right
       extra_row_right:
         type: pad
         anchor:
@@ -628,6 +676,18 @@ pcbs:
           width: 3
           height: 3
           front: false
+          text: 'RN'
+      battery:
+        type: jstph
+        anchor:
+          ref:
+            - matrix_inner_bottom
+            - mirror_matrix_inner_bottom
+          shift: [0, -43]
+          rotate: 180
+        nets:
+          pos: RAWER
+          neg: GND
       led:
         type: rgb
         anchor:

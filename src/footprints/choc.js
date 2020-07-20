@@ -7,14 +7,14 @@ module.exports = {
         ${p.at /* parametric position */}
 
         ${''/* corner marks */}
-        (fp_line (start -7 -6) (end -7 -7) (layer F.SilkS) (width 0.15))
-        (fp_line (start -7 7) (end -6 7) (layer F.SilkS) (width 0.15))
-        (fp_line (start -6 -7) (end -7 -7) (layer F.SilkS) (width 0.15))
-        (fp_line (start -7 7) (end -7 6) (layer F.SilkS) (width 0.15))
-        (fp_line (start 7 6) (end 7 7) (layer F.SilkS) (width 0.15))
-        (fp_line (start 7 -7) (end 6 -7) (layer F.SilkS) (width 0.15))
-        (fp_line (start 6 7) (end 7 7) (layer F.SilkS) (width 0.15))
-        (fp_line (start 7 -7) (end 7 -6) (layer F.SilkS) (width 0.15))
+        (fp_line (start -7 -6) (end -7 -7) (layer Dwgs.User) (width 0.15))
+        (fp_line (start -7 7) (end -6 7) (layer Dwgs.User) (width 0.15))
+        (fp_line (start -6 -7) (end -7 -7) (layer Dwgs.User) (width 0.15))
+        (fp_line (start -7 7) (end -7 6) (layer Dwgs.User) (width 0.15))
+        (fp_line (start 7 6) (end 7 7) (layer Dwgs.User) (width 0.15))
+        (fp_line (start 7 -7) (end 6 -7) (layer Dwgs.User) (width 0.15))
+        (fp_line (start 6 7) (end 7 7) (layer Dwgs.User) (width 0.15))
+        (fp_line (start 7 -7) (end 7 -6) (layer Dwgs.User) (width 0.15))
 
         ${''/* pins */}
         (pad 1 thru_hole circle (at 5 -3.8) (size 2.032 2.032) (drill 1.27) (layers *.Cu *.Mask) ${p.net_from})

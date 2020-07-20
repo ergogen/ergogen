@@ -4,18 +4,29 @@ module.exports = {
         width: 1,
         height: 1,
         front: true,
-        back: true
+        back: true,
+        text: '',
+        align: 'left',
+        mirrored: '!mirrored'
     },
     body: p => {
 
-        let front = ''
-        if (p.param_front) {
-            front = `(pad 1 smd rect (at 0 0 ${p.rot}) (size ${p.param_width} ${p.param_height}) (layers F.Cu F.Paste F.Mask) ${p.net_net})`
-        }
-
-        let back = ''
-        if (p.param_back) {
-            back = `(pad 1 smd rect (at 0 0 ${p.rot}) (size ${p.param_width} ${p.param_height}) (layers B.Cu B.Paste B.Mask) ${p.net_net})`
+        const layout = (toggle, side) => {
+            if (!toggle) return ''
+            let x = 0, y = 0
+            const mirror = side == 'B' ? '(justify mirror)' : ''
+            const plus = (p.param_text.length + 1) * 0.5
+            let align = p.param_align
+            if (p.param_mirrored === true) {
+                if (align == 'left') align = 'right'
+                else if (align == 'right') align = 'left'
+            }
+            if (align == 'left') x -= p.param_width / 2 + plus
+            if (align == 'right') x += p.param_width / 2 + plus
+            if (align == 'up') y += p.param_height / 2 + plus
+            if (align == 'down') y -= p.param_height / 2 + plus
+            const text = `(fp_text user ${p.param_text} (at ${x} ${y} ${p.rot}) (layer ${side}.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15)) ${mirror}))`
+            return `(pad 1 smd rect (at 0 0 ${p.rot}) (size ${p.param_width} ${p.param_height}) (layers ${side}.Cu ${side}.Paste ${side}.Mask) ${p.net_net})\n${text}`
         }
 
         return `
@@ -25,8 +36,8 @@ module.exports = {
             ${p.at /* parametric position */}
             
             ${''/* SMD pads */}
-            ${front}
-            ${back}
+            ${layout(p.param_front, 'F')}
+            ${layout(p.param_back, 'B')}
             
         )
     
