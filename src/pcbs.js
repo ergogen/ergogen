@@ -145,7 +145,7 @@ const makerjs2kicad = exports._makerjs2kicad = (model, layer='Edge.Cuts') => {
 }
 
 const footprint_types = require('./footprints')
-const footprint = exports._footprint = (config, name, points, net_indexer, point) => {
+const footprint = exports._footprint = (config, name, points, point, net_indexer, component_indexer) => {
 
     if (config === false) return ''
     
@@ -165,9 +165,10 @@ const footprint = exports._footprint = (config, name, points, net_indexer, point
     parsed_params.rot = anchor.r
 
     // connecting static nets
+    parsed_params.net = {}
     for (const net of (fp.static_nets || [])) {
         const index = net_indexer(net)
-        parsed_params['net_' + net] = `(net ${index} "${net}")`
+        parsed_params.net[net] = `(net ${index} "${net}")`
     }
 
     // connecting parametric nets
@@ -180,10 +181,11 @@ const footprint = exports._footprint = (config, name, points, net_indexer, point
             a.sane(net, `${name}.nets.${net_ref} --> ${point.meta.name}.${indirect}`, 'string')
         }
         const index = net_indexer(net)
-        parsed_params['net_' + net_ref] = `(net ${index} "${net}")`
+        parsed_params.net[net_ref] = `(net ${index} "${net}")`
     }
 
     // connecting other, non-net parameters
+    parsed_params.param = {}
     for (const param of (Object.keys(fp.params || {}))) {
         let value = params[param] === undefined ? fp.params[param] : params[param]
         if (value === undefined) throw new Error(`Field "${name}.params.${param}" is missing!`)
@@ -192,8 +194,11 @@ const footprint = exports._footprint = (config, name, points, net_indexer, point
             value = point.meta[indirect]
             if (value === undefined) throw new Error(`Field "${name}.params.${param} --> ${point.meta.name}.${indirect}" is missing!`)
         }
-        parsed_params['param_' + param] = value
+        parsed_params.param[param] = value
     }
+
+    // reference
+    parsed_params.ref = component_indexer(parsed_params.param.class || '_')
 
     return fp.body(parsed_params)
 }
@@ -224,20 +229,29 @@ exports.parse = (config, points, outlines) => {
             const index = Object.keys(nets).length
             return nets[net] = index
         }
+        // and a component indexer
+        const component_registry = {}
+        const component_indexer = _class => {
+            if (!component_registry[_class]) {
+                component_registry[_class] = 0
+            }
+            component_registry[_class]++
+            return `${_class}${component_registry[_class]}`
+        }
 
         const footprints = []
 
         // key-level footprints
         for (const [p_name, point] of Object.entries(points)) {
             for (const [f_name, f] of Object.entries(point.meta.footprints || {})) {
-                footprints.push(footprint(f, `${p_name}.footprints.${f_name}`, points, net_indexer, point))
+                footprints.push(footprint(f, `${p_name}.footprints.${f_name}`, points, point, net_indexer, component_indexer))
             }
         }
 
         // global one-off footprints
         const global_footprints = a.sane(pcb_config.footprints || {}, `pcb.${pcb_name}.footprints`, 'object')
         for (const [gf_name, gf] of Object.entries(global_footprints)) {
-            footprints.push(footprint(gf, `pcb.${pcb_name}.footprints.${gf_name}`, points, net_indexer))
+            footprints.push(footprint(gf, `pcb.${pcb_name}.footprints.${gf_name}`, points, undefined, net_indexer, component_indexer))
         }
 
         // finalizing nets

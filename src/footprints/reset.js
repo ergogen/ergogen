@@ -1,6 +1,7 @@
 module.exports = {
     nets: ['from', 'to'],
     params: {
+        class: 'B', // for Button
         side: 'F'
     },
     body: p => `
@@ -11,22 +12,25 @@ module.exports = {
         (tags "SPST Tactile Switch")
 
         ${p.at /* parametric position */}
+        ${'' /* footprint reference */}
+        (fp_text reference "${p.ref}" (at 0 0) (layer F.SilkS) (effects (font (size 1.27 1.27) (thickness 0.15))))
+        (fp_text value "" (at 0 0) (layer F.SilkS) (effects (font (size 1.27 1.27) (thickness 0.15))))
         
         ${'' /* outline */}
-        (fp_line (start 2.75 1.25) (end 1.25 2.75) (layer ${p.param_side}.SilkS) (width 0.15))
-        (fp_line (start 2.75 -1.25) (end 1.25 -2.75) (layer ${p.param_side}.SilkS) (width 0.15))
-        (fp_line (start 2.75 -1.25) (end 2.75 1.25) (layer ${p.param_side}.SilkS) (width 0.15))
-        (fp_line (start -1.25 2.75) (end 1.25 2.75) (layer ${p.param_side}.SilkS) (width 0.15))
-        (fp_line (start -1.25 -2.75) (end 1.25 -2.75) (layer ${p.param_side}.SilkS) (width 0.15))
-        (fp_line (start -2.75 1.25) (end -1.25 2.75) (layer ${p.param_side}.SilkS) (width 0.15))
-        (fp_line (start -2.75 -1.25) (end -1.25 -2.75) (layer ${p.param_side}.SilkS) (width 0.15))
-        (fp_line (start -2.75 -1.25) (end -2.75 1.25) (layer ${p.param_side}.SilkS) (width 0.15))
+        (fp_line (start 2.75 1.25) (end 1.25 2.75) (layer ${p.param.side}.SilkS) (width 0.15))
+        (fp_line (start 2.75 -1.25) (end 1.25 -2.75) (layer ${p.param.side}.SilkS) (width 0.15))
+        (fp_line (start 2.75 -1.25) (end 2.75 1.25) (layer ${p.param.side}.SilkS) (width 0.15))
+        (fp_line (start -1.25 2.75) (end 1.25 2.75) (layer ${p.param.side}.SilkS) (width 0.15))
+        (fp_line (start -1.25 -2.75) (end 1.25 -2.75) (layer ${p.param.side}.SilkS) (width 0.15))
+        (fp_line (start -2.75 1.25) (end -1.25 2.75) (layer ${p.param.side}.SilkS) (width 0.15))
+        (fp_line (start -2.75 -1.25) (end -1.25 -2.75) (layer ${p.param.side}.SilkS) (width 0.15))
+        (fp_line (start -2.75 -1.25) (end -2.75 1.25) (layer ${p.param.side}.SilkS) (width 0.15))
         
         ${'' /* pins */}
-        (pad 1 smd rect (at -3.1 -1.85 ${p.rot}) (size 1.8 1.1) (layers ${p.param_side}.Cu ${p.param_side}.Paste ${p.param_side}.Mask) ${p.net_from})
-        (pad 1 smd rect (at 3.1 -1.85 ${p.rot}) (size 1.8 1.1) (layers ${p.param_side}.Cu ${p.param_side}.Paste ${p.param_side}.Mask) ${p.net_from})
-        (pad 2 smd rect (at -3.1 1.85 ${p.rot}) (size 1.8 1.1) (layers ${p.param_side}.Cu ${p.param_side}.Paste ${p.param_side}.Mask) ${p.net_to})
-        (pad 2 smd rect (at 3.1 1.85 ${p.rot}) (size 1.8 1.1) (layers ${p.param_side}.Cu ${p.param_side}.Paste ${p.param_side}.Mask) ${p.net_to})
+        (pad 1 smd rect (at -3.1 -1.85 ${p.rot}) (size 1.8 1.1) (layers ${p.param.side}.Cu ${p.param.side}.Paste ${p.param.side}.Mask) ${p.net.from})
+        (pad 1 smd rect (at 3.1 -1.85 ${p.rot}) (size 1.8 1.1) (layers ${p.param.side}.Cu ${p.param.side}.Paste ${p.param.side}.Mask) ${p.net.from})
+        (pad 2 smd rect (at -3.1 1.85 ${p.rot}) (size 1.8 1.1) (layers ${p.param.side}.Cu ${p.param.side}.Paste ${p.param.side}.Mask) ${p.net.to})
+        (pad 2 smd rect (at 3.1 1.85 ${p.rot}) (size 1.8 1.1) (layers ${p.param.side}.Cu ${p.param.side}.Paste ${p.param.side}.Mask) ${p.net.to})
     )
     
     `

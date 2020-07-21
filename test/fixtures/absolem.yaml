@@ -130,7 +130,6 @@ points:
                   front: false
                   text: '!row_mark'
                   align: right
-
         ring:
           rows:
             bottom:
@@ -307,7 +306,6 @@ points:
                     front: false
                     text: '!row_mark'
                     align: right
-
         home:
           spread: 21.25
           rotate: -28
@@ -315,11 +313,14 @@ points:
           rows:
             thumb:
               bind: [,10,,15]
-          key:
-            column_net: P3
-            tags:
-              classic: true
-              uniform: true
+              column_net: P3
+              tags:
+                classic: true
+                uniform: true
+              footprints:
+                diode:
+                  anchor:
+                    shift: [8,]
         far:
           rows:
             thumb:
@@ -334,6 +335,12 @@ points:
                 diode:
                   anchor:
                     shift: [-4,]
+                    rotate: 0
+              mirror:
+                footprints:
+                  diode:
+                    anchor:
+                      rotate: 180
       rows:
         thumb:
           row_net: P10

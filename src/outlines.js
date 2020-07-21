@@ -71,9 +71,6 @@ const layout = exports._layout = (config = {}, points = {}) => {
         a.detect_unexpected(params, `${export_name}`, expected.concat(['side', 'tags', 'glue', 'size', 'corner', 'bevel', 'bound']))
         const side = a.in(params.side, `${export_name}.side`, ['left', 'right', 'middle', 'both', 'glue'])
         const tags = a.sane(params.tags || [], `${export_name}.tags`, 'array')
-        const default_glue_name = Object.keys(parsed_glue)[0]
-        const glue_def = parsed_glue[a.sane(params.glue || default_glue_name, `${export_name}.glue`, 'string')]
-        a.assert(glue_def, `Field "${export_name}.glue" does not name a valid glue!`)
         const size = a.wh(params.size, `${export_name}.size`)
         const corner = a.sane(params.corner || 0, `${export_name}.corner`, 'number')
         const bevel = a.sane(params.bevel || 0, `${export_name}.bevel`, 'number')
@@ -134,6 +131,10 @@ const layout = exports._layout = (config = {}, points = {}) => {
 
         let glue = {models: {}}
         if (bound && ['middle', 'both', 'glue'].includes(side)) {
+
+            const default_glue_name = Object.keys(parsed_glue)[0]
+            const glue_def = parsed_glue[a.sane(params.glue || default_glue_name, `${export_name}.glue`, 'string')]
+            a.assert(glue_def, `Field "${export_name}.glue" does not name a valid glue!`)
 
             const get_line = (anchor) => {
                 if (a.type(anchor) == 'number') {

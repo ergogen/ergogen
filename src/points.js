@@ -217,6 +217,7 @@ exports.parse = (config = {}) => {
             p.meta.mirrored = false
             const new_name = `mirror_${name}`
             mp.meta.name = new_name
+            mp.meta.colrow = `mirror_${mp.meta.colrow}`
             mirrored_points[new_name] = mp
             if (p.meta.asym == 'right') {
                 p.meta.skip = true

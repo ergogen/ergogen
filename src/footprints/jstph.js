@@ -1,6 +1,7 @@
 module.exports = {
     nets: ['pos', 'neg'],
     params: {
+        class: 'J',
         side: 'F'
     },
     body: p => `
@@ -12,20 +13,24 @@ module.exports = {
 
         ${p.at /* parametric position */}
 
-        (fp_line (start -2.25 0.25) (end -2.25 -1.35) (layer ${p.param_side}.SilkS) (width 0.15))
-        (fp_line (start -2.25 -1.35) (end -2.95 -1.35) (layer ${p.param_side}.SilkS) (width 0.15))
-        (fp_line (start -2.95 -1.35) (end -2.95 6.25) (layer ${p.param_side}.SilkS) (width 0.15))
-        (fp_line (start -2.95 6.25) (end 2.95 6.25) (layer ${p.param_side}.SilkS) (width 0.15))
-        (fp_line (start 2.95 6.25) (end 2.95 -1.35) (layer ${p.param_side}.SilkS) (width 0.15))
-        (fp_line (start 2.95 -1.35) (end 2.25 -1.35) (layer ${p.param_side}.SilkS) (width 0.15))
-        (fp_line (start 2.25 -1.35) (end 2.25 0.25) (layer ${p.param_side}.SilkS) (width 0.15))
-        (fp_line (start 2.25 0.25) (end -2.25 0.25) (layer ${p.param_side}.SilkS) (width 0.15))
+        ${'' /* footprint reference */}
+        (fp_text reference "${p.ref}" (at 0 0) (layer F.SilkS) (effects (font (size 1.27 1.27) (thickness 0.15))))
+        (fp_text value "" (at 0 0) (layer F.SilkS) (effects (font (size 1.27 1.27) (thickness 0.15))))
 
-        (fp_line (start -1 1.5) (end -1 2.0) (layer ${p.param_side}.SilkS) (width 0.15))
-        (fp_line (start -1.25 1.75) (end -0.75 1.75) (layer ${p.param_side}.SilkS) (width 0.15))
+        (fp_line (start -2.25 0.25) (end -2.25 -1.35) (layer ${p.param.side}.SilkS) (width 0.15))
+        (fp_line (start -2.25 -1.35) (end -2.95 -1.35) (layer ${p.param.side}.SilkS) (width 0.15))
+        (fp_line (start -2.95 -1.35) (end -2.95 6.25) (layer ${p.param.side}.SilkS) (width 0.15))
+        (fp_line (start -2.95 6.25) (end 2.95 6.25) (layer ${p.param.side}.SilkS) (width 0.15))
+        (fp_line (start 2.95 6.25) (end 2.95 -1.35) (layer ${p.param.side}.SilkS) (width 0.15))
+        (fp_line (start 2.95 -1.35) (end 2.25 -1.35) (layer ${p.param.side}.SilkS) (width 0.15))
+        (fp_line (start 2.25 -1.35) (end 2.25 0.25) (layer ${p.param.side}.SilkS) (width 0.15))
+        (fp_line (start 2.25 0.25) (end -2.25 0.25) (layer ${p.param.side}.SilkS) (width 0.15))
 
-        (pad 1 thru_hole rect (at -1 0 ${p.rot}) (size 1.2 1.7) (drill 0.75) (layers *.Cu *.Mask) ${p.net_pos})
-        (pad 2 thru_hole oval (at 1 0 ${p.rot}) (size 1.2 1.7) (drill 0.75) (layers *.Cu *.Mask) ${p.net_neg})
+        (fp_line (start -1 1.5) (end -1 2.0) (layer ${p.param.side}.SilkS) (width 0.15))
+        (fp_line (start -1.25 1.75) (end -0.75 1.75) (layer ${p.param.side}.SilkS) (width 0.15))
+
+        (pad 1 thru_hole rect (at -1 0 ${p.rot}) (size 1.2 1.7) (drill 0.75) (layers *.Cu *.Mask) ${p.net.pos})
+        (pad 2 thru_hole oval (at 1 0 ${p.rot}) (size 1.2 1.7) (drill 0.75) (layers *.Cu *.Mask) ${p.net.neg})
             
     )
     
