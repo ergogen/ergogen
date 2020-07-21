@@ -12,6 +12,12 @@ describe('Absolem', function() {
         const actual = points_lib.parse(absolem_config.points)
         // remove metadata, so that it only checks the points
         Object.values(actual).map(val => delete val.meta)
+        // only check points in the "main" zones
+        for (const key of Object.keys(actual)) {
+            if (!expected[key]) {
+                delete actual[key]
+            }
+        }
         actual.should.deep.equal(expected)
     })
 })

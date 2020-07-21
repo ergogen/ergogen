@@ -1,180 +1,180 @@
 {
-    "pinky_bottom": {
+    "matrix_pinky_bottom": {
         "x": 0,
         "y": 0,
         "r": -15
     },
-    "pinky_home": {
+    "matrix_pinky_home": {
         "x": 4.9175619,
         "y": 18.3525907,
         "r": -15
     },
-    "pinky_top": {
+    "matrix_pinky_top": {
         "x": 9.8351237,
         "y": 36.7051814,
         "r": -15
     },
-    "ring_bottom": {
+    "matrix_ring_bottom": {
         "x": 22.7244416,
         "y": 5.176704,
         "r": -20
     },
-    "ring_home": {
+    "matrix_ring_home": {
         "x": 29.2228244,
         "y": 23.0308638,
         "r": -20
     },
-    "ring_top": {
+    "matrix_ring_top": {
         "x": 35.7212071,
         "y": 40.8850235,
         "r": -20
     },
-    "middle_bottom": {
+    "matrix_middle_bottom": {
         "x": 42.2887022,
         "y": 3.3767843,
         "r": -20
     },
-    "middle_home": {
+    "matrix_middle_home": {
         "x": 48.7870849,
         "y": 21.2309442,
         "r": -20
     },
-    "middle_top": {
+    "matrix_middle_top": {
         "x": 55.2854676,
         "y": 39.0851039,
         "r": -20
     },
-    "index_bottom": {
+    "matrix_index_bottom": {
         "x": 58.0907411,
         "y": -8.7597541,
         "r": -20
     },
-    "index_home": {
+    "matrix_index_home": {
         "x": 64.5891238,
         "y": 9.0944057,
         "r": -20
     },
-    "index_top": {
+    "matrix_index_top": {
         "x": 71.0875065,
         "y": 26.9485655,
         "r": -20
     },
-    "inner_bottom": {
+    "matrix_inner_bottom": {
         "x": 75.2608606,
         "y": -17.1375221,
         "r": -20
     },
-    "inner_home": {
+    "matrix_inner_home": {
         "x": 81.7592433,
         "y": 0.7166377,
         "r": -20
     },
-    "inner_top": {
+    "matrix_inner_top": {
         "x": 88.257626,
         "y": 18.5707976,
         "r": -20
     },
-    "near_thumb": {
+    "thumbfan_near_thumb": {
         "x": 62.1846295,
         "y": -32.5975409,
         "r": -20
     },
-    "home_thumb": {
+    "thumbfan_home_thumb": {
         "x": 82.5841162,
         "y": -47.013742,
         "r": -48
     },
-    "far_thumb": {
+    "thumbfan_far_thumb": {
         "x": 94.7890169,
         "y": -68.8083815,
         "r": -76
     },
-    "mirror_pinky_bottom": {
+    "mirror_matrix_pinky_bottom": {
         "x": 233.5881016,
         "y": 0,
         "r": 15
     },
-    "mirror_pinky_home": {
+    "mirror_matrix_pinky_home": {
         "x": 228.67053969999998,
         "y": 18.3525907,
         "r": 15
     },
-    "mirror_pinky_top": {
+    "mirror_matrix_pinky_top": {
         "x": 223.7529779,
         "y": 36.7051814,
         "r": 15
     },
-    "mirror_ring_bottom": {
+    "mirror_matrix_ring_bottom": {
         "x": 210.86365999999998,
         "y": 5.176704,
         "r": 20
     },
-    "mirror_ring_home": {
+    "mirror_matrix_ring_home": {
         "x": 204.36527719999998,
         "y": 23.0308638,
         "r": 20
     },
-    "mirror_ring_top": {
+    "mirror_matrix_ring_top": {
         "x": 197.8668945,
         "y": 40.8850235,
         "r": 20
     },
-    "mirror_middle_bottom": {
+    "mirror_matrix_middle_bottom": {
         "x": 191.29939939999997,
         "y": 3.3767843,
         "r": 20
     },
-    "mirror_middle_home": {
+    "mirror_matrix_middle_home": {
         "x": 184.8010167,
         "y": 21.2309442,
         "r": 20
     },
-    "mirror_middle_top": {
+    "mirror_matrix_middle_top": {
         "x": 178.30263399999998,
         "y": 39.0851039,
         "r": 20
     },
-    "mirror_index_bottom": {
+    "mirror_matrix_index_bottom": {
         "x": 175.49736049999998,
         "y": -8.7597541,
         "r": 20
     },
-    "mirror_index_home": {
+    "mirror_matrix_index_home": {
         "x": 168.99897779999998,
         "y": 9.0944057,
         "r": 20
     },
-    "mirror_index_top": {
+    "mirror_matrix_index_top": {
         "x": 162.5005951,
         "y": 26.9485655,
         "r": 20
     },
-    "mirror_inner_bottom": {
+    "mirror_matrix_inner_bottom": {
         "x": 158.327241,
         "y": -17.1375221,
         "r": 20
     },
-    "mirror_inner_home": {
+    "mirror_matrix_inner_home": {
         "x": 151.82885829999998,
         "y": 0.7166377,
         "r": 20
     },
-    "mirror_inner_top": {
+    "mirror_matrix_inner_top": {
         "x": 145.3304756,
         "y": 18.5707976,
         "r": 20
     },
-    "mirror_near_thumb": {
+    "mirror_thumbfan_near_thumb": {
         "x": 171.4034721,
         "y": -32.5975409,
         "r": 20
     },
-    "mirror_home_thumb": {
+    "mirror_thumbfan_home_thumb": {
         "x": 151.00398539999998,
         "y": -47.013742,
         "r": 48
     },
-    "mirror_far_thumb": {
+    "mirror_thumbfan_far_thumb": {
         "x": 138.79908469999998,
         "y": -68.8083815,
         "r": 76
