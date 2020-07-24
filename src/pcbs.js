@@ -199,6 +199,7 @@ const footprint = exports._footprint = (config, name, points, point, net_indexer
 
     // reference
     parsed_params.ref = component_indexer(parsed_params.param.class || '_')
+    parsed_params.ref_hide = 'hide' // TODO: make this parametric?
 
     return fp.body(parsed_params)
 }
