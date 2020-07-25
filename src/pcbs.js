@@ -206,20 +206,20 @@ const footprint = exports._footprint = (config, name, points, point, net_indexer
 
 exports.parse = (config, points, outlines) => {
 
-    const pcbs = a.sane(config, 'pcb', 'object')
+    const pcbs = a.sane(config, 'pcbs', 'object')
     const results = {}
 
     for (const [pcb_name, pcb_config] of Object.entries(pcbs)) {
 
         // config sanitization
-        a.detect_unexpected(pcb_config, `pcb.${pcb_name}`, ['outlines', 'footprints'])
+        a.detect_unexpected(pcb_config, `pcbs.${pcb_name}`, ['outlines', 'footprints'])
 
         // outline conversion
-        const config_outlines = a.sane(pcb_config.outlines, `pcb.${pcb_name}.outlines`, 'object')
+        const config_outlines = a.sane(pcb_config.outlines, `pcbs.${pcb_name}.outlines`, 'object')
         const kicad_outlines = {}
         for (const [outline_name, outline] of Object.entries(config_outlines)) {
-            const ref = a.in(outline.outline, `pcb.${pcb_name}.outlines.${outline_name}.outline`, Object.keys(outlines))
-            const layer = a.sane(outline.layer || 'Edge.Cuts', `pcb.${pcb_name}.outlines.${outline_name}.outline`, 'string')
+            const ref = a.in(outline.outline, `pcbs.${pcb_name}.outlines.${outline_name}.outline`, Object.keys(outlines))
+            const layer = a.sane(outline.layer || 'Edge.Cuts', `pcbs.${pcb_name}.outlines.${outline_name}.outline`, 'string')
             kicad_outlines[outline_name] = makerjs2kicad(outlines[ref], layer)
         }
 
@@ -250,9 +250,9 @@ exports.parse = (config, points, outlines) => {
         }
 
         // global one-off footprints
-        const global_footprints = a.sane(pcb_config.footprints || {}, `pcb.${pcb_name}.footprints`, 'object')
+        const global_footprints = a.sane(pcb_config.footprints || {}, `pcbs.${pcb_name}.footprints`, 'object')
         for (const [gf_name, gf] of Object.entries(global_footprints)) {
-            footprints.push(footprint(gf, `pcb.${pcb_name}.footprints.${gf_name}`, points, undefined, net_indexer, component_indexer))
+            footprints.push(footprint(gf, `pcbs.${pcb_name}.footprints.${gf_name}`, points, undefined, net_indexer, component_indexer))
         }
 
         // finalizing nets
