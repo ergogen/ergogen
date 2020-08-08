@@ -206,7 +206,7 @@ const footprint = exports._footprint = (config, name, points, point, net_indexer
 
 exports.parse = (config, points, outlines) => {
 
-    const pcbs = a.sane(config, 'pcbs', 'object')
+    const pcbs = a.sane(config || {}, 'pcbs', 'object')
     const results = {}
 
     for (const [pcb_name, pcb_config] of Object.entries(pcbs)) {
@@ -215,7 +215,7 @@ exports.parse = (config, points, outlines) => {
         a.detect_unexpected(pcb_config, `pcbs.${pcb_name}`, ['outlines', 'footprints'])
 
         // outline conversion
-        const config_outlines = a.sane(pcb_config.outlines, `pcbs.${pcb_name}.outlines`, 'object')
+        const config_outlines = a.sane(pcb_config.outlines || {}, `pcbs.${pcb_name}.outlines`, 'object')
         const kicad_outlines = {}
         for (const [outline_name, outline] of Object.entries(config_outlines)) {
             const ref = a.in(outline.outline, `pcbs.${pcb_name}.outlines.${outline_name}.outline`, Object.keys(outlines))

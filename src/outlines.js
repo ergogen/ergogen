@@ -209,7 +209,7 @@ exports.parse = (config = {}, points = {}) => {
 
     const outlines = {}
 
-    const ex = a.sane(config.exports, 'outlines.exports', 'object')
+    const ex = a.sane(config.exports || {}, 'outlines.exports', 'object')
     for (let [key, parts] of Object.entries(ex)) {
         parts = a.inherit('outlines.exports', key, ex)
         let result = {models: {}}
