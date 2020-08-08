@@ -38,9 +38,11 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key)
 
     // column layout
 
-    for (const [col_name, col] of Object.entries(cols)) {
+    for (let [col_name, col] of Object.entries(cols)) {
 
         // column-level sanitization
+
+        col = col || {}
 
         a.detect_unexpected(
             col,
