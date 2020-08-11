@@ -185,7 +185,13 @@ exports.parse = (config = {}) => {
         zone = a.inherit('points.zones', zone_name, zones)
 
         const anchor = a.anchor(zone.anchor || {}, `points.zones.${zone_name}.anchor`, points)
-        points = Object.assign(points, render_zone(zone_name, zone, anchor, global_key))
+        const new_points = render_zone(zone_name, zone, anchor, global_key)
+        for (const new_key of Object.keys(new_points)) {
+            if (Object.keys(points).includes(new_key)) {
+                throw new Error(`Key "${new_key}" defined more than once!`)
+            }
+        }
+        points = Object.assign(points, new_points)
     }
 
     // applying global rotation
