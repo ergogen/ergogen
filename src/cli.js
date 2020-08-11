@@ -14,6 +14,7 @@ const io = require('./io')
 const points_lib = require('./points')
 const outlines_lib = require('./outlines')
 const pcbs_lib = require('./pcbs')
+const cases_lib = require('./cases')
 
 // command line args
 
@@ -68,7 +69,7 @@ if (args.debug) {
 // outlines
 
 console.log('Generating outlines...')
-const outlines = outlines_lib.parse(config.outlines, points)
+const outlines = outlines_lib.parse(config.outlines || {}, points)
 for (const [name, outline] of Object.entries(outlines)) {
     if (!args.debug && name.startsWith('_')) continue
     io.dump_model(outline, path.join(args.o, `outlines/${name}`), args.debug)
@@ -77,11 +78,21 @@ for (const [name, outline] of Object.entries(outlines)) {
 // pcbs
 
 console.log('Scaffolding PCBs...')
-const pcbs = pcbs_lib.parse(config.pcbs, points, outlines)
+const pcbs = pcbs_lib.parse(config.pcbs || {}, points, outlines)
 for (const [pcb_name, pcb_text] of Object.entries(pcbs)) {
     const pcb_file = path.join(args.o, `pcbs/${pcb_name}.kicad_pcb`)
     fs.mkdirpSync(path.dirname(pcb_file))
     fs.writeFileSync(pcb_file, pcb_text)
+}
+
+// cases
+
+console.log('Extruding cases...')
+const cases = cases_lib.parse(config.cases || {}, outlines)
+for (const [case_name, case_text] of Object.entries(cases)) {
+    const case_file = path.join(args.o, `cases/${case_name}.jscad`)
+    fs.mkdirpSync(path.dirname(case_file))
+    fs.writeFileSync(case_file, case_text)
 }
 
 // goodbye

@@ -2,46 +2,7 @@ const m = require('makerjs')
 const u = require('./utils')
 const a = require('./assert')
 
-const Point = require('./point')
-
-const makerjs2jscad = exports._makerjs2jscad = (model, resolution = 32) => {
-    const commands = []
-    m.model.walk(model, {
-        onPath: wp => {
-            const p = wp.pathContext
-            switch (p.type) {
-                case 'line':
-                    commands.push(`new CSG.Path2D([ ${p.origin}, ${p.end} ]);`)
-                    break
-                case 'arc':
-                    const angle_start = p.startAngle > p.endAngle ? p.startAngle - 360 : p.startAngle
-                    commands.push(`CSG.Path2D.arc({
-                        center: ${p.origin},
-                        radius: ${p.radius},
-                        startangle: ${angle_start},
-                        endangle: ${p.endAngle},
-                        resolution: ${resolution}
-                    });`)
-                    break
-                case 'circle':
-                    commands.push(`CSG.Path2D.arc({
-                        center: ${p.origin},
-                        radius: ${p.radius},
-                        startangle: 0,
-                        endangle: 360,
-                        resolution: ${resolution}
-                    });`)
-                    break
-                default:
-                    throw new Error(`Can't convert path type "${p.type}" to jscad!`)
-            }
-        }
-    })
-    return commands
-}
-
-
-exports.parse = (config, points, outlines) => {
+exports.parse = (config, outlines) => {
 
     const cases = a.sane(config, 'cases', 'object')
     const results = {}
@@ -50,6 +11,9 @@ exports.parse = (config, points, outlines) => {
 
         // config sanitization
         parts = a.sane(case_config, `cases.${case_name}`, 'array')
+
+        const scripts = []
+        const main = []
 
         let part_index = 0
         for (const part of parts) {
@@ -67,8 +31,44 @@ exports.parse = (config, points, outlines) => {
             else if (operation == 'intersect') op = u.intersect
             else if (operation == 'stack') op = u.stack
 
+            const part_fn = `${part.outline}_fn`
+            const part_var = `${part.outline}_var`
 
+            scripts.push(m.exporter.toJscadScript(outline, {
+                functionName: part_fn,
+                extrude: extrude
+            }))
+
+            let op_statement = `let ${case_name} = ${part_var};`
+            if (part_index > 1) {
+                op_statement = `${case_name} = ${case_name}.${operation}(${part_var});`
+            }
+
+            main.push(`
+
+                // creating part ${part_index} of case ${case_name}
+                let ${part_var} = ${part_fn}();
+                ${part_var} = ${part_var}.rotateX(${rotate[0]});
+                ${part_var} = ${part_var}.rotateY(${rotate[1]});
+                ${part_var} = ${part_var}.rotateZ(${rotate[2]});
+                ${part_var} = ${part_var}.translate(${shift});
+                ${op_statement}
+                
+            `)
         }
+
+        results[case_name] = `
+
+            // individual makerjs exports
+            ${scripts.join('\n\n')}
+
+            // combination of parts
+            function main() {
+                ${main.join('')}
+                return ${case_name};
+            }
+
+        `
     }
 
     return results
