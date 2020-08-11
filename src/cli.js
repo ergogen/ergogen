@@ -47,12 +47,20 @@ const args = yargs
 if (args.clean) fs.removeSync(args.o)
 fs.mkdirpSync(args.o)
 
-const config_parser = args.c.endsWith('.yaml') ? yaml.load : JSON.parse
+let config_text
+try {
+    config_text = fs.readFileSync(args.c).toString()
+} catch (err) {
+    throw new Error(`Could not read file "${args.c}": ${err}`)
+}
+
+const is_yaml = args.c.endsWith('.yaml') || args.c.endsWith('.yml')
+const config_parser = is_yaml ? yaml.load : JSON.parse
 let config
 try {
-    config = config_parser(fs.readFileSync(args.c).toString())
+    config = config_parser(config_text)
 } catch (err) {
-    throw new Error(`Malformed input "${args.c}": ${err}`)
+    throw new Error(`Malformed input within "${args.c}": ${err}`)
 }
 
 // points
