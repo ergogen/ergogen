@@ -17,7 +17,7 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key)
 
     // zone-wide sanitization
 
-    a.detect_unexpected(zone, `points.zones.${zone_name}`, ['anchor', 'columns', 'rows', 'key'])
+    a.detect_unexpected(zone, `points.zones.${zone_name}`, ['columns', 'rows', 'key'])
     // the anchor comes from "above", because it needs other zones too (for references)
     const cols = a.sane(zone.columns || {}, `points.zones.${zone_name}.columns`, 'object')
     const zone_wide_rows = a.sane(zone.rows || {'default': {}}, `points.zones.${zone_name}.rows`, 'object')
@@ -178,79 +178,128 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key)
     return points
 }
 
+const parse_axis = exports._parse_axis = (config, name, points) => {
+    if (!['number', 'undefined'].includes(a.type(config))) {
+        const mirror_obj = a.sane(config || {}, name, 'object')
+        const distance = a.sane(mirror_obj.distance || 0, `${name}.distance`, 'number')
+        delete mirror_obj.distance
+        let axis = a.anchor(mirror_obj, name, points).x
+        axis += distance / 2
+        return axis
+    } else return config
+}
+
+const perform_mirror = exports._perform_mirror = (point, axis) => {
+    if (axis !== undefined) {
+        point.meta.mirrored = false
+        if (point.meta.asym == 'left') return ['', null]
+        const mp = point.clone().mirror(axis)
+        const mirrored_name = `mirror_${point.meta.name}`
+        mp.meta = a.extend(mp.meta, mp.meta.mirror || {})
+        mp.meta.name = mirrored_name
+        mp.meta.colrow = `mirror_${mp.meta.colrow}`
+        mp.meta.mirrored = true
+        if (point.meta.asym == 'right') {
+            point.meta.skip = true
+        }
+        return [mirrored_name, mp]
+    }
+    return ['', null]
+}
+
 exports.parse = (config = {}) => {
 
+    // config sanitization
     a.detect_unexpected(config, 'points', ['zones', 'key', 'rotate', 'mirror'])
-
-    let points = {}
-
-    // getting original points
-
     const zones = a.sane(config.zones || {}, 'points.zones', 'object')
     const global_key = a.sane(config.key || {}, 'points.key', 'object')
+    const global_rotate = a.sane(config.rotate || 0, 'points.rotate', 'number')
+    const global_mirror = config.mirror
+    let points = {}
+    let mirrored_points = {}
+    let all_points = {}
+
+    // rendering zones
     for (let [zone_name, zone] of Object.entries(zones)) {
 
         // handle zone-level `extends` clauses
         zone = a.inherit('points.zones', zone_name, zones)
 
-        const anchor = a.anchor(zone.anchor || {}, `points.zones.${zone_name}.anchor`, points)
+        // extracting keys that are handled here, not at the zone render level
+        const anchor = a.anchor(zone.anchor || {}, `points.zones.${zone_name}.anchor`, all_points)
+        const rotate = a.sane(zone.rotate || 0, `points.zones.${zone_name}.rotate`, 'number')
+        const mirror = zone.mirror
+        delete zone.anchor
+        delete zone.rotate
+        delete zone.mirror
+
+        // creating new points
         const new_points = render_zone(zone_name, zone, anchor, global_key)
-        for (const new_key of Object.keys(new_points)) {
-            if (Object.keys(points).includes(new_key)) {
-                throw new Error(`Key "${new_key}" defined more than once!`)
+
+        // adjusting new points
+        for (const [new_name, new_point] of Object.entries(new_points)) {
+            
+            // issuing a warning for duplicate keys
+            if (Object.keys(points).includes(new_name)) {
+                throw new Error(`Key "${new_name}" defined more than once!`)
+            }
+
+            // per-zone rotation
+            if (rotate) {
+                new_point.rotate(rotate)
             }
         }
+
+        // adding new points so that they can be referenced from now on
         points = Object.assign(points, new_points)
+        all_points = Object.assign(all_points, points)
+
+        // per-zone mirroring for the new keys
+        const axis = parse_axis(mirror, `points.zones.${zone_name}.mirror`, all_points)
+        if (axis) {
+            for (const new_point of Object.values(new_points)) {
+                const [mname, mp] = perform_mirror(new_point, axis)
+                if (mp) {
+                    mirrored_points[mname] = mp
+                    all_points[mname] = mp
+                }
+            }
+        }
     }
+
+    // merging regular and early-mirrored points
+    points = Object.assign(points, mirrored_points)
 
     // applying global rotation
-
-    if (config.rotate !== undefined) {
-        const r = a.sane(config.rotate || 0, 'points.rotate', 'number')
-        for (const p of Object.values(points)) {
-            p.rotate(config.rotate)
+    for (const point of Object.values(points)) {
+        if (global_rotate) {
+            point.rotate(global_rotate)
         }
     }
 
-    // mirroring
-
-    if (config.mirror !== undefined) {
-        const mirror = a.sane(config.mirror || {}, 'points.mirror', 'object')
-        let axis = mirror.axis
-        if (axis === undefined) {
-            const distance = a.sane(mirror.distance || 0, 'points.mirror.distance', 'number')
-            delete mirror.distance
-            axis = a.anchor(mirror, 'points.mirror', points).x
-            axis += distance / 2
-        } else {
-            axis = a.sane(axis || 0, 'points.mirror.axis', 'number')
-        }
-        const mirrored_points = {}
-        for (const [name, p] of Object.entries(points)) {
-            if (p.meta.asym == 'left') continue
-            const mp = p.clone().mirror(axis)
-            mp.meta = a.extend(mp.meta, mp.meta.mirror || {})
-            mp.meta.mirrored = true
-            p.meta.mirrored = false
-            const new_name = `mirror_${name}`
-            mp.meta.name = new_name
-            mp.meta.colrow = `mirror_${mp.meta.colrow}`
-            mirrored_points[new_name] = mp
-            if (p.meta.asym == 'right') {
-                p.meta.skip = true
+    // global mirroring for points that haven't been mirrored yet
+    const global_axis = parse_axis(global_mirror, `points.mirror`, points)
+    const global_mirrored_points = {}
+    for (const point of Object.values(points)) {
+        if (global_axis && point.mirrored === undefined) {
+            const [mname, mp] = perform_mirror(point, global_axis)
+            if (mp) {
+                global_mirrored_points[mname] = mp
             }
         }
-        Object.assign(points, mirrored_points)
     }
 
+    // merging the global-mirrored points as well
+    points = Object.assign(points, global_mirrored_points)
+
     // removing temporary points
-    
     const filtered = {}
     for (const [k, p] of Object.entries(points)) {
         if (p.meta.skip) continue
         filtered[k] = p
     }
 
+    // done
     return filtered
 }
 
