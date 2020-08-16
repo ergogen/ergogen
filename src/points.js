@@ -38,6 +38,7 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key)
 
     // column layout
 
+    let first_col = true
     for (let [col_name, col] of Object.entries(cols)) {
 
         // column-level sanitization
@@ -55,7 +56,7 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key)
             'number'
         )
         col.spread = a.sane(
-            col.spread || 19,
+            col.spread || (first_col ? 0 : 19),
             `points.zones.${zone_name}.columns.${col_name}.spread`,
             'number'
         )
@@ -95,13 +96,24 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key)
 
         // setting up column-level anchor
 
-        anchor.y += col.stagger || 0        
+        anchor.x += col.spread
+        anchor.y += col.stagger
         const col_anchor = anchor.clone()
         // clear potential rotations, as they will get re-applied anyway
         // and we don't want to apply them twice...
         col_anchor.r = 0
 
-        // getting key config through the 4-level extension
+        // applying col-level rotation (cumulatively, for the next columns as well)
+
+        if (col.rotate) {
+            push_rotation(
+                rotations,
+                col.rotate,
+                col_anchor.clone().shift(col.origin, false).p
+            )
+        }
+
+        // getting key config through the 5-level extension
 
         const keys = []
         const default_key = {
@@ -151,19 +163,7 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key)
             col_anchor.y += key.padding
         }
 
-        // applying col-level rotation for the next columns
-
-        if (col.rotate) {
-            push_rotation(
-                rotations,
-                col.rotate,
-                anchor.clone().shift(col.origin, false).p
-            )
-        }
-
-        // moving over and starting the next column
-
-        anchor.x += col.spread
+        first_col = false
     }
 
     return points
