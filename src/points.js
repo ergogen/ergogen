@@ -48,7 +48,7 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key)
         a.detect_unexpected(
             col,
             `points.zones.${zone_name}.columns.${col_name}`,
-            ['stagger', 'spread', 'rotate', 'origin', 'rows', 'key']
+            ['stagger', 'spread', 'rotate', 'origin', 'rows', 'row_overrides', 'key']
         )
         col.stagger = a.sane(
             col.stagger || 0,
@@ -69,11 +69,20 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key)
             col.origin || [0, 0],
             `points.zones.${zone_name}.columns.${col_name}.origin`,
         )
+        let override = false
         col.rows = a.sane(
             col.rows || {},
             `points.zones.${zone_name}.columns.${col_name}.rows`,
             'object'
         )
+        if (col.row_overrides) {
+            override = true
+            col.rows = a.sane(
+                col.row_overrides,
+                `points.zones.${zone_name}.columns.${col_name}.row_overrides`,
+                'object'
+            )
+        }
         for (const [key, val] of Object.entries(col.rows)) {
             col.rows[key] = a.sane(
                 val || {},
@@ -87,12 +96,15 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key)
             'object'
         )
 
-        // column-level prep
+        // propagating object key to name field
 
-        // propagate object key to name field
         col.name = col_name
-        // combine row data from zone-wide defs and col-specific defs
-        const actual_rows = Object.keys(col.rows).length ? col.rows : zone_wide_rows
+
+        // combining row data from zone-wide defs and col-specific defs
+        // (while also handling potential overrides)
+
+        const actual_rows = override ? Object.keys(col.rows)
+            : Object.keys(a.extend(zone_wide_rows, col.rows))
 
         // setting up column-level anchor
 
@@ -123,7 +135,7 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key)
             skip: false,
             asym: 'both'
         }
-        for (const row of Object.keys(actual_rows)) {
+        for (const row of actual_rows) {
             const key = a.extend(
                 default_key,
                 global_key,
@@ -139,10 +151,7 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key)
             key.rotate = a.sane(key.rotate, `${key.name}.rotate`, 'number')
             key.padding = a.sane(key.padding, `${key.name}.padding`, 'number')
             key.skip = a.sane(key.skip, `${key.name}.skip`, 'boolean')
-            a.assert(
-                ['left', 'right', 'both'].includes(key.asym),
-                `${key.name}.asym should be one of "left", "right", or "both"!`
-            )
+            key.asym = a.in(key.asym, `${key.name}.asym`, ['left', 'right', 'both'])
             key.col = col
             key.row = row
             keys.push(key)
