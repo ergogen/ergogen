@@ -20,7 +20,7 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key)
     a.detect_unexpected(zone, `points.zones.${zone_name}`, ['columns', 'rows', 'key'])
     // the anchor comes from "above", because it needs other zones too (for references)
     const cols = a.sane(zone.columns || {}, `points.zones.${zone_name}.columns`, 'object')
-    const zone_wide_rows = a.sane(zone.rows || {'default': {}}, `points.zones.${zone_name}.rows`, 'object')
+    const zone_wide_rows = a.sane(zone.rows || {}, `points.zones.${zone_name}.rows`, 'object')
     for (const [key, val] of Object.entries(zone_wide_rows)) {
         zone_wide_rows[key] = a.sane(val || {}, `points.zones.${zone_name}.rows.${key}`, 'object')
     }
@@ -105,6 +105,9 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key)
 
         const actual_rows = override ? Object.keys(col.rows)
             : Object.keys(a.extend(zone_wide_rows, col.rows))
+        if (!actual_rows.length) {
+            actual_rows.push('default')
+        }
 
         // setting up column-level anchor
 
@@ -132,6 +135,8 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key)
             shift: [0, 0],
             rotate: 0,
             padding: 19,
+            width: 1,
+            height: 1,
             skip: false,
             asym: 'both'
         }
@@ -149,6 +154,8 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key)
             key.colrow = `${col_name}_${row}`
             key.shift = a.xy(key.shift, `${key.name}.shift`)
             key.rotate = a.sane(key.rotate, `${key.name}.rotate`, 'number')
+            key.width = a.sane(key.width, `${key.name}.width`, 'number')
+            key.height = a.sane(key.height, `${key.name}.height`, 'number')
             key.padding = a.sane(key.padding, `${key.name}.padding`, 'number')
             key.skip = a.sane(key.skip, `${key.name}.skip`, 'boolean')
             key.asym = a.in(key.asym, `${key.name}.asym`, ['left', 'right', 'both'])
@@ -164,9 +171,8 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key)
             for (const r of rotations) {
                 point.rotate(r.angle, r.origin)
             }
-            if (key.rotate) {
-                point.r += key.rotate
-            }
+            point.shift(key.shift)
+            point.r += key.rotate
             point.meta = key
             points[key.name] = point
             col_anchor.y += key.padding
@@ -303,10 +309,13 @@ exports.parse = (config = {}) => {
     return filtered
 }
 
-exports.position = (points, shape) => {
-    const shapes = {}
+exports.visualize = (points) => {
+    const models = {}
     for (const [pname, p] of Object.entries(points)) {
-        shapes[pname] = p.position(u.deepcopy(shape))
+        const w = (p.meta.width * 19) - 1
+        const h = (p.meta.height * 19) - 1
+        const rect = u.rect(w, h, [-w/2, -h/2])
+        models[pname] = p.position(rect)
     }
-    return {models: shapes}
+    return {models: models}
 }

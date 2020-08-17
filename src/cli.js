@@ -68,8 +68,7 @@ try {
 console.log('Parsing points...')
 const points = points_lib.parse(config.points)
 if (args.debug) {
-    const rect = u.rect(18, 18, [-9, -9])
-    const points_demo = points_lib.position(points, rect)
+    const points_demo = points_lib.visualize(points)
     io.dump_model(points_demo, path.join(args.o, 'points/points_demo'), args.debug)
     fs.writeJSONSync(path.join(args.o, 'points/points.json'), points, {spaces: 4})
 }
