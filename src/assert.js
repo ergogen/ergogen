@@ -26,17 +26,21 @@ const detect_unexpected = exports.detect_unexpected = (obj, name, expected) => {
     }
 }
 
-exports.in = (raw, name, arr) => {
+const _in = exports.in = (raw, name, arr) => {
     assert(arr.includes(raw), `Field "${name}" should be one of [${arr.join(', ')}]!`)
     return raw
 }
 
-const numarr = exports.numarr = (raw, name, length) => {
-    assert(type(raw) == 'array' && raw.length == length, `Field "${name}" should be an array of length ${length}!`)
-    raw = raw.map(val => val || 0)
-    raw.map(val => assert(type(val) == 'number', `Field "${name}" should contain numbers!`))
+const arr = exports.arr = (raw, name, length, _type, _default) => {
+    assert(type(raw) == 'array', `Field "${name}" should be an array!`)
+    assert(length == 0 || raw.length == length, `Field "${name}" should be an array of length ${length}!`)
+    raw = raw.map(val => val || _default)
+    raw.map(val => assert(type(val) == _type, `Field "${name}" should contain ${_type}s!`))
     return raw
 }
+
+const numarr = exports.numarr = (raw, name, length) => arr(raw, name, length, 'number', 0)
+const strarr = exports.strarr = (raw, name) => arr(raw, name, 0, 'string', '')
 
 const xy = exports.xy = (raw, name) => numarr(raw, name, 2)
 
@@ -51,8 +55,16 @@ exports.trbl = (raw, name) => {
     return numarr(raw, name, 4)
 }
 
-exports.anchor = (raw, name, points={}, check_unexpected=true, default_point=new Point()) => {
-    if (check_unexpected) detect_unexpected(raw, name, ['ref', 'shift', 'rotate'])
+const anchor = exports.anchor = (raw, name, points={}, check_unexpected=true, default_point=new Point()) => {
+    if (type(raw) == 'array') {
+        // recursive call with incremental default_point mods, according to `affect`s
+        let current = default_point.clone()
+        for (const step of raw) {
+            current = anchor(step, name, points, check_unexpected, current)
+        }
+        return current
+    }
+    if (check_unexpected) detect_unexpected(raw, name, ['ref', 'orient', 'shift', 'rotate', 'affect'])
     let point = default_point.clone()
     if (raw.ref !== undefined) {
         if (type(raw.ref) == 'array') {
@@ -72,15 +84,31 @@ exports.anchor = (raw, name, points={}, check_unexpected=true, default_point=new
             point = points[raw.ref].clone()
         }
     }
+    if (raw.orient !== undefined) {
+        point.r += sane(raw.orient || 0, `${name}.orient`, 'number')
+    }
     if (raw.shift !== undefined) {
-        let xyval = wh(raw.shift || [0, 0], name + '.shift')
+        let xyval = wh(raw.shift || [0, 0], `${name}.shift`)
         if (point.meta.mirrored) {
             xyval[0] = -xyval[0]
         }
         point.shift(xyval, true)
     }
     if (raw.rotate !== undefined) {
-        point.r += sane(raw.rotate || 0, name + '.rotate', 'number')
+        point.r += sane(raw.rotate || 0, `${name}.rotate`, 'number')
+    }
+    if (raw.affect !== undefined) {
+        const candidate = point
+        point = default_point.clone()
+        const valid_affects = ['x', 'y', 'r']
+        let affect = raw.affect || valid_affects
+        if (type(affect) == 'string') affect = affect.split('')
+        affect = strarr(affect, `${name}.affect`)
+        let i = 0
+        for (const a of affect) {
+            _in(a, `${name}.affect[${++i}]`, valid_affects)
+            point[a] = candidate[a]
+        }
     }
     return point
 }
