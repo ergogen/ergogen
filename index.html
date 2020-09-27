@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Web UI for the ergogen tool">
+    <meta name="author" content="Dénes Bán">
+    <!-- <link rel="icon" href="/docs/4.0/assets/img/favicons/favicon.ico"> -->
+
+    <title>Ergogen</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+
+    <!-- Custom styles for this template -->
+    <link href="css/webui.css" rel="stylesheet">
+  </head>
+
+  <body class="text-center">
+
+    <div class="cover-container d-flex h-100 px-5 py-3 mx-auto flex-column">
+      <header class="masthead">
+        <div class="inner">
+          <h3 class="masthead-brand">Ergogen</h3>
+          <nav class="nav nav-masthead justify-content-center">
+            <a id="intro-link" class="nav-link" href="#">Intro</a>
+            <a class="nav-link" href="https://github.com/mrzealot/ergogen">Docs</a>
+            <a class="nav-link" href="https://discord.gg/DbCfZfZ">Discord</a>
+          </nav>
+        </div>
+      </header>
+
+      <main id="main" role="main" class="inner cover d-flex h-100">
+        <div class="row d-none w-100 justify-content-center" id="intro">
+          <div class="col-sm">
+            <h2 class="mb-4">Hey there!</h2>
+
+            <p>It's unlikely that you're here by accident, but just in case you don't know: ergogen is a generator utility for ergonomic keyboard layouts, including plates, cases, and even PCBs.</p>
+
+            <p>Everything's configured in a text-based (YAML or JSON) input file, which you can then convert to DXF drawings for outlines, OpenJSCAD scripts for 3D-printable cases, and kicad_pcb files for (unrouted) PCB templates.</p>
+
+            <p>You just paste your config into the textbox on the left, click the button, and your results will show up on the right. Piece of cake.</p>
+
+            <p>If you'd like to dive deeper, let me suggest the <a href="https://github.com/mrzealot/ergogen">docs</a>, or joining us at the <a href="https://discord.gg/DbCfZfZ">Discord</a> for some help! Otherwise, just click the "Intro" button again to revert back to the tool!</p>
+          </div>
+        </div>
+        <div class="row h-100" id="tool">
+          <div class="col-sm h-100 flex-column">
+            Paste YAML/JSON here:
+            <textarea id="text" class="h-100 w-100 my-2"></textarea>
+            <a href="#" id="generate" class="btn btn-success mb-5">Generate!</a>
+          </div>
+          <div class="col-sm">
+            Get results here:
+            <div id="results"></div>
+              
+          </div>
+        </div>
+      </main>
+
+      <footer class="mastfoot">
+        <div class="inner">
+          <p>Made by <a href="https://zealot.hu">MrZealot</a>, powering the <a href="https://zealot.hu/absolem">Absolem</a>.</p>
+        </div>
+      </footer>
+    </div>
+
+    <!-- JS, Popper.js, and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/3.14.0/js-yaml.min.js" integrity="sha512-ia9gcZkLHA+lkNST5XlseHz/No5++YBneMsDp1IZRJSbi1YqQvBeskJuG1kR+PH1w7E0bFgEZegcj0EwpXQnww==" crossorigin="anonymous"></script>
+    <script src="js/maker.js"></script>
+    <script>
+      makerjs = require('makerjs')
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.5.0/jszip.min.js" integrity="sha512-y3o0Z5TJF1UsKjs/jS2CDkeHN538bWsftxO9nctODL5W40nyXIbs0Pgyu7//icrQY9m6475gLaVr39i/uh/nLA==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.0/FileSaver.min.js" integrity="sha512-csNcFYJniKjJxRWRV1R7fvnXrycHP6qDR21mgz1ZP55xY5d+aHLfo9/FcGDQLfn2IfngbAHd8LdfsagcCqgTcQ==" crossorigin="anonymous"></script>
+    <script src="js/ergogen.js"></script>
+    <script src="js/webui.js"></script>
+  </body>
+</html>
