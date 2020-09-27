@@ -46,7 +46,7 @@ The `outlines` section then uses these points to generate plate, case, and PCB o
 The `cases` section details how the case outlines are to be 3D-ized to form a 3D-printable object.
 Finally, the `pcbs` section is used to configure KiCAD PCB templates.
 
-In the following, we'll have an in-depth discussion about each of these, with an additional running example of how the [Absolem](#TODO-link-to-config-yaml)'s config was created.
+In the following, we'll have an in-depth discussion about each of these, with an additional running example of how the [Absolem](https://github.com/mrzealot/absolem/blob/master/absolem.yaml)'s config was created.
 
 
 
@@ -101,8 +101,10 @@ points:
         my_zone_name:
             anchor:
                 ref: <point reference>
+                orient: num # default = 0
                 shift: [x, y] # default = [0, 0]
                 rotate: num # default = 0
+                affects: string containing any of x, y, or r # default = xyr
             columns:
                 column_name: <column def>
                 ...
@@ -114,9 +116,14 @@ points:
 ```
 
 `anchors` are used to, well, anchor the zone to something.
-It's the `[0, 0]` origin with a 0 degree orientation by default, but it can be changed to any other pre-existing point.(Consequently, the first zone can't use a ref, because there isn't any yet.)
+It's the `[0, 0]` origin with a 0 degree orientation by default, but it can be changed to any other pre-existing point. (Consequently, the first zone can't use a ref, because there isn't any yet.)
 The `ref` field can also be an array of references, in which case their average is used -- mostly useful for anchoring to the center, by averaging a key and its mirror; see later.
-This initial position can then be changed with the `rotate` and `shift` options, adding extra rotation and translation, respectively.
+This initial position can then be changed with the `orient`, `shift`, and `rotate` options.
+`shift` adds extra translation, while the difference between `orient` and `rotate` is whether they add their rotation before or after the translation.
+
+Also note that anywhere an anchor can be specified, a list of anchors is also valid.
+It would be meaningless, though, if each subsequent anchor would override the previous one, so the `affects` clause helps to affect only certain dimensions of the anchor.
+It can be declared using a string containing any of `x`, `y`, or `r`, which stand for the x and y coordinates and the rotation of the anchor, respectively.
 
 Once we know _where_ to start, we can describe the `columns` of our layout.
 
@@ -179,7 +186,7 @@ So, for example, when the outline phase specifies `bind` as a key-level paramete
 Now for the "official" key-level attributes:
 
 ```yaml
-name: name_override # default = a concatenation of column and row
+name: name_override # default = a concatenation of zone, column, and row
 shift: [x, y] # default = [0, 0]
 rotate: num # default = 0
 padding: num # default = 19
@@ -594,9 +601,9 @@ pcbs:
         edge: <outline reference>
         footprints:
             - type: <footprint type>
-            anchor: <anchor declaration>
-            nets: <type-specific net params>
-            params: <type-specific (non-net) footprint params>
+              anchor: <anchor declaration>
+              nets: <type-specific net params>
+              params: <type-specific (non-net) footprint params>
             - ...
     ...
 ```
