@@ -10,7 +10,7 @@ exports.parse = (config, outlines) => {
     for (const [case_name, case_config] of Object.entries(cases)) {
 
         // config sanitization
-        parts = a.sane(case_config, `cases.${case_name}`, 'array')
+        const parts = a.sane(case_config, `cases.${case_name}`, 'array')
 
         const scripts = []
         const main = []
