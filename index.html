@@ -12,8 +12,12 @@
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
 
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+
     <!-- Custom styles for this template -->
     <link href="css/webui.css" rel="stylesheet">
+    
   </head>
 
   <body class="text-center">
@@ -30,7 +34,7 @@
         </div>
       </header>
 
-      <main id="main" role="main" class="inner cover d-flex h-100">
+      <main id="main" role="main" class="inner cover d-flex">
         <div class="row d-none w-100 justify-content-center" id="intro">
           <div class="col-sm">
             <h2 class="mb-4">Hey there!</h2>
@@ -48,17 +52,17 @@
           <div class="col-sm h-100 flex-column">
             Paste YAML/JSON here:
             <textarea id="text" class="h-100 w-100 my-2"></textarea>
-            <a href="#" id="generate" class="btn btn-success mb-5">Generate!</a>
+            <a href="#" id="generate" class="btn btn-success">Generate!</a>
           </div>
-          <div class="col-sm">
+          <div class="col-sm h-100 flex-column">
             Get results here:
-            <div id="results"></div>
+            <div id="results" class="py-2"></div>
               
           </div>
         </div>
       </main>
 
-      <footer class="mastfoot">
+      <footer class="mastfoot mt-5">
         <div class="inner">
           <p>Made by <a href="https://zealot.hu">MrZealot</a>, powering the <a href="https://zealot.hu/absolem">Absolem</a>.</p>
         </div>

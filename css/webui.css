@@ -50,6 +50,7 @@ body {
 
 .cover-container {
   width: 100%;
+  overflow: hidden;
 }
 
 
@@ -102,6 +103,8 @@ body {
 
 #main {
     flex: 1;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 #tool {
@@ -118,4 +121,39 @@ body {
     justify-content: center;
     flex-direction: column;
     max-width: 45rem;
+}
+
+textarea {
+  border: none;
+  border-radius: 0.25rem;
+}
+
+#results {
+  overflow-y: auto;
+}
+
+table.table {
+  color: #fff;
+}
+
+.table th, .table td {
+  padding: 0.25rem;
+  border-top: none;
+}
+
+.table thead th {
+  padding-bottom: 0.75rem;
+}
+
+.table hr {
+  border-color: #fff;
+  width: 90%;
+}
+
+.rounded {
+  border-radius: 0.25rem;
+}
+
+.btn:focus {
+  box-shadow: none !important;
 }
