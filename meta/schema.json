@@ -1,0 +1,504 @@
+{
+    "title": "Ergogen configuration schema",
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "type": "object",
+    "properties": {
+        "points": {
+            "description": "Defines the locations of the keys",
+            "type": "object",
+            "properties": {
+                "zones": {
+                    "description": "A collection of columns",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                            "anchor": {
+                                "description": "Used to anchor the zone to something",
+                                "type": "object",
+                                "properties": {
+                                    "ref": {
+                                        "description": "Point reference",
+                                        "$ref": "#/definitions/pointRef"
+                                    },
+                                    "orient": {
+                                        "description": "Add rotation before translation",
+                                        "type": "number"
+                                    },
+                                    "shift": {
+                                        "description": "Add translation",
+                                        "$ref": "#/definitions/coordPair"
+                                    },
+                                    "rotate": {
+                                        "description": "Add rotation after translation",
+                                        "type": "number"
+                                    },
+                                    "affects": {
+                                        "description": "Affect only certain dimensions of the anchor",
+                                        "type": "string"
+                                    }
+                                }
+                            },
+                            "columns": {
+                                "description": "Columns of the layout",
+                                "type": "object",
+                                "additionalProperties": {
+                                    "type": "object",
+                                    "properties": {
+                                        "stagger": {
+                                            "description": "Extra vertical shift to the starting point of the whole column compared to the previous one",
+                                            "type": "number"
+                                        },
+                                        "spread": {
+                                            "description": "The horizontal space between this column and the next",
+                                            "type": "number"
+                                        },
+                                        "rotate": {
+                                            "description": "Column rotation around the origin",
+                                            "type": "number"
+                                        },
+                                        "origin": {
+                                            "description": "Origin relative to center of column's first key",
+                                            "$ref": "#/definitions/coordPair"
+                                        },
+                                        "rows": {
+                                            "description": "Key-specific key defs",
+                                            "$ref": "#/definitions/rowdef"
+                                        },
+                                        "key": {
+                                            "description": "Column-level key defs",
+                                            "$ref": "#/definitions/keydef"
+                                        }
+                                    }
+                                }
+                            },
+                            "rows": {
+                                "description": "Row-level key defs",
+                                "$ref": "#/definitions/rowdef"
+                            },
+                            "key": {
+                                "description": "Zone-level key defs",
+                                "$ref": "#/definitions/keydef"
+                            }
+                        }
+                    }
+                },
+                "key": {
+                    "description": "Global key defs",
+                    "$ref": "#/definitions/keydef"
+                },
+                "rotate": {
+                    "description": "Global angle to all of the points",
+                    "type": "number"
+                },
+                "mirror": {
+                    "description": "Global mirror",
+                    "$ref": "#/definitions/mirror"
+                }
+            }
+        },
+        "outlines": {
+            "description": "Create solid, continuous outlines",
+            "type": "object",
+            "properties": {
+                "glue": {
+                    "description": "Glue the halves together",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                            "top": {
+                                "$ref": "#/definitions/glueSide"
+                            },
+                            "bottom": {
+                                "$ref": "#/definitions/glueSide"
+                            },
+                            "waypoints": {
+                                "description": "Can be used to supplement the glue",
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "percent": {
+                                            "description": "The y coordinate along the centerline (going from the top intersection to the bottom intersection)",
+                                            "type": "number"
+                                        },
+                                        "width": {
+                                            "description": "The offset on the x axis",
+                                            "anyOf": [
+                                                {
+                                                    "type": "number"
+                                                },
+                                                {
+                                                    "$ref": "#/definitions/coordPair"
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            },
+                            "extra": {
+                                "type": "array",
+                                "items": true
+                            }
+                        }
+                    }
+                },
+                "exports": {
+                    "description": "Configure what to \"export\" as outlines from this phase",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                            "extends": {
+                                "type": "string"
+                            }
+                        },
+                        "additionalProperties": {
+                            "type": "object",
+                            "properties": {
+                                "operation": {
+                                    "type": "string",
+                                    "enum": ["add", "subtract", "intersect", "stack"]
+                                },
+                                "type": {
+                                    "description": "keys: the combined outline that we've just created\nrectangle: an independent primitive rectangle\ncircle: an independent circle primitive\npolygon: an independent polygon primitive\noutline: a previously defined outline",
+                                    "type": "string",
+                                    "enum": ["keys", "rectangle", "circle", "polygon", "outline"]
+                                },
+                                "side": {
+                                    "description": "keys: the part we want to use\nleft and right are just the appropriate side of the laid out keys, without the glue\nmiddle means an \"ideal\" version of the glue (meaning that instead of the outline.glue we defined above, we get both - left - right, so the exact middle piece we would have needed to glue everything together\nboth means both sides, held together by the glue\nglue is just the raw glue shape we defined under outline.glue",
+                                    "type": "string",
+                                    "enum": ["left", "right", "middle", "both", "glue"]
+                                },
+                                "tag": {
+                                    "description": "keys: optional tags to filter which points to consider in this step, where tags can be specified as key-level attributes",
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
+                                "glue": {
+                                    "description": "keys: the name of the glue to use, if applicable",
+                                    "type": "string"
+                                },
+                                "size": {
+                                    "description": "keys/rectangle: the width/height of the rectangles to lay onto the points. Note that the relative flag for the glue declaration above meant this size as the basis of the shift. So during a keys layout with a size of 18, for example, a relative shift of [.5, .5] actually means [9, 9] in mms.",
+                                    "anyOf": [
+                                        {
+                                            "type": "number"
+                                        },
+                                        {
+                                            "$ref": "#/definitions/coordPair"
+                                        }
+                                    ]
+                                },
+                                "corner": {
+                                    "description": "keys/rectangle: corner radius of the rectangles",
+                                    "type": "number"
+                                },
+                                "bevel": {
+                                    "description": "keys/rectangle: corner bevel of the rectangles, can be combined with rounding",
+                                    "type": "number"
+                                },
+                                "bound": {
+                                    "description": "keys: whether to use the binding declared previously",
+                                    "type": "boolean"
+                                },
+                                "ref": {
+                                    "description": "rectangle/circle: what position and rotation to consider as the origin",
+                                    "$ref": "#/definitions/pointRef"
+                                },
+                                "rotate": {
+                                    "description": "rectangle/circle: extra rotation",
+                                    "type": "number"
+                                },
+                                "shift": {
+                                    "description": "rectangle/circle: extra translation",
+                                    "$ref": "#/definitions/coordPair"
+                                },
+                                "radius": {
+                                    "description": "circle: the radius of the circle",
+                                    "type": "number"
+                                },
+                                "points": {
+                                    "description": "polygon: the points of the polygon",
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "ref": {
+                                                "description": "What position and rotation to consider as the origin",
+                                                "$ref": "#/definitions/pointRef"
+                                            },
+                                            "shift": {
+                                                "description": "Extra translation",
+                                                "$ref": "#/definitions/pointRef"
+                                            }
+                                        }
+                                    }
+                                },
+                                "name": {
+                                    "description": "outline: the name of the referenced outline",
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "cases": {
+            "description": "Add a basic and minimal 3D aspect to the generation process",
+            "type": "object",
+            "additionalProperties": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "outline": {
+                            "description": "Specifies which outline to import onto the xy plane",
+                            "type": "string"
+                        },
+                        "extrude": {
+                            "description": "How much the outline should be extruded along the z axis",
+                            "type": "number"
+                        },
+                        "translate": {
+                            "$ref": "#/definitions/threeNumArray"
+                        },
+                        "rotate": {
+                            "$ref": "#/definitions/threeNumArray"
+                        },
+                        "operation": {
+                            "description": "How to combine the resulting object with what we have so far",
+                            "type": "string",
+                            "enum": ["add", "subtract", "intersect"]
+                        }
+                    }
+                }
+            }
+        },
+        "pcbs": {
+            "description": "Add a PCB to the generation process",
+            "type": "object",
+            "additionalProperties": {
+                "type": "object",
+                "properties": {
+                    "outlines": {
+                        "description": "Define the edge cut of the PCB using a previously defined outline name",
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "object",
+                            "properties": {
+                                "outline": {
+                                    "type": "string"
+                                },
+                                "layer": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "footprints": {
+                        "description": "PCB footprints",
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "object",
+                            "properties": {
+                                "type": {
+                                    "description": "Footprint type",
+                                    "type": "string",
+                                    "enum": ["mx", "alps", "choc", "diode", "promicro", "slider", "button", "rgb", "jstph", "pin", "hole", "pad", "reset"]
+                                },
+                                "anchor": {
+                                    "description": "Anchor",
+                                    "$ref": "#/definitions/glueAnchor"
+                                },
+                                "nets": {
+                                    "description": "Type-specific net params",
+                                    "type": "object",
+                                    "additionalProperties": {
+                                        "type": "string"
+                                    }
+                                },
+                                "params": {
+                                    "description": "Type-specific (non-net) footprint params",
+                                    "type": "object",
+                                    "additionalProperties": true
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "coordPair": {
+            "type": "array",
+            "items": {
+                "type": "number"
+            },
+            "minItems": 2,
+            "maxItems": 2
+        },
+        "threeNumArray": {
+            "type": "array",
+            "items": {
+                "type": "number"
+            },
+            "minItems": 3,
+            "maxItems": 3
+        },
+        "fourNumArray": {
+            "type": "array",
+            "items": {
+                "type": "number"
+            },
+            "minItems": 4,
+            "maxItems": 4
+        },
+        "keydef": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "description": "The unique identifier of this specific key",
+                    "type": "string"
+                },
+                "shift": {
+                    "description": "Key-level translation",
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    },
+                    "minItems": 2,
+                    "maxItems": 2
+                },
+                "rotate": {
+                    "description": "Key-level rotation",
+                    "type": "number"
+                },
+                "padding": {
+                    "description": "Amount of vertical space before moving on to the next key in the column",
+                    "type": "number"
+                },
+                "skip": {
+                    "description": "Signals that the point is just a \"helper\" and should not be included in the output",
+                    "type": "boolean"
+                },
+                "asym": {
+                    "description": "Indicate which side the key should appear on",
+                    "type": "string",
+                    "enum": [
+                        "left",
+                        "right",
+                        "both"
+                    ]
+                },
+                "mirror": {
+                    "description": "Key-level mirror",
+                    "$ref": "#/definitions/mirror"
+                },
+                "bind": {
+                    "description": "Bind the individual holes to each other",
+                    "anyOf": [
+                        {
+                            "type": "number"
+                        },
+                        {
+                            "$ref": "#/definitions/coordPair"
+                        },
+                        {
+                            "$ref": "#/definitions/fourNumArray"
+                        }
+                    ]
+                },
+                "column_net": {
+                    "type": "string"
+                },
+                "column_mark": {
+                    "type": "string"
+                }
+            }
+        },
+        "rowdef": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "object",
+                "properties": {
+                    "bind": {
+                        "type": "array",
+                        "items": {
+                            "type": "number"
+                        }
+                    }
+                }
+            }
+        },
+        "pointRef": {
+            "type": [
+                "string",
+                "array"
+            ],
+            "items": {
+                "type": "string"
+            }
+        },
+        "mirror": {
+            "type": "object",
+            "properties": {
+                "axis": {
+                    "description": "Points will be mirrored according to the axis",
+                    "type": "number"
+                },
+                "ref": {
+                    "$ref": "#/definitions/pointRef"
+                },
+                "distance": {
+                    "description": "Millimeters between the referenced point and its duplicate",
+                    "type": "number"
+                }
+            }
+        },
+        "glueAnchor": {
+            "type": "object",
+            "properties": {
+                "ref": {
+                    "description": "Point reference",
+                    "$ref": "#/definitions/pointRef"
+                },
+                "shift": {
+                    "description": "Add translation",
+                    "$ref": "#/definitions/coordPair"
+                },
+                "rotate": {
+                    "description": "Add rotation",
+                    "type": "number"
+                },
+                "relative": {
+                    "description": "shift is interpreted in layout size units instead of mms",
+                    "type": "boolean"
+                }
+            }
+        },
+        "glueSide": {
+            "type": "object",
+            "properties": {
+                "left": {
+                    "$ref": "#/definitions/glueAnchor"
+                },
+                "right": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/glueAnchor"
+                        },
+                        {
+                            "type": "number"
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}
