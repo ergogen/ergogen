@@ -24,12 +24,11 @@ exports.parse = (config, outlines) => {
             const extrude = a.sane(part.extrude || 1, `${part_name}.extrude`, 'number')
             const shift = a.numarr(part.shift || [0, 0, 0], `${part_name}.shift`, 3)
             const rotate = a.numarr(part.rotate || [0, 0, 0], `${part_name}.rotate`, 3)
-            const operation = a.in(part.operation || 'add', `${part_name}.operation`, ['add', 'subtract', 'intersect', 'stack'])
+            const operation = a.in(part.operation || 'add', `${part_name}.operation`, ['add', 'subtract', 'intersect'])
 
-            let op = u.union
-            if (operation == 'subtract') op = u.subtract
-            else if (operation == 'intersect') op = u.intersect
-            else if (operation == 'stack') op = u.stack
+            let op = 'union'
+            if (operation == 'subtract') op = 'subtract'
+            else if (operation == 'intersect') op = 'intersect'
 
             const part_fn = `${part.outline}_fn`
             const part_var = `${part.outline}_var`
@@ -41,17 +40,15 @@ exports.parse = (config, outlines) => {
 
             let op_statement = `let ${case_name} = ${part_var};`
             if (part_index > 1) {
-                op_statement = `${case_name} = ${case_name}.${operation}(${part_var});`
+                op_statement = `${case_name} = ${case_name}.${op}(${part_var});`
             }
 
             main.push(`
 
                 // creating part ${part_index} of case ${case_name}
                 let ${part_var} = ${part_fn}();
-                ${part_var} = ${part_var}.rotateX(${rotate[0]});
-                ${part_var} = ${part_var}.rotateY(${rotate[1]});
-                ${part_var} = ${part_var}.rotateZ(${rotate[2]});
-                ${part_var} = ${part_var}.translate(${shift});
+                ${part_var} = rotate(${JSON.stringify(rotate)}, ${part_var});
+                ${part_var} = translate(${JSON.stringify(shift)}, ${part_var});
                 ${op_statement}
                 
             `)
