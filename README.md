@@ -497,18 +497,27 @@ Declarations might look like this:
 ```yaml
 cases:
     case_name:
-        - outline: <outline ref>
+        - type: outline
+          name: <outline ref>
           extrude: num # default = 1
           shift: [x, y, z] # default = [0, 0, 0]
           rotate: [ax, ay, az] # default = [0, 0, 0]
           operation: add | subtract | intersect # default = add
+        - type: case
+          name: <case_ref>
+          # extrude makes no sense here...
+          shift: # same as above
+          rotate: # same as above
+          operation: # same as above
         - ...
     ...
 ```
 
-`outline` specifies which outline to import onto the xy plane, while `extrude` specifies how much it should be extruded along the z axis.
-After that, the object is `shift`d, `rotate`d, and combined with what we have so far according to `operation`.
+When the `type` is `outline`, `name` specifies which outline to import onto the xy plane, while `extrude` specifies how much it should be extruded along the z axis.
+When the `type` is `case`, `name` specifies which case to use.
+After having established our base 3D object, it is (relatively!) `rotate`d, `shift`ed, and combined with what we have so far according to `operation`.
 If we only want to use an object as a building block for further objects, we can employ the same "start with an underscore" trick we learned at the outlines section to make it "private".
+
 
 
 
