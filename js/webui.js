@@ -4,14 +4,20 @@
 
 const deepcopy = input => JSON.parse(JSON.stringify(input))
 
-const dxf = model => {
+const drawing = (model, mode='dxf') => {
     const assembly = makerjs.model.originate({
         models: {
             export: deepcopy(model)
         },
         units: 'mm'
     })
-    return makerjs.exporter.toDXF(assembly)
+    if (mode == 'dxf') {
+        return makerjs.exporter.toDXF(assembly)
+    } else {
+        return makerjs.exporter.toSVG(assembly, {
+            stroke: 'white'
+        })
+    }
 }
 
 const generate = raw => {
@@ -76,12 +82,12 @@ const zipup = results => {
     zip_source.file('canonical.yaml', jsyaml.dump(results.canonical, {indent: 4}))
 
     const zip_points = zip.folder('points')
-    zip_points.file('demo.dxf', dxf(ergogen.points.visualize(results.points)))
+    zip_points.file('demo.dxf', drawing(ergogen.points.visualize(results.points)))
     zip_points.file('points.yaml', jsyaml.dump(results.points, {indent: 4}))
 
     const zip_outlines = zip.folder('outlines')
     for (const [name, outline] of Object.entries(results.outlines)) {
-        zip_outlines.file(`${name}.dxf`, dxf(outline))
+        zip_outlines.file(`${name}.dxf`, drawing(outline))
     }
     
     const zip_pcbs = zip.folder('pcbs')
@@ -168,19 +174,47 @@ const make_divider = () => $(`
 
 const text_callback = val => console.log(val)
 const yaml_callback = val => console.log(jsyaml.load(val))
-const svg_callback = val => console.log(val)
+let panzoom = null
+const svg_callback = svg => _ => {
+    const $viewer = $('#svg-viewer')
+    $viewer.empty()
+    SVG(svg).addTo($viewer[0])
+    $svg = $viewer.find('svg')
+    if (panzoom) {
+        panzoom.destroy()
+    }
+    panzoom = Panzoom($svg[0], {
+        canvas: true
+    })
+    $viewer.on('wheel', event => {
+        panzoom.zoomWithWheel(event.originalEvent, {
+            maxScale: 10
+        })
+    })
+    $('div.swap').addClass('d-none')
+    $('#back-link').removeClass('d-none')
+    $viewer.removeClass('d-none')
+
+}
 const jscad_callback = val => console.log(val)
 
 
 
 $(function() {
 
-    // Show/hide intro
+    // Show intro
     $('#intro-link').click(function() {
-        $('#intro').toggleClass('d-none')
-        $('#tool').toggleClass('d-none')
+        $('div.swap').addClass('d-none')
+        $('#intro').removeClass('d-none')
+        $('#back-link').removeClass('d-none')
     })
-
+    
+    // Back to tool
+    $('#back-link').click(function() {
+        $('div.swap').addClass('d-none')
+        $('#tool').removeClass('d-none')
+        $('#back-link').addClass('d-none')
+    })
     
     // Push the button
     $('#generate').click(function() {
@@ -201,17 +235,19 @@ $(function() {
                 // by category
 
                 let $tbody = make_table($res)
+                make_divider().appendTo($tbody)
 
                 make_row('source', 'raw', 'txt', raw, text_callback).appendTo($tbody)
                 make_row('source', 'canonical', 'yaml', jsyaml.dump(results.canonical, {indent: 4}), yaml_callback).appendTo($tbody)
                 make_divider().appendTo($tbody)
                 
-                make_row('points', 'demo', 'dxf', dxf(ergogen.points.visualize(results.points)), svg_callback).appendTo($tbody)
+                const points_demo = ergogen.points.visualize(results.points)
+                make_row('points', 'demo', 'dxf', drawing(points_demo), svg_callback(drawing(points_demo, 'svg'))).appendTo($tbody)
                 make_row('points', 'points', 'yaml', jsyaml.dump(results.points, {indent: 4}), yaml_callback).appendTo($tbody)
                 make_divider().appendTo($tbody)
                 
                 for (const [name, outline] of Object.entries(results.outlines)) {
-                    make_row('outlines', name, 'dxf', dxf(outline), svg_callback).appendTo($tbody)
+                    make_row('outlines', name, 'dxf', drawing(outline), svg_callback(drawing(outline, 'svg'))).appendTo($tbody)
                 }
                 make_divider().appendTo($tbody)
                 

@@ -33,7 +33,7 @@ html,
 body {
   height: 100%;
   background-color: #333;
-  font-size: 1.3rem;
+  font-size: 1.2rem;
 }
 
 body {
@@ -103,8 +103,7 @@ body {
 
 #main {
     flex: 1;
-    overflow-x: hidden;
-    overflow-y: auto;
+    overflow: hidden;
 }
 
 #tool {
@@ -142,7 +141,7 @@ table.table {
 }
 
 .table thead th {
-  padding-bottom: 0.75rem;
+  border: none;
 }
 
 .table hr {
@@ -156,4 +155,8 @@ table.table {
 
 .btn:focus {
   box-shadow: none !important;
+}
+
+#back-link {
+  color: #dc3545;
 }

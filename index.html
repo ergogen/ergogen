@@ -27,6 +27,7 @@
         <div class="inner">
           <h3 class="masthead-brand">Ergogen</h3>
           <nav class="nav nav-masthead justify-content-center">
+            <a id="back-link" class="nav-link d-none" href="#">Go Back!</a>
             <a id="intro-link" class="nav-link" href="#">Intro</a>
             <a class="nav-link" href="https://github.com/mrzealot/ergogen">Docs</a>
             <a class="nav-link" href="https://discord.gg/DbCfZfZ">Discord</a>
@@ -35,20 +36,22 @@
       </header>
 
       <main id="main" role="main" class="inner cover d-flex">
-        <div class="row d-none w-100 justify-content-center" id="intro">
+        <div class="row d-none w-100 swap" id="svg-viewer">
+        </div>
+        <div class="row d-none w-100 justify-content-center swap" id="intro">
           <div class="col-sm">
             <h2 class="mb-4">Hey there!</h2>
 
             <p>It's unlikely that you're here by accident, but just in case you don't know: ergogen is a generator utility for ergonomic keyboard layouts, including plates, cases, and even PCBs.</p>
 
-            <p>Everything's configured in a text-based (YAML or JSON) input file, which you can then convert to DXF drawings for outlines, OpenJSCAD scripts for 3D-printable cases, and kicad_pcb files for (unrouted) PCB templates.</p>
+            <p>Everything's configured in a text-based (YAML, JSON, or JS code) input file, which you can then convert to DXF drawings for outlines, OpenJSCAD scripts for 3D-printable cases, and kicad_pcb files for (unrouted) PCB templates.</p>
 
             <p>You just paste your config into the textbox on the left, click the button, and your results will show up on the right. Piece of cake.</p>
 
-            <p>If you'd like to dive deeper, let me suggest the <a href="https://github.com/mrzealot/ergogen">docs</a>, or joining us at the <a href="https://discord.gg/DbCfZfZ">Discord</a> for some help! Otherwise, just click the "Intro" button again to revert back to the tool!</p>
+            <p>If you'd like to dive deeper, let me suggest the <a href="https://github.com/mrzealot/ergogen">docs</a>, or joining us at the <a href="https://discord.gg/DbCfZfZ">Discord</a> for some help! Otherwise, just click the "Go Back!" button to, well, go back to the tool!</p>
           </div>
         </div>
-        <div class="row h-100" id="tool">
+        <div class="row h-100 swap" id="tool">
           <div class="col-sm h-100 flex-column">
             Paste YAML/JSON here:
             <textarea id="text" class="h-100 w-100 my-2"></textarea>
@@ -69,7 +72,6 @@
       </footer>
     </div>
 
-    <!-- JS, Popper.js, and jQuery -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
@@ -80,6 +82,8 @@
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.5.0/jszip.min.js" integrity="sha512-y3o0Z5TJF1UsKjs/jS2CDkeHN538bWsftxO9nctODL5W40nyXIbs0Pgyu7//icrQY9m6475gLaVr39i/uh/nLA==" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.0/FileSaver.min.js" integrity="sha512-csNcFYJniKjJxRWRV1R7fvnXrycHP6qDR21mgz1ZP55xY5d+aHLfo9/FcGDQLfn2IfngbAHd8LdfsagcCqgTcQ==" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.js@3.0/dist/svg.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.panzoom/4.0.0/panzoom.min.js" integrity="sha512-9P4403el58YclVUmhMst5Bzpcy+i0V0F0wiMlrkTDgmVqYXhF+tccpnhGIHKzKPXKaTF0Q4J9UEhu2i6PckJWg==" crossorigin="anonymous"></script>
     <script src="js/ergogen.js"></script>
     <script src="js/webui.js"></script>
   </body>
