@@ -133,16 +133,19 @@ const make_table = (container) => {
     return t.find('tbody')
 }
 
+let autoview = null
+
 const make_row = (category, name, ext, value, callback) => {
+    const check = autoview == `${category}.${name}`
     const $row = $(`
         <tr>
             <td>${category}</td>
             <td>${name}</td>
             <td>${ext}</td>
             <td>
-                <button type="button" class="btn btn-success preview"><i class="far fa-eye"></i></button>
-                <button type="button" class="btn btn-success download"><i class="fas fa-download"></i></button>
-                <button type="button" class="btn btn-outline-success autoview" data-name="${category}.${name}"><i class="fas fa-sync-alt"></i></button>
+                <button type="button" class="btn btn-success preview" data-name="${category}.${name}" title="Preview ${name}.${ext}!"><i class="far fa-eye"></i></button>
+                <button type="button" class="btn btn-success download" title="Download ${name}.${ext}!"><i class="fas fa-download"></i></button>
+                <button type="button" class="btn ${check ? 'btn-success' : 'btn-outline-success'} autoview" data-name="${category}.${name}" title="Automatically preview ${name}.${ext} on the next reload!"><i class="fas fa-sync-alt"></i></button>
             </td>
         </tr>
     `)
@@ -159,8 +162,13 @@ const make_row = (category, name, ext, value, callback) => {
     })
 
     $row.find('.autoview').click(function() {
+        const had_it = $(this).hasClass('btn-success')
         $('button.autoview').removeClass('btn-success').addClass('btn-outline-success')
-        $(this).removeClass('btn-outline-success').addClass('btn-success')
+        autoview = null
+        if (!had_it) {
+            $(this).removeClass('btn-outline-success').addClass('btn-success')
+            autoview = $(this).data('name')
+        }
     })
 
     return $row
@@ -269,6 +277,11 @@ $(function() {
                 $('#download-all').click(function() {
                     zipup(results)
                 })
+
+                // automatic preview
+                if (autoview) {
+                    $(`button.preview[data-name='${autoview}']`).click()
+                }
 
                 console.log('Done.')
 
