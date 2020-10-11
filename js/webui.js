@@ -15,17 +15,26 @@ const dxf = model => {
 }
 
 const generate = raw => {
+
     console.log('Interpreting the input...')
     let input
     try {
-        input = jsyaml.load(raw)
+        input = jsyaml.safeLoad(raw)
+        console.log('YAML input format detected.')
     } catch (yamlex) {
         try {
             input = JSON.parse(raw)
+            console.log('JSON input format detected.')
         } catch (jsonex) {
-            console.log('yaml exception:', yamlex)
-            console.log('json exception:', jsonex)
-            throw new Error('Input is neither valid YAML, nor valid JSON!')
+            try {
+                input = new Function(raw)()
+                console.log('JS code input format detected.')
+            } catch (codeex) {
+                console.log('YAML exception:', yamlex)
+                console.log('JSON exception:', jsonex)
+                console.log('Code exception:', codeex)
+                throw new Error('Input is not valid YAML, JSON, or JS code!')
+            }
         }
     }
     if (!input) {
@@ -35,6 +44,8 @@ const generate = raw => {
         throw new Error('Input does not contain any points!')
     }
     console.log('Loaded input:', input)
+
+
     console.log('Parsing points...')
     const points = ergogen.points.parse(input.points)
     if (!Object.keys(points).length) {
@@ -46,6 +57,7 @@ const generate = raw => {
     const pcbs = ergogen.pcbs.parse(input.pcbs || {}, points, outlines)
     console.log('Extruding cases...')
     const cases = ergogen.cases.parse(input.cases || {}, outlines)
+
 
     return {
         raw,
