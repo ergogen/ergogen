@@ -46,7 +46,7 @@ The `outlines` section then uses these points to generate plate, case, and PCB o
 The `cases` section details how the case outlines are to be 3D-ized to form a 3D-printable object.
 Finally, the `pcbs` section is used to configure KiCAD PCB templates.
 
-In the following, we'll have an in-depth discussion about each of these, with an additional running example of how the [Absolem](https://github.com/mrzealot/absolem/blob/master/absolem.yaml)'s config was created.
+In the following, we'll have an in-depth discussion about each of these.
 
 
 
@@ -236,48 +236,7 @@ It will use the same extension mechanism as it did for the 5 levels before.
 And this concludes point definitions.
 This should be generic enough to describe any ergo layout, yet easy enough so that you'll appreciate not having to work in raw CAD.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-## A concrete points example
-
-TODO: Absolem points here, with pics
-
-<br />
-
-
-
+<br>
 
 
 
@@ -415,47 +374,41 @@ Using these, we define exports as follows:
 exports:
     my_name:
         - operation: add | subtract | intersect | stack # default = add
-          type: <one of the types>
+          type: <one of the types> # default = outline
           <type-specific params>
         - ...
+```
+
+Individual parts can also be specified as an object instead of an array (which could be useful when YAML or built-in inheritance is used), like so:
+
+```yaml
+exports:
+    my_name:
+        first_phase:
+            operation: add | subtract | intersect | stack # default = add
+            type: <one of the types> # default = outline
+            <type-specific params>
+        second:
+            ...
 ```
 
 Operations are performed in order, and the resulting shape is exported as an output.
 Additionally, it is going to be available for further export declarations to use (through the `ref` type) under the name specified (`my_name`, in this case).
 If we only want to use it as a building block for further exports, we can start the name with an underscore (e.g., `_my_name`) to prevent it from being actually exported.
 
+A shorthand version of a part can be given when the elements of the above arrays/objects are simple strings instead of further objects.
+The syntax is a symbol from `[+, -, ~, ^]`, followed by a name, and is equivalent to adding/subtracting/intersecting/stacking an outline of that name, respectively.
+More specifically, `~something` is equivalent to:
+
+```yaml
+type: outline
+name: something
+operation: intersect
+```
+
+<br>
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-## A concrete outline example
-
-<br />
 
 
 
@@ -497,7 +450,7 @@ Declarations might look like this:
 ```yaml
 cases:
     case_name:
-        - type: outline
+        - type: outline # default option
           name: <outline ref>
           extrude: num # default = 1
           shift: [x, y, z] # default = [0, 0, 0]
@@ -518,45 +471,13 @@ When the `type` is `case`, `name` specifies which case to use.
 After having established our base 3D object, it is (relatively!) `rotate`d, `shift`ed, and combined with what we have so far according to `operation`.
 If we only want to use an object as a building block for further objects, we can employ the same "start with an underscore" trick we learned at the outlines section to make it "private".
 
+Individual case parts can again be listed as an object instead of an array, if that's more comfortable for inheritance/reuse (just like for outlines).
+And speaking of outline similarities, the `[+, -, ~]` plus name shorthand is available again.
+First it will try to look up cases, and then outlines by the name given.
+Stacking is omitted as it makes no sense here.
 
+<br>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-## A concrete case example
-
-<br />
 
 
 
@@ -602,12 +523,16 @@ The differences between the two footprint types are:
 - an omitted `ref` in the anchor means the current key for key-level declarations, while here it defaults to `[0, 0]`
 - a parameter starting with an exclamation point is an indirect reference to an eponymous key-level attribute -- so, for example, `from = !column_net` would mean that the key's `column_net` attribute is read there.
 
-Additionally, the edge cut of the PCB can be specified using a previously defined outline name under the `edge` key.
+Additionally, the edge cut of the PCB (or other decorative outlines for the silkscreen) can be specified using a previously defined outline name under the `outlines` key.
 
 ```yaml
 pcbs:
     pcb_name:
-        edge: <outline reference>
+        outlines:
+            pcb_outline_name:
+                outline: <outline reference>
+                layer: <kicad layer to export to> # default = Edge.Cuts
+            ...
         footprints:
             - type: <footprint type>
               anchor: <anchor declaration>
@@ -617,6 +542,7 @@ pcbs:
     ...
 ```
 
+Defining both the `outlines` and the `footprints` can be done either as arrays or objects, whichever is more convenient.
 Currently, the following footprint types are supported:
 
 - **`mx`**, **`alps`**, **`choc`**: mechanical switch footprints. Common nets:

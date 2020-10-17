@@ -212,11 +212,18 @@ exports.parse = (config = {}, points = {}) => {
     const ex = a.sane(config.exports || {}, 'outlines.exports', 'object')
     for (let [key, parts] of Object.entries(ex)) {
         parts = a.inherit('outlines.exports', key, ex)
+        if (a.type(parts) == 'array') {
+            parts = {...parts}
+        }
+        parts = a.sane(parts, `outlines.exports.${key}`, 'object')
         let result = {models: {}}
-        for (const [part_name, part] of Object.entries(parts)) {
+        for (let [part_name, part] of Object.entries(parts)) {
             const name = `outlines.exports.${key}.${part_name}`
+            if (a.type(part) == 'string') {
+                part = a.op_str(part, {outline: Object.keys(outlines)})
+            }
             const expected = ['type', 'operation']
-            part.type = a.in(part.type, `${name}.type`, ['keys', 'rectangle', 'circle', 'polygon', 'outline'])
+            part.type = a.in(part.type || 'outline', `${name}.type`, ['keys', 'rectangle', 'circle', 'polygon', 'outline'])
             part.operation = a.in(part.operation || 'add', `${name}.operation`, ['add', 'subtract', 'intersect', 'stack'])
 
             let op = u.union
