@@ -1,3 +1,5 @@
+const webui_version = '1.0.0'
+
 //
 // Generator stuff
 //
@@ -209,6 +211,10 @@ const jscad_callback = val => console.log(val)
 
 
 $(function() {
+
+    // Show versions
+    $('#ergogen-version').html(ergogen.version)
+    $('#webui-version').html(webui_version)
 
     // Show intro
     $('#intro-link').click(function() {
