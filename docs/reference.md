@@ -1,36 +1,6 @@
-# Ergogen
-
-This keyboard generator aims to provide a common configuration format to describe **ergonomic** 2D layouts, and generate automatic plates, cases, and (un-routed) PCBs for them.
-The project grew out of (and is an integral part of) the [Absolem keyboard](https://zealot.hu/absolem), and shares its [Discord server](https://discord.gg/DbCfZfZ) as well!
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Overview
 
-The whole config is a single YAML file.
+The whole ergogen config is a single YAML file.
 If you prefer JSON over YAML, feel free to use it, conversion is trivial and the generator will detect the input format.
 The important thing is that the data should contain the following keys:
 
@@ -47,6 +17,8 @@ The `cases` section details how the case outlines are to be 3D-ized to form a 3D
 Finally, the `pcbs` section is used to configure KiCAD PCB templates.
 
 In the following, we'll have an in-depth discussion about each of these.
+Of course, if the declarative nature of the config causes unnecessary repetition (despite the built-in YAML references, and the ergogen-based inheritance detailed below), there's nothing stopping you from writing code that generates the config.
+It brings the game to yet another abstraction level higher, so that you can use branching, loops, and parametric functions to compose a "drier" keyboard definition.
 
 
 
@@ -149,16 +121,21 @@ We repeat this until the end of the column definitions, then move on to the next
 
 <hr />
 
-Regarding lower level layout, rows appear both in zones and columns, and keys can be defined in four (!) different places. So what gives?
+Regarding lower level layout, rows appear both in zones and columns, and keys can be defined in five (!) different places. So what gives?
 Don't worry, all this is there just so that we can keep repetition to a minimum.
 We could safely remove the `rows` and `key` options from zones, and the `key` option from column definitions, without losing any of the functionality.
 But we'd have to repeat ourselves a lot more.
 
 Let's start with rows.
 `zone.rows` can give an overall picture about how many rows we'll have, and set key-related options on a per-row basis.
-But what if we want to override this in a certain column?
-For example, we want an outer pinky column with just two keys instead of the regular three.
-That's where `column.rows` can help, specifying a row-override for just that column.
+But what if we want to extend this initial picture with some column-specific details? (More on "extension" in a bit.)
+For example, we want an outer pinky column where padding is tighter than it is for the others.
+That's where `column.rows` can help, specifying a row "extension" for just that column.
+
+And what if we want to **override** the zone-level declarations in a certain column?
+For example, we don't just want to modify a row's attributes for a given column, but actually override the amount of rows there are.
+Like an outer pinky column with just two keys instead of the regular three.
+That's where `column.row_overrides` can help, specifying a row-level override that disregards the zone-level defaults.
 Easy.
 
 Now for the trickier part: keys.
@@ -284,6 +261,7 @@ bind: num | [num_x, num_y] | [num_t, num_r, num_b, num_l] # default = 0
 
 Again, key-level declaration means that both of these should be specified in the `points` section, benefiting from the same extension process every key-level setting does.
 This field declares how much we want to bind in each direction, i.e., the amount of overlap we want to make sure that we can reach the neighbor (`num` applies to all directions, `num_x` horizontally, `num_y` vertically, and the t/r/b/l versions to top/right/bottom/left, respectively).
+Note that it might make sense to have negative `bind` values, in case we not only don't want to bind in the given direction, but also don't want to "cover up" a potential corner rounding or bevel (see below).
 
 If it's a one-piece design, we also need to "glue" the halves together (or we might want to leave some extra space for the controller on the inner side for splits).
 This is where the following section comes into play:
@@ -523,7 +501,7 @@ The differences between the two footprint types are:
 - an omitted `ref` in the anchor means the current key for key-level declarations, while here it defaults to `[0, 0]`
 - a parameter starting with an exclamation point is an indirect reference to an eponymous key-level attribute -- so, for example, `from = !column_net` would mean that the key's `column_net` attribute is read there.
 
-Additionally, the edge cut of the PCB (or other decorative outlines for the silkscreen) can be specified using a previously defined outline name under the `outlines` key.
+Additionally, the edge cut of the PCB (or other decorative outlines for the silkscreen maybe) can be specified using a previously defined outline name under the `outlines` key.
 
 ```yaml
 pcbs:
@@ -576,6 +554,7 @@ Currently, the following footprint types are supported:
 - **`hole`**: a simple circular hole. Parameters:
     - `diameter`: the diameter of the (non-plated!) hole
 
+<br>
 
 
 
@@ -588,7 +567,13 @@ Currently, the following footprint types are supported:
 
 
 
+## Phew, that's it.
 
+*Theoretically*, you should know everything to start making your own dream keyboard.
+*Realistically*, tho, this might have been a bit dense, to say the least.
+But hey, this is the full reference, what did you expect?
 
-## A concrete PCB example
-
+If you'd like to get your feet wet with easier examples, and get gradually more hard-core, let me suggest the other tutorials in the docs folder (as they become available).
+Alternatively, if you'd like to talk to a certified ergogen representative, come join us [on Discord](https://discord.gg/nbKcAZB)!
+It's also a great place to get in touch if you are already somewhat familiar with this whole shebang, and would like to contribute examples, tests, features, whatever.
+See you there!
