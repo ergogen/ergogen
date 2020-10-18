@@ -112,7 +112,7 @@ const zipup = results => {
 //
 
 const msg = (type, text) => $(`
-    <div class="bg-${type} rounded">
+    <div class="bg-${type} colorchange-${type} rounded">
         ${text}
     </div>
 `)
@@ -137,7 +137,7 @@ const make_table = (container) => {
 
 let autoview = null
 
-const make_row = (category, name, ext, value, callback) => {
+const make_row = (category, name, ext, value, callback, preview_suffix='') => {
     const check = autoview == `${category}.${name}`
     const $row = $(`
         <tr>
@@ -145,7 +145,7 @@ const make_row = (category, name, ext, value, callback) => {
             <td>${name}</td>
             <td>${ext}</td>
             <td>
-                <button type="button" class="btn btn-success preview" data-name="${category}.${name}" title="Preview ${name}.${ext}!"><i class="far fa-eye"></i></button>
+                <button type="button" class="btn btn-success preview" data-name="${category}.${name}" title="Preview ${name}.${ext}${preview_suffix}!"><i class="far fa-eye"></i></button>
                 <button type="button" class="btn btn-success download" title="Download ${name}.${ext}!"><i class="fas fa-download"></i></button>
                 <button type="button" class="btn ${check ? 'btn-success' : 'btn-outline-success'} autoview" data-name="${category}.${name}" title="Automatically preview ${name}.${ext} on the next reload!"><i class="fas fa-sync-alt"></i></button>
             </td>
@@ -185,25 +185,47 @@ const make_divider = () => $(`
 const text_callback = val => console.log(val)
 const yaml_callback = val => console.log(jsyaml.load(val))
 let panzoom = null
-const svg_callback = svg => _ => {
+const svg_callback = svg_text => _ => {
+
+    // cleaning up potential old stuff
     const $viewer = $('#svg-viewer')
     $viewer.empty()
-    SVG(svg).addTo($viewer[0])
-    $svg = $viewer.find('svg')
     if (panzoom) {
         panzoom.destroy()
     }
+
+    // creating new stuff
+    const svg = SVG(svg_text).addTo($viewer[0])
+    // add some padding so we don't cut at the border
+    const vbox = svg.viewbox()
+    svg.viewbox(vbox.x - 5, vbox.y - 5, vbox.w + 10, vbox.h + 10)
+    const $svg = $viewer.find('svg')
     panzoom = Panzoom($svg[0], {
         canvas: true
     })
+
+    // enabling zoom
     $viewer.on('wheel', event => {
         panzoom.zoomWithWheel(event.originalEvent, {
             maxScale: 10
         })
     })
+
+    // showing the viewer
     $('div.swap').addClass('d-none')
     $('#back-link').removeClass('d-none')
     $viewer.removeClass('d-none')
+
+    // centering the initial view
+    const svg_offset = $svg.offset()
+    const svg_x = svg_offset.left + $svg.width() / 2
+    const svg_y = svg_offset.top + $svg.height() / 2
+    const viewer_offset = $viewer.offset()
+    const viewer_x = viewer_offset.left + $viewer.width() / 2
+    const viewer_y = viewer_offset.top + $viewer.height() / 2
+    setTimeout(function() {
+        panzoom.pan(viewer_x - svg_x, viewer_y - svg_y, { relative: true })
+    }, 10)
 
 }
 const jscad_callback = val => console.log(val)
@@ -251,13 +273,14 @@ $(function() {
                 let $tbody = make_table($res)
                 make_divider().appendTo($tbody)
 
-                make_row('source', 'raw', 'txt', raw, text_callback).appendTo($tbody)
-                make_row('source', 'canonical', 'yaml', jsyaml.dump(results.canonical, {indent: 4}), yaml_callback).appendTo($tbody)
+                const con = ' in the console'
+                make_row('source', 'raw', 'txt', raw, text_callback, con).appendTo($tbody)
+                make_row('source', 'canonical', 'yaml', jsyaml.dump(results.canonical, {indent: 4}), yaml_callback, con).appendTo($tbody)
                 make_divider().appendTo($tbody)
                 
                 const points_demo = ergogen.points.visualize(results.points)
                 make_row('points', 'demo', 'dxf', drawing(points_demo), svg_callback(drawing(points_demo, 'svg'))).appendTo($tbody)
-                make_row('points', 'points', 'yaml', jsyaml.dump(results.points, {indent: 4}), yaml_callback).appendTo($tbody)
+                make_row('points', 'points', 'yaml', jsyaml.dump(results.points, {indent: 4}), yaml_callback, con).appendTo($tbody)
                 make_divider().appendTo($tbody)
                 
                 for (const [name, outline] of Object.entries(results.outlines)) {
@@ -266,7 +289,7 @@ $(function() {
                 make_divider().appendTo($tbody)
                 
                 for (const [pcb_name, pcb_text] of Object.entries(results.pcbs)) {
-                    make_row('pcbs', pcb_name, 'kicad_pcb', pcb_text, text_callback).appendTo($tbody)
+                    make_row('pcbs', pcb_name, 'kicad_pcb', pcb_text, text_callback, con).appendTo($tbody)
                 }
                 make_divider().appendTo($tbody)
                 
@@ -296,6 +319,6 @@ $(function() {
                 $res.empty()
                 msg('danger', ex).appendTo($res)
             }
-        }, 1)
+        }, 10)
     })
 })
