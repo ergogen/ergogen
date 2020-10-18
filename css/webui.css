@@ -169,3 +169,18 @@ table.table {
 .colorchange-warning {
   color: #333;
 }
+
+canvas { 
+  margin: 0px; /* not inherited */
+  border: 0px none gray; /* not inherited */
+  padding: 0px; /* not inherited */
+
+  width: 100%;
+  height: 100%;
+
+  cursor: move; 
+}
+
+#statusdiv {
+  display: none !important;
+}

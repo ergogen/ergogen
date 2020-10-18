@@ -228,7 +228,21 @@ const svg_callback = svg_text => _ => {
     }, 10)
 
 }
-const jscad_callback = val => console.log(val)
+
+let jscad_inited = false
+const jscad_callback = val => {
+    if (!jscad_inited) {
+        window.gProcessor = myjscad.setup()
+        jscad_inited = true
+    }
+    myjscad.load(val, 'placeholder')
+    // showing the viewer
+    $('div.swap').addClass('d-none')
+    $('#back-link').removeClass('d-none')
+    const $viewer = $('#jscad-viewer')
+    $viewer.removeClass('d-none')
+    window.dispatchEvent(new Event('resize'))
+}
 
 
 

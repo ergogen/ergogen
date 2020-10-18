@@ -38,16 +38,14 @@
       <main id="main" role="main" class="inner cover d-flex">
         <div class="row d-none w-100 swap" id="svg-viewer">
         </div>
+        <div class="row d-none w-100 swap" id="jscad-viewer">
+        </div>
         <div class="row d-none w-100 justify-content-center swap" id="intro">
           <div class="col-sm">
             <h2 class="mb-4">Hey there!</h2>
-
             <p>It's unlikely that you're here by accident, but just in case you don't know: ergogen is a generator utility for ergonomic keyboard layouts, including plates, cases, and even PCBs.</p>
-
             <p>Everything's configured in a text-based (YAML, JSON, or JS code) input file, which you can then convert to DXF drawings for outlines, OpenJSCAD scripts for 3D-printable cases, and kicad_pcb files for (unrouted) PCB templates.</p>
-
             <p>You just paste your config into the textbox on the left, click the button, and your results will show up on the right. Piece of cake.</p>
-
             <p>If you'd like to dive deeper, let me suggest the <a href="https://github.com/mrzealot/ergogen/blob/master/docs/reference.md">docs</a>, or joining us at <a href="https://discord.gg/nbKcAZB">Discord</a> for some help! Otherwise, just click the "Go Back!" button to, well, go back to the tool!</p>
           </div>
         </div>
@@ -92,6 +90,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.0/FileSaver.min.js" integrity="sha512-csNcFYJniKjJxRWRV1R7fvnXrycHP6qDR21mgz1ZP55xY5d+aHLfo9/FcGDQLfn2IfngbAHd8LdfsagcCqgTcQ==" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.js@3.0/dist/svg.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.panzoom/4.0.0/panzoom.min.js" integrity="sha512-9P4403el58YclVUmhMst5Bzpcy+i0V0F0wiMlrkTDgmVqYXhF+tccpnhGIHKzKPXKaTF0Q4J9UEhu2i6PckJWg==" crossorigin="anonymous"></script>
+    <script src="js/openjscad.js"></script>
     <script src="js/ergogen.js"></script>
     <script src="js/webui.js"></script>
   </body>
