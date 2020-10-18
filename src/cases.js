@@ -18,7 +18,7 @@ exports.parse = (config, outlines) => {
             resolved_cases.add(c)
             resolve(c, resolved_scripts, resolved_cases)
         }
-        result = []
+        const result = []
         for (const o of resolved_scripts) {
             result.push(scripts[o] + '\n\n')
         }
