@@ -318,6 +318,26 @@
 	    }
 	    return result
 	};
+
+	const op_prefix = exports.op_prefix = str => {
+	    const suffix = str.slice(1);
+	    if (str.startsWith('+')) return {name: suffix, operation: 'add'}
+	    if (str.startsWith('-')) return {name: suffix, operation: 'subtract'}
+	    if (str.startsWith('~')) return {name: suffix, operation: 'intersect'}
+	    if (str.startsWith('^')) return {name: suffix, operation: 'stack'}
+	    return {name: str, operation: 'add'}
+	};
+
+	exports.op_str = (str, choices={}, order=Object.keys(choices)) => {
+	    let res = op_prefix(str);
+	    for (const key of order) {
+	        if (choices[key].includes(res.name)) {
+	            res.type = key;
+	            break
+	        }
+	    }
+	    return res
+	};
 	});
 
 	var points = createCommonjsModule(function (module, exports) {
@@ -850,11 +870,18 @@
 	    const ex = assert_1.sane(config.exports || {}, 'outlines.exports', 'object');
 	    for (let [key, parts] of Object.entries(ex)) {
 	        parts = assert_1.inherit('outlines.exports', key, ex);
+	        if (assert_1.type(parts) == 'array') {
+	            parts = {...parts};
+	        }
+	        parts = assert_1.sane(parts, `outlines.exports.${key}`, 'object');
 	        let result = {models: {}};
-	        for (const [part_name, part] of Object.entries(parts)) {
+	        for (let [part_name, part] of Object.entries(parts)) {
 	            const name = `outlines.exports.${key}.${part_name}`;
+	            if (assert_1.type(part) == 'string') {
+	                part = assert_1.op_str(part, {outline: Object.keys(outlines)});
+	            }
 	            const expected = ['type', 'operation'];
-	            part.type = assert_1.in(part.type, `${name}.type`, ['keys', 'rectangle', 'circle', 'polygon', 'outline']);
+	            part.type = assert_1.in(part.type || 'outline', `${name}.type`, ['keys', 'rectangle', 'circle', 'polygon', 'outline']);
 	            part.operation = assert_1.in(part.operation || 'add', `${name}.operation`, ['add', 'subtract', 'intersect', 'stack']);
 
 	            let op = utils.union;
@@ -935,71 +962,131 @@
 
 	var parse = (config, outlines) => {
 
-	    const cases = assert_1.sane(config, 'cases', 'object');
+	    const cases_config = assert_1.sane(config, 'cases', 'object');
+
+	    const scripts = {};
+	    const cases = {};
 	    const results = {};
 
-	    for (const [case_name, case_config] of Object.entries(cases)) {
+	    const resolve = (case_name, resolved_scripts=new Set(), resolved_cases=new Set()) => {
+	        for (const o of Object.values(cases[case_name].outline_dependencies)) {
+	            resolved_scripts.add(o);
+	        }
+	        for (const c of Object.values(cases[case_name].case_dependencies)) {
+	            resolved_cases.add(c);
+	            resolve(c, resolved_scripts, resolved_cases);
+	        }
+	        const result = [];
+	        for (const o of resolved_scripts) {
+	            result.push(scripts[o] + '\n\n');
+	        }
+	        for (const c of resolved_cases) {
+	            result.push(cases[c].body);
+	        }
+	        result.push(cases[case_name].body);
+	        result.push(`
+        
+            function main() {
+                return ${case_name}_case_fn();
+            }
+
+        `);
+	        return result.join('')
+	    };
+
+	    for (let [case_name, case_config] of Object.entries(cases_config)) {
 
 	        // config sanitization
-	        const parts = assert_1.sane(case_config, `cases.${case_name}`, 'array');
+	        case_config = assert_1.inherit('cases', case_name, cases_config);
+	        if (assert_1.type(case_config) == 'array') {
+	            case_config = {...case_config};
+	        }
+	        const parts = assert_1.sane(case_config, `cases.${case_name}`, 'object');
 
-	        const scripts = [];
-	        const main = [];
+	        const body = [];
+	        const case_dependencies = [];
+	        const outline_dependencies = [];
+	        let first = true;
+	        for (let [part_name, part] of Object.entries(parts)) {
+	            if (assert_1.type(part) == 'string') {
+	                part = assert_1.op_str(part, {
+	                    outline: Object.keys(outlines),
+	                    case: Object.keys(cases)
+	                }, ['case', 'outline']);
+	            }
+	            const part_qname = `cases.${case_name}.${part_name}`;
+	            const part_var = `${case_name}__part_${part_name}`;
+	            assert_1.detect_unexpected(part, part_qname, ['type', 'name', 'extrude', 'shift', 'rotate', 'operation']);
+	            const type = assert_1.in(part.type || 'outline', `${part_qname}.type`, ['outline', 'case']);
+	            const name = assert_1.sane(part.name, `${part_qname}.name`, 'string');
+	            const shift = assert_1.numarr(part.shift || [0, 0, 0], `${part_qname}.shift`, 3);
+	            const rotate = assert_1.numarr(part.rotate || [0, 0, 0], `${part_qname}.rotate`, 3);
+	            const operation = assert_1.in(part.operation || 'add', `${part_qname}.operation`, ['add', 'subtract', 'intersect']);
 
-	        let part_index = 0;
-	        for (const part of parts) {
-	            const part_name = `cases.${case_name}[${++part_index}]`;
-	            assert_1.detect_unexpected(part, part_name, ['outline', 'extrude', 'shift', 'rotate', 'operation']);
-	            const outline = outlines[part.outline];
-	            assert_1.assert(outline, `Field ${part_name}.outline does not name a valid outline!`);
-	            const extrude = assert_1.sane(part.extrude || 1, `${part_name}.extrude`, 'number');
-	            const shift = assert_1.numarr(part.shift || [0, 0, 0], `${part_name}.shift`, 3);
-	            const rotate = assert_1.numarr(part.rotate || [0, 0, 0], `${part_name}.rotate`, 3);
-	            const operation = assert_1.in(part.operation || 'add', `${part_name}.operation`, ['add', 'subtract', 'intersect', 'stack']);
-
-	            let op = utils.union;
-	            if (operation == 'subtract') op = utils.subtract;
-	            else if (operation == 'intersect') op = utils.intersect;
-	            else if (operation == 'stack') op = utils.stack;
-
-	            const part_fn = `${part.outline}_fn`;
-	            const part_var = `${part.outline}_var`;
-
-	            scripts.push(makerjs.exporter.toJscadScript(outline, {
-	                functionName: part_fn,
-	                extrude: extrude
-	            }));
-
-	            let op_statement = `let ${case_name} = ${part_var};`;
-	            if (part_index > 1) {
-	                op_statement = `${case_name} = ${case_name}.${operation}(${part_var});`;
+	            let base;
+	            if (type == 'outline') {
+	                const extrude = assert_1.sane(part.extrude || 1, `${part_qname}.extrude`, 'number');
+	                const outline = outlines[name];
+	                assert_1.assert(outline, `Field "${part_qname}.name" does not name a valid outline!`);
+	                if (!scripts[name]) {
+	                    scripts[name] = makerjs.exporter.toJscadScript(outline, {
+	                        functionName: `${name}_outline_fn`,
+	                        extrude: extrude,
+	                        indent: 4
+	                    });
+	                }
+	                outline_dependencies.push(name);
+	                base = `${name}_outline_fn()`;
+	            } else {
+	                assert_1.assert(part.extrude === undefined, `Field "${part_qname}.extrude" should not be used when type=case!`);
+	                assert_1.in(name, `${part_qname}.name`, Object.keys(cases));
+	                case_dependencies.push(name);
+	                base = `${name}_case_fn()`;
 	            }
 
-	            main.push(`
+	            let op = 'union';
+	            if (operation == 'subtract') op = 'subtract';
+	            else if (operation == 'intersect') op = 'intersect';
 
-                // creating part ${part_index} of case ${case_name}
-                let ${part_var} = ${part_fn}();
-                ${part_var} = ${part_var}.rotateX(${rotate[0]});
-                ${part_var} = ${part_var}.rotateY(${rotate[1]});
-                ${part_var} = ${part_var}.rotateZ(${rotate[2]});
-                ${part_var} = ${part_var}.translate(${shift});
+	            let op_statement = `let result = ${part_var};`;
+	            if (!first) {
+	                op_statement = `result = result.${op}(${part_var});`;
+	            }
+	            first = false;
+
+	            body.push(`
+
+                // creating part ${part_name} of case ${case_name}
+                let ${part_var} = ${base};
+
+                // make sure that rotations are relative
+                let ${part_var}_bounds = ${part_var}.getBounds();
+                let ${part_var}_x = ${part_var}_bounds[0].x + (${part_var}_bounds[1].x - ${part_var}_bounds[0].x) / 2
+                let ${part_var}_y = ${part_var}_bounds[0].y + (${part_var}_bounds[1].y - ${part_var}_bounds[0].y) / 2
+                ${part_var} = translate([-${part_var}_x, -${part_var}_y, 0], ${part_var});
+                ${part_var} = rotate(${JSON.stringify(rotate)}, ${part_var});
+                ${part_var} = translate([${part_var}_x, ${part_var}_y, 0], ${part_var});
+
+                ${part_var} = translate(${JSON.stringify(shift)}, ${part_var});
                 ${op_statement}
                 
             `);
 	        }
 
-	        results[case_name] = `
+	        cases[case_name] = {
+	            body: `
 
-            // individual makerjs exports
-            ${scripts.join('\n\n')}
+                function ${case_name}_case_fn() {
+                    ${body.join('')}
+                    return result;
+                }
+            
+            `,
+	            case_dependencies,
+	            outline_dependencies
+	        };
 
-            // combination of parts
-            function main() {
-                ${main.join('')}
-                return ${case_name};
-            }
-
-        `;
+	        results[case_name] = resolve(case_name);
 	    }
 
 	    return results
@@ -1715,6 +1802,9 @@
 	        assert_1.detect_unexpected(pcb_config, `pcbs.${pcb_name}`, ['outlines', 'footprints']);
 
 	        // outline conversion
+	        if (assert_1.type(pcb_config.outlines) == 'array') {
+	            pcb_config.outlines = {...pcb_config.outlines};
+	        }
 	        const config_outlines = assert_1.sane(pcb_config.outlines || {}, `pcbs.${pcb_name}.outlines`, 'object');
 	        const kicad_outlines = {};
 	        for (const [outline_name, outline] of Object.entries(config_outlines)) {
@@ -1750,6 +1840,9 @@
 	        }
 
 	        // global one-off footprints
+	        if (assert_1.type(pcb_config.footprints) == 'array') {
+	            pcb_config.footprints = {...pcb_config.footprints};
+	        }
 	        const global_footprints = assert_1.sane(pcb_config.footprints || {}, `pcbs.${pcb_name}.footprints`, 'object');
 	        for (const [gf_name, gf] of Object.entries(global_footprints)) {
 	            footprints.push(footprint(gf, `pcbs.${pcb_name}.footprints.${gf_name}`, points, undefined, net_indexer, component_indexer));
