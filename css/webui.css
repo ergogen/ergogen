@@ -112,6 +112,7 @@ body {
     flex: 1;
 }
 
+#tool > .flex-row,
 #tool > .flex-column {
     display: flex;
 }
@@ -130,6 +131,18 @@ textarea {
 
 #results {
   overflow-y: auto;
+  width: 100%;
+}
+
+#results-placeholder {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  font-size: 4rem;
+  opacity: 0.1;
+  border: 2px solid white;
+  border-radius: 5px;
 }
 
 table.table {
@@ -183,4 +196,8 @@ canvas {
 
 #statusdiv {
   display: none !important;
+}
+
+div.dropdown.bootstrap-select {
+  width: 100% !important;
 }

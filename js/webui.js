@@ -1,4 +1,4 @@
-const webui_version = '1.0.0'
+const webui_version = '1.1.0'
 
 //
 // Generator stuff
@@ -252,6 +252,22 @@ $(function() {
     $('#ergogen-version').html(ergogen.version)
     $('#webui-version').html(webui_version)
 
+    // Load examples
+    $ex = $('#examples')
+    for (const [group, items] of Object.entries(ergogen_examples)) {
+        $group = $(`<optgroup label="${group}"></optgroup>`)
+        for (const [name, text] of Object.entries(items)) {
+            $(`<option data-group="${group}" data-name="${name}">${name}</option>`).appendTo($group)
+        }
+        $group.appendTo($ex)
+    }
+    $ex.on('change', function() {
+        const o = $(this).find('option:selected')
+        const group = o.data('group')
+        const name = o.data('name')
+        $('#text').val(ergogen_examples[group][name].trim())
+    })
+
     // Show intro
     $('#intro-link').click(function() {
         $('div.swap').addClass('d-none')
@@ -271,8 +287,10 @@ $(function() {
 
         const raw = $('#text').val()
         const $res = $('#results')
+        const $placeholder = $('#results-placeholder')
 
-        $res.empty()
+        $placeholder.addClass('d-none')
+        $res.removeClass('d-none').empty()
         msg('warning', 'Generating...').appendTo($res)
 
         setTimeout(function() {
