@@ -267,6 +267,7 @@ $(function() {
         const name = o.data('name')
         $('#text').val(ergogen_examples[group][name].trim())
     })
+    $('#examples').selectpicker()
 
     // Show intro
     $('#intro-link').click(function() {
