@@ -1,4 +1,4 @@
-const webui_version = '1.1.0'
+const webui_version = '1.1.1'
 
 //
 // Generator stuff
