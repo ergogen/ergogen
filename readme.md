@@ -10,7 +10,7 @@ The project grew out of (and is an integral part of) the [Absolem keyboard](http
 
 ## Usage
 
-Supposing you have a config ready, you can use ergogen either on the command line, or through the [web UI](https://zeaolt.hu/ergogen).
+Supposing you have a config ready, you can use ergogen either on the command line, or through the [web UI](https://zealot.hu/ergogen/).
 
 Command line usage requires `node v14.4.0+` with `npm v6.14.5+` to be installed, the repo to be checked out, `npm install` to be issued, and then simply calling the CLI interface through `node src/cli.js`.
 The `--help` switch lists the available command line options.
