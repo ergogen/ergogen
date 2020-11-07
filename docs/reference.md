@@ -277,7 +277,7 @@ glue:
             right: <anchor> | num
         waypoints:
             - percent: num
-            width: num | [num_left, num_right]
+              width: num | [num_left, num_right]
             - ...
         extra:
             - <primitive shape>
