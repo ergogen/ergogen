@@ -534,7 +534,7 @@ Currently, the following footprint types are supported:
 - **`slider`**: an SMD slider switch (part no. here), ideal for on/off operation. Nets:
     - `from`, `to`: nets to connect
 
-- **`button`**: an SMD button (part no. here), ideal for momentary toggles (like a reset switch). Nets:
+- **`reset`**: an SMD button (part no. here), ideal for momentary toggles (like a reset switch). Nets:
     - `from`, `to`: nets to connect
 
 - **`rgb`**: an RGB led (part no. here), for per-key illumination, underglow, or feedback. Nets:
@@ -544,16 +544,12 @@ Currently, the following footprint types are supported:
 - **`jstph`**: a two-pin JST-PH battery header footprint. Nets:
     - `pos`, `neg`: nets to connect to the positive and negative terminals, respectively.
 
-- **`pin`**: a single pin.
+- **`pad`**: a single pin.
     - Nets:
         - `net`: the net it should connect to
     - Parameters:
         - `diameter`: the larger diameter of the hole, including the copper ring
         - `drill`: the smaller diameter of the actual hole
-
-- **`hole`**: a simple circular hole. Parameters:
-    - `diameter`: the diameter of the (non-plated!) hole
-
 <br>
 
 
