@@ -133,7 +133,8 @@ const layout = exports._layout = (config = {}, points = {}) => {
         if (bound && ['middle', 'both', 'glue'].includes(side)) {
 
             const default_glue_name = Object.keys(parsed_glue)[0]
-            const glue_def = parsed_glue[a.sane(params.glue || default_glue_name, `${export_name}.glue`, 'string')]
+            const computed_glue_name = a.sane(params.glue || default_glue_name, `${export_name}.glue`, 'string')
+            const glue_def = parsed_glue[computed_glue_name]
             a.assert(glue_def, `Field "${export_name}.glue" does not name a valid glue!`)
 
             const get_line = (anchor) => {
@@ -152,12 +153,18 @@ const layout = exports._layout = (config = {}, points = {}) => {
             const tll = get_line(glue_def.top.left)
             const trl = get_line(glue_def.top.right)
             const tip = m.path.converge(tll, trl)
+            if (!tip) {
+                throw new Error(`Top lines don't intersect in glue "${computed_glue_name}"!`)
+            }
             const tlp = u.eq(tll.origin, tip) ? tll.end : tll.origin
             const trp = u.eq(trl.origin, tip) ? trl.end : trl.origin
     
             const bll = get_line(glue_def.bottom.left)
             const brl = get_line(glue_def.bottom.right)
             const bip = m.path.converge(bll, brl)
+            if (!bip) {
+                throw new Error(`Bottom lines don't intersect in glue "${computed_glue_name}"!`)
+            }
             const blp = u.eq(bll.origin, bip) ? bll.end : bll.origin
             const brp = u.eq(brl.origin, bip) ? brl.end : brl.origin
     
