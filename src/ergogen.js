@@ -1,4 +1,5 @@
 module.exports = {
+    utils: require('./utils'),
     points: require('./points'),
     outlines: require('./outlines'),
     cases: require('./cases'),

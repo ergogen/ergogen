@@ -62,6 +62,7 @@ try {
 } catch (err) {
     throw new Error(`Malformed input within "${args.c}": ${err}`)
 }
+config = u.expand_nested_keys(config)
 
 // points
 

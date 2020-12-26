@@ -2,6 +2,29 @@ const m = require('makerjs')
 
 exports.deepcopy = (value) => JSON.parse(JSON.stringify(value))
 
+const deep_assign = exports.deep_assign = (obj, key, val) => {
+    const levels = key.split('.')
+    const last = levels.pop()
+    let step = obj
+    for (const level of levels) {
+        step[level] = step[level] || {}
+        step = step[level]
+    }
+    step[last] = val
+    return obj
+}
+
+const expand_nested_keys = exports.expand_nested_keys = (config) => {
+    if (typeof config == 'object') {
+        const result = {}
+        for (const [key, val] of Object.entries(config)) {
+            deep_assign(result, key, expand_nested_keys(val))
+        }
+        return result
+    }
+    return config
+}
+
 const eq = exports.eq = (a=[], b=[]) => {
     return a[0] === b[0] && a[1] === b[1]
 }
