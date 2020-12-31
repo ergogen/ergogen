@@ -9,12 +9,8 @@ const yargs = require('yargs')
 
 // internals
 
-const u = require('./utils')
 const io = require('./io')
-const points_lib = require('./points')
-const outlines_lib = require('./outlines')
-const pcbs_lib = require('./pcbs')
-const cases_lib = require('./cases')
+const ergogen = require('./ergogen')
 
 // command line args
 
@@ -47,6 +43,8 @@ const args = yargs
 if (args.clean) fs.removeSync(args.o)
 fs.mkdirpSync(args.o)
 
+// config parsing
+
 let config_text
 try {
     config_text = fs.readFileSync(args.c).toString()
@@ -62,45 +60,38 @@ try {
 } catch (err) {
     throw new Error(`Malformed input within "${args.c}": ${err}`)
 }
-config = u.expand_nested_keys(config)
 
-// points
+// processing
 
-console.log('Parsing points...')
-const points = points_lib.parse(config.points)
+const results = ergogen.process(config, args.debug, s => console.log(s))
+
+// output
+
+console.log('Writing output to disk...')
+
 if (args.debug) {
-    const points_demo = points_lib.visualize(points)
-    io.dump_model(points_demo, path.join(args.o, 'points/points_demo'), args.debug)
-    fs.writeJSONSync(path.join(args.o, 'points/points.json'), points, {spaces: 4})
+    io.dump_model(results.points.demo, path.join(args.o, 'points/demo'), args.debug)
+    fs.writeJSONSync(path.join(args.o, 'points/data.json'), results.points.data, {spaces: 4})
 }
 
-// outlines
-
-console.log('Generating outlines...')
-const outlines = outlines_lib.parse(config.outlines || {}, points)
-for (const [name, outline] of Object.entries(outlines)) {
-    if (!args.debug && name.startsWith('_')) continue
+for (const [name, outline] of Object.entries(results.outlines)) {
     io.dump_model(outline, path.join(args.o, `outlines/${name}`), args.debug)
 }
 
-// pcbs
+// for (const [name, pcb] of Object.entries(results.pcbs)) {
+//     const file = path.join(args.o, `pcbs/${name}.kicad_pcb`)
+//     fs.mkdirpSync(path.dirname(file))
+//     fs.writeFileSync(file, pcb)
+// }
 
-console.log('Scaffolding PCBs...')
-const pcbs = pcbs_lib.parse(config.pcbs || {}, points, outlines)
-for (const [pcb_name, pcb_text] of Object.entries(pcbs)) {
-    const pcb_file = path.join(args.o, `pcbs/${pcb_name}.kicad_pcb`)
-    fs.mkdirpSync(path.dirname(pcb_file))
-    fs.writeFileSync(pcb_file, pcb_text)
-}
+// for (const [name, _case] of Object.entries(results.cases)) {
+//     const file = path.join(args.o, `cases/${name}.jscad`)
+//     fs.mkdirpSync(path.dirname(file))
+//     fs.writeFileSync(file, _case)
+// }
 
-// cases
-
-console.log('Extruding cases...')
-const cases = cases_lib.parse(config.cases || {}, outlines)
-for (const [case_name, case_text] of Object.entries(cases)) {
-    const case_file = path.join(args.o, `cases/${case_name}.jscad`)
-    fs.mkdirpSync(path.dirname(case_file))
-    fs.writeFileSync(case_file, case_text)
+if (args.debug) {
+    fs.writeJSONSync(path.join(args.o, 'results.json'), results, {spaces: 4})
 }
 
 // goodbye

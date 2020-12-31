@@ -1,6 +1,8 @@
 const m = require('makerjs')
 const u = require('./utils')
 const a = require('./assert')
+const prep = require('./prepare')
+const make_anchor = require('./anchor')
 
 const push_rotation = exports._push_rotation = (list, angle, origin) => {
     let candidate = origin
@@ -13,18 +15,18 @@ const push_rotation = exports._push_rotation = (list, angle, origin) => {
     })
 }
 
-const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key) => {
+const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key, units) => {
 
     // zone-wide sanitization
 
     a.detect_unexpected(zone, `points.zones.${zone_name}`, ['columns', 'rows', 'key'])
     // the anchor comes from "above", because it needs other zones too (for references)
-    const cols = a.sane(zone.columns || {}, `points.zones.${zone_name}.columns`, 'object')
-    const zone_wide_rows = a.sane(zone.rows || {}, `points.zones.${zone_name}.rows`, 'object')
+    const cols = a.sane(zone.columns || {}, `points.zones.${zone_name}.columns`, 'object')()
+    const zone_wide_rows = a.sane(zone.rows || {}, `points.zones.${zone_name}.rows`, 'object')()
     for (const [key, val] of Object.entries(zone_wide_rows)) {
-        zone_wide_rows[key] = a.sane(val || {}, `points.zones.${zone_name}.rows.${key}`, 'object')
+        zone_wide_rows[key] = a.sane(val || {}, `points.zones.${zone_name}.rows.${key}`, 'object')()
     }
-    const zone_wide_key = a.sane(zone.key || {}, `points.zones.${zone_name}.key`, 'object')
+    const zone_wide_key = a.sane(zone.key || {}, `points.zones.${zone_name}.key`, 'object')()
 
     // algorithm prep
 
@@ -54,47 +56,47 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key)
             col.stagger || 0,
             `points.zones.${zone_name}.columns.${col_name}.stagger`,
             'number'
-        )
+        )(units)
         col.spread = a.sane(
-            col.spread || (first_col ? 0 : 19),
+            col.spread || (first_col ? 0 : 'u'),
             `points.zones.${zone_name}.columns.${col_name}.spread`,
             'number'
-        )
+        )(units)
         col.rotate = a.sane(
             col.rotate || 0,
             `points.zones.${zone_name}.columns.${col_name}.rotate`,
             'number'
-        )
+        )(units)
         col.origin = a.xy(
             col.origin || [0, 0],
-            `points.zones.${zone_name}.columns.${col_name}.origin`,
-        )
+            `points.zones.${zone_name}.columns.${col_name}.origin`
+        )(units)
         let override = false
         col.rows = a.sane(
             col.rows || {},
             `points.zones.${zone_name}.columns.${col_name}.rows`,
             'object'
-        )
+        )()
         if (col.row_overrides) {
             override = true
             col.rows = a.sane(
                 col.row_overrides,
                 `points.zones.${zone_name}.columns.${col_name}.row_overrides`,
                 'object'
-            )
+            )()
         }
         for (const [key, val] of Object.entries(col.rows)) {
             col.rows[key] = a.sane(
                 val || {},
                 `points.zones.${zone_name}.columns.${col_name}.rows.${key}`,
                 'object'
-            )
+            )()
         }
         col.key = a.sane(
             col.key || {},
             `points.zones.${zone_name}.columns.${col_name}.key`,
             'object'
-        )
+        )()
 
         // propagating object key to name field
 
@@ -104,7 +106,7 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key)
         // (while also handling potential overrides)
 
         const actual_rows = override ? Object.keys(col.rows)
-            : Object.keys(a.extend(zone_wide_rows, col.rows))
+            : Object.keys(prep.extend(zone_wide_rows, col.rows))
         if (!actual_rows.length) {
             actual_rows.push('default')
         }
@@ -134,14 +136,14 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key)
         const default_key = {
             shift: [0, 0],
             rotate: 0,
-            padding: 19,
+            padding: 'u',
             width: 1,
             height: 1,
             skip: false,
             asym: 'both'
         }
         for (const row of actual_rows) {
-            const key = a.extend(
+            const key = prep.extend(
                 default_key,
                 global_key,
                 zone_wide_key,
@@ -152,12 +154,12 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key)
 
             key.name = key.name || `${zone_name}_${col_name}_${row}`
             key.colrow = `${col_name}_${row}`
-            key.shift = a.xy(key.shift, `${key.name}.shift`)
-            key.rotate = a.sane(key.rotate, `${key.name}.rotate`, 'number')
-            key.width = a.sane(key.width, `${key.name}.width`, 'number')
-            key.height = a.sane(key.height, `${key.name}.height`, 'number')
-            key.padding = a.sane(key.padding, `${key.name}.padding`, 'number')
-            key.skip = a.sane(key.skip, `${key.name}.skip`, 'boolean')
+            key.shift = a.xy(key.shift, `${key.name}.shift`)(units)
+            key.rotate = a.sane(key.rotate, `${key.name}.rotate`, 'number')(units)
+            key.width = a.sane(key.width, `${key.name}.width`, 'number')(units)
+            key.height = a.sane(key.height, `${key.name}.height`, 'number')(units)
+            key.padding = a.sane(key.padding, `${key.name}.padding`, 'number')(units)
+            key.skip = a.sane(key.skip, `${key.name}.skip`, 'boolean')()
             key.asym = a.in(key.asym, `${key.name}.asym`, ['left', 'right', 'both'])
             key.col = col
             key.row = row
@@ -184,12 +186,12 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key)
     return points
 }
 
-const parse_axis = exports._parse_axis = (config, name, points) => {
-    if (!['number', 'undefined'].includes(a.type(config))) {
-        const mirror_obj = a.sane(config || {}, name, 'object')
-        const distance = a.sane(mirror_obj.distance || 0, `${name}.distance`, 'number')
+const parse_axis = exports._parse_axis = (config, name, points, units) => {
+    if (!['number', 'undefined'].includes(a.type(config)(units))) {
+        const mirror_obj = a.sane(config || {}, name, 'object')()
+        const distance = a.sane(mirror_obj.distance || 0, `${name}.distance`, 'number')(units)
         delete mirror_obj.distance
-        let axis = a.anchor(mirror_obj, name, points).x
+        let axis = make_anchor(mirror_obj, name, points)(units).x
         axis += distance / 2
         return axis
     } else return config
@@ -201,7 +203,7 @@ const perform_mirror = exports._perform_mirror = (point, axis) => {
         if (point.meta.asym == 'left') return ['', null]
         const mp = point.clone().mirror(axis)
         const mirrored_name = `mirror_${point.meta.name}`
-        mp.meta = a.extend(mp.meta, mp.meta.mirror || {})
+        mp.meta = prep.extend(mp.meta, mp.meta.mirror || {})
         mp.meta.name = mirrored_name
         mp.meta.colrow = `mirror_${mp.meta.colrow}`
         mp.meta.mirrored = true
@@ -215,32 +217,41 @@ const perform_mirror = exports._perform_mirror = (point, axis) => {
 
 exports.parse = (config = {}) => {
 
+    // parsing units
+    const raw_units = prep.extend({
+        u: 19,
+        cx: 18,
+        cy: 17
+    }, a.sane(config.units || {}, 'points.units', 'object')())
+    const units = {}
+    for (const [key, val] of Object.entries(raw_units)) {
+        units[key] = a.mathnum(val)(units)
+    }
+
     // config sanitization
-    a.detect_unexpected(config, 'points', ['zones', 'key', 'rotate', 'mirror'])
-    const zones = a.sane(config.zones || {}, 'points.zones', 'object')
-    const global_key = a.sane(config.key || {}, 'points.key', 'object')
-    const global_rotate = a.sane(config.rotate || 0, 'points.rotate', 'number')
+    a.detect_unexpected(config, 'points', ['units', 'zones', 'key', 'rotate', 'mirror'])
+    const zones = a.sane(config.zones || {}, 'points.zones', 'object')()
+    const global_key = a.sane(config.key || {}, 'points.key', 'object')()
+    const global_rotate = a.sane(config.rotate || 0, 'points.rotate', 'number')(units)
     const global_mirror = config.mirror
     let points = {}
     let mirrored_points = {}
     let all_points = {}
 
+
     // rendering zones
     for (let [zone_name, zone] of Object.entries(zones)) {
 
-        // handle zone-level `extends` clauses
-        zone = a.inherit('points.zones', zone_name, zones)
-
         // extracting keys that are handled here, not at the zone render level
-        const anchor = a.anchor(zone.anchor || {}, `points.zones.${zone_name}.anchor`, all_points)
-        const rotate = a.sane(zone.rotate || 0, `points.zones.${zone_name}.rotate`, 'number')
+        const anchor = make_anchor(zone.anchor || {}, `points.zones.${zone_name}.anchor`, all_points)(units)
+        const rotate = a.sane(zone.rotate || 0, `points.zones.${zone_name}.rotate`, 'number')(units)
         const mirror = zone.mirror
         delete zone.anchor
         delete zone.rotate
         delete zone.mirror
 
         // creating new points
-        const new_points = render_zone(zone_name, zone, anchor, global_key)
+        const new_points = render_zone(zone_name, zone, anchor, global_key, units)
 
         // adjusting new points
         for (const [new_name, new_point] of Object.entries(new_points)) {
@@ -261,7 +272,7 @@ exports.parse = (config = {}) => {
         all_points = Object.assign(all_points, points)
 
         // per-zone mirroring for the new keys
-        const axis = parse_axis(mirror, `points.zones.${zone_name}.mirror`, all_points)
+        const axis = parse_axis(mirror, `points.zones.${zone_name}.mirror`, all_points, units)
         if (axis) {
             for (const new_point of Object.values(new_points)) {
                 const [mname, mp] = perform_mirror(new_point, axis)
@@ -284,7 +295,7 @@ exports.parse = (config = {}) => {
     }
 
     // global mirroring for points that haven't been mirrored yet
-    const global_axis = parse_axis(global_mirror, `points.mirror`, points)
+    const global_axis = parse_axis(global_mirror, `points.mirror`, points, units)
     const global_mirrored_points = {}
     for (const point of Object.values(points)) {
         if (global_axis && point.mirrored === undefined) {
@@ -306,7 +317,7 @@ exports.parse = (config = {}) => {
     }
 
     // done
-    return filtered
+    return [filtered, units]
 }
 
 exports.visualize = (points) => {

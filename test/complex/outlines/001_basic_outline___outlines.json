@@ -1,0 +1,506 @@
+{
+    "outline": {
+        "models": {
+            "a": {
+                "models": {
+                    "a": {
+                        "models": {},
+                        "origin": [
+                            0,
+                            0
+                        ]
+                    },
+                    "b": {
+                        "models": {
+                            "a": {
+                                "models": {
+                                    "a": {
+                                        "models": {
+                                            "a": {
+                                                "models": {
+                                                    "a": {
+                                                        "models": {},
+                                                        "origin": [
+                                                            0,
+                                                            0
+                                                        ]
+                                                    },
+                                                    "b": {
+                                                        "models": {
+                                                            "a": {
+                                                                "models": {
+                                                                    "a": {
+                                                                        "paths": {
+                                                                            "ShapeLine1": {
+                                                                                "type": "line",
+                                                                                "origin": [
+                                                                                    -10,
+                                                                                    -10
+                                                                                ],
+                                                                                "end": [
+                                                                                    29,
+                                                                                    -10
+                                                                                ]
+                                                                            },
+                                                                            "ShapeLine4": {
+                                                                                "type": "line",
+                                                                                "origin": [
+                                                                                    -10,
+                                                                                    -10
+                                                                                ],
+                                                                                "end": [
+                                                                                    -10,
+                                                                                    29
+                                                                                ]
+                                                                            }
+                                                                        },
+                                                                        "origin": [
+                                                                            0,
+                                                                            0
+                                                                        ]
+                                                                    },
+                                                                    "b": {
+                                                                        "paths": {},
+                                                                        "origin": [
+                                                                            0,
+                                                                            0
+                                                                        ]
+                                                                    }
+                                                                },
+                                                                "origin": [
+                                                                    0,
+                                                                    0
+                                                                ]
+                                                            },
+                                                            "b": {
+                                                                "paths": {},
+                                                                "origin": [
+                                                                    0,
+                                                                    0
+                                                                ]
+                                                            }
+                                                        },
+                                                        "origin": [
+                                                            0,
+                                                            0
+                                                        ]
+                                                    }
+                                                },
+                                                "origin": [
+                                                    0,
+                                                    0
+                                                ]
+                                            },
+                                            "b": {
+                                                "models": {
+                                                    "a": {
+                                                        "models": {
+                                                            "a": {
+                                                                "paths": {
+                                                                    "ShapeLine3": {
+                                                                        "type": "line",
+                                                                        "origin": [
+                                                                            -10,
+                                                                            29
+                                                                        ],
+                                                                        "end": [
+                                                                            29,
+                                                                            29
+                                                                        ]
+                                                                    }
+                                                                },
+                                                                "origin": [
+                                                                    0,
+                                                                    0
+                                                                ]
+                                                            },
+                                                            "b": {
+                                                                "paths": {},
+                                                                "origin": [
+                                                                    0,
+                                                                    0
+                                                                ]
+                                                            }
+                                                        },
+                                                        "origin": [
+                                                            0,
+                                                            0
+                                                        ]
+                                                    },
+                                                    "b": {
+                                                        "paths": {},
+                                                        "origin": [
+                                                            0,
+                                                            0
+                                                        ]
+                                                    }
+                                                },
+                                                "origin": [
+                                                    0,
+                                                    0
+                                                ]
+                                            }
+                                        },
+                                        "origin": [
+                                            0,
+                                            0
+                                        ]
+                                    },
+                                    "b": {
+                                        "models": {
+                                            "a": {
+                                                "models": {
+                                                    "a": {
+                                                        "paths": {
+                                                            "ShapeLine2": {
+                                                                "type": "line",
+                                                                "origin": [
+                                                                    29,
+                                                                    -10
+                                                                ],
+                                                                "end": [
+                                                                    29,
+                                                                    29
+                                                                ]
+                                                            }
+                                                        },
+                                                        "origin": [
+                                                            0,
+                                                            0
+                                                        ]
+                                                    },
+                                                    "b": {
+                                                        "paths": {},
+                                                        "origin": [
+                                                            0,
+                                                            0
+                                                        ]
+                                                    }
+                                                },
+                                                "origin": [
+                                                    0,
+                                                    0
+                                                ]
+                                            },
+                                            "b": {
+                                                "paths": {},
+                                                "origin": [
+                                                    0,
+                                                    0
+                                                ]
+                                            }
+                                        },
+                                        "origin": [
+                                            0,
+                                            0
+                                        ]
+                                    }
+                                },
+                                "origin": [
+                                    0,
+                                    0
+                                ]
+                            },
+                            "b": {
+                                "models": {
+                                    "a": {
+                                        "models": {
+                                            "a": {
+                                                "paths": {},
+                                                "origin": [
+                                                    0,
+                                                    0
+                                                ]
+                                            },
+                                            "b": {
+                                                "paths": {},
+                                                "origin": [
+                                                    0,
+                                                    0
+                                                ]
+                                            }
+                                        },
+                                        "origin": [
+                                            0,
+                                            0
+                                        ]
+                                    },
+                                    "b": {
+                                        "paths": {},
+                                        "origin": [
+                                            0,
+                                            0
+                                        ]
+                                    }
+                                },
+                                "origin": [
+                                    0,
+                                    0
+                                ]
+                            }
+                        },
+                        "origin": [
+                            0,
+                            0
+                        ]
+                    }
+                },
+                "origin": [
+                    0,
+                    0
+                ]
+            },
+            "b": {
+                "models": {
+                    "a": {
+                        "models": {
+                            "a": {
+                                "models": {
+                                    "a": {
+                                        "models": {
+                                            "a": {
+                                                "models": {},
+                                                "origin": [
+                                                    0,
+                                                    0
+                                                ]
+                                            },
+                                            "b": {
+                                                "paths": {
+                                                    "ShapeLine1": {
+                                                        "type": "line",
+                                                        "origin": [
+                                                            -7,
+                                                            -7
+                                                        ],
+                                                        "end": [
+                                                            7,
+                                                            -7
+                                                        ]
+                                                    },
+                                                    "ShapeLine2": {
+                                                        "type": "line",
+                                                        "origin": [
+                                                            7,
+                                                            -7
+                                                        ],
+                                                        "end": [
+                                                            7,
+                                                            7
+                                                        ]
+                                                    },
+                                                    "ShapeLine3": {
+                                                        "type": "line",
+                                                        "origin": [
+                                                            7,
+                                                            7
+                                                        ],
+                                                        "end": [
+                                                            -7,
+                                                            7
+                                                        ]
+                                                    },
+                                                    "ShapeLine4": {
+                                                        "type": "line",
+                                                        "origin": [
+                                                            -7,
+                                                            7
+                                                        ],
+                                                        "end": [
+                                                            -7,
+                                                            -7
+                                                        ]
+                                                    }
+                                                },
+                                                "origin": [
+                                                    0,
+                                                    0
+                                                ]
+                                            }
+                                        },
+                                        "origin": [
+                                            0,
+                                            0
+                                        ]
+                                    },
+                                    "b": {
+                                        "paths": {
+                                            "ShapeLine1": {
+                                                "type": "line",
+                                                "origin": [
+                                                    -7,
+                                                    12
+                                                ],
+                                                "end": [
+                                                    7,
+                                                    12
+                                                ]
+                                            },
+                                            "ShapeLine2": {
+                                                "type": "line",
+                                                "origin": [
+                                                    7,
+                                                    12
+                                                ],
+                                                "end": [
+                                                    7,
+                                                    26
+                                                ]
+                                            },
+                                            "ShapeLine3": {
+                                                "type": "line",
+                                                "origin": [
+                                                    7,
+                                                    26
+                                                ],
+                                                "end": [
+                                                    -7,
+                                                    26
+                                                ]
+                                            },
+                                            "ShapeLine4": {
+                                                "type": "line",
+                                                "origin": [
+                                                    -7,
+                                                    26
+                                                ],
+                                                "end": [
+                                                    -7,
+                                                    12
+                                                ]
+                                            }
+                                        },
+                                        "origin": [
+                                            0,
+                                            0
+                                        ]
+                                    }
+                                },
+                                "origin": [
+                                    0,
+                                    0
+                                ]
+                            },
+                            "b": {
+                                "paths": {
+                                    "ShapeLine1": {
+                                        "type": "line",
+                                        "origin": [
+                                            12,
+                                            -7
+                                        ],
+                                        "end": [
+                                            26,
+                                            -7
+                                        ]
+                                    },
+                                    "ShapeLine2": {
+                                        "type": "line",
+                                        "origin": [
+                                            26,
+                                            -7
+                                        ],
+                                        "end": [
+                                            26,
+                                            7
+                                        ]
+                                    },
+                                    "ShapeLine3": {
+                                        "type": "line",
+                                        "origin": [
+                                            26,
+                                            7
+                                        ],
+                                        "end": [
+                                            12,
+                                            7
+                                        ]
+                                    },
+                                    "ShapeLine4": {
+                                        "type": "line",
+                                        "origin": [
+                                            12,
+                                            7
+                                        ],
+                                        "end": [
+                                            12,
+                                            -7
+                                        ]
+                                    }
+                                },
+                                "origin": [
+                                    0,
+                                    0
+                                ]
+                            }
+                        },
+                        "origin": [
+                            0,
+                            0
+                        ]
+                    },
+                    "b": {
+                        "paths": {
+                            "ShapeLine1": {
+                                "type": "line",
+                                "origin": [
+                                    12,
+                                    12
+                                ],
+                                "end": [
+                                    26,
+                                    12
+                                ]
+                            },
+                            "ShapeLine2": {
+                                "type": "line",
+                                "origin": [
+                                    26,
+                                    12
+                                ],
+                                "end": [
+                                    26,
+                                    26
+                                ]
+                            },
+                            "ShapeLine3": {
+                                "type": "line",
+                                "origin": [
+                                    26,
+                                    26
+                                ],
+                                "end": [
+                                    12,
+                                    26
+                                ]
+                            },
+                            "ShapeLine4": {
+                                "type": "line",
+                                "origin": [
+                                    12,
+                                    26
+                                ],
+                                "end": [
+                                    12,
+                                    12
+                                ]
+                            }
+                        },
+                        "origin": [
+                            0,
+                            0
+                        ]
+                    }
+                },
+                "origin": [
+                    0,
+                    0
+                ]
+            }
+        },
+        "origin": [
+            0,
+            0
+        ]
+    }
+}
