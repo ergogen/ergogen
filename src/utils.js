@@ -1,6 +1,9 @@
 const m = require('makerjs')
 
-exports.deepcopy = (value) => JSON.parse(JSON.stringify(value))
+exports.deepcopy = value => {
+    if (value === undefined) return undefined
+    return JSON.parse(JSON.stringify(value))
+}
 
 const deep = exports.deep = (obj, key, val) => {
     const levels = key.split('.')

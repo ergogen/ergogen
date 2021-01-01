@@ -244,7 +244,7 @@ exports.parse = (config = {}, points = {}, units = {}) => {
                         sx: size[0],
                         sy: size[1]
                     }, units)
-                    anchor = a.anchor(part, name, points, false)(rec_units)
+                    anchor = make_anchor(part, name, points, false)(rec_units)
                     const corner = a.sane(part.corner || 0, `${name}.corner`, 'number')(rec_units)
                     const bevel = a.sane(part.bevel || 0, `${name}.bevel`, 'number')(rec_units)
                     const rect_mirror = a.sane(part.mirror || false, `${name}.mirror`, 'boolean')()

@@ -33,21 +33,21 @@ module.exports = {
             results.outlines[name] = outline
         }
 
-        // logger('Extruding cases...')
-        // const cases = cases_lib.parse(config.cases || {}, outlines, units)
-        // results.cases = {}
-        // for (const [case_name, case_text] of Object.entries(cases)) {
-        //     if (!debug && case_name.startsWith('_')) continue
-        //     results.cases[case_name] = case_text
-        // }
+        logger('Extruding cases...')
+        const cases = cases_lib.parse(config.cases || {}, outlines, units)
+        results.cases = {}
+        for (const [case_name, case_text] of Object.entries(cases)) {
+            if (!debug && case_name.startsWith('_')) continue
+            results.cases[case_name] = case_text
+        }
 
-        // logger('Scaffolding PCBs...')
-        // const pcbs = pcbs_lib.parse(config.pcbs || {}, points, outlines, units)
-        // results.pcbs = {}
-        // for (const [pcb_name, pcb_text] of Object.entries(pcbs)) {
-        //     if (!debug && pcb_name.startsWith('_')) continue
-        //     results.cases[pcb_name] = pcb_text
-        // }
+        logger('Scaffolding PCBs...')
+        const pcbs = pcbs_lib.parse(config.pcbs || {}, points, outlines, units)
+        results.pcbs = {}
+        for (const [pcb_name, pcb_text] of Object.entries(pcbs)) {
+            if (!debug && pcb_name.startsWith('_')) continue
+            results.pcbs[pcb_name] = pcb_text
+        }
 
         return results
     }

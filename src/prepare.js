@@ -48,12 +48,13 @@ const _inherit = exports._inherit = (config, root, breadcrumbs) => {
         breadcrumbs.push(key)
         let newval = _inherit(val, root, breadcrumbs)
         if (newval && newval.extends !== undefined) {
-            let candidates = [newval.extends]
+            let candidates = u.deepcopy(newval.extends)
+            if (a.type(candidates)() !== 'array') candidates = [candidates]
             const list = [newval]
             while (candidates.length) {
                 const path = candidates.shift()
                 const other = u.deepcopy(u.deep(root, path))
-                a.assert(other, `"${path}" (reached from "${breadcrumbs.join('.')}.${key}.extends") does not name a valid target!`)
+                a.assert(other, `"${path}" (reached from "${breadcrumbs.join('.')}.extends") does not name a valid inheritance target!`)
                 let parents = other.extends || []
                 if (a.type(parents)() !== 'array') parents = [parents]
                 candidates = candidates.concat(parents)

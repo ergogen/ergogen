@@ -3,7 +3,7 @@ const a = require('./assert')
 const Point = require('./point')
 
 const anchor = module.exports = (raw, name, points={}, check_unexpected=true, default_point=new Point()) => units => {
-    if (a.type(raw) == 'array') {
+    if (a.type(raw)() == 'array') {
         // recursive call with incremental default_point mods, according to `affect`s
         let current = () => default_point.clone()
         for (const step of raw) {
@@ -14,7 +14,7 @@ const anchor = module.exports = (raw, name, points={}, check_unexpected=true, de
     if (check_unexpected) a.detect_unexpected(raw, name, ['ref', 'orient', 'shift', 'rotate', 'affect'])
     let point = default_point.clone()
     if (raw.ref !== undefined) {
-        if (a.type(raw.ref) == 'array') {
+        if (a.type(raw.ref)() == 'array') {
             // averaging multiple anchors
             let x = 0, y = 0, r = 0
             const len = raw.ref.length
@@ -49,7 +49,7 @@ const anchor = module.exports = (raw, name, points={}, check_unexpected=true, de
         point = default_point.clone()
         const valid_affects = ['x', 'y', 'r']
         let affect = raw.affect || valid_affects
-        if (a.type(affect) == 'string') affect = affect.split('')
+        if (a.type(affect)() == 'string') affect = affect.split('')
         affect = a.strarr(affect, `${name}.affect`)
         let i = 0
         for (const a of affect) {

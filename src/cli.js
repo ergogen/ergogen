@@ -78,17 +78,17 @@ for (const [name, outline] of Object.entries(results.outlines)) {
     io.dump_model(outline, path.join(args.o, `outlines/${name}`), args.debug)
 }
 
-// for (const [name, pcb] of Object.entries(results.pcbs)) {
-//     const file = path.join(args.o, `pcbs/${name}.kicad_pcb`)
-//     fs.mkdirpSync(path.dirname(file))
-//     fs.writeFileSync(file, pcb)
-// }
+for (const [name, _case] of Object.entries(results.cases)) {
+    const file = path.join(args.o, `cases/${name}.jscad`)
+    fs.mkdirpSync(path.dirname(file))
+    fs.writeFileSync(file, _case)
+}
 
-// for (const [name, _case] of Object.entries(results.cases)) {
-//     const file = path.join(args.o, `cases/${name}.jscad`)
-//     fs.mkdirpSync(path.dirname(file))
-//     fs.writeFileSync(file, _case)
-// }
+for (const [name, pcb] of Object.entries(results.pcbs)) {
+    const file = path.join(args.o, `pcbs/${name}.kicad_pcb`)
+    fs.mkdirpSync(path.dirname(file))
+    fs.writeFileSync(file, pcb)
+}
 
 if (args.debug) {
     fs.writeJSONSync(path.join(args.o, 'results.json'), results, {spaces: 4})
