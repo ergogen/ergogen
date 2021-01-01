@@ -534,7 +534,7 @@ Currently, the following footprint types are supported:
 - **`slider`**: an SMD slider switch (part no. here), ideal for on/off operation. Nets:
     - `from`, `to`: nets to connect
 
-- **`button`**: an SMD button (part no. here), ideal for momentary toggles (like a reset switch). Nets:
+- **`button`**: an SMD button ([TL3342](https://www.e-switch.com/product-catalog/tact/product-lines/tl3342-series-low-profile-smt-tact-switch)), ideal for momentary toggles (like a reset switch). Nets:
     - `from`, `to`: nets to connect
 
 - **`rgb`**: an RGB led (part no. here), for per-key illumination, underglow, or feedback. Nets:
