@@ -173,7 +173,7 @@ const footprint = exports._footprint = (config, name, points, point, net_indexer
     for (const net_ref of (fp.nets || [])) {
         let net = nets[net_ref]
         a.sane(net, `${name}.nets.${net_ref}`, 'string')()
-        if (net.startsWith('!') && point) {
+        if (net.startsWith('=') && point) {
             const indirect = net.substring(1)
             net = point.meta[indirect]
             a.sane(net, `${name}.nets.${net_ref} --> ${point.meta.name}.${indirect}`, 'string')()
@@ -187,7 +187,7 @@ const footprint = exports._footprint = (config, name, points, point, net_indexer
     for (const param of (Object.keys(fp.params || {}))) {
         let value = params[param] === undefined ? fp.params[param] : params[param]
         if (value === undefined) throw new Error(`Field "${name}.params.${param}" is missing!`)
-        if (a.type(value)() == 'string' && value.startsWith('!') && point) {
+        if (a.type(value)() == 'string' && value.startsWith('=') && point) {
             const indirect = value.substring(1)
             value = point.meta[indirect]
             if (value === undefined) throw new Error(`Field "${name}.params.${param} --> ${point.meta.name}.${indirect}" is missing!`)
