@@ -5,7 +5,7 @@ module.exports = {
     diode: require('./diode'),
     promicro: require('./promicro'),
     slider: require('./slider'),
-    reset: require('./reset'),
+    button: require('./button'),
     rgb: require('./rgb'),
     jstph: require('./jstph'),
     pad: require('./pad')
