@@ -1,15 +1,6 @@
 const u = require('./utils')
 const a = require('./assert')
 
-const unnest = exports.unnest = config => {
-    if (a.type(config)() !== 'object') return config
-    const result = {}
-    for (const [key, val] of Object.entries(config)) {
-        u.deep(result, key, unnest(val))
-    }
-    return result
-}
-
 const _extend = exports._extend = (to, from) => {
     const to_type = a.type(to)()
     const from_type = a.type(from)()
@@ -41,32 +32,79 @@ const extend = exports.extend = (...args) => {
     return res
 }
 
-const _inherit = exports._inherit = (config, root, breadcrumbs) => {
+const traverse = exports.traverse = (config, root, breadcrumbs, op) => {
     if (a.type(config)() !== 'object') return config
     const result = {}
     for (const [key, val] of Object.entries(config)) {
         breadcrumbs.push(key)
-        let newval = _inherit(val, root, breadcrumbs)
-        if (newval && newval.$extends !== undefined) {
-            let candidates = u.deepcopy(newval.$extends)
-            if (a.type(candidates)() !== 'array') candidates = [candidates]
-            const list = [newval]
-            while (candidates.length) {
-                const path = candidates.shift()
-                const other = u.deepcopy(u.deep(root, path))
-                a.assert(other, `"${path}" (reached from "${breadcrumbs.join('.')}.$extends") does not name a valid inheritance target!`)
-                let parents = other.$extends || []
-                if (a.type(parents)() !== 'array') parents = [parents]
-                candidates = candidates.concat(parents)
-                list.unshift(other)
-            }
-            newval = extend.apply(this, list)
-            delete newval.$extends
-        }
-        result[key] = newval
+        op(result, key, traverse(val, root, breadcrumbs, op), root, breadcrumbs)
         breadcrumbs.pop()
     }
     return result
 }
 
-const inherit = exports.inherit = config => _inherit(config, config, [])
+exports.unnest = config => traverse(config, config, [], (target, key, val) => {
+    u.deep(target, key, val)
+})
+
+exports.inherit = config => traverse(config, config, [], (target, key, val, root, breadcrumbs) => {
+    if (val && val.$extends !== undefined) {
+        let candidates = u.deepcopy(val.$extends)
+        if (a.type(candidates)() !== 'array') candidates = [candidates]
+        const list = [val]
+        while (candidates.length) {
+            const path = candidates.shift()
+            const other = u.deepcopy(u.deep(root, path))
+            a.assert(other, `"${path}" (reached from "${breadcrumbs.join('.')}.$extends") does not name a valid inheritance target!`)
+            let parents = other.$extends || []
+            if (a.type(parents)() !== 'array') parents = [parents]
+            candidates = candidates.concat(parents)
+            list.unshift(other)
+        }
+        val = extend.apply(this, list)
+        delete val.$extends
+    }
+    target[key] = val
+})
+
+exports.parameterize = config => traverse(config, config, [], (target, key, val, root, breadcrumbs) => {
+    let params = val.$params
+    let args = val.$args
+
+    // explicitly skipped (probably intermediate) template, remove (by not setting it)
+    if (val.$skip) return
+
+    // nothing to do here, just pass the original value through
+    if (!params && !args) {
+        target[key] = val
+        return
+    }
+
+    // unused template, remove (by not setting it)
+    if (params && !args) return
+
+    if (!params && args) {
+        throw new Error(`Trying to parameterize through "${breadcrumbs}.$args", but the corresponding "$params" field is missing!`)
+    }
+
+    params = a.strarr(params, `${breadcrumbs}.$params`)
+    args = a.sane(args, `${breadcrumbs}.$args`, 'array')()
+    if (params.length !== args.length) {
+        throw new Error(`The number of "$params" and "$args" don't match for "${breadcrumbs}"!`)
+    }
+
+    let str = JSON.stringify(val)
+    const zip = rows => rows[0].map((_, i) => rows.map(row => row[i]))
+    for (const [par, arg] of zip([params, args])) {
+        str = str.replace(new RegExp(`"${par}"`, 'g'), JSON.stringify(arg))
+    }
+    try {
+        val = JSON.parse(str)
+    } catch (ex) {
+        throw new Error(`Replacements didn't lead to a valid JSON object at "${breadcrumbs}"! ` + ex)
+    }
+
+    delete val.$params
+    delete val.$args
+    target[key] = val
+})

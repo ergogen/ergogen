@@ -11,7 +11,8 @@
     "bin": "./src/cli.js",
     "scripts": {
         "build": "rollup -c",
-        "test": "nyc --reporter=html --reporter=text mocha -r chai/register-should test/unit/*.js test/complex/index.js"
+        "test": "mocha -r chai/register-should test/index.js",
+        "coverage": "nyc --reporter=html --reporter=text mocha -r chai/register-should test/index.js"
     },
     "dependencies": {
         "fs-extra": "^9.0.1",

@@ -11,12 +11,12 @@ describe('Prepare', function() {
 
     it('extend', function() {
         p.extend('something', undefined).should.equal('something')
-        should.equal(p.extend('something', '!!unset'), undefined)
+        should.equal(p.extend('something', '$unset'), undefined)
         p.extend(undefined, 'something').should.equal('something')
         p.extend(28, 'something').should.equal('something')
         p.extend('something', 28).should.equal(28)
         p.extend(27, 28).should.equal(28)
-        p.extend({a: 1, c: 1, d: 1}, {b: 2, c: 2, d: '!!unset'}).should.deep.equal({a: 1, b: 2, c: 2})
+        p.extend({a: 1, c: 1, d: 1}, {b: 2, c: 2, d: '$unset'}).should.deep.equal({a: 1, b: 2, c: 2})
         p.extend([3, 2, 1], [null, 4, 5]).should.deep.equal([3, 4, 5])
     })
 
@@ -27,11 +27,11 @@ describe('Prepare', function() {
                 y: 2
             },
             b: {
-                extends: 'a',
+                $extends: 'a',
                 z: 3
             },
             c: {
-                extends: 'b',
+                $extends: ['b'],
                 w: 4
             }
         }).c.should.deep.equal({
@@ -40,5 +40,49 @@ describe('Prepare', function() {
             z: 3,
             w: 4
         })
+    })
+
+    it('parameterize', function() {
+        p.parameterize(1).should.equal(1)
+
+        p.parameterize({
+            unused: {
+                $params: ['PAR']
+            },
+            skip: {
+                $skip: true
+            }
+        }).should.deep.equal({})
+
+        p.parameterize({
+            decl: {
+                a: 'PAR',
+                $params: ['PAR'],
+                $args: [1]
+            }
+        }).decl.should.deep.equal({
+            a: 1
+        })
+
+        p.parameterize.bind(this, {
+            decl: {
+                $args: [1]
+            }
+        }).should.throw('missing')
+
+        p.parameterize.bind(this, {
+            decl: {
+                $params: ['PAR1', 'PAR2'],
+                $args: [1]
+            }
+        }).should.throw('match')
+
+        p.parameterize.bind(this, {
+            decl: {
+                a: 'PAR',
+                $params: ['PAR'],
+                $args: [undefined]
+            }
+        }).should.throw('valid')
     })
 })
