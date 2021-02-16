@@ -1,5 +1,6 @@
 module.exports = {
     mx: require('./mx'),
+    mx_hotswap: require('./mx_hotswap'),
     alps: require('./alps'),
     choc: require('./choc'),
     diode: require('./diode'),
