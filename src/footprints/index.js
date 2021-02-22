@@ -9,5 +9,6 @@ module.exports = {
     button: require('./button'),
     rgb: require('./rgb'),
     jstph: require('./jstph'),
-    pad: require('./pad')
+    pad: require('./pad'),
+    rotary: require('./rotary')
 }
