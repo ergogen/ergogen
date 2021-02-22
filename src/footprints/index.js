@@ -3,6 +3,7 @@ module.exports = {
     mx_hotswap: require('./mx_hotswap'),
     alps: require('./alps'),
     choc: require('./choc'),
+    choc_hotswap: require('./choc_hotswap'),
     diode: require('./diode'),
     promicro: require('./promicro'),
     slider: require('./slider'),
