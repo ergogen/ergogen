@@ -1,7 +1,7 @@
 module.exports = {
     nets: ['A', 'B', 'C', 'S1', 'S2', 'MP1', 'MP2'],
     params: {
-        class: 'S'
+        class: 'R'
     },
     body: p => `
         (module rotary_encoder (layer F.Cu) (tedit 603326DE)
@@ -11,7 +11,7 @@ module.exports = {
             ${'' /* footprint reference */}
             (fp_text reference "${p.ref}" (at 0 0.5) (layer F.SilkS) 
                 ${p.ref_hide} (effects (font (size 1 1) (thickness 0.15))))
-            (fp_text value rotary_encoder (at 0 8.89) (layer F.Fab)
+            (fp_text value "" (at 0 8.89) (layer F.Fab)
                 (effects (font (size 1 1) (thickness 0.15))))
 
             ${''/* component outline */}
@@ -46,14 +46,12 @@ module.exports = {
             (pad A thru_hole rect (at -7.62 -2.54) (size 2 2) (drill 1) (layers *.Cu *.Mask) ${p.net.A}))
             (pad C thru_hole circle (at -7.62 -0.04) (size 2 2) (drill 1) (layers *.Cu *.Mask) ${p.net.B}))
             (pad B thru_hole circle (at -7.62 2.46) (size 2 2) (drill 1) (layers *.Cu *.Mask) ${p.net.C}))
+            (pad S1 thru_hole circle (at 6.88 -2.54) (size 1.5 1.5) (drill 1) (layers *.Cu *.Mask) ${p.net.S1}))
+            (pad S2 thru_hole circle (at 6.88 2.46) (size 1.5 1.5) (drill 1) (layers *.Cu *.Mask) ${p.net.S2})
 
             ${''/* Legs */}
             (pad MP_1 thru_hole rect (at -0.12 -5.64) (size 3.2 2) (drill oval 2.8 1.5) (layers *.Cu *.Mask) ${p.net.MP1}))
             (pad MP_2 thru_hole rect (at -0.12 5.56) (size 3.2 2) (drill oval 2.8 1.5) (layers *.Cu *.Mask) ${p.net.MP2}))
-
-            ${''/* pin names */}
-            (pad S1 thru_hole circle (at 6.88 -2.54) (size 1.5 1.5) (drill 1) (layers *.Cu *.Mask) ${p.net.S1}))
-            (pad S2 thru_hole circle (at 6.88 2.46) (size 1.5 1.5) (drill 1) (layers *.Cu *.Mask) ${p.net.S2})
         )
     `
 }
