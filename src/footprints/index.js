@@ -9,5 +9,5 @@ module.exports = {
     rgb: require('./rgb'),
     jstph: require('./jstph'),
     pad: require('./pad'),
-    choc_hotswap: require('./choc_hotswap')
+    choc_2u_cutout: require('./choc_2u_cutout')
 }
