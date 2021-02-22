@@ -11,12 +11,9 @@ module.exports = {
   
         ${'' /* footprint reference */}
         (fp_text reference "${p.ref}" (at 0 -8.255) (layer F.SilkS) ${p.ref_hide}
-            (effects (font (size 1 1) (thickness 0.15)))
-        )
-        (fp_text value Kailh_socket_PG1350_optional (at 0 8.25) (layer F.Fab)
-            (effects (font (size 1 1) (thickness 0.15)))
-        )
-       
+            (effects (font (size 1 1) (thickness 0.15))))
+        (fp_text value "" (at 0 8.25) (layer F.Fab)
+            (effects (font (size 1 1) (thickness 0.15))))       
         
         ${''/* corner marks */}
         (fp_line (start -2.6 -3.1) (end 2.6 -3.1) (layer Eco2.User) (width 0.15))
