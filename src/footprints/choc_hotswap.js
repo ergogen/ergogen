@@ -1,5 +1,5 @@
 module.exports = {
-    nets: ['from', 'to', 'pad_from', 'pad_to'],
+    nets: ['from', 'to'],
     params: {
         class: 'S'
     },
@@ -83,12 +83,12 @@ module.exports = {
         
         
         ${'' /* pins */}
-        (pad 2 thru_hole circle (at -5 3.8) (size 2.032 2.032) (drill 1.27) (layers *.Cu *.Mask) ${p.net.from})
-        (pad 1 thru_hole circle (at 0 5.9) (size 2.032 2.032) (drill 1.27) (layers *.Cu *.Mask) ${p.net.to})
+        (pad 2 thru_hole circle (at -5 3.8) (size 2.032 2.032) (drill 1.27) (layers *.Cu *.Mask))
+        (pad 1 thru_hole circle (at 0 5.9) (size 2.032 2.032) (drill 1.27) (layers *.Cu *.Mask))
         
         ${'' /* net pads */}
-        (pad 1 smd rect (at -3.275 -5.95) (size 2.6 2.6) (layers B.Cu B.Paste B.Mask)  ${p.net.pad_from})
-        (pad 2 smd rect (at 8.275 -3.75) (size 2.6 2.6) (layers B.Cu B.Paste B.Mask)  ${p.net.pad_to})
+        (pad 1 smd rect (at -3.275 -5.95) (size 2.6 2.6) (layers B.Cu B.Paste B.Mask)  ${p.net.from})
+        (pad 2 smd rect (at 8.275 -3.75) (size 2.6 2.6) (layers B.Cu B.Paste B.Mask)  ${p.net.to})
     )
 
 
