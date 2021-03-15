@@ -1,4 +1,4 @@
-const webui_version = '1.1.1'
+const webui_version = '1.2.0'
 
 //
 // Generator stuff
@@ -22,7 +22,7 @@ const drawing = (model, mode='dxf') => {
     }
 }
 
-const generate = raw => {
+const generate = (raw, debug) => {
 
     console.log('Interpreting the input...')
     let input
@@ -54,26 +54,16 @@ const generate = raw => {
     console.log('Loaded input:', input)
 
 
-    console.log('Parsing points...')
-    const points = ergogen.points.parse(input.points)
-    if (!Object.keys(points).length) {
-        throw new Error('No points parsed from input!')
-    }
-    console.log('Generating outlines...')
-    const outlines = ergogen.outlines.parse(input.outlines || {}, points)
-    console.log('Scaffolding PCBs...')
-    const pcbs = ergogen.pcbs.parse(input.pcbs || {}, points, outlines)
-    console.log('Extruding cases...')
-    const cases = ergogen.cases.parse(input.cases || {}, outlines)
-
+    const logger = m => console.log(m)
+    const res = ergogen.process(input, debug, logger)
 
     return {
         raw,
         canonical: input,
-        points,
-        outlines,
-        pcbs,
-        cases
+        points: res.points,
+        outlines: res.outlines,
+        pcbs: res.pcbs,
+        cases: res.cases
     }
 }
 
@@ -83,9 +73,11 @@ const zipup = results => {
     zip_source.file('raw.txt', results.raw)
     zip_source.file('canonical.yaml', jsyaml.dump(results.canonical, {indent: 4}))
 
-    const zip_points = zip.folder('points')
-    zip_points.file('demo.dxf', drawing(ergogen.points.visualize(results.points)))
-    zip_points.file('points.yaml', jsyaml.dump(results.points, {indent: 4}))
+    if (debug) {
+        const zip_points = zip.folder('points')
+        zip_points.file('demo.dxf', drawing(ergogen.visualize(results.points.data)))
+        zip_points.file('points.yaml', jsyaml.dump(results.points.data, {indent: 4}))
+    }
 
     const zip_outlines = zip.folder('outlines')
     for (const [name, outline] of Object.entries(results.outlines)) {
@@ -117,7 +109,7 @@ const msg = (type, text) => $(`
     </div>
 `)
 
-const make_table = (container) => {
+const make_table = () => {
     const t = $(`
         <table class="table">
             <thead>
@@ -131,11 +123,12 @@ const make_table = (container) => {
             <tbody>
             </tbody>
         </table>
-    `).appendTo(container)
-    return t.find('tbody')
+    `)
+    return [t, t.find('tbody')]
 }
 
 let autoview = null
+let debug = true
 
 const make_row = (category, name, ext, value, callback, preview_suffix='') => {
     const check = autoview == `${category}.${name}`
@@ -298,52 +291,70 @@ $(function() {
 
             try {
 
-                const results = generate(raw)
+                const results = generate(raw, debug)
                 $res.empty()
+                const con = ' in the console'
 
                 // by category
 
-                let $tbody = make_table($res)
+                let [$table, $tbody] = make_table()
+                let empty_res = true
                 make_divider().appendTo($tbody)
 
-                const con = ' in the console'
-                make_row('source', 'raw', 'txt', raw, text_callback, con).appendTo($tbody)
-                make_row('source', 'canonical', 'yaml', jsyaml.dump(results.canonical, {indent: 4}), yaml_callback, con).appendTo($tbody)
-                make_divider().appendTo($tbody)
+                if (debug) {
+                    empty_res = false
+                    make_row('source', 'raw', 'txt', raw, text_callback, con).appendTo($tbody)
+                    make_row('source', 'canonical', 'yaml', jsyaml.dump(results.canonical, {indent: 4}), yaml_callback, con).appendTo($tbody)
+                    make_divider().appendTo($tbody)
                 
-                const points_demo = ergogen.points.visualize(results.points)
-                make_row('points', 'demo', 'dxf', drawing(points_demo), svg_callback(drawing(points_demo, 'svg'))).appendTo($tbody)
-                make_row('points', 'points', 'yaml', jsyaml.dump(results.points, {indent: 4}), yaml_callback, con).appendTo($tbody)
-                make_divider().appendTo($tbody)
+                    const points_demo = ergogen.visualize(results.points.data)
+                    make_row('points', 'demo', 'dxf', drawing(points_demo), svg_callback(drawing(points_demo, 'svg'))).appendTo($tbody)
+                    make_row('points', 'points', 'yaml', jsyaml.dump(results.points.data, {indent: 4}), yaml_callback, con).appendTo($tbody)
+                    make_divider().appendTo($tbody)
+                }
                 
                 for (const [name, outline] of Object.entries(results.outlines)) {
                     make_row('outlines', name, 'dxf', drawing(outline), svg_callback(drawing(outline, 'svg'))).appendTo($tbody)
                 }
-                make_divider().appendTo($tbody)
+                if (Object.entries(results.outlines).length) {
+                    empty_res = false
+                    make_divider().appendTo($tbody)
+                }
                 
                 for (const [pcb_name, pcb_text] of Object.entries(results.pcbs)) {
                     make_row('pcbs', pcb_name, 'kicad_pcb', pcb_text, text_callback, con).appendTo($tbody)
                 }
-                make_divider().appendTo($tbody)
+                if (Object.entries(results.pcbs).length) {
+                    empty_res = false
+                    make_divider().appendTo($tbody)
+                }
                 
                 for (const [case_name, case_text] of Object.entries(results.cases)) {
+                    empty_res = false
                     make_row('cases', case_name, 'jscad', case_text, jscad_callback).appendTo($tbody)
                 }
                 
                 // everything as a zip
 
-                $(`
-                    <a href="#" id="download-all" class="btn btn-success my-5">Download everything in a ZIP!</a>
-                `).appendTo($res)
+                if (!empty_res) {
+                    $table.appendTo($res)
+                    $(`
+                        <a href="#" id="download-all" class="btn btn-success my-5">Download everything in a ZIP!</a>
+                    `).appendTo($res)
+    
+                    $('#download-all').click(function() {
+                        zipup(results)
+                    })
 
-                $('#download-all').click(function() {
-                    zipup(results)
-                })
-
-                // automatic preview
-                if (autoview) {
-                    $(`button.preview[data-name='${autoview}']`).click()
+                    // automatic preview
+                    if (autoview) {
+                        $(`button.preview[data-name='${autoview}']`).click()
+                    }
+                } else {
+                    const suffix = debug ? '' : ' Maybe in debug mode?'
+                    msg('info', 'The results are empty!' + suffix).appendTo($res)
                 }
+
 
                 console.log('Done.')
 
@@ -353,5 +364,14 @@ $(function() {
                 msg('danger', ex).appendTo($res)
             }
         }, 10)
+    })
+
+    $('#debug').click(function() {
+        debug = !debug
+        if (debug) {
+            $(this).removeClass('btn-outline-success').addClass('btn-success')
+        } else {
+            $(this).removeClass('btn-success').addClass('btn-outline-success')
+        }
     })
 })

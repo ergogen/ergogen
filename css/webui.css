@@ -143,6 +143,7 @@ textarea {
   opacity: 0.1;
   border: 2px solid white;
   border-radius: 5px;
+  user-select: none;
 }
 
 table.table {
@@ -200,4 +201,8 @@ canvas {
 
 div.dropdown.bootstrap-select {
   width: 100% !important;
+}
+
+#debug {
+  max-width: 50px;
 }

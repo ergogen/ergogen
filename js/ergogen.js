@@ -1,15 +1,16 @@
 /*!
- * ergogen v1.0.0
+ * ergogen v2.0.0
  * https://zealot.hu/ergogen
  */
 
 (function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('makerjs')) :
-	typeof define === 'function' && define.amd ? define(['makerjs'], factory) :
-	(global = global || self, global.ergogen = factory(global.makerjs));
-}(this, (function (makerjs) { 'use strict';
+	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('makerjs'), require('mathjs')) :
+	typeof define === 'function' && define.amd ? define(['makerjs', 'mathjs'], factory) :
+	(global = global || self, global.ergogen = factory(global.makerjs, global.math));
+}(this, (function (makerjs, mathjs) { 'use strict';
 
 	makerjs = makerjs && Object.prototype.hasOwnProperty.call(makerjs, 'default') ? makerjs['default'] : makerjs;
+	mathjs = mathjs && Object.prototype.hasOwnProperty.call(mathjs, 'default') ? mathjs['default'] : mathjs;
 
 	function createCommonjsModule(fn, basedir, module) {
 		return module = {
@@ -26,7 +27,23 @@
 	}
 
 	var utils = createCommonjsModule(function (module, exports) {
-	exports.deepcopy = (value) => JSON.parse(JSON.stringify(value));
+	exports.deepcopy = value => {
+	    if (value === undefined) return undefined
+	    return JSON.parse(JSON.stringify(value))
+	};
+
+	const deep = exports.deep = (obj, key, val) => {
+	    const levels = key.split('.');
+	    const last = levels.pop();
+	    let step = obj;
+	    for (const level of levels) {
+	        step[level] = step[level] || {};
+	        step = step[level];
+	    }
+	    if (val === undefined) return step[last]
+	    step[last] = val;
+	    return obj
+	};
 
 	const eq = exports.eq = (a=[], b=[]) => {
 	    return a[0] === b[0] && a[1] === b[1]
@@ -157,25 +174,34 @@
 	};
 
 	var assert_1 = createCommonjsModule(function (module, exports) {
+	const mathnum = exports.mathnum = raw => units => {
+	    return mathjs.evaluate(`${raw}`, units || {})
+	};
+
 	const assert = exports.assert = (exp, msg) => {
 	    if (!exp) {
 	        throw new Error(msg)
 	    }
 	};
 
-	const type = exports.type = (val) => {
+	const type = exports.type = val => units => {
 	    if (Array.isArray(val)) return 'array'
 	    if (val === null) return 'null'
+	    try {
+	        const num = mathnum(val)(units);
+	        if (typeof num === 'number') return 'number'
+	    } catch (err) {}
 	    return typeof val
 	};
 
-	const sane = exports.sane = (val, name, _type) => {
-	    assert(type(val) == _type, `Field "${name}" should be of type ${_type}!`);
+	const sane = exports.sane = (val, name, _type) => units => {
+	    assert(type(val)(units) == _type, `Field "${name}" should be of type ${_type}!`);
+	    if (_type == 'number') return mathnum(val)(units)
 	    return val
 	};
 
 	const detect_unexpected = exports.detect_unexpected = (obj, name, expected) => {
-	    const sane_obj = sane(obj, name, 'object');
+	    const sane_obj = sane(obj, name, 'object')();
 	    for (const key of Object.keys(sane_obj)) {
 	        assert(expected.includes(key), `Unexpected key "${key}" within field "${name}"!`);
 	    }
@@ -186,105 +212,52 @@
 	    return raw
 	};
 
-	const arr = exports.arr = (raw, name, length, _type, _default) => {
-	    assert(type(raw) == 'array', `Field "${name}" should be an array!`);
+	const arr = exports.arr = (raw, name, length, _type, _default) => units => {
+	    assert(type(raw)(units) == 'array', `Field "${name}" should be an array!`);
 	    assert(length == 0 || raw.length == length, `Field "${name}" should be an array of length ${length}!`);
 	    raw = raw.map(val => val || _default);
-	    raw.map(val => assert(type(val) == _type, `Field "${name}" should contain ${_type}s!`));
+	    raw.map(val => assert(type(val)(units) == _type, `Field "${name}" should contain ${_type}s!`));
+	    if (_type == 'number') {
+	        raw = raw.map(val => mathnum(val)(units));
+	    }
 	    return raw
 	};
 
-	const numarr = exports.numarr = (raw, name, length) => arr(raw, name, length, 'number', 0);
-	const strarr = exports.strarr = (raw, name) => arr(raw, name, 0, 'string', '');
+	const numarr = exports.numarr = (raw, name, length) => units => arr(raw, name, length, 'number', 0)(units);
+	const strarr = exports.strarr = (raw, name) => arr(raw, name, 0, 'string', '')();
 
-	const xy = exports.xy = (raw, name) => numarr(raw, name, 2);
+	const xy = exports.xy = (raw, name) => units => numarr(raw, name, 2)(units);
 
-	const wh = exports.wh = (raw, name) => {
+	const wh = exports.wh = (raw, name) => units => {
 	    if (!Array.isArray(raw)) raw = [raw, raw];
-	    return xy(raw, name)
+	    return xy(raw, name)(units)
 	};
 
-	exports.trbl = (raw, name) => {
+	exports.trbl = (raw, name) => units => {
 	    if (!Array.isArray(raw)) raw = [raw, raw, raw, raw];
 	    if (raw.length == 2) raw = [raw[1], raw[0], raw[1], raw[0]];
-	    return numarr(raw, name, 4)
+	    return numarr(raw, name, 4, 'number', 0)(units)
 	};
+	});
 
-	const anchor = exports.anchor = (raw, name, points={}, check_unexpected=true, default_point=new point()) => {
-	    if (type(raw) == 'array') {
-	        // recursive call with incremental default_point mods, according to `affect`s
-	        let current = default_point.clone();
-	        for (const step of raw) {
-	            current = anchor(step, name, points, check_unexpected, current);
-	        }
-	        return current
-	    }
-	    if (check_unexpected) detect_unexpected(raw, name, ['ref', 'orient', 'shift', 'rotate', 'affect']);
-	    let point$1 = default_point.clone();
-	    if (raw.ref !== undefined) {
-	        if (type(raw.ref) == 'array') {
-	            // averaging multiple anchors
-	            let x = 0, y = 0, r = 0;
-	            const len = raw.ref.length;
-	            for (const ref of raw.ref) {
-	                assert(points[ref], `Unknown point reference "${ref}" in anchor "${name}"!`);
-	                const resolved = points[ref];
-	                x += resolved.x;
-	                y += resolved.y;
-	                r += resolved.r;
-	            }
-	            point$1 = new point(x / len, y / len, r / len);
-	        } else {
-	            assert(points[raw.ref], `Unknown point reference "${raw.ref}" in anchor "${name}"!`);
-	            point$1 = points[raw.ref].clone();
-	        }
-	    }
-	    if (raw.orient !== undefined) {
-	        point$1.r += sane(raw.orient || 0, `${name}.orient`, 'number');
-	    }
-	    if (raw.shift !== undefined) {
-	        let xyval = wh(raw.shift || [0, 0], `${name}.shift`);
-	        if (point$1.meta.mirrored) {
-	            xyval[0] = -xyval[0];
-	        }
-	        point$1.shift(xyval, true);
-	    }
-	    if (raw.rotate !== undefined) {
-	        point$1.r += sane(raw.rotate || 0, `${name}.rotate`, 'number');
-	    }
-	    if (raw.affect !== undefined) {
-	        const candidate = point$1;
-	        point$1 = default_point.clone();
-	        const valid_affects = ['x', 'y', 'r'];
-	        let affect = raw.affect || valid_affects;
-	        if (type(affect) == 'string') affect = affect.split('');
-	        affect = strarr(affect, `${name}.affect`);
-	        let i = 0;
-	        for (const a of affect) {
-	            _in(a, `${name}.affect[${++i}]`, valid_affects);
-	            point$1[a] = candidate[a];
-	        }
-	    }
-	    return point$1
-	};
-
-	const extend_pair = exports.extend_pair = (to, from) => {
-	    const to_type = type(to);
-	    const from_type = type(from);
+	var prepare = createCommonjsModule(function (module, exports) {
+	const _extend = exports._extend = (to, from) => {
+	    const to_type = assert_1.type(to)();
+	    const from_type = assert_1.type(from)();
 	    if (from === undefined || from === null) return to
-	    if (from === '!!unset') return undefined
+	    if (from === '$unset') return undefined
 	    if (to_type != from_type) return from
 	    if (from_type == 'object') {
 	        const res = utils.deepcopy(to);
 	        for (const key of Object.keys(from)) {
-	            res[key] = extend_pair(to[key], from[key]);
+	            res[key] = _extend(to[key], from[key]);
 	            if (res[key] === undefined) delete res[key];
 	        }
 	        return res
 	    } else if (from_type == 'array') {
 	        const res = utils.deepcopy(to);
 	        for (const [i, val] of from.entries()) {
-	            res[i] = extend_pair(res[i], val);
+	            res[i] = _extend(res[i], val);
 	        }
 	        return res
 	    } else return from
@@ -294,49 +267,146 @@
 	    let res = args[0];
 	    for (const arg of args) {
 	        if (res == arg) continue
-	        res = extend_pair(res, arg);
+	        res = _extend(res, arg);
 	    }
 	    return res
 	};
 
-	const inherit = exports.inherit = (name_prefix, name, set) => {
-	    let result = utils.deepcopy(set[name]);
-	    if (result.extends !== undefined) {
-	        let candidates = [name];
-	        const list = [];
-	        while (candidates.length) {
-	            const item = candidates.shift();
-	            const other = utils.deepcopy(set[item]);
-	            assert(other, `"${item}" (reached from "${name_prefix}.${name}.extends") does not name a valid target!`);
-	            let parents = other.extends || [];
-	            if (type(parents) !== 'array') parents = [parents];
-	            candidates = candidates.concat(parents);
-	            delete other.extends;
-	            list.unshift(other);
-	        }
-	        result = extend.apply(this, list);
+	const traverse = exports.traverse = (config, root, breadcrumbs, op) => {
+	    if (assert_1.type(config)() !== 'object') return config
+	    const result = {};
+	    for (const [key, val] of Object.entries(config)) {
+	        breadcrumbs.push(key);
+	        op(result, key, traverse(val, root, breadcrumbs, op), root, breadcrumbs);
+	        breadcrumbs.pop();
 	    }
 	    return result
 	};
 
-	const op_prefix = exports.op_prefix = str => {
-	    const suffix = str.slice(1);
-	    if (str.startsWith('+')) return {name: suffix, operation: 'add'}
-	    if (str.startsWith('-')) return {name: suffix, operation: 'subtract'}
-	    if (str.startsWith('~')) return {name: suffix, operation: 'intersect'}
-	    if (str.startsWith('^')) return {name: suffix, operation: 'stack'}
-	    return {name: str, operation: 'add'}
-	};
+	exports.unnest = config => traverse(config, config, [], (target, key, val) => {
+	    utils.deep(target, key, val);
+	});
 
-	exports.op_str = (str, choices={}, order=Object.keys(choices)) => {
-	    let res = op_prefix(str);
-	    for (const key of order) {
-	        if (choices[key].includes(res.name)) {
-	            res.type = key;
-	            break
+	exports.inherit = config => traverse(config, config, [], (target, key, val, root, breadcrumbs) => {
+	    if (val && val.$extends !== undefined) {
+	        let candidates = utils.deepcopy(val.$extends);
+	        if (assert_1.type(candidates)() !== 'array') candidates = [candidates];
+	        const list = [val];
+	        while (candidates.length) {
+	            const path = candidates.shift();
+	            const other = utils.deepcopy(utils.deep(root, path));
+	            assert_1.assert(other, `"${path}" (reached from "${breadcrumbs.join('.')}.$extends") does not name a valid inheritance target!`);
+	            let parents = other.$extends || [];
+	            if (assert_1.type(parents)() !== 'array') parents = [parents];
+	            candidates = candidates.concat(parents);
+	            list.unshift(other);
+	        }
+	        val = extend.apply(this, list);
+	        delete val.$extends;
+	    }
+	    target[key] = val;
+	});
+
+	exports.parameterize = config => traverse(config, config, [], (target, key, val, root, breadcrumbs) => {
+	    let params = val.$params;
+	    let args = val.$args;
+
+	    // explicitly skipped (probably intermediate) template, remove (by not setting it)
+	    if (val.$skip) return
+
+	    // nothing to do here, just pass the original value through
+	    if (!params && !args) {
+	        target[key] = val;
+	        return
+	    }
+
+	    // unused template, remove (by not setting it)
+	    if (params && !args) return
+
+	    if (!params && args) {
+	        throw new Error(`Trying to parameterize through "${breadcrumbs}.$args", but the corresponding "$params" field is missing!`)
+	    }
+
+	    params = assert_1.strarr(params, `${breadcrumbs}.$params`);
+	    args = assert_1.sane(args, `${breadcrumbs}.$args`, 'array')();
+	    if (params.length !== args.length) {
+	        throw new Error(`The number of "$params" and "$args" don't match for "${breadcrumbs}"!`)
+	    }
+
+	    let str = JSON.stringify(val);
+	    const zip = rows => rows[0].map((_, i) => rows.map(row => row[i]));
+	    for (const [par, arg] of zip([params, args])) {
+	        str = str.replace(new RegExp(`"${par}"`, 'g'), JSON.stringify(arg));
+	    }
+	    try {
+	        val = JSON.parse(str);
+	    } catch (ex) {
+	        throw new Error(`Replacements didn't lead to a valid JSON object at "${breadcrumbs}"! ` + ex)
+	    }
+
+	    delete val.$params;
+	    delete val.$args;
+	    target[key] = val;
+	});
+	});
+
+	var anchor_1 = createCommonjsModule(function (module) {
+	const anchor = module.exports = (raw, name, points={}, check_unexpected=true, default_point=new point()) => units => {
+	    if (assert_1.type(raw)() == 'array') {
+	        // recursive call with incremental default_point mods, according to `affect`s
+	        let current = () => default_point.clone();
+	        for (const step of raw) {
+	            current = anchor(step, name, points, check_unexpected, current(units));
+	        }
+	        return current
+	    }
+	    if (check_unexpected) assert_1.detect_unexpected(raw, name, ['ref', 'orient', 'shift', 'rotate', 'affect']);
+	    let point$1 = default_point.clone();
+	    if (raw.ref !== undefined) {
+	        if (assert_1.type(raw.ref)() == 'array') {
+	            // averaging multiple anchors
+	            let x = 0, y = 0, r = 0;
+	            const len = raw.ref.length;
+	            for (const ref of raw.ref) {
+	                assert_1.assert(points[ref], `Unknown point reference "${ref}" in anchor "${name}"!`);
+	                const resolved = points[ref];
+	                x += resolved.x;
+	                y += resolved.y;
+	                r += resolved.r;
+	            }
+	            point$1 = new point(x / len, y / len, r / len);
+	        } else {
+	            assert_1.assert(points[raw.ref], `Unknown point reference "${raw.ref}" in anchor "${name}"!`);
+	            point$1 = points[raw.ref].clone();
 	        }
 	    }
-	    return res
+	    if (raw.orient !== undefined) {
+	        point$1.r += assert_1.sane(raw.orient || 0, `${name}.orient`, 'number')(units);
+	    }
+	    if (raw.shift !== undefined) {
+	        let xyval = assert_1.wh(raw.shift || [0, 0], `${name}.shift`)(units);
+	        if (point$1.meta.mirrored) {
+	            xyval[0] = -xyval[0];
+	        }
+	        point$1.shift(xyval, true);
+	    }
+	    if (raw.rotate !== undefined) {
+	        point$1.r += assert_1.sane(raw.rotate || 0, `${name}.rotate`, 'number')(units);
+	    }
+	    if (raw.affect !== undefined) {
+	        const candidate = point$1;
+	        point$1 = default_point.clone();
+	        const valid_affects = ['x', 'y', 'r'];
+	        let affect = raw.affect || valid_affects;
+	        if (assert_1.type(affect)() == 'string') affect = affect.split('');
+	        affect = assert_1.strarr(affect, `${name}.affect`);
+	        let i = 0;
+	        for (const a of affect) {
+	            a._in(a, `${name}.affect[${++i}]`, valid_affects);
+	            point$1[a] = candidate[a];
+	        }
+	    }
+	    return point$1
 	};
 	});
 
@@ -352,18 +422,18 @@
 	    });
 	};
 
-	const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key) => {
+	const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key, units) => {
 
 	    // zone-wide sanitization
 
 	    assert_1.detect_unexpected(zone, `points.zones.${zone_name}`, ['columns', 'rows', 'key']);
 	    // the anchor comes from "above", because it needs other zones too (for references)
-	    const cols = assert_1.sane(zone.columns || {}, `points.zones.${zone_name}.columns`, 'object');
-	    const zone_wide_rows = assert_1.sane(zone.rows || {}, `points.zones.${zone_name}.rows`, 'object');
+	    const cols = assert_1.sane(zone.columns || {}, `points.zones.${zone_name}.columns`, 'object')();
+	    const zone_wide_rows = assert_1.sane(zone.rows || {}, `points.zones.${zone_name}.rows`, 'object')();
 	    for (const [key, val] of Object.entries(zone_wide_rows)) {
-	        zone_wide_rows[key] = assert_1.sane(val || {}, `points.zones.${zone_name}.rows.${key}`, 'object');
+	        zone_wide_rows[key] = assert_1.sane(val || {}, `points.zones.${zone_name}.rows.${key}`, 'object')();
 	    }
-	    const zone_wide_key = assert_1.sane(zone.key || {}, `points.zones.${zone_name}.key`, 'object');
+	    const zone_wide_key = assert_1.sane(zone.key || {}, `points.zones.${zone_name}.key`, 'object')();
 
 	    // algorithm prep
 
@@ -393,47 +463,47 @@
 	            col.stagger || 0,
 	            `points.zones.${zone_name}.columns.${col_name}.stagger`,
 	            'number'
-	        );
+	        )(units);
 	        col.spread = assert_1.sane(
-	            col.spread || (first_col ? 0 : 19),
+	            col.spread || (first_col ? 0 : 'u'),
 	            `points.zones.${zone_name}.columns.${col_name}.spread`,
 	            'number'
-	        );
+	        )(units);
 	        col.rotate = assert_1.sane(
 	            col.rotate || 0,
 	            `points.zones.${zone_name}.columns.${col_name}.rotate`,
 	            'number'
-	        );
+	        )(units);
 	        col.origin = assert_1.xy(
 	            col.origin || [0, 0],
-	            `points.zones.${zone_name}.columns.${col_name}.origin`,
-	        );
+	            `points.zones.${zone_name}.columns.${col_name}.origin`
+	        )(units);
 	        let override = false;
 	        col.rows = assert_1.sane(
 	            col.rows || {},
 	            `points.zones.${zone_name}.columns.${col_name}.rows`,
 	            'object'
-	        );
+	        )();
 	        if (col.row_overrides) {
 	            override = true;
 	            col.rows = assert_1.sane(
 	                col.row_overrides,
 	                `points.zones.${zone_name}.columns.${col_name}.row_overrides`,
 	                'object'
-	            );
+	            )();
 	        }
 	        for (const [key, val] of Object.entries(col.rows)) {
 	            col.rows[key] = assert_1.sane(
 	                val || {},
 	                `points.zones.${zone_name}.columns.${col_name}.rows.${key}`,
 	                'object'
-	            );
+	            )();
 	        }
 	        col.key = assert_1.sane(
 	            col.key || {},
 	            `points.zones.${zone_name}.columns.${col_name}.key`,
 	            'object'
-	        );
+	        )();
 
 	        // propagating object key to name field
 
@@ -443,7 +513,7 @@
 	        // (while also handling potential overrides)
 
 	        const actual_rows = override ? Object.keys(col.rows)
-	            : Object.keys(assert_1.extend(zone_wide_rows, col.rows));
+	            : Object.keys(prepare.extend(zone_wide_rows, col.rows));
 	        if (!actual_rows.length) {
 	            actual_rows.push('default');
 	        }
@@ -473,14 +543,14 @@
 	        const default_key = {
 	            shift: [0, 0],
 	            rotate: 0,
-	            padding: 19,
+	            padding: 'u',
 	            width: 1,
 	            height: 1,
 	            skip: false,
 	            asym: 'both'
 	        };
 	        for (const row of actual_rows) {
-	            const key = assert_1.extend(
+	            const key = prepare.extend(
 	                default_key,
 	                global_key,
 	                zone_wide_key,
@@ -491,12 +561,12 @@
 
 	            key.name = key.name || `${zone_name}_${col_name}_${row}`;
 	            key.colrow = `${col_name}_${row}`;
-	            key.shift = assert_1.xy(key.shift, `${key.name}.shift`);
-	            key.rotate = assert_1.sane(key.rotate, `${key.name}.rotate`, 'number');
-	            key.width = assert_1.sane(key.width, `${key.name}.width`, 'number');
-	            key.height = assert_1.sane(key.height, `${key.name}.height`, 'number');
-	            key.padding = assert_1.sane(key.padding, `${key.name}.padding`, 'number');
-	            key.skip = assert_1.sane(key.skip, `${key.name}.skip`, 'boolean');
+	            key.shift = assert_1.xy(key.shift, `${key.name}.shift`)(units);
+	            key.rotate = assert_1.sane(key.rotate, `${key.name}.rotate`, 'number')(units);
+	            key.width = assert_1.sane(key.width, `${key.name}.width`, 'number')(units);
+	            key.height = assert_1.sane(key.height, `${key.name}.height`, 'number')(units);
+	            key.padding = assert_1.sane(key.padding, `${key.name}.padding`, 'number')(units);
+	            key.skip = assert_1.sane(key.skip, `${key.name}.skip`, 'boolean')();
 	            key.asym = assert_1.in(key.asym, `${key.name}.asym`, ['left', 'right', 'both']);
 	            key.col = col;
 	            key.row = row;
@@ -523,12 +593,12 @@
 	    return points
 	};
 
-	const parse_axis = exports._parse_axis = (config, name, points) => {
-	    if (!['number', 'undefined'].includes(assert_1.type(config))) {
-	        const mirror_obj = assert_1.sane(config || {}, name, 'object');
-	        const distance = assert_1.sane(mirror_obj.distance || 0, `${name}.distance`, 'number');
+	const parse_axis = exports._parse_axis = (config, name, points, units) => {
+	    if (!['number', 'undefined'].includes(assert_1.type(config)(units))) {
+	        const mirror_obj = assert_1.sane(config || {}, name, 'object')();
+	        const distance = assert_1.sane(mirror_obj.distance || 0, `${name}.distance`, 'number')(units);
 	        delete mirror_obj.distance;
-	        let axis = assert_1.anchor(mirror_obj, name, points).x;
+	        let axis = anchor_1(mirror_obj, name, points)(units).x;
 	        axis += distance / 2;
 	        return axis
 	    } else return config
@@ -540,7 +610,7 @@
 	        if (point.meta.asym == 'left') return ['', null]
 	        const mp = point.clone().mirror(axis);
 	        const mirrored_name = `mirror_${point.meta.name}`;
-	        mp.meta = assert_1.extend(mp.meta, mp.meta.mirror || {});
+	        mp.meta = prepare.extend(mp.meta, mp.meta.mirror || {});
 	        mp.meta.name = mirrored_name;
 	        mp.meta.colrow = `mirror_${mp.meta.colrow}`;
 	        mp.meta.mirrored = true;
@@ -554,32 +624,41 @@
 
 	exports.parse = (config = {}) => {
 
+	    // parsing units
+	    const raw_units = prepare.extend({
+	        u: 19,
+	        cx: 18,
+	        cy: 17
+	    }, assert_1.sane(config.units || {}, 'points.units', 'object')());
+	    const units = {};
+	    for (const [key, val] of Object.entries(raw_units)) {
+	        units[key] = assert_1.mathnum(val)(units);
+	    }
+
 	    // config sanitization
-	    assert_1.detect_unexpected(config, 'points', ['zones', 'key', 'rotate', 'mirror']);
-	    const zones = assert_1.sane(config.zones || {}, 'points.zones', 'object');
-	    const global_key = assert_1.sane(config.key || {}, 'points.key', 'object');
-	    const global_rotate = assert_1.sane(config.rotate || 0, 'points.rotate', 'number');
+	    assert_1.detect_unexpected(config, 'points', ['units', 'zones', 'key', 'rotate', 'mirror']);
+	    const zones = assert_1.sane(config.zones || {}, 'points.zones', 'object')();
+	    const global_key = assert_1.sane(config.key || {}, 'points.key', 'object')();
+	    const global_rotate = assert_1.sane(config.rotate || 0, 'points.rotate', 'number')(units);
 	    const global_mirror = config.mirror;
 	    let points = {};
 	    let mirrored_points = {};
 	    let all_points = {};
 
+
 	    // rendering zones
 	    for (let [zone_name, zone] of Object.entries(zones)) {
 
-	        // handle zone-level `extends` clauses
-	        zone = assert_1.inherit('points.zones', zone_name, zones);
-
 	        // extracting keys that are handled here, not at the zone render level
-	        const anchor = assert_1.anchor(zone.anchor || {}, `points.zones.${zone_name}.anchor`, all_points);
-	        const rotate = assert_1.sane(zone.rotate || 0, `points.zones.${zone_name}.rotate`, 'number');
+	        const anchor = anchor_1(zone.anchor || {}, `points.zones.${zone_name}.anchor`, all_points)(units);
+	        const rotate = assert_1.sane(zone.rotate || 0, `points.zones.${zone_name}.rotate`, 'number')(units);
 	        const mirror = zone.mirror;
 	        delete zone.anchor;
 	        delete zone.rotate;
 	        delete zone.mirror;
 
 	        // creating new points
-	        const new_points = render_zone(zone_name, zone, anchor, global_key);
+	        const new_points = render_zone(zone_name, zone, anchor, global_key, units);
 
 	        // adjusting new points
 	        for (const [new_name, new_point] of Object.entries(new_points)) {
@@ -600,7 +679,7 @@
 	        all_points = Object.assign(all_points, points);
 
 	        // per-zone mirroring for the new keys
-	        const axis = parse_axis(mirror, `points.zones.${zone_name}.mirror`, all_points);
+	        const axis = parse_axis(mirror, `points.zones.${zone_name}.mirror`, all_points, units);
 	        if (axis) {
 	            for (const new_point of Object.values(new_points)) {
 	                const [mname, mp] = perform_mirror(new_point, axis);
@@ -623,7 +702,7 @@
 	    }
 
 	    // global mirroring for points that haven't been mirrored yet
-	    const global_axis = parse_axis(global_mirror, `points.mirror`, points);
+	    const global_axis = parse_axis(global_mirror, `points.mirror`, points, units);
 	    const global_mirrored_points = {};
 	    for (const point of Object.values(points)) {
 	        if (global_axis && point.mirrored === undefined) {
@@ -645,7 +724,7 @@
 	    }
 
 	    // done
-	    return filtered
+	    return [filtered, units]
 	};
 
 	exports.visualize = (points) => {
@@ -657,6 +736,28 @@
 	        models[pname] = p.position(rect);
 	    }
 	    return {models: models}
+	};
+	});
+
+	var operation = createCommonjsModule(function (module, exports) {
+	const op_prefix = exports.op_prefix = str => {
+	    const suffix = str.slice(1);
+	    if (str.startsWith('+')) return {name: suffix, operation: 'add'}
+	    if (str.startsWith('-')) return {name: suffix, operation: 'subtract'}
+	    if (str.startsWith('~')) return {name: suffix, operation: 'intersect'}
+	    if (str.startsWith('^')) return {name: suffix, operation: 'stack'}
+	    return {name: str, operation: 'add'}
+	};
+
+	exports.operation = (str, choices={}, order=Object.keys(choices)) => {
+	    let res = op_prefix(str);
+	    for (const key of order) {
+	        if (choices[key].includes(res.name)) {
+	            res.type = key;
+	            break
+	        }
+	    }
+	    return res
 	};
 	});
 
@@ -675,44 +776,29 @@
 	    return makerjs.model.moveRelative(res, [corner + bevel, corner + bevel])
 	};
 
-	const relative_anchor = (decl, name, points={}, check_unexpected=true, default_point=new point()) => {
-	    decl.shift = assert_1.wh(decl.shift || [0, 0], name + '.shift');
-	    const relative = assert_1.sane(decl.relative === undefined ? true : decl.relative, `${name}.relative`, 'boolean');
-	    delete decl.relative;
-	    if (relative) {
-	        return size => {
-	            const copy = utils.deepcopy(decl);
-	            copy.shift = [copy.shift[0] * size[0], copy.shift[1] * size[1]];
-	            return assert_1.anchor(copy, name, points, check_unexpected, default_point)
-	        }
-	    }
-	    return () => assert_1.anchor(decl, name, points, check_unexpected, default_point)
-	};
-
-	const layout = exports._layout = (config = {}, points = {}) => {
+	const layout = exports._layout = (config = {}, points = {}, units = {}) => {
 
 	    // Glue config sanitization
 
-	    const parsed_glue = utils.deepcopy(assert_1.sane(config, 'outlines.glue', 'object'));
+	    const parsed_glue = utils.deepcopy(assert_1.sane(config, 'outlines.glue', 'object')());
 	    for (let [gkey, gval] of Object.entries(parsed_glue)) {
-	        gval = assert_1.inherit('outlines.glue', gkey, config);
 	        assert_1.detect_unexpected(gval, `outlines.glue.${gkey}`, ['top', 'bottom', 'waypoints', 'extra']);
 	    
 	        for (const y of ['top', 'bottom']) {
 	            assert_1.detect_unexpected(gval[y], `outlines.glue.${gkey}.${y}`, ['left', 'right']);
-	            gval[y].left = relative_anchor(gval[y].left, `outlines.glue.${gkey}.${y}.left`, points);
-	            if (assert_1.type(gval[y].right) != 'number') {
-	                gval[y].right = relative_anchor(gval[y].right, `outlines.glue.${gkey}.${y}.right`, points);
+	            gval[y].left = anchor_1(gval[y].left, `outlines.glue.${gkey}.${y}.left`, points);
+	            if (assert_1.type(gval[y].right)(units) != 'number') {
+	                gval[y].right = anchor_1(gval[y].right, `outlines.glue.${gkey}.${y}.right`, points);
 	            }
 	        }
 	    
-	        gval.waypoints = assert_1.sane(gval.waypoints || [], `outlines.glue.${gkey}.waypoints`, 'array');
+	        gval.waypoints = assert_1.sane(gval.waypoints || [], `outlines.glue.${gkey}.waypoints`, 'array')(units);
 	        let wi = 0;
 	        gval.waypoints = gval.waypoints.map(w => {
 	            const name = `outlines.glue.${gkey}.waypoints[${++wi}]`;
 	            assert_1.detect_unexpected(w, name, ['percent', 'width']);
-	            w.percent = assert_1.sane(w.percent, name + '.percent', 'number');
-	            w.width = assert_1.wh(w.width, name + '.width');
+	            w.percent = assert_1.sane(w.percent, name + '.percent', 'number')(units);
+	            w.width = assert_1.wh(w.width, name + '.width')(units);
 	            return w
 	        });
 
@@ -727,12 +813,19 @@
 	        // Layout params sanitization
 
 	        assert_1.detect_unexpected(params, `${export_name}`, expected.concat(['side', 'tags', 'glue', 'size', 'corner', 'bevel', 'bound']));
+	        const size = assert_1.wh(params.size, `${export_name}.size`)(units);
+	        const relative_units = prepare.extend({
+	            sx: size[0],
+	            sy: size[1]
+	        }, units);
+
+
+
 	        const side = assert_1.in(params.side, `${export_name}.side`, ['left', 'right', 'middle', 'both', 'glue']);
-	        const tags = assert_1.sane(params.tags || [], `${export_name}.tags`, 'array');
-	        const size = assert_1.wh(params.size, `${export_name}.size`);
-	        const corner = assert_1.sane(params.corner || 0, `${export_name}.corner`, 'number');
-	        const bevel = assert_1.sane(params.bevel || 0, `${export_name}.bevel`, 'number');
-	        const bound = assert_1.sane(params.bound === undefined ? true : params.bound, `${export_name}.bound`, 'boolean');
+	        const tags = assert_1.sane(params.tags || [], `${export_name}.tags`, 'array')();
+	        const corner = assert_1.sane(params.corner || 0, `${export_name}.corner`, 'number')(relative_units);
+	        const bevel = assert_1.sane(params.bevel || 0, `${export_name}.bevel`, 'number')(relative_units);
+	        const bound = assert_1.sane(params.bound === undefined ? true : params.bound, `${export_name}.bound`, 'boolean')();
 
 	        // Actual layout
 
@@ -758,7 +851,7 @@
 
 	                // extra binding "material", if necessary
 	                if (bound) {
-	                    let bind = assert_1.trbl(p.meta.bind || 0, `${pname}.bind`);
+	                    let bind = assert_1.trbl(p.meta.bind || 0, `${pname}.bind`)(relative_units);
 	                    // if it's a mirrored key, we swap the left and right bind values
 	                    if (p.meta.mirrored) {
 	                        bind = [bind[0], bind[3], bind[2], bind[1]];
@@ -791,17 +884,17 @@
 	        if (bound && ['middle', 'both', 'glue'].includes(side)) {
 
 	            const default_glue_name = Object.keys(parsed_glue)[0];
-	            const glue_def = parsed_glue[assert_1.sane(params.glue || default_glue_name, `${export_name}.glue`, 'string')];
+	            const computed_glue_name = assert_1.sane(params.glue || default_glue_name, `${export_name}.glue`, 'string')();
+	            const glue_def = parsed_glue[computed_glue_name];
 	            assert_1.assert(glue_def, `Field "${export_name}.glue" does not name a valid glue!`);
 
 	            const get_line = (anchor) => {
-	                if (assert_1.type(anchor) == 'number') {
+	                if (assert_1.type(anchor)(relative_units) == 'number') {
 	                    return utils.line([anchor, -1000], [anchor, 1000])
 	                }
 
-	                // if it wasn't a number, then it's a function returning an achor
-	                // have to feed it `size` first in case it's relative
-	                const from = anchor(size).clone();
+	                // if it wasn't a number, then it's a (possibly relative) achor
+	                const from = anchor(relative_units).clone();
 	                const to = from.clone().shift([from.meta.mirrored ? -1 : 1, 0]);
 
 	                return utils.line(from.p, to.p)
@@ -810,12 +903,18 @@
 	            const tll = get_line(glue_def.top.left);
 	            const trl = get_line(glue_def.top.right);
 	            const tip = makerjs.path.converge(tll, trl);
+	            if (!tip) {
+	                throw new Error(`Top lines don't intersect in glue "${computed_glue_name}"!`)
+	            }
 	            const tlp = utils.eq(tll.origin, tip) ? tll.end : tll.origin;
 	            const trp = utils.eq(trl.origin, tip) ? trl.end : trl.origin;
 	    
 	            const bll = get_line(glue_def.bottom.left);
 	            const brl = get_line(glue_def.bottom.right);
 	            const bip = makerjs.path.converge(bll, brl);
+	            if (!bip) {
+	                throw new Error(`Bottom lines don't intersect in glue "${computed_glue_name}"!`)
+	            }
 	            const blp = utils.eq(bll.origin, bip) ? bll.end : bll.origin;
 	            const brp = utils.eq(brl.origin, bip) ? brl.end : brl.origin;
 	    
@@ -833,7 +932,7 @@
 	            }
 	            
 	            let waypoints;
-	            const is_split = assert_1.type(glue_def.top.right) == 'number';
+	            const is_split = assert_1.type(glue_def.top.right)(relative_units) == 'number';
 	            if (is_split) {
 	                waypoints = [tip, tlp]
 	                .concat(left_waypoints)
@@ -861,24 +960,23 @@
 	    }
 	};
 
-	exports.parse = (config = {}, points = {}) => {
+	exports.parse = (config = {}, points = {}, units = {}) => {
 	    assert_1.detect_unexpected(config, 'outline', ['glue', 'exports']);
-	    const layout_fn = layout(config.glue, points);
+	    const layout_fn = layout(config.glue, points, units);
 
 	    const outlines = {};
 
-	    const ex = assert_1.sane(config.exports || {}, 'outlines.exports', 'object');
+	    const ex = assert_1.sane(config.exports || {}, 'outlines.exports', 'object')();
 	    for (let [key, parts] of Object.entries(ex)) {
-	        parts = assert_1.inherit('outlines.exports', key, ex);
-	        if (assert_1.type(parts) == 'array') {
+	        if (assert_1.type(parts)() == 'array') {
 	            parts = {...parts};
 	        }
-	        parts = assert_1.sane(parts, `outlines.exports.${key}`, 'object');
+	        parts = assert_1.sane(parts, `outlines.exports.${key}`, 'object')();
 	        let result = {models: {}};
 	        for (let [part_name, part] of Object.entries(parts)) {
 	            const name = `outlines.exports.${key}.${part_name}`;
-	            if (assert_1.type(part) == 'string') {
-	                part = assert_1.op_str(part, {outline: Object.keys(outlines)});
+	            if (assert_1.type(part)() == 'string') {
+	                part = operation.operation(part, {outline: Object.keys(outlines)});
 	            }
 	            const expected = ['type', 'operation'];
 	            part.type = assert_1.in(part.type || 'outline', `${name}.type`, ['keys', 'rectangle', 'circle', 'polygon', 'outline']);
@@ -897,45 +995,49 @@
 	                    break
 	                case 'rectangle':
 	                    assert_1.detect_unexpected(part, name, expected.concat(['ref', 'shift', 'rotate', 'size', 'corner', 'bevel', 'mirror']));
-	                    anchor = assert_1.anchor(part, name, points, false);
-	                    const size = assert_1.wh(part.size, `${name}.size`);
-	                    const corner = assert_1.sane(part.corner || 0, `${name}.corner`, 'number');
-	                    const bevel = assert_1.sane(part.bevel || 0, `${name}.bevel`, 'number');
-	                    const rect_mirror = assert_1.sane(part.mirror || false, `${name}.mirror`, 'boolean');
+	                    const size = assert_1.wh(part.size, `${name}.size`)(units);
+	                    const rec_units = prepare.extend({
+	                        sx: size[0],
+	                        sy: size[1]
+	                    }, units);
+	                    anchor = anchor_1(part, name, points, false)(rec_units);
+	                    const corner = assert_1.sane(part.corner || 0, `${name}.corner`, 'number')(rec_units);
+	                    const bevel = assert_1.sane(part.bevel || 0, `${name}.bevel`, 'number')(rec_units);
+	                    const rect_mirror = assert_1.sane(part.mirror || false, `${name}.mirror`, 'boolean')();
 	                    const rect = rectangle(size[0], size[1], corner, bevel, name);
 	                    arg = anchor.position(utils.deepcopy(rect));
 	                    if (rect_mirror) {
 	                        const mirror_part = utils.deepcopy(part);
 	                        assert_1.assert(mirror_part.ref, `Field "${name}.ref" must be speficied if mirroring is required!`);
 	                        mirror_part.ref = `mirror_${mirror_part.ref}`;
-	                        anchor = assert_1.anchor(mirror_part, name, points, false);
+	                        anchor = anchor_1(mirror_part, name, points, false)(rec_units);
 	                        const mirror_rect = makerjs.model.moveRelative(utils.deepcopy(rect), [-size[0], 0]);
 	                        arg = utils.union(arg, anchor.position(mirror_rect));
 	                    }
 	                    break
 	                case 'circle':
 	                    assert_1.detect_unexpected(part, name, expected.concat(['ref', 'shift', 'rotate', 'radius', 'mirror']));
-	                    anchor = assert_1.anchor(part, name, points, false);
-	                    const radius = assert_1.sane(part.radius, `${name}.radius`, 'number');
-	                    const circle_mirror = assert_1.sane(part.mirror || false, `${name}.mirror`, 'boolean');
+	                    anchor = anchor_1(part, name, points, false)(units);
+	                    const radius = assert_1.sane(part.radius, `${name}.radius`, 'number')(units);
+	                    const circle_mirror = assert_1.sane(part.mirror || false, `${name}.mirror`, 'boolean')();
 	                    arg = utils.circle(anchor.p, radius);
 	                    if (circle_mirror) {
 	                        const mirror_part = utils.deepcopy(part);
 	                        assert_1.assert(mirror_part.ref, `Field "${name}.ref" must be speficied if mirroring is required!`);
 	                        mirror_part.ref = `mirror_${mirror_part.ref}`;
-	                        anchor = assert_1.anchor(mirror_part, name, points, false);
+	                        anchor = anchor_1(mirror_part, name, points, false)(units);
 	                        arg = utils.union(arg, utils.circle(anchor.p, radius));
 	                    }
 	                    break
 	                case 'polygon':
 	                    assert_1.detect_unexpected(part, name, expected.concat(['points']));
-	                    const poly_points = assert_1.sane(part.points, `${name}.points`, 'array');
+	                    const poly_points = assert_1.sane(part.points, `${name}.points`, 'array')();
 	                    const parsed_points = [];
 	                    let last_anchor = new point();
 	                    let poly_index = 0;
 	                    for (const poly_point of poly_points) {
 	                        const poly_name = `${name}.points[${++poly_index}]`;
-	                        const anchor = assert_1.anchor(poly_point, poly_name, points, true, last_anchor);
+	                        const anchor = anchor_1(poly_point, poly_name, points, true, last_anchor)(units);
 	                        parsed_points.push(anchor.p);
 	                    }
 	                    arg = utils.poly(parsed_points);
@@ -960,9 +1062,9 @@
 	};
 	});
 
-	var parse = (config, outlines) => {
+	var parse = (config, outlines, units) => {
 
-	    const cases_config = assert_1.sane(config, 'cases', 'object');
+	    const cases_config = assert_1.sane(config, 'cases', 'object')();
 
 	    const scripts = {};
 	    const cases = {};
@@ -997,19 +1099,18 @@
 	    for (let [case_name, case_config] of Object.entries(cases_config)) {
 
 	        // config sanitization
-	        case_config = assert_1.inherit('cases', case_name, cases_config);
-	        if (assert_1.type(case_config) == 'array') {
+	        if (assert_1.type(case_config)() == 'array') {
 	            case_config = {...case_config};
 	        }
-	        const parts = assert_1.sane(case_config, `cases.${case_name}`, 'object');
+	        const parts = assert_1.sane(case_config, `cases.${case_name}`, 'object')();
 
 	        const body = [];
 	        const case_dependencies = [];
 	        const outline_dependencies = [];
 	        let first = true;
 	        for (let [part_name, part] of Object.entries(parts)) {
-	            if (assert_1.type(part) == 'string') {
-	                part = assert_1.op_str(part, {
+	            if (assert_1.type(part)() == 'string') {
+	                part = operation.operation(part, {
 	                    outline: Object.keys(outlines),
 	                    case: Object.keys(cases)
 	                }, ['case', 'outline']);
@@ -1018,14 +1119,14 @@
 	            const part_var = `${case_name}__part_${part_name}`;
 	            assert_1.detect_unexpected(part, part_qname, ['type', 'name', 'extrude', 'shift', 'rotate', 'operation']);
 	            const type = assert_1.in(part.type || 'outline', `${part_qname}.type`, ['outline', 'case']);
-	            const name = assert_1.sane(part.name, `${part_qname}.name`, 'string');
-	            const shift = assert_1.numarr(part.shift || [0, 0, 0], `${part_qname}.shift`, 3);
-	            const rotate = assert_1.numarr(part.rotate || [0, 0, 0], `${part_qname}.rotate`, 3);
-	            const operation = assert_1.in(part.operation || 'add', `${part_qname}.operation`, ['add', 'subtract', 'intersect']);
+	            const name = assert_1.sane(part.name, `${part_qname}.name`, 'string')();
+	            const shift = assert_1.numarr(part.shift || [0, 0, 0], `${part_qname}.shift`, 3)(units);
+	            const rotate = assert_1.numarr(part.rotate || [0, 0, 0], `${part_qname}.rotate`, 3)(units);
+	            const operation$1 = assert_1.in(part.operation || 'add', `${part_qname}.operation`, ['add', 'subtract', 'intersect']);
 
 	            let base;
 	            if (type == 'outline') {
-	                const extrude = assert_1.sane(part.extrude || 1, `${part_qname}.extrude`, 'number');
+	                const extrude = assert_1.sane(part.extrude || 1, `${part_qname}.extrude`, 'number')(units);
 	                const outline = outlines[name];
 	                assert_1.assert(outline, `Field "${part_qname}.name" does not name a valid outline!`);
 	                if (!scripts[name]) {
@@ -1045,8 +1146,8 @@
 	            }
 
 	            let op = 'union';
-	            if (operation == 'subtract') op = 'subtract';
-	            else if (operation == 'intersect') op = 'intersect';
+	            if (operation$1 == 'subtract') op = 'subtract';
+	            else if (operation$1 == 'intersect') op = 'intersect';
 
 	            let op_statement = `let result = ${part_var};`;
 	            if (!first) {
@@ -1136,6 +1237,69 @@
   `
 	};
 
+	var mx_hotswap = {
+	    nets: ['from', 'to'],
+	    params: {
+	      class: 'S'
+	    },
+	    body: p => `
+  
+      (module MX_Hotswap (layer F.Cu) (tedit 5DD4F656)
+
+        ${p.at /* parametric position */}
+  
+        ${'' /* footprint reference */}
+        (fp_text reference "${p.ref}" (at 7.1 8.2) (layer F.SilkS) ${p.ref_hide} (effects (font (size 1.27 1.27) (thickness 0.15))))
+        (fp_text value "" (at 0 0) (layer F.SilkS) hide (effects (font (size 1.27 1.27) (thickness 0.15))))
+        
+        ${'' /* silk stuff */}
+        (fp_line (start -7 7) (end -6 7) (layer Dwgs.User) (width 0.15))
+        (fp_line (start 7 -7) (end 7 -6) (layer Dwgs.User) (width 0.15))
+        (fp_line (start -7 -7) (end -6 -7) (layer Dwgs.User) (width 0.15))
+        (fp_line (start 7 7) (end 7 6) (layer Dwgs.User) (width 0.15))
+        (fp_line (start 6 7) (end 7 7) (layer Dwgs.User) (width 0.15))
+        (fp_line (start -7 6) (end -7 7) (layer Dwgs.User) (width 0.15))
+        (fp_line (start 7 -7) (end 6 -7) (layer Dwgs.User) (width 0.15))
+        (fp_line (start -7 -6) (end -7 -7) (layer Dwgs.User) (width 0.15))
+        (fp_line (start -9.525 9.525) (end -9.525 -9.525) (layer Dwgs.User) (width 0.15))
+        (fp_line (start 9.525 9.525) (end -9.525 9.525) (layer Dwgs.User) (width 0.15))
+        (fp_line (start 9.525 -9.525) (end 9.525 9.525) (layer Dwgs.User) (width 0.15))
+        (fp_line (start -9.525 -9.525) (end 9.525 -9.525) (layer Dwgs.User) (width 0.15))
+        (fp_line (start -5.8 -4.05) (end -5.8 -4.7) (layer B.SilkS) (width 0.3))
+        (fp_line (start -5.3 -1.6) (end -5.3 -3.399999) (layer B.SilkS) (width 0.8))
+        (fp_line (start -4.17 -5.1) (end -4.17 -2.86) (layer B.SilkS) (width 3))
+        (fp_line (start 4.2 -3.25) (end 2.9 -3.3) (layer B.SilkS) (width 0.5))
+        (fp_line (start 3.9 -6) (end 3.9 -3.5) (layer B.SilkS) (width 1))
+        (fp_line (start 2.6 -4.8) (end -4.1 -4.8) (layer B.SilkS) (width 3.5))
+        (fp_line (start 4.4 -3) (end 4.4 -6.6) (layer B.SilkS) (width 0.15))
+        (fp_line (start 4.38 -4) (end 4.38 -6.25) (layer B.SilkS) (width 0.15))
+        (fp_line (start -5.9 -3.95) (end -5.7 -3.95) (layer B.SilkS) (width 0.15))
+        (fp_line (start -5.65 -5.55) (end -5.65 -1.1) (layer B.SilkS) (width 0.15))
+        (fp_line (start -5.9 -4.7) (end -5.9 -3.95) (layer B.SilkS) (width 0.15))
+        (fp_line (start -5.65 -1.1) (end -2.62 -1.1) (layer B.SilkS) (width 0.15))
+        (fp_line (start -0.4 -3) (end 4.4 -3) (layer B.SilkS) (width 0.15))
+        (fp_line (start 4.4 -6.6) (end -3.800001 -6.6) (layer B.SilkS) (width 0.15))
+        (fp_arc (start -0.465 -0.83) (end -0.4 -3) (angle -84) (layer B.SilkS) (width 0.15))
+        (fp_arc (start -3.9 -4.6) (end -3.800001 -6.6) (angle -90) (layer B.SilkS) (width 0.15))
+        (fp_arc (start -0.865 -1.23) (end -0.8 -3.4) (angle -84) (layer B.SilkS) (width 1))
+        (fp_line (start -5.45 -1.3) (end -3 -1.3) (layer B.SilkS) (width 0.5))
+        (fp_line (start 4.25 -6.4) (end 3 -6.4) (layer B.SilkS) (width 0.4))
+
+        ${'' /* holes */}
+        (pad "" np_thru_hole circle (at 2.54 -5.08) (size 3 3) (drill 3) (layers *.Cu *.Mask))
+        (pad "" np_thru_hole circle (at -3.81 -2.54) (size 3 3) (drill 3) (layers *.Cu *.Mask))
+        (pad "" np_thru_hole circle (at -5.08 0) (size 1.9 1.9) (drill 1.9) (layers *.Cu *.Mask))
+        (pad "" np_thru_hole circle (at 5.08 0) (size 1.9 1.9) (drill 1.9) (layers *.Cu *.Mask))
+        (pad "" np_thru_hole circle (at 0 0 90) (size 4.1 4.1) (drill 4.1) (layers *.Cu *.Mask))
+
+        ${'' /* net pads */}
+        (pad 1 smd rect (at -7.085 -2.54 180) (size 2.55 2.5) (layers B.Cu B.Paste B.Mask) ${p.net.from})
+        (pad 2 smd rect (at 5.842 -5.08 180) (size 2.55 2.5) (layers B.Cu B.Paste B.Mask) ${p.net.to})
+      )
+  
+    `
+	  };
+
 	var alps = {
 	    nets: ['from', 'to'],
 	    params: {
@@ -1205,6 +1369,103 @@
         (pad "" np_thru_hole circle (at 5.5 0) (size 1.7018 1.7018) (drill 1.7018) (layers *.Cu *.Mask))
         (pad "" np_thru_hole circle (at -5.5 0) (size 1.7018 1.7018) (drill 1.7018) (layers *.Cu *.Mask))
     )
+
+    `
+	};
+
+	var choc_hotswap = {
+	    nets: ['from', 'to'],
+	    params: {
+	        class: 'S'
+	    },
+	    body: p => `
+
+    (module Kailh_socket_PG1350_optional (layer F.Cu) (tedit 5DD50F3F)
+
+        ${p.at /* parametric position */}   
+  
+        ${'' /* footprint reference */}
+        (fp_text reference "${p.ref}" (at 0 -8.255) (layer F.SilkS) ${p.ref_hide}
+            (effects (font (size 1 1) (thickness 0.15))))
+        (fp_text value "" (at 0 8.25) (layer F.Fab)
+            (effects (font (size 1 1) (thickness 0.15))))       
+        
+        ${''/* corner marks */}
+        (fp_line (start -2.6 -3.1) (end 2.6 -3.1) (layer Eco2.User) (width 0.15))
+        (fp_line (start 2.6 -3.1) (end 2.6 -6.3) (layer Eco2.User) (width 0.15))
+        (fp_line (start 2.6 -6.3) (end -2.6 -6.3) (layer Eco2.User) (width 0.15))
+        (fp_line (start -2.6 -3.1) (end -2.6 -6.3) (layer Eco2.User) (width 0.15))
+        (fp_line (start -7 -6) (end -7 -7) (layer F.SilkS) (width 0.15))
+        (fp_line (start -7 7) (end -6 7) (layer F.SilkS) (width 0.15))
+        (fp_line (start -6 -7) (end -7 -7) (layer F.SilkS) (width 0.15))
+        (fp_line (start -7 7) (end -7 6) (layer F.SilkS) (width 0.15))
+        (fp_line (start 7 6) (end 7 7) (layer F.SilkS) (width 0.15))
+        (fp_line (start 7 -7) (end 6 -7) (layer F.SilkS) (width 0.15))
+        (fp_line (start 6 7) (end 7 7) (layer F.SilkS) (width 0.15))
+        (fp_line (start 7 -7) (end 7 -6) (layer F.SilkS) (width 0.15))
+        
+        (fp_line (start -6.9 6.9) (end 6.9 6.9) (layer Eco2.User) (width 0.15))
+        (fp_line (start 6.9 -6.9) (end -6.9 -6.9) (layer Eco2.User) (width 0.15))
+        (fp_line (start 6.9 -6.9) (end 6.9 6.9) (layer Eco2.User) (width 0.15))
+        (fp_line (start -6.9 6.9) (end -6.9 -6.9) (layer Eco2.User) (width 0.15))
+        
+        ${''/* Outline */}
+        (fp_line (start -7.5 -7.5) (end 7.5 -7.5) (layer F.Fab) (width 0.15))
+        (fp_line (start 7.5 -7.5) (end 7.5 7.5) (layer F.Fab) (width 0.15))
+        (fp_line (start 7.5 7.5) (end -7.5 7.5) (layer F.Fab) (width 0.15))
+        (fp_line (start -7.5 7.5) (end -7.5 -7.5) (layer F.Fab) (width 0.15))
+        
+        ${''/* hotswap marks */}
+        (fp_line (start 7 -1.5) (end 7 -2) (layer B.SilkS) (width 0.15))
+        (fp_line (start -1.5 -8.2) (end 1.5 -8.2) (layer B.SilkS) (width 0.15))
+        (fp_line (start -2 -7.7) (end -1.5 -8.2) (layer B.SilkS) (width 0.15))
+        (fp_line (start -1.5 -3.7) (end 1 -3.7) (layer B.SilkS) (width 0.15))
+        (fp_line (start 7 -5.6) (end 7 -6.2) (layer B.SilkS) (width 0.15))
+        (fp_line (start -2 -4.2) (end -1.5 -3.7) (layer B.SilkS) (width 0.15))
+        (fp_line (start 7 -6.2) (end 2.5 -6.2) (layer B.SilkS) (width 0.15))
+        (fp_line (start 2 -6.7) (end 2 -7.7) (layer B.SilkS) (width 0.15))
+        (fp_line (start 1.5 -8.2) (end 2 -7.7) (layer B.SilkS) (width 0.15))
+        (fp_line (start 2.5 -1.5) (end 7 -1.5) (layer B.SilkS) (width 0.15))
+        (fp_line (start 2.5 -2.2) (end 2.5 -1.5) (layer B.SilkS) (width 0.15))
+        (fp_line (start 9.5 -2.5) (end 7 -2.5) (layer B.Fab) (width 0.12))
+        (fp_line (start -2 -4.75) (end -4.5 -4.75) (layer B.Fab) (width 0.12))
+        (fp_line (start -4.5 -4.75) (end -4.5 -7.25) (layer B.Fab) (width 0.12))
+        (fp_line (start -4.5 -7.25) (end -2 -7.25) (layer B.Fab) (width 0.12))
+        (fp_line (start 9.5 -5) (end 9.5 -2.5) (layer B.Fab) (width 0.12))
+        (fp_line (start -2 -4.25) (end -2 -7.7) (layer B.Fab) (width 0.12))
+        (fp_line (start 2.5 -2.2) (end 2.5 -1.5) (layer B.Fab) (width 0.15))
+        (fp_line (start 2.5 -1.5) (end 7 -1.5) (layer B.Fab) (width 0.15))
+        (fp_line (start 1.5 -8.2) (end 2 -7.7) (layer B.Fab) (width 0.15))
+        (fp_line (start 2 -6.7) (end 2 -7.7) (layer B.Fab) (width 0.15))
+        (fp_line (start 7 -6.2) (end 2.5 -6.2) (layer B.Fab) (width 0.15))
+        (fp_line (start -2 -4.2) (end -1.5 -3.7) (layer B.Fab) (width 0.15))
+        (fp_line (start -1.5 -3.7) (end 1 -3.7) (layer B.Fab) (width 0.15))
+        (fp_line (start -2 -7.7) (end -1.5 -8.2) (layer B.Fab) (width 0.15))
+        (fp_line (start -1.5 -8.2) (end 1.5 -8.2) (layer B.Fab) (width 0.15))
+        (fp_line (start 7 -1.5) (end 7 -6.2) (layer B.Fab) (width 0.12))
+        (fp_line (start 7 -5) (end 9.5 -5) (layer B.Fab) (width 0.12))
+        (fp_arc (start 2.5 -6.7) (end 2 -6.7) (angle -90) (layer B.Fab) (width 0.15))
+        (fp_arc (start 1 -2.2) (end 2.5 -2.2) (angle -90) (layer B.Fab) (width 0.15))
+        (fp_arc (start 1 -2.2) (end 2.5 -2.2) (angle -90) (layer B.SilkS) (width 0.15))
+        (fp_arc (start 2.5 -6.7) (end 2 -6.7) (angle -90) (layer B.SilkS) (width 0.15))
+        
+        ${'' /* holes */}
+        (pad "" np_thru_hole circle (at -5.5 0) (size 1.7018 1.7018) (drill 1.7018) (layers *.Cu *.Mask))
+        (pad "" np_thru_hole circle (at 5.5 0) (size 1.7018 1.7018) (drill 1.7018) (layers *.Cu *.Mask))
+        (pad "" np_thru_hole circle (at 5 -3.75) (size 3 3) (drill 3) (layers *.Cu *.Mask))
+        (pad "" np_thru_hole circle (at 0 0) (size 3.429 3.429) (drill 3.429) (layers *.Cu *.Mask))
+        (pad "" np_thru_hole circle (at 0 -5.95) (size 3 3) (drill 3) (layers *.Cu *.Mask))
+        
+        
+        ${'' /* pins */}
+        (pad 2 thru_hole circle (at -5 3.8) (size 2.032 2.032) (drill 1.27) (layers *.Cu *.Mask))
+        (pad 1 thru_hole circle (at 0 5.9) (size 2.032 2.032) (drill 1.27) (layers *.Cu *.Mask))
+        
+        ${'' /* net pads */}
+        (pad 1 smd rect (at -3.275 -5.95) (size 2.6 2.6) (layers B.Cu B.Paste B.Mask)  ${p.net.from})
+        (pad 2 smd rect (at 8.275 -3.75) (size 2.6 2.6) (layers B.Cu B.Paste B.Mask)  ${p.net.to})
+    )
+
 
     `
 	};
@@ -1404,7 +1665,7 @@
 	    }
 	};
 
-	var reset = {
+	var button = {
 	    nets: ['from', 'to'],
 	    params: {
 	        class: 'B', // for Button
@@ -1414,7 +1675,7 @@
     
     (module E73:SW_TACT_ALPS_SKQGABE010 (layer F.Cu) (tstamp 5BF2CC94)
 
-        (descr "Low-profile SMD Tactile Switch, https://www.e-switch.com/system/asset/product_line/data_sheet/165/TL3342.pdf")
+        (descr "Low-profile SMD Tactile Switch, https://www.e-switch.com/product-catalog/tact/product-lines/tl3342-series-low-profile-smt-tact-switch")
         (tags "SPST Tactile Switch")
 
         ${p.at /* parametric position */}
@@ -1535,7 +1796,7 @@
 	        back: true,
 	        text: '',
 	        align: 'left',
-	        mirrored: '!mirrored'
+	        mirrored: '=mirrored'
 	    },
 	    body: p => {
 
@@ -1577,17 +1838,78 @@
 	    }
 	};
 
+	var rotary = {
+	    nets: ['A', 'B', 'C', 'from', 'to'],
+	    params: {
+	        class: 'R'
+	    },
+	    body: p => `
+        (module rotary_encoder (layer F.Cu) (tedit 603326DE)
+
+            ${p.at /* parametric position */}
+        
+            ${'' /* footprint reference */}
+            (fp_text reference "${p.ref}" (at 0 0.5) (layer F.SilkS) 
+                ${p.ref_hide} (effects (font (size 1 1) (thickness 0.15))))
+            (fp_text value "" (at 0 8.89) (layer F.Fab)
+                (effects (font (size 1 1) (thickness 0.15))))
+
+            ${''/* component outline */}
+            (fp_line (start -0.62 -0.04) (end 0.38 -0.04) (layer F.SilkS) (width 0.12))
+            (fp_line (start -0.12 -0.54) (end -0.12 0.46) (layer F.SilkS) (width 0.12))
+            (fp_line (start 5.98 3.26) (end 5.98 5.86) (layer F.SilkS) (width 0.12))
+            (fp_line (start 5.98 -1.34) (end 5.98 1.26) (layer F.SilkS) (width 0.12))
+            (fp_line (start 5.98 -5.94) (end 5.98 -3.34) (layer F.SilkS) (width 0.12))
+            (fp_line (start -3.12 -0.04) (end 2.88 -0.04) (layer F.Fab) (width 0.12))
+            (fp_line (start -0.12 -3.04) (end -0.12 2.96) (layer F.Fab) (width 0.12))
+            (fp_line (start -7.32 -4.14) (end -7.62 -3.84) (layer F.SilkS) (width 0.12))
+            (fp_line (start -7.92 -4.14) (end -7.32 -4.14) (layer F.SilkS) (width 0.12))
+            (fp_line (start -7.62 -3.84) (end -7.92 -4.14) (layer F.SilkS) (width 0.12))
+            (fp_line (start -6.22 -5.84) (end -6.22 5.86) (layer F.SilkS) (width 0.12))
+            (fp_line (start -2.12 -5.84) (end -6.22 -5.84) (layer F.SilkS) (width 0.12))
+            (fp_line (start -2.12 5.86) (end -6.22 5.86) (layer F.SilkS) (width 0.12))
+            (fp_line (start 5.98 5.86) (end 1.88 5.86) (layer F.SilkS) (width 0.12))
+            (fp_line (start 1.88 -5.94) (end 5.98 -5.94) (layer F.SilkS) (width 0.12))
+            (fp_line (start -6.12 -4.74) (end -5.12 -5.84) (layer F.Fab) (width 0.12))
+            (fp_line (start -6.12 5.76) (end -6.12 -4.74) (layer F.Fab) (width 0.12))
+            (fp_line (start 5.88 5.76) (end -6.12 5.76) (layer F.Fab) (width 0.12))
+            (fp_line (start 5.88 -5.84) (end 5.88 5.76) (layer F.Fab) (width 0.12))
+            (fp_line (start -5.12 -5.84) (end 5.88 -5.84) (layer F.Fab) (width 0.12))
+            (fp_line (start -8.87 -6.89) (end 7.88 -6.89) (layer F.CrtYd) (width 0.05))
+            (fp_line (start -8.87 -6.89) (end -8.87 6.81) (layer F.CrtYd) (width 0.05))
+            (fp_line (start 7.88 6.81) (end 7.88 -6.89) (layer F.CrtYd) (width 0.05))
+            (fp_line (start 7.88 6.81) (end -8.87 6.81) (layer F.CrtYd) (width 0.05))
+            (fp_circle (center -0.12 -0.04) (end 2.88 -0.04) (layer F.SilkS) (width 0.12))
+            (fp_circle (center -0.12 -0.04) (end 2.88 -0.04) (layer F.Fab) (width 0.12))
+
+            ${''/* pin names */}
+            (pad A thru_hole rect (at -7.62 -2.54) (size 2 2) (drill 1) (layers *.Cu *.Mask) ${p.net.A}))
+            (pad C thru_hole circle (at -7.62 -0.04) (size 2 2) (drill 1) (layers *.Cu *.Mask) ${p.net.B}))
+            (pad B thru_hole circle (at -7.62 2.46) (size 2 2) (drill 1) (layers *.Cu *.Mask) ${p.net.C}))
+            (pad 1 thru_hole circle (at 6.88 -2.54) (size 1.5 1.5) (drill 1) (layers *.Cu *.Mask) ${p.net.from}))
+            (pad 2 thru_hole circle (at 6.88 2.46) (size 1.5 1.5) (drill 1) (layers *.Cu *.Mask) ${p.net.to})
+
+            ${''/* Legs */}
+            (pad "" thru_hole rect (at -0.12 -5.64) (size 3.2 2) (drill oval 2.8 1.5) (layers *.Cu *.Mask)))
+            (pad "" thru_hole rect (at -0.12 5.56) (size 3.2 2) (drill oval 2.8 1.5) (layers *.Cu *.Mask)))
+        )
+    `
+	};
+
 	var footprints = {
 	    mx: mx,
+	    mx_hotswap: mx_hotswap,
 	    alps: alps,
 	    choc: choc,
+	    choc_hotswap: choc_hotswap,
 	    diode: diode,
 	    promicro: promicro,
 	    slider: slider,
-	    reset: reset,
+	    button: button,
 	    rgb: rgb,
 	    jstph: jstph,
-	    pad: pad
+	    pad: pad,
+	    rotary: rotary
 	};
 
 	var pcbs = createCommonjsModule(function (module, exports) {
@@ -1732,16 +2054,16 @@
 	};
 
 
-	const footprint = exports._footprint = (config, name, points, point, net_indexer, component_indexer) => {
+	const footprint = exports._footprint = (config, name, points, point, net_indexer, component_indexer, units) => {
 
 	    if (config === false) return ''
 	    
 	    // config sanitization
 	    assert_1.detect_unexpected(config, name, ['type', 'anchor', 'nets', 'params']);
 	    const type = assert_1.in(config.type, `${name}.type`, Object.keys(footprints));
-	    let anchor = assert_1.anchor(config.anchor || {}, `${name}.anchor`, points, true, point);
-	    const nets = assert_1.sane(config.nets || {}, `${name}.nets`, 'object');
-	    const params = assert_1.sane(config.params || {}, `${name}.params`, 'object');
+	    let anchor = anchor_1(config.anchor || {}, `${name}.anchor`, points, true, point)(units);
+	    const nets = assert_1.sane(config.nets || {}, `${name}.nets`, 'object')();
+	    const params = assert_1.sane(config.params || {}, `${name}.params`, 'object')();
 
 	    // basic setup
 	    const fp = footprints[type];
@@ -1761,11 +2083,11 @@
 	    // connecting parametric nets
 	    for (const net_ref of (fp.nets || [])) {
 	        let net = nets[net_ref];
-	        assert_1.sane(net, `${name}.nets.${net_ref}`, 'string');
-	        if (net.startsWith('!') && point) {
+	        assert_1.sane(net, `${name}.nets.${net_ref}`, 'string')();
+	        if (net.startsWith('=') && point) {
 	            const indirect = net.substring(1);
 	            net = point.meta[indirect];
-	            assert_1.sane(net, `${name}.nets.${net_ref} --> ${point.meta.name}.${indirect}`, 'string');
+	            assert_1.sane(net, `${name}.nets.${net_ref} --> ${point.meta.name}.${indirect}`, 'string')();
 	        }
 	        const index = net_indexer(net);
 	        parsed_params.net[net_ref] = `(net ${index} "${net}")`;
@@ -1776,7 +2098,7 @@
 	    for (const param of (Object.keys(fp.params || {}))) {
 	        let value = params[param] === undefined ? fp.params[param] : params[param];
 	        if (value === undefined) throw new Error(`Field "${name}.params.${param}" is missing!`)
-	        if (assert_1.type(value) == 'string' && value.startsWith('!') && point) {
+	        if (assert_1.type(value)() == 'string' && value.startsWith('=') && point) {
 	            const indirect = value.substring(1);
 	            value = point.meta[indirect];
 	            if (value === undefined) throw new Error(`Field "${name}.params.${param} --> ${point.meta.name}.${indirect}" is missing!`)
@@ -1791,9 +2113,9 @@
 	    return fp.body(parsed_params)
 	};
 
-	exports.parse = (config, points, outlines) => {
+	exports.parse = (config, points, outlines, units) => {
 
-	    const pcbs = assert_1.sane(config || {}, 'pcbs', 'object');
+	    const pcbs = assert_1.sane(config || {}, 'pcbs', 'object')();
 	    const results = {};
 
 	    for (const [pcb_name, pcb_config] of Object.entries(pcbs)) {
@@ -1802,14 +2124,14 @@
 	        assert_1.detect_unexpected(pcb_config, `pcbs.${pcb_name}`, ['outlines', 'footprints']);
 
 	        // outline conversion
-	        if (assert_1.type(pcb_config.outlines) == 'array') {
+	        if (assert_1.type(pcb_config.outlines)() == 'array') {
 	            pcb_config.outlines = {...pcb_config.outlines};
 	        }
-	        const config_outlines = assert_1.sane(pcb_config.outlines || {}, `pcbs.${pcb_name}.outlines`, 'object');
+	        const config_outlines = assert_1.sane(pcb_config.outlines || {}, `pcbs.${pcb_name}.outlines`, 'object')();
 	        const kicad_outlines = {};
 	        for (const [outline_name, outline] of Object.entries(config_outlines)) {
 	            const ref = assert_1.in(outline.outline, `pcbs.${pcb_name}.outlines.${outline_name}.outline`, Object.keys(outlines));
-	            const layer = assert_1.sane(outline.layer || 'Edge.Cuts', `pcbs.${pcb_name}.outlines.${outline_name}.outline`, 'string');
+	            const layer = assert_1.sane(outline.layer || 'Edge.Cuts', `pcbs.${pcb_name}.outlines.${outline_name}.outline`, 'string')();
 	            kicad_outlines[outline_name] = makerjs2kicad(outlines[ref], layer);
 	        }
 
@@ -1835,17 +2157,17 @@
 	        // key-level footprints
 	        for (const [p_name, point] of Object.entries(points)) {
 	            for (const [f_name, f] of Object.entries(point.meta.footprints || {})) {
-	                footprints.push(footprint(f, `${p_name}.footprints.${f_name}`, points, point, net_indexer, component_indexer));
+	                footprints.push(footprint(f, `${p_name}.footprints.${f_name}`, points, point, net_indexer, component_indexer, units));
 	            }
 	        }
 
 	        // global one-off footprints
-	        if (assert_1.type(pcb_config.footprints) == 'array') {
+	        if (assert_1.type(pcb_config.footprints)() == 'array') {
 	            pcb_config.footprints = {...pcb_config.footprints};
 	        }
-	        const global_footprints = assert_1.sane(pcb_config.footprints || {}, `pcbs.${pcb_name}.footprints`, 'object');
+	        const global_footprints = assert_1.sane(pcb_config.footprints || {}, `pcbs.${pcb_name}.footprints`, 'object')();
 	        for (const [gf_name, gf] of Object.entries(global_footprints)) {
-	            footprints.push(footprint(gf, `pcbs.${pcb_name}.footprints.${gf_name}`, points, undefined, net_indexer, component_indexer));
+	            footprints.push(footprint(gf, `pcbs.${pcb_name}.footprints.${gf_name}`, points, undefined, net_indexer, component_indexer, units));
 	        }
 
 	        // finalizing nets
@@ -1874,12 +2196,53 @@
 	};
 	});
 
+	const noop = () => {};
+
 	var ergogen = {
-	    points: points,
-	    outlines: outlines,
-	    cases: cases,
-	    pcbs: pcbs,
-	    version: '1.0.0'
+	    version: '2.0.0',
+	    process: (config, debug=false, logger=noop) => {
+
+	        logger('Preparing input...');
+	        config = prepare.unnest(config);
+	        config = prepare.inherit(config);
+	        const results = {};
+
+	        logger('Parsing points...');
+	        const [points$1, units] = points.parse(config.points);
+	        if (debug) {
+	            results.points = {
+	                data: points$1,
+	                units: units
+	            };
+	        }
+
+	        logger('Generating outlines...');
+	        const outlines$1 = outlines.parse(config.outlines || {}, points$1, units);
+	        results.outlines = {};
+	        for (const [name, outline] of Object.entries(outlines$1)) {
+	            if (!debug && name.startsWith('_')) continue
+	            results.outlines[name] = outline;
+	        }
+
+	        logger('Extruding cases...');
+	        const cases$1 = cases.parse(config.cases || {}, outlines$1, units);
+	        results.cases = {};
+	        for (const [case_name, case_text] of Object.entries(cases$1)) {
+	            if (!debug && case_name.startsWith('_')) continue
+	            results.cases[case_name] = case_text;
+	        }
+
+	        logger('Scaffolding PCBs...');
+	        const pcbs$1 = pcbs.parse(config.pcbs || {}, points$1, outlines$1, units);
+	        results.pcbs = {};
+	        for (const [pcb_name, pcb_text] of Object.entries(pcbs$1)) {
+	            if (!debug && pcb_name.startsWith('_')) continue
+	            results.pcbs[pcb_name] = pcb_text;
+	        }
+
+	        return results
+	    },
+	    visualize: points.visualize
 	};
 
 	return ergogen;
