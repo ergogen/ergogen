@@ -17,12 +17,99 @@ The `cases` section details how the case outlines are to be 3D-ized to form a 3D
 Finally, the `pcbs` section is used to configure KiCAD PCB templates.
 
 In the following, we'll have an in-depth discussion about each of these.
-Of course, if the declarative nature of the config causes unnecessary repetition (despite the built-in YAML references, and the Ergogen-based inheritance detailed below), there's nothing stopping you from writing code that generates the config.
+There's also a completely separate "preprocessing" step to help reduce unnecessary repetition.
+Of course, if the declarative nature of the config is still not terse enough (despite the preprocessor, the built-in YAML references, and the Ergogen-based inheritance detailed below), there's nothing stopping you from writing code that generates the config.
 It brings the game to yet another abstraction level higher, so that you can use branching, loops, and parametric functions to compose a "drier" keyboard definition.
 
+<br>
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Preprocessing
+
+Ergogen does a separate preprocessor pass on the config before starting to interpret it.
+This consists of the following steps:
+
+- **Unnesting**: any object key containing dots (as in, `.`s) will be unnested. This allows the use of the so called "dot notation". For example, `nested.key.definition: value` will turn into `{nested: {key: {definition: value}}}` in the preprocessed config object.
+
+- **Inheritance**: the `$extends` key can be used in any declaration to inherit values from another declaration. Extension happens according to the following rules:
+    - if the new value is `undefined`, the old value will be used as a default;
+    - if both values are defined (and have the same type), the new one will override the old;
+    - if both values have different types, the new value will take precedence;
+    - if the new value is `$unset`, the resulting value will be `undefined`, regardless of previous type;
+    - for arrays or objects, extension is called for each child element recursively.
+
+    The actual value of the `$extends` key should be the full absolute path of the declaration we wish to inherit from (using the above mentioned, nested "dot notation" if necessary). For example:
+
+    ```yaml
+    top:
+        parent:
+            a: 1
+            b: 2
+    child:
+        $extends: top.parent
+        c: 3
+    ```
+
+    This declaration will lead to `child` containing all three letter keys: `{a: 1, b: 2, c: 3}`.
+
+- **Parameterization**: allows regex replacements within declarations. Take the following declaration as a starting point:
+
+    ```yaml
+    top:
+        value: placeholder
+        double_value: placeholder * 2
+        $params: [placeholder]
+        $args: [3]
+    ```
+
+    In this case, every occurrence of the value "placeholder" will be replaced with "3", which allows us to define it only once and still use it in multiple places (kind of like a pseudo-variable).
+
+- **Skipping**: the `$skip` key can be used anywhere to, well, skip (or "comment out" entire declarations). It can also be useful when combining inheritance and parameterization. For example:
+
+    ```yaml
+    grandparent:
+        a: placeholder1
+        b: placeholder2
+        $params: [placeholder1, placeholder2]
+    parent:
+        $extends: grandparent
+        $args: [value1]
+    child:
+        $extends: parent
+        $args: [,value2]
+    ```
+
+    Here, the grandparent defines two different parameters, but only the child knows both arguments that should be substituted. This would lead to an error at the parent's level, because it has two parameters, and only one argument. But, assuming that this is just an intermediary abstract declaration and we wouldn't want to use it anyway, we can just declare `$skip: true`.
+
+The result of the preprocessor is *almost* just a plain JSON object.
+The only semantic difference is how numbers are handled. For example, the value `3 * 2` would lead to a string type in JSON, but since it's a mathematical formula, it can also be interpreted as a number.
+Ergogen tries this interpretation for every string value, and if it succeeds, it calculates the results and converts them to JSON numbers.
+This syntax also works with variables, which we can use to define units (see below).
+
+Otherwise, we can begin with the actual keyboard-related layout...
+
+<br>
 
 
 
@@ -65,10 +152,14 @@ What makes this generator "ergo" is the implicit focus on the column-stagger.
 Of course we could simulate the traditional row-stagger by defining everything with a 90 degree rotation, but that's really not the goal here.
 Since we're focusing on column-stagger, keys are laid out in columns, and a collection of columns is called a "zone".
 For example, we can define multiple, independent zones to make it easy to differentiate between the keywell and the thumb fan/cluster.
-Zones can be described as follows:
+
+Points can be described as follows:
 
 ```yaml
 points:
+    units:
+        name: val
+        ...
     zones:
         my_zone_name:
             anchor:
@@ -87,6 +178,12 @@ points:
         ...
 ```
 
+We start with a `units` clause, where we can define units to use in relative calculations.
+The three predefined ones are `u` (=19mm), `cx` (=18mm, named for "Choc X distance"), and `cy` (=17mm, named for "Choc Y distance").
+But we can add any other (or modify these predefined ones), or even use an existing measure in calculating a new value (for example, `double: 2 u`).
+Recall how each string that can be interpreted as a math formula will be treated like a number, so this is a great way to add math-level variables to your config.
+
+Then comes the `zones` key, under which we can define the individual, named zones.
 `anchors` are used to, well, anchor the zone to something.
 It's the `[0, 0]` origin with a 0 degree orientation by default, but it can be changed to any other pre-existing point. (Consequently, the first zone can't use a ref, because there isn't any yet.)
 The `ref` field can also be an array of references, in which case their average is used -- mostly useful for anchoring to the center, by averaging a key and its mirror; see later.
@@ -187,12 +284,13 @@ Indeed:
 
 ```yaml
 points:
+    units: <mentioned at the beginning...>
     zones: <what we talked about so far...>
     key: <global key def>
     rotate: num # default = 0
     mirror:
         axis: num # default = 0
-        ref: <point reference>
+        ref: <point reference> # and other anchor-level settings
         distance: num # default = 0
 ```
 
@@ -285,19 +383,11 @@ glue:
     ...
 ```
 
-...where an `<anchor>` is (mostly) the same as it was for points:
-
-```yaml
-ref: <point reference>
-shift: [x, y] # default = [0, 0]
-rotate: num # default = 0
-relative: boolean # default = true
-```
+...where an `<anchor>` is the same as it was for points.
 
 The `top` and `bottom` fields in each glue's section are both formatted the same, and describe the center line's top and bottom intersections, respectively.
-In a one-piece case, this means that we project a line from a left-side reference point (optionally rotated and translated), another from the right, and converge them to where they meet.
+In a one-piece case, this means that we project a line from a left-side anchor, another from the right, and converge them to where they meet.
 Split designs can specify `right` as a single number to mean the x coordinate where the side should be "cut off".
-The `relative` flag means that the `shift` is interpreted in layout size units instead of mms (see below).
 
 This leads to a gluing middle patch that can be used to meld the left and right sides together, given by the counter-clockwise polygon:
 
@@ -312,7 +402,8 @@ If this is insufficient (maybe because it would leave holes), the `waypoints` ca
 Here, `percent` means the y coordinate along the centerline (going from the top intersection to the bottom intersection), and `width` means the offset on the x axis.
 
 If this is somehow _still_ insufficient (or there were problems with the binding phase), we can specify additional primitive shapes under the `extra` key (similarly to how we would use them in the exports; see below).
-These are then added to what we have so far to finish out the glue. TODO!
+These are then added to what we have so far to finish out the glue.
+(TODO: while the `extra` key is reserved for this purpose, it hasn't been needed, and therefore is unimplemented for now.)
 
 <hr />
 
@@ -329,20 +420,18 @@ Now we can configure what we want to "export" as outlines from this phase, given
         - `glue` is just the raw glue shape we defined above under `outline.glue`
     - `tag: <array of tags>` : optional tags to filter which points to consider in this step, where tags can be specified as key-level attributes.
     - `glue: <glue_name>` : the name of the glue to use, if applicable
-    - `size: num | [num_x, num_y]` : the width/height of the rectangles to lay onto the points. Note that the `relative` flag for the glue declaration above meant this size as the basis of the shift. So during a `keys` layout with a size of 18, for example, a relative shift of `[.5, .5]` actually means `[9, 9]` in mms.
+    - `size: num | [num_x, num_y]` : the width/height of the rectangles to lay onto the points. Note that these values are added to the evaluation context as the variables `sx` and `sy`. So during a `keys` layout with a size of 18, for example, a relative shift of `[.5 sx, .5 sy]` actually means `[9, 9]` in mms.
     - `corner: num # default = 0)` : corner radius of the rectangles
     - `bevel: num # default = 0)` : corner bevel of the rectangles, can be combined with rounding
     - `bound: boolean # default = true` : whether to use the binding declared previously
 - `rectangle` : an independent rectangle primitive. Parameters:
-    - `ref: <point reference>` : what position and rotation to consider as the origin
-    - `rotate: num` : extra rotation
-    - `shift: [x, y]` : extra translation
+    - `ref`, `rotate`, and `shift`, etc. (the usual anchor settings)
     - `size`, `corner` and `bevel`, just like for `keys`
 - `circle` : an independent circle primitive. Parameters:
-    - `ref`, `rotate`, and `shift` are the same as above
+    - `ref`, `rotate`, and `shift`, etc. (the usual anchor settings)
     - `radius: num` : the radius of the circle
 - `polygon` : an independent polygon primitive. Parameters:
-    - `points: [<point_def>, ...]` : the points of the polygon. Each `<point_def>` can have its own `ref` and `shift`, all of which are still the same as above. If `ref` is unspecified, the previous point's will be assumed. For the first, it's `[0, 0]` by default.
+    - `points: [<anchor>, ...]` : the points of the polygon. Each `<anchor>` can have its own `ref`, `shift`, etc. (all of which are still the same as above). The only difference here is that if a `ref` is unspecified, the previous point will be assumed (as in a continuous chain). For the first, it's `[0, 0]` by default.
 - `outline` : a previously defined outline, see below.
     - `name: outline_name` : the name of the referenced outline
 
@@ -371,8 +460,9 @@ exports:
 ```
 
 Operations are performed in order, and the resulting shape is exported as an output.
-Additionally, it is going to be available for further export declarations to use (through the `ref` type) under the name specified (`my_name`, in this case).
+Additionally, it is going to be available for further export declarations to use (through the `outline` type) under the name specified (`my_name`, in this case).
 If we only want to use it as a building block for further exports, we can start the name with an underscore (e.g., `_my_name`) to prevent it from being actually exported.
+(By convention, a starting underscore is kind of like a "private" marker.)
 
 A shorthand version of a part can be given when the elements of the above arrays/objects are simple strings instead of further objects.
 The syntax is a symbol from `[+, -, ~, ^]`, followed by a name, and is equivalent to adding/subtracting/intersecting/stacking an outline of that name, respectively.
@@ -499,7 +589,7 @@ Footprints can be specified at the key-level (under the `points` section, like w
 The differences between the two footprint types are:
 
 - an omitted `ref` in the anchor means the current key for key-level declarations, while here it defaults to `[0, 0]`
-- a parameter starting with an exclamation point is an indirect reference to an eponymous key-level attribute -- so, for example, `from = !column_net` would mean that the key's `column_net` attribute is read there.
+- a parameter starting with an equal sign `=` is an indirect reference to an eponymous key-level attribute -- so, for example, `{from: =column_net}` would mean that the key's `column_net` attribute is read there.
 
 Additionally, the edge cut of the PCB (or other decorative outlines for the silkscreen maybe) can be specified using a previously defined outline name under the `outlines` key.
 
@@ -521,38 +611,12 @@ pcbs:
 ```
 
 Defining both the `outlines` and the `footprints` can be done either as arrays or objects, whichever is more convenient.
-Currently, the following footprint types are supported:
+The currently supported footprint types can be viewed in [this folder](https://github.com/mrzealot/ergogen/tree/master/src/footprints), where:
 
-- **`mx`**, **`alps`**, **`choc`**: mechanical switch footprints. Common nets:
-    - `from`, `to`: nets to connect
+- `nets` represents the available PCB nets the footprint should connect to, and
+- `params` represents other, non-net parameters to customize the footprint.
 
-- **`diode`**: a combined THT+SMD diode footprint. Nets:
-    - `from`, `to`: nets to connect
-
-- **`promicro`**: a controller to drive the keyboard. Available pins are `RAW`, `VCC`, `GND`, `RST`, and 18 GPIOs `P01` through `P18`. No Nets.
-
-- **`slider`**: an SMD slider switch (part no. here), ideal for on/off operation. Nets:
-    - `from`, `to`: nets to connect
-
-- **`button`**: an SMD button ([TL3342](https://www.e-switch.com/product-catalog/tact/product-lines/tl3342-series-low-profile-smt-tact-switch)), ideal for momentary toggles (like a reset switch). Nets:
-    - `from`, `to`: nets to connect
-
-- **`rgb`**: an RGB led (part no. here), for per-key illumination, underglow, or feedback. Nets:
-    - `din`, `dout`: input and output nets of the data line
-    - VCC and GND nets are assumed to be called `VCC` and `GND`...
-
-- **`jstph`**: a two-pin JST-PH battery header footprint. Nets:
-    - `pos`, `neg`: nets to connect to the positive and negative terminals, respectively.
-
-- **`pin`**: a single pin.
-    - Nets:
-        - `net`: the net it should connect to
-    - Parameters:
-        - `diameter`: the larger diameter of the hole, including the copper ring
-        - `drill`: the smaller diameter of the actual hole
-
-- **`hole`**: a simple circular hole. Parameters:
-    - `diameter`: the diameter of the (non-plated!) hole
+These can be specified in the eponymous keys within `pcbs.pcb_name.footprints`.
 
 <br>
 
