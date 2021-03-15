@@ -2,6 +2,7 @@ module.exports = {
     mx: require('./mx'),
     alps: require('./alps'),
     choc: require('./choc'),
+    choc_hotswap: require('./choc_hotswap'),
     diode: require('./diode'),
     promicro: require('./promicro'),
     slider: require('./slider'),
@@ -9,5 +10,5 @@ module.exports = {
     rgb: require('./rgb'),
     jstph: require('./jstph'),
     pad: require('./pad'),
-    choc_hotswap: require('./choc_hotswap')
+    rotary: require('./rotary')
 }
