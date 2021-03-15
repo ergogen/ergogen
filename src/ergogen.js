@@ -19,7 +19,6 @@ module.exports = {
         const [points, units] = points_lib.parse(config.points)
         if (debug) {
             results.points = {
-                demo: points_lib.visualize(points),
                 data: points,
                 units: units
             }
@@ -50,5 +49,6 @@ module.exports = {
         }
 
         return results
-    }
+    },
+    visualize: points_lib.visualize
 }
