@@ -15,7 +15,18 @@ const rectangle = (w, h, corner, bevel, name='') => {
     a.assert(ch >= 0, error('tall', h))
 
     let res = new m.models.Rectangle(cw, ch)
-    if (bevel > 0) res = m.model.outline(res, bevel, 2)
+    if (bevel) {
+        res = u.poly([
+            [-bevel, 0],
+            [-bevel, ch],
+            [0, ch + bevel],
+            [cw, ch + bevel],
+            [cw + bevel, ch],
+            [cw + bevel, 0],
+            [cw, -bevel],
+            [0, -bevel]
+        ])
+    }
     if (corner > 0) res = m.model.outline(res, corner, 0)
     return m.model.moveRelative(res, [corner + bevel, corner + bevel])
 }
@@ -274,21 +285,37 @@ exports.parse = (config = {}, points = {}, units = {}) => {
                     }
                     break
                 case 'polygon':
-                    a.detect_unexpected(part, name, expected.concat(['points']))
+                    a.detect_unexpected(part, name, expected.concat(['points', 'mirror']))
                     const poly_points = a.sane(part.points, `${name}.points`, 'array')()
+                    const poly_mirror = a.sane(part.mirror || false, `${name.mirror}`, 'boolean')()
                     const parsed_points = []
+                    const mirror_points = []
+                    let poly_mirror_x = 0
                     let last_anchor = new Point()
                     let poly_index = 0
                     for (const poly_point of poly_points) {
+                        if (poly_index == 0 && poly_mirror) {
+                            a.assert(poly_point.ref, `Field "${name}.ref" must be speficied if mirroring is required!`)
+                            poly_mirror_x = (points[poly_point.ref].x + points[`mirror_${poly_point.ref}`].x) / 2
+                        }
                         const poly_name = `${name}.points[${++poly_index}]`
-                        const anchor = make_anchor(poly_point, poly_name, points, true, last_anchor)(units)
-                        parsed_points.push(anchor.p)
+                        last_anchor = make_anchor(poly_point, poly_name, points, true, last_anchor)(units)
+                        parsed_points.push(last_anchor.p)
+                        mirror_points.push(last_anchor.clone().mirror(poly_mirror_x).p)
                     }
                     arg = u.poly(parsed_points)
+                    if (poly_mirror) {
+                        arg = u.union(arg, u.poly(mirror_points))
+                    }
                     break
                 case 'outline':
+                    a.detect_unexpected(part, name, expected.concat(['name', 'fillet']))
                     a.assert(outlines[part.name], `Field "${name}.name" does not name an existing outline!`)
+                    const fillet = a.sane(part.fillet || 0, `${name}.fillet`, 'number')(units)
                     arg = u.deepcopy(outlines[part.name])
+                    if (fillet) {
+                        arg.models.fillets = m.chain.fillet(m.model.findSingleChain(arg), fillet)
+                    }
                     break
                 default:
                     throw new Error(`Field "${name}.type" (${part.type}) does not name a valid outline part type!`)
