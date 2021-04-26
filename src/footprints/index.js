@@ -11,5 +11,9 @@ module.exports = {
     rgb: require('./rgb'),
     jstph: require('./jstph'),
     pad: require('./pad'),
-    rotary: require('./rotary')
+    rotary: require('./rotary'),
+	// Fresh prints
+	promicro_front: require('./promicro_front'),
+	trrs: require('./TRRS-PJ-320A-dual'),
+	via: require('./via.js')
 }
