@@ -37,10 +37,10 @@ const layout = exports._layout = (config = {}, points = {}, units = {}) => {
 
     const parsed_glue = u.deepcopy(a.sane(config, 'outlines.glue', 'object')())
     for (let [gkey, gval] of Object.entries(parsed_glue)) {
-        a.detect_unexpected(gval, `outlines.glue.${gkey}`, ['top', 'bottom', 'waypoints', 'extra'])
+        a.unexpected(gval, `outlines.glue.${gkey}`, ['top', 'bottom', 'waypoints', 'extra'])
     
         for (const y of ['top', 'bottom']) {
-            a.detect_unexpected(gval[y], `outlines.glue.${gkey}.${y}`, ['left', 'right'])
+            a.unexpected(gval[y], `outlines.glue.${gkey}.${y}`, ['left', 'right'])
             gval[y].left = make_anchor(gval[y].left, `outlines.glue.${gkey}.${y}.left`, points)
             if (a.type(gval[y].right)(units) != 'number') {
                 gval[y].right = make_anchor(gval[y].right, `outlines.glue.${gkey}.${y}.right`, points)
@@ -51,7 +51,7 @@ const layout = exports._layout = (config = {}, points = {}, units = {}) => {
         let wi = 0
         gval.waypoints = gval.waypoints.map(w => {
             const name = `outlines.glue.${gkey}.waypoints[${++wi}]`
-            a.detect_unexpected(w, name, ['percent', 'width'])
+            a.unexpected(w, name, ['percent', 'width'])
             w.percent = a.sane(w.percent, name + '.percent', 'number')(units)
             w.width = a.wh(w.width, name + '.width')(units)
             return w
@@ -67,7 +67,7 @@ const layout = exports._layout = (config = {}, points = {}, units = {}) => {
 
         // Layout params sanitization
 
-        a.detect_unexpected(params, `${export_name}`, expected.concat(['side', 'tags', 'glue', 'size', 'corner', 'bevel', 'bound']))
+        a.unexpected(params, `${export_name}`, expected.concat(['side', 'tags', 'glue', 'size', 'corner', 'bevel', 'bound']))
         const size = a.wh(params.size, `${export_name}.size`)(units)
         const relative_units = prep.extend({
             sx: size[0],
@@ -216,7 +216,7 @@ const layout = exports._layout = (config = {}, points = {}, units = {}) => {
 }
 
 exports.parse = (config = {}, points = {}, units = {}) => {
-    a.detect_unexpected(config, 'outline', ['glue', 'exports'])
+    a.unexpected(config, 'outline', ['glue', 'exports'])
     const layout_fn = layout(config.glue, points, units)
 
     const outlines = {}
@@ -249,7 +249,7 @@ exports.parse = (config = {}, points = {}, units = {}) => {
                     arg = layout_fn(part, name, expected)
                     break
                 case 'rectangle':
-                    a.detect_unexpected(part, name, expected.concat(['ref', 'shift', 'rotate', 'size', 'corner', 'bevel', 'mirror']))
+                    a.unexpected(part, name, expected.concat(['ref', 'shift', 'rotate', 'size', 'corner', 'bevel', 'mirror']))
                     const size = a.wh(part.size, `${name}.size`)(units)
                     const rec_units = prep.extend({
                         sx: size[0],
@@ -271,7 +271,7 @@ exports.parse = (config = {}, points = {}, units = {}) => {
                     }
                     break
                 case 'circle':
-                    a.detect_unexpected(part, name, expected.concat(['ref', 'shift', 'rotate', 'radius', 'mirror']))
+                    a.unexpected(part, name, expected.concat(['ref', 'shift', 'rotate', 'radius', 'mirror']))
                     anchor = make_anchor(part, name, points, false)(units)
                     const radius = a.sane(part.radius, `${name}.radius`, 'number')(units)
                     const circle_mirror = a.sane(part.mirror || false, `${name}.mirror`, 'boolean')()
@@ -285,7 +285,7 @@ exports.parse = (config = {}, points = {}, units = {}) => {
                     }
                     break
                 case 'polygon':
-                    a.detect_unexpected(part, name, expected.concat(['points', 'mirror']))
+                    a.unexpected(part, name, expected.concat(['points', 'mirror']))
                     const poly_points = a.sane(part.points, `${name}.points`, 'array')()
                     const poly_mirror = a.sane(part.mirror || false, `${name.mirror}`, 'boolean')()
                     const parsed_points = []
@@ -309,7 +309,7 @@ exports.parse = (config = {}, points = {}, units = {}) => {
                     }
                     break
                 case 'outline':
-                    a.detect_unexpected(part, name, expected.concat(['name', 'fillet']))
+                    a.unexpected(part, name, expected.concat(['name', 'fillet']))
                     a.assert(outlines[part.name], `Field "${name}.name" does not name an existing outline!`)
                     const fillet = a.sane(part.fillet || 0, `${name}.fillet`, 'number')(units)
                     arg = u.deepcopy(outlines[part.name])

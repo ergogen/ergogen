@@ -29,7 +29,7 @@ const sane = exports.sane = (val, name, _type) => units => {
     return val
 }
 
-const detect_unexpected = exports.detect_unexpected = (obj, name, expected) => {
+const unexpected = exports.unexpected = (obj, name, expected) => {
     const sane_obj = sane(obj, name, 'object')()
     for (const key of Object.keys(sane_obj)) {
         assert(expected.includes(key), `Unexpected key "${key}" within field "${name}"!`)

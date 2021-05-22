@@ -19,7 +19,7 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key,
 
     // zone-wide sanitization
 
-    a.detect_unexpected(zone, `points.zones.${zone_name}`, ['columns', 'rows', 'key'])
+    a.unexpected(zone, `points.zones.${zone_name}`, ['columns', 'rows', 'key'])
     // the anchor comes from "above", because it needs other zones too (for references)
     const cols = a.sane(zone.columns || {}, `points.zones.${zone_name}.columns`, 'object')()
     const zone_wide_rows = a.sane(zone.rows || {}, `points.zones.${zone_name}.rows`, 'object')()
@@ -47,7 +47,7 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key,
 
         col = col || {}
 
-        a.detect_unexpected(
+        a.unexpected(
             col,
             `points.zones.${zone_name}.columns.${col_name}`,
             ['stagger', 'spread', 'rotate', 'origin', 'rows', 'row_overrides', 'key']
@@ -229,7 +229,7 @@ exports.parse = (config = {}) => {
     }
 
     // config sanitization
-    a.detect_unexpected(config, 'points', ['units', 'zones', 'key', 'rotate', 'mirror'])
+    a.unexpected(config, 'points', ['units', 'zones', 'key', 'rotate', 'mirror'])
     const zones = a.sane(config.zones || {}, 'points.zones', 'object')()
     const global_key = a.sane(config.key || {}, 'points.key', 'object')()
     const global_rotate = a.sane(config.rotate || 0, 'points.rotate', 'number')(units)

@@ -148,7 +148,7 @@ const footprint = exports._footprint = (config, name, points, point, net_indexer
     if (config === false) return ''
     
     // config sanitization
-    a.detect_unexpected(config, name, ['type', 'anchor', 'nets', 'params'])
+    a.unexpected(config, name, ['type', 'anchor', 'nets', 'params'])
     const type = a.in(config.type, `${name}.type`, Object.keys(footprint_types))
     let anchor = make_anchor(config.anchor || {}, `${name}.anchor`, points, true, point)(units)
     const nets = a.sane(config.nets || {}, `${name}.nets`, 'object')()
@@ -210,7 +210,7 @@ exports.parse = (config, points, outlines, units) => {
     for (const [pcb_name, pcb_config] of Object.entries(pcbs)) {
 
         // config sanitization
-        a.detect_unexpected(pcb_config, `pcbs.${pcb_name}`, ['outlines', 'footprints'])
+        a.unexpected(pcb_config, `pcbs.${pcb_name}`, ['outlines', 'footprints'])
 
         // outline conversion
         if (a.type(pcb_config.outlines)() == 'array') {

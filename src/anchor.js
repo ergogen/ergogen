@@ -11,7 +11,7 @@ const anchor = module.exports = (raw, name, points={}, check_unexpected=true, de
         }
         return current
     }
-    if (check_unexpected) a.detect_unexpected(raw, name, ['ref', 'orient', 'shift', 'rotate', 'affect'])
+    if (check_unexpected) a.unexpected(raw, name, ['ref', 'orient', 'shift', 'rotate', 'affect'])
     let point = default_point.clone()
     if (raw.ref !== undefined) {
         if (a.type(raw.ref)() == 'array') {
