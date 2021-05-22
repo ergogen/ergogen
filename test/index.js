@@ -18,6 +18,7 @@ const cap = s => s.charAt(0).toUpperCase() + s.slice(1)
 for (const part of ['points', 'outlines', 'cases', 'pcbs']) {
     if (what && !what.includes(part)) continue
     describe(cap(part), function() {
+        this.timeout(120000)
         const dir = path.join(__dirname, part)
         for (const input_path of glob.sync(path.join(dir, '*.yaml'))) {
             const basename = path.basename(input_path, '.yaml')

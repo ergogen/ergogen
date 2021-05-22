@@ -12,7 +12,7 @@
     "scripts": {
         "build": "rollup -c",
         "test": "mocha -r chai/register-should test/index.js",
-        "coverage": "nyc --reporter=html --reporter=text mocha -r chai/register-should test/index.js"
+        "coverage": "nyc --reporter=html --reporter=text npm test"
     },
     "dependencies": {
         "fs-extra": "^9.0.1",
@@ -33,7 +33,7 @@
     "nyc": {
         "all": true,
         "include": [
-            "src/*.js"
+            "src/**/*.js"
         ],
         "exclude": [
             "src/cli.js",
