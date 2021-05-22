@@ -1,12 +1,6 @@
 const m = require('makerjs')
 const Point = require('../../src/point')
-
-const check = (point, expected) => {
-    point.x.should.equal(expected[0])
-    point.y.should.equal(expected[1])
-    point.r.should.equal(expected[2])
-    point.meta.should.deep.equal(expected[3])
-}
+const {check} = require('../helpers/point')
 
 describe('Point', function() {
 

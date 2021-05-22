@@ -5,9 +5,9 @@ const Point = require('./point')
 const anchor = module.exports = (raw, name, points={}, check_unexpected=true, default_point=new Point()) => units => {
     if (a.type(raw)() == 'array') {
         // recursive call with incremental default_point mods, according to `affect`s
-        let current = () => default_point.clone()
+        let current = default_point.clone()
         for (const step of raw) {
-            current = anchor(step, name, points, check_unexpected, current(units))
+            current = anchor(step, name, points, check_unexpected, current)(units)
         }
         return current
     }
@@ -32,29 +32,28 @@ const anchor = module.exports = (raw, name, points={}, check_unexpected=true, de
         }
     }
     if (raw.orient !== undefined) {
-        point.r += a.sane(raw.orient || 0, `${name}.orient`, 'number')(units)
+        point.r += a.sane(raw.orient, `${name}.orient`, 'number')(units)
     }
     if (raw.shift !== undefined) {
-        let xyval = a.wh(raw.shift || [0, 0], `${name}.shift`)(units)
+        let xyval = a.wh(raw.shift, `${name}.shift`)(units)
         if (point.meta.mirrored) {
             xyval[0] = -xyval[0]
         }
         point.shift(xyval, true)
     }
     if (raw.rotate !== undefined) {
-        point.r += a.sane(raw.rotate || 0, `${name}.rotate`, 'number')(units)
+        point.r += a.sane(raw.rotate, `${name}.rotate`, 'number')(units)
     }
     if (raw.affect !== undefined) {
         const candidate = point
         point = default_point.clone()
-        const valid_affects = ['x', 'y', 'r']
-        let affect = raw.affect || valid_affects
+        let affect = raw.affect
         if (a.type(affect)() == 'string') affect = affect.split('')
         affect = a.strarr(affect, `${name}.affect`)
         let i = 0
-        for (const a of affect) {
-            a._in(a, `${name}.affect[${++i}]`, valid_affects)
-            point[a] = candidate[a]
+        for (const aff of affect) {
+            a.in(aff, `${name}.affect[${++i}]`, ['x', 'y', 'r'])
+            point[aff] = candidate[aff]
         }
     }
     return point
