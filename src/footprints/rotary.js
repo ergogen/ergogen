@@ -1,5 +1,14 @@
+// EC11 rotary encoder
+//
+// Nets
+//    from: corresponds to switch pin 1 (for button presses)
+//    to: corresponds to switch pin 2 (for button presses)
+//    A: corresponds to pin 1 (for rotary)
+//    B: corresponds to pin 2 (for rotary, should be GND)
+//    C: corresponds to pin 3 (for rotary)
+
 module.exports = {
-    nets: ['A', 'B', 'C', 'from', 'to'],
+    nets: ['from', 'to', 'A', 'B', 'C'],
     params: {
         class: 'R'
     },
