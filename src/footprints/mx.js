@@ -15,7 +15,8 @@ module.exports = {
   params: {
       class: 'S',
       hotswap: false,
-      reverse: false
+      reverse: false,
+      keycaps: false
   },
   body: p => {
     const standard = `
@@ -42,10 +43,16 @@ module.exports = {
       ${''/* stabilizers */}
       (pad "" np_thru_hole circle (at 5.08 0) (size 1.7018 1.7018) (drill 1.7018) (layers *.Cu *.Mask))
       (pad "" np_thru_hole circle (at -5.08 0) (size 1.7018 1.7018) (drill 1.7018) (layers *.Cu *.Mask))
-      )
+      `
+    const keycap = `
+      ${'' /* keycap marks */}
+      (fp_line (start -9.5 -9.5) (end 9.5 -9.5) (layer Dwgs.User) (width 0.15))
+      (fp_line (start 9.5 -9.5) (end 9.5 9.5) (layer Dwgs.User) (width 0.15))
+      (fp_line (start 9.5 9.5) (end -9.5 9.5) (layer Dwgs.User) (width 0.15))
+      (fp_line (start -9.5 9.5) (end -9.5 -9.5) (layer Dwgs.User) (width 0.15))
       `
     function pins(def_neg, def_pos, def_side) {
-      if(p.param.hotswap == TRUE) {
+      if(p.param.hotswap) {
         return `
         ${'' /* holes */}
         (pad "" np_thru_hole circle (at ${def_pos}2.54 -5.08) (size 3 3) (drill 3) (layers *.Cu *.Mask))
@@ -66,12 +73,14 @@ module.exports = {
     if(p.param.reverse){
       return `
         ${standard}
+        ${p.param.keycaps ? keycap : ''}
         ${pins('-', '', 'B')}
         ${pins('', '-', 'F')})
         `
     } else {
       return `
         ${standard}
+        ${p.param.keycaps ? keycap : ''}
         ${pins('-', '', 'B')})
         `
     }
