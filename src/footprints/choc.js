@@ -15,7 +15,8 @@ module.exports = {
   params: {
     class: 'S',
     hotswap: false,
-    reverse: false
+    reverse: false,
+    keycaps: false
   },
   body: p => {
     const standard = `
@@ -34,7 +35,7 @@ module.exports = {
       (fp_line (start 7 6) (end 7 7) (layer Dwgs.User) (width 0.15))
       (fp_line (start 7 -7) (end 6 -7) (layer Dwgs.User) (width 0.15))
       (fp_line (start 6 7) (end 7 7) (layer Dwgs.User) (width 0.15))
-      (fp_line (start 7 -7) (end 7 -6) (layer Dwgs.User) (width 0.15))
+      (fp_line (start 7 -7) (end 7 -6) (layer Dwgs.User) (width 0.15))      
       
       ${''/* middle shaft */}
       (pad "" np_thru_hole circle (at 0 0) (size 3.429 3.429) (drill 3.429) (layers *.Cu *.Mask))
@@ -43,6 +44,13 @@ module.exports = {
       (pad "" np_thru_hole circle (at 5.5 0) (size 1.7018 1.7018) (drill 1.7018) (layers *.Cu *.Mask))
       (pad "" np_thru_hole circle (at -5.5 0) (size 1.7018 1.7018) (drill 1.7018) (layers *.Cu *.Mask))
       `
+      const keycap = `
+        ${'' /* keycap marks */}
+        (fp_line (start -9 -8.5) (end 9 -8.5) (layer Dwgs.User) (width 0.15))
+        (fp_line (start 9 -8.5) (end 9 8.5) (layer Dwgs.User) (width 0.15))
+        (fp_line (start 9 8.5) (end -9 8.5) (layer Dwgs.User) (width 0.15))
+        (fp_line (start -9 8.5) (end -9 -8.5) (layer Dwgs.User) (width 0.15))
+        `
     function pins(def_neg, def_pos, def_side) {
       if(p.param.hotswap) {
         return `
@@ -65,12 +73,14 @@ module.exports = {
     if(p.param.reverse) {
       return `
         ${standard}
+        ${p.param.keycaps ? keycap : ''}
         ${pins('-', '', 'B')}
         ${pins('', '-', 'F')})
         `
     } else {
       return `
         ${standard}
+        ${p.param.keycaps ? keycap : ''}
         ${pins('-', '', 'B')})
         `
     }
