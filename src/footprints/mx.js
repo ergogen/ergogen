@@ -7,6 +7,8 @@
 //      if true, will include holes and pads for Kailh MX hotswap sockets
 //    reverse: default is false
 //      if true, will flip the footprint such that the pcb can be reversible 
+//    keycaps: default is false
+//      if true, will add choc sized keycap box around the footprint
 //
 // note: hotswap and reverse can be used simultaneously
 

@@ -5,6 +5,8 @@
 // Params
 //    reverse: default is false
 //      if true, will flip the footprint such that the pcb can be reversible 
+//    keycaps: default is false
+//      if true, will add choc sized keycap box around the footprint
 
 module.exports = {
     nets: ['from', 'to'],
@@ -20,7 +22,7 @@ module.exports = {
         ${p.at /* parametric position */} 
 
         ${'' /* footprint reference */}        
-        (fp_text reference REF** (at 0 7.4) (layer F.Fab) (effects (font (size 1 1) (thickness 0.15))))
+        (fp_text reference "${p.ref}" (at 0 0) (layer F.SilkS) ${p.ref_hide} (effects (font (size 1.27 1.27) (thickness 0.15))))
         (fp_text value Kailh_PG1232 (at 0 -7.3) (layer F.Fab) (effects (font (size 1 1) (thickness 0.15))))
 
         ${'' /* corner marks */}
