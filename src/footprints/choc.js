@@ -7,6 +7,8 @@
 //      if true, will include holes and pads for Kailh choc hotswap sockets
 //    reverse: default is false
 //      if true, will flip the footprint such that the pcb can be reversible
+//    keycaps: default is false
+//      if true, will add choc sized keycap box around the footprint
 // 
 // note: hotswap and reverse can be used simultaneously
 
@@ -44,13 +46,13 @@ module.exports = {
       (pad "" np_thru_hole circle (at 5.5 0) (size 1.7018 1.7018) (drill 1.7018) (layers *.Cu *.Mask))
       (pad "" np_thru_hole circle (at -5.5 0) (size 1.7018 1.7018) (drill 1.7018) (layers *.Cu *.Mask))
       `
-      const keycap = `
-        ${'' /* keycap marks */}
-        (fp_line (start -9 -8.5) (end 9 -8.5) (layer Dwgs.User) (width 0.15))
-        (fp_line (start 9 -8.5) (end 9 8.5) (layer Dwgs.User) (width 0.15))
-        (fp_line (start 9 8.5) (end -9 8.5) (layer Dwgs.User) (width 0.15))
-        (fp_line (start -9 8.5) (end -9 -8.5) (layer Dwgs.User) (width 0.15))
-        `
+    const keycap = `
+      ${'' /* keycap marks */}
+      (fp_line (start -9 -8.5) (end 9 -8.5) (layer Dwgs.User) (width 0.15))
+      (fp_line (start 9 -8.5) (end 9 8.5) (layer Dwgs.User) (width 0.15))
+      (fp_line (start 9 8.5) (end -9 8.5) (layer Dwgs.User) (width 0.15))
+      (fp_line (start -9 8.5) (end -9 -8.5) (layer Dwgs.User) (width 0.15))
+      `
     function pins(def_neg, def_pos, def_side) {
       if(p.param.hotswap) {
         return `
