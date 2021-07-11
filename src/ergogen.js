@@ -1,4 +1,5 @@
 const prepare = require('./prepare')
+const units_lib = require('./units')
 const points_lib = require('./points')
 const outlines_lib = require('./outlines')
 const cases_lib = require('./cases')
@@ -15,13 +16,17 @@ module.exports = {
         config = prepare.inherit(config)
         const results = {}
 
-        logger('Parsing points...')
-        const [points, units] = points_lib.parse(config.points)
+        // parsing units
+        logger('Calculating variables...')
+        const units = units_lib.parse(config)
         if (debug) {
-            results.points = {
-                data: points,
-                units: units
-            }
+            results.units = units
+        }
+
+        logger('Parsing points...')
+        const points = points_lib.parse(config.points, units)
+        if (debug) {
+            results.points = points
         }
 
         logger('Generating outlines...')

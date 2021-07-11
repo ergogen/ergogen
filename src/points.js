@@ -215,18 +215,7 @@ const perform_mirror = exports._perform_mirror = (point, axis) => {
     return ['', null]
 }
 
-exports.parse = (config = {}) => {
-
-    // parsing units
-    const raw_units = prep.extend({
-        u: 19,
-        cx: 18,
-        cy: 17
-    }, a.sane(config.units || {}, 'points.units', 'object')())
-    const units = {}
-    for (const [key, val] of Object.entries(raw_units)) {
-        units[key] = a.mathnum(val)(units)
-    }
+exports.parse = (config, units) => {
 
     // config sanitization
     a.unexpected(config, 'points', ['units', 'zones', 'key', 'rotate', 'mirror'])
@@ -317,7 +306,7 @@ exports.parse = (config = {}) => {
     }
 
     // done
-    return [filtered, units]
+    return filtered
 }
 
 exports.visualize = (points) => {
