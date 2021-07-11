@@ -8,7 +8,7 @@ module.exports = {
     jumper: require('./jumper'),
     mx: require('./mx'),
     oled: require('./oled'),
-    omron: required('./omron'),
+    omron: require('./omron'),
     pad: require('./pad'),
     promicro: require('./promicro'),
     rgb: require('./rgb'),
