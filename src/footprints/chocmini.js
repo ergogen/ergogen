@@ -9,7 +9,10 @@
 //      if true, will add choc sized keycap box around the footprint
 
 module.exports = {
-    nets: ['from', 'to'],
+    nets: {
+      from: undefined,
+      to: undefined
+    },
     params: {
       class: 'S',
 		  side: 'F',
@@ -68,8 +71,8 @@ module.exports = {
       function pins(def_neg, def_pos) {
         return `
         ${''/* pins */}
-        (pad 1 thru_hole circle (at ${def_neg}4.58 5.1) (size 1.6 1.6) (drill 1.1) (layers *.Cu *.Mask) ${p.net.from} (clearance 0.2))
-        (pad 2 thru_hole circle (at ${def_pos}2 5.4) (size 1.6 1.6) (drill 1.1) (layers *.Cu *.Mask) ${p.net.to} (clearance 0.2))
+        (pad 1 thru_hole circle (at ${def_neg}4.58 5.1) (size 1.6 1.6) (drill 1.1) (layers *.Cu *.Mask) ${p.net.from.str} (clearance 0.2))
+        (pad 2 thru_hole circle (at ${def_pos}2 5.4) (size 1.6 1.6) (drill 1.1) (layers *.Cu *.Mask) ${p.net.to.str} (clearance 0.2))
 			  `
       }
       if(p.param.reverse){

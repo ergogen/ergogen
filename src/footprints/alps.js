@@ -1,5 +1,8 @@
 module.exports = {
-    nets: ['from', 'to'],
+    nets: {
+        from: undefined,
+        to: undefined
+    },
     params: {
         class: 'S'
     },
@@ -24,8 +27,8 @@ module.exports = {
         (fp_line (start 7 -7) (end 7 -6) (layer Dwgs.User) (width 0.15))
 
         ${''/* pins */}
-        (pad 1 thru_hole circle (at 2.5 -4.5) (size 2.25 2.25) (drill 1.47) (layers *.Cu *.Mask) ${p.net.from})
-        (pad 2 thru_hole circle (at -2.5 -4) (size 2.25 2.25) (drill 1.47) (layers *.Cu *.Mask) ${p.net.to})
+        (pad 1 thru_hole circle (at 2.5 -4.5) (size 2.25 2.25) (drill 1.47) (layers *.Cu *.Mask) ${p.net.from.str})
+        (pad 2 thru_hole circle (at -2.5 -4) (size 2.25 2.25) (drill 1.47) (layers *.Cu *.Mask) ${p.net.to.str})
     )
 
     `

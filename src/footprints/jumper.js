@@ -1,5 +1,8 @@
 module.exports = {
-    nets: ['from', 'to' ],
+    nets: {
+        from: undefined,
+        to: undefined
+    },
     params: {
       class: 'J',
 	  side: 'F'
@@ -14,8 +17,8 @@ module.exports = {
 
         ${'' /* pins */}
         (pad 1 smd rect (at -0.50038 0 ${p.rot}) (size 0.635 1.143) (layers ${p.param.side}.Cu ${p.param.side}.Paste ${p.param.side}.Mask)
-        (clearance 0.1905) ${p.net.from})
+        (clearance 0.1905) ${p.net.from.str})
         (pad 2 smd rect (at 0.50038 0 ${p.rot}) (size 0.635 1.143) (layers ${p.param.side}.Cu ${p.param.side}.Paste ${p.param.side}.Mask)
-        (clearance 0.1905) ${p.net.to}))
+        (clearance 0.1905) ${p.net.to.str}))
     `
 }

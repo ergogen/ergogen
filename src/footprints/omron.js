@@ -1,7 +1,10 @@
 module.exports = {
-    nets: ['from', 'to'],
+    nets: {
+        from: undefined,
+        to: undefined
+    },
     params: {
-        class: 'B' // for Button,
+        class: 'S'
     },
     body: p => `
     
@@ -23,10 +26,10 @@ module.exports = {
         (fp_line (start -6 6) (end -6 -6) (layer Dwgs.User) (width 0.15))
 
         ${'' /* pins */}
-        (pad 1 np_thru_hole circle (at 6.25 -2.5) (size 1.2 1.2) (drill 1.2) (layers *.Cu *.Mask) ${p.net.from})
-        (pad 2 np_thru_hole circle (at -6.25 -2.5) (size 1.2 1.2) (drill 1.2) (layers *.Cu *.Mask) ${p.net.from})
-        (pad 3 np_thru_hole circle (at 6.25 2.5) (size 1.2 1.2) (drill 1.2) (layers *.Cu *.Mask) ${p.net.to})
-        (pad 4 np_thru_hole circle (at -6.25 2.5 ) (size 1.2 1.2) (drill 1.2) (layers *.Cu *.Mask) ${p.net.to})
+        (pad 1 np_thru_hole circle (at 6.25 -2.5) (size 1.2 1.2) (drill 1.2) (layers *.Cu *.Mask) ${p.net.from.str})
+        (pad 2 np_thru_hole circle (at -6.25 -2.5) (size 1.2 1.2) (drill 1.2) (layers *.Cu *.Mask) ${p.net.from.str})
+        (pad 3 np_thru_hole circle (at 6.25 2.5) (size 1.2 1.2) (drill 1.2) (layers *.Cu *.Mask) ${p.net.to.str})
+        (pad 4 np_thru_hole circle (at -6.25 2.5 ) (size 1.2 1.2) (drill 1.2) (layers *.Cu *.Mask) ${p.net.to.str})
     )
     
     `
