@@ -221,10 +221,8 @@ const footprint = exports._footprint = (config, name, points, point, net_indexer
 
     // parsing anchor-type parameters
     parsed_params.anchors = {}
-    console.log(name, config, fp.anchors, anchors)
     for (const [anchor_name, anchor_config] of Object.entries(prep.extend(fp.anchors || {}, anchors))) {
         let parsed_anchor = make_anchor(anchor_config || {}, `${name}.anchors.${anchor_name}`, points, true, anchor)(units)
-        console.log(anchor_name, anchor_config, anchor, parsed_anchor)
         parsed_anchor.y = -parsed_anchor.y
         parsed_params.anchors[anchor_name] = parsed_anchor
     }
