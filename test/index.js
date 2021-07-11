@@ -4,6 +4,7 @@ const yaml = require('js-yaml')
 const glob = require('glob')
 const u = require('../src/utils')
 const ergogen = require('../src/ergogen')
+require('./helpers/mock_footprints').inject(ergogen)
 
 let what = process.env.npm_config_what
 let first = process.env.npm_config_first

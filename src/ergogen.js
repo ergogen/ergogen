@@ -27,6 +27,7 @@ module.exports = {
         const points = points_lib.parse(config.points, units)
         if (debug) {
             results.points = points
+            results.demo = points_lib.visualize(points)
         }
 
         logger('Generating outlines...')
@@ -55,5 +56,6 @@ module.exports = {
 
         return results
     },
-    visualize: points_lib.visualize
+    visualize: points_lib.visualize,
+    inject_footprint: pcbs_lib.inject_footprint
 }

@@ -70,8 +70,8 @@ const results = ergogen.process(config, args.debug, s => console.log(s))
 console.log('Writing output to disk...')
 
 if (args.debug) {
-    io.dump_model(results.points.demo, path.join(args.o, 'points/demo'), args.debug)
-    fs.writeJSONSync(path.join(args.o, 'points/data.json'), results.points.data, {spaces: 4})
+    io.dump_model(results.demo, path.join(args.o, 'points/demo'), args.debug)
+    fs.writeJSONSync(path.join(args.o, 'points/data.json'), results.points, {spaces: 4})
 }
 
 for (const [name, outline] of Object.entries(results.outlines)) {
