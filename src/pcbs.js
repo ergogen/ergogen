@@ -168,11 +168,13 @@ const footprint = exports._footprint = (config, name, points, point, net_indexer
     // connecting other, non-net, non-anchor parameters
     parsed_params.param = {}
     for (const [param_name, param_value] of Object.entries(prep.extend(fp.params || {}, params))) {
-        let value = a.sane(param_value, `${name}.nets.${param_name}`, 'string')()
+        let value = param_value
         if (a.type(value)() == 'string' && value.startsWith('=') && point) {
             const indirect = value.substring(1)
             value = point.meta[indirect]
-            value = a.sane(value, `${name}.params.${param} --> ${point.meta.name}.${indirect}`, 'string')()
+            if (value === undefined) {
+                throw new Error(`Indirection "${name}.params.${param}" --> "${point.meta.name}.${indirect}" to undefined value!`)
+            }
         }
         parsed_params.param[param_name] = value
     }

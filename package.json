@@ -15,8 +15,10 @@
         "coverage": "nyc --reporter=html --reporter=text npm test"
     },
     "dependencies": {
+        "@jscad/openjscad": "^1.6.1",
         "fs-extra": "^9.0.1",
         "js-yaml": "^3.14.0",
+        "json5": "^2.2.0",
         "makerjs": "github:mrzealot/maker.js-dist#a0ca32948845efe8ad5c9ca454f1285926853138",
         "mathjs": "^8.1.1",
         "yargs": "^15.4.1"
@@ -36,8 +38,7 @@
             "src/**/*.js"
         ],
         "exclude": [
-            "src/cli.js",
-            "src/io.js"
+            "src/cli.js"
         ]
     }
 }

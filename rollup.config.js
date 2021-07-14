@@ -4,7 +4,7 @@ import replace from '@rollup/plugin-replace'
 
 export default {
   input: 'src/ergogen.js',
-  external: ['makerjs', 'js-yaml', 'mathjs'],
+  external: ['makerjs', 'js-yaml', 'mathjs', 'json5'],
   output: {
     name: 'ergogen',
     file: 'dist/ergogen.js',
@@ -13,7 +13,8 @@ export default {
     globals: {
       'makerjs': 'makerjs',
       'js-yaml': 'jsyaml',
-      'mathjs': 'math'
+      'mathjs': 'math',
+      'json5': 'json5'
     }
   },
   plugins: [
