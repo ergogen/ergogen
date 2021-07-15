@@ -33,9 +33,9 @@ const cap = s => s.charAt(0).toUpperCase() + s.slice(1)
 const test = function(input_path) {
     this.timeout(120000)
     title = path.basename(input_path, '.yaml').split('_').join(' ')
-    it(title, function() {
+    it(title, async function() {
         const input = yaml.load(fs.readFileSync(input_path).toString())
-        const actual = ergogen.process(input, true)
+        const actual = await ergogen.process(input, true)
 
         // if we're just creating the reference, we can dump the current output
         if (dump) {

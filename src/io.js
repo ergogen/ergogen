@@ -8,8 +8,8 @@ const a = require('./assert')
 const kle = require('./kle')
 
 exports.interpret = (raw, logger) => {
-    let config
-    let format
+    let config = raw
+    let format = 'OBJ'
     if (a.type(raw)() != 'object') {
         try {
             config = yaml.safeLoad(raw)

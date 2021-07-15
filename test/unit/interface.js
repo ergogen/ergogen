@@ -54,22 +54,22 @@ const underscore = obj => {
 
 describe('Interface', function() {
 
-    it('minimal', function() {
-        underscore(ergogen.process(minimal)).should.be.false
+    it('minimal', async function() {
+        underscore(await ergogen.process(minimal)).should.be.false
     })
 
-    it('production', function() {
-        underscore(ergogen.process(full, false)).should.be.false
+    it('production', async function() {
+        underscore(await ergogen.process(full, false)).should.be.false
     })
     
-    it('debug', function() {
-        underscore(ergogen.process(full, true)).should.be.true
+    it('debug', async function() {
+        underscore(await ergogen.process(full, true)).should.be.true
     })
 
-    it('logging', function() {
+    it('logging', async function() {
         const flag = {value: false}
         const logger = msg => { flag.value = true }
-        ergogen.process(full, false, logger)
+        await ergogen.process(full, false, logger)
         flag.value.should.be.true
     })
 
