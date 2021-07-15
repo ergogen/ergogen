@@ -1,11 +1,5 @@
-const yaml = require('js-yaml')
-const json5 = require('json5')
-const makerjs = require('makerjs')
-const jscad = require('@jscad/openjscad')
-
-const a = require('./assert')
 const u = require('./utils')
-
+const io = require('./io')
 const prepare = require('./prepare')
 const units_lib = require('./units')
 const points_lib = require('./points')
@@ -13,79 +7,20 @@ const outlines_lib = require('./outlines')
 const cases_lib = require('./cases')
 const pcbs_lib = require('./pcbs')
 
-const noop = () => {}
-
-const twodee = (model, debug) => {
-    const assembly = makerjs.model.originate({
-        models: {
-            export: u.deepcopy(model)
-        },
-        units: 'mm'
-    })
-
-    const result = {
-        dxf: makerjs.exporter.toDXF(assembly),
-    }
-    if (debug) {
-        result.json = assembly
-        result.svg = makerjs.exporter.toSVG(assembly)
-    }
-    return result
-}
-
-const threedee = async (script, debug) => {
-    const compiled = await new Promise((resolve, reject) => {
-        jscad.compile(script, {}).then(compiled => {
-            resolve(compiled)
-        })
-    })
-    const result = {
-        stl: jscad.generateOutput('stla', compiled).asBuffer()
-    }
-    if (debug) {
-        result.jscad = script
-    }
-    return result
-}
-
 module.exports = {
     version: '__ergogen_version',
-    process: async (raw, debug=false, logger=noop) => {
+    process: async (raw, debug=false, logger=()=>{}) => {
 
-        const prefix = 'Interpreting format... '
-        let config = raw
-        if (a.type(raw)() != 'object') {
-            try {
-                config = yaml.safeLoad(raw)
-                logger(prefix + 'YAML detected.')
-            } catch (yamlex) {
-                try {
-                    config = json5.parse(raw)
-                    logger(prefix + 'JSON detected.')
-                } catch (jsonex) {
-                    try {
-                        config = new Function(raw)()
-                        logger(prefix + 'JS code detected.')
-                    } catch (codeex) {
-                        logger('YAML exception:', yamlex)
-                        logger('JSON exception:', jsonex)
-                        logger('Code exception:', codeex)
-                        throw new Error('Input is not valid YAML, JSON, or JS code!')
-                    }
-                }
-            }
-            if (!config) {
-                throw new Error('Input appears to be empty!')
-            }
-        }
-
+        let [config, format] = io.interpret(raw, logger)
+        logger('Interpreting format: ' + format)
+        
         logger('Preprocessing input...')
         config = prepare.unnest(config)
         config = prepare.inherit(config)
         const results = {}
         if (debug) {
             results.raw = raw
-            results.canonical = config
+            results.canonical = u.deepcopy(config)
         }
 
         logger('Calculating variables...')
@@ -94,6 +29,7 @@ module.exports = {
             results.units = units
         }
 
+        
         logger('Parsing points...')
         if (!config.points) {
             throw new Error('Input does not contain any points!')
@@ -101,7 +37,7 @@ module.exports = {
         const points = points_lib.parse(config.points, units)
         if (debug) {
             results.points = points
-            results.demo = twodee(points_lib.visualize(points), debug)
+            results.demo = io.twodee(points_lib.visualize(points), debug)
         }
 
         logger('Generating outlines...')
@@ -109,7 +45,7 @@ module.exports = {
         results.outlines = {}
         for (const [name, outline] of Object.entries(outlines)) {
             if (!debug && name.startsWith('_')) continue
-            results.outlines[name] = twodee(outline, debug)
+            results.outlines[name] = io.twodee(outline, debug)
         }
 
         logger('Extruding cases...')
@@ -117,7 +53,7 @@ module.exports = {
         results.cases = {}
         for (const [case_name, case_script] of Object.entries(cases)) {
             if (!debug && case_name.startsWith('_')) continue
-            results.cases[case_name] = await threedee(case_script, debug)
+            results.cases[case_name] = await io.threedee(case_script, debug)
         }
 
         logger('Scaffolding PCBs...')
