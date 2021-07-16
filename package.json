@@ -16,7 +16,7 @@
     },
     "dependencies": {
         "kle-serial": "github:mrzealot/kle-serial",
-        "@jscad/openjscad": "^1.6.1",
+        "@jscad/openjscad": "github:mrzealot/oldjscad",
         "fs-extra": "^9.0.1",
         "js-yaml": "^3.14.0",
         "json5": "^2.2.0",
