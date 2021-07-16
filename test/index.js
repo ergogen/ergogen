@@ -39,16 +39,20 @@ const test = function(input_path) {
 
         // if we're just creating the reference, we can dump the current output
         if (dump) {
-            const out = path.join(
-                path.dirname(input_path),
-                path.basename(input_path, '.yaml') + '___ref_candidate'
-            )
             // whole dump
-            if (dump === true) {
-                fs.writeJSONSync(out + '.json', actual, {spaces: 4})
+            if (dump === true || dump === 'true') {
+                const out = path.join(
+                    path.dirname(input_path),
+                    path.basename(input_path, '.yaml') + '___ref_candidate.json'
+                )
+                fs.writeJSONSync(out, actual, {spaces: 4})
             // partial, type-specific dump
             } else {
                 const part = u.deep(actual, dump)
+                const out = path.join(
+                    path.dirname(input_path),
+                    path.basename(input_path, '.yaml') + '___' + dump.split('.').join('_')
+                )
                 if (a.type(part)() == 'string') {
                     fs.writeFileSync(out + '.txt', part)
                 } else {
