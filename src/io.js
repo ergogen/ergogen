@@ -69,7 +69,7 @@ exports.threedee = async (script, debug) => {
         })
     })
     const result = {
-        stl: jscad.generateOutput('stla', compiled).asBuffer()
+        stl: jscad.generateOutput('stla', compiled).asBuffer().toString()
     }
     if (debug) {
         result.jscad = script

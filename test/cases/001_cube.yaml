@@ -1,0 +1,16 @@
+points:
+    zones:
+        arst:
+            columns:
+                c1:
+                    rows:
+                        r1:
+outlines:
+    exports:
+        square:
+            - type: rectangle
+              size: [5, 5]
+cases:
+    cube:
+        - name: square
+          extrude: 5
