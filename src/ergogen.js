@@ -9,9 +9,15 @@ const pcbs_lib = require('./pcbs')
 
 const process = async (raw, debug=false, logger=()=>{}) => {
 
+    const prefix = 'Interpreting format: '
     let empty = true
     let [config, format] = io.interpret(raw, logger)
-    logger('Interpreting format: ' + format)
+    let suffix = format
+    if (format == 'KLE') {
+        suffix = `${format} (Auto-debug)`
+        debug = true
+    }
+    logger(prefix + suffix)
     
     logger('Preprocessing input...')
     config = prepare.unnest(config)
