@@ -1,18 +1,19 @@
 const u = require('./utils')
 const kle = require('kle-serial')
-const json5 = require('json5')
+const yaml = require('js-yaml')
 
 exports.convert = (config, logger) => {
     const keyboard = kle.Serial.deserialize(config)
     const result = {points: {zones: {}}, pcbs: {main: {}}}
 
-    // if the keyboard notes are valid JSON, they get added to each key as metadata
-    let meta = {}
+    // if the keyboard notes are valid YAML/JSON, they get added to each key as metadata
+    let meta
     try {
-        meta = json5.parse(keyboard.meta.notes)
+        meta = yaml.load(keyboard.meta.notes)
     } catch (ex) {
-        // notes were not valid JSON, oh well...
+        // notes were not valid YAML/JSON, oh well...
     }
+    meta = meta || {}
 
     let index = 1
     for (const key of keyboard.keys) {
@@ -68,5 +69,5 @@ exports.convert = (config, logger) => {
         result.points.zones[id] = converted
     }
 
-    return [result, 'KLE']
+    return result
 }

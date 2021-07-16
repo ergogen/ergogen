@@ -1,4 +1,3 @@
-const json5 = require('json5')
 const yaml = require('js-yaml')
 const makerjs = require('makerjs')
 const jscad = require('@jscad/openjscad')
@@ -10,38 +9,43 @@ const kle = require('./kle')
 exports.interpret = (raw, logger) => {
     let config = raw
     let format = 'OBJ'
-    if (a.type(raw)() != 'object') {
+    if (a.type(raw)() == 'string') {
         try {
             config = yaml.safeLoad(raw)
             format = 'YAML'
         } catch (yamlex) {
             try {
-                config = json5.parse(raw)
-                format = 'JSON'
-            } catch (jsonex) {
-                try {
-                    config = new Function(raw)()
-                    format = 'JS Code'
-                } catch (codeex) {
-                    logger('YAML exception:', yamlex)
-                    logger('JSON exception:', jsonex)
-                    logger('Code exception:', codeex)
-                    throw new Error('Input is not valid YAML, JSON, or JS Code!')
-                }
+                config = new Function(raw)()
+                a.assert(
+                    a.type(config)() == 'object',
+                    'Input JS Code doesn\'t resolve into an object!'
+                )
+                format = 'JS'
+            } catch (codeex) {
+                logger('YAML exception:', yamlex)
+                logger('Code exception:', codeex)
+                throw new Error('Input is not valid YAML, JSON, or JS Code!')
             }
-        }
-        if (!config) {
-            throw new Error('Input appears to be empty!')
         }
     }
     
     try {
         // assume it's KLE and try to convert it
-        // if it's not, it'll throw anyway
-        return kle.convert(config, logger)
+        config = kle.convert(config, logger)
+        format = 'KLE'
     } catch (kleex) {
-        return [config, format]
+        // nope... nevermind
     }
+
+    if (a.type(config)() != 'object') {
+        throw new Error('Input doesn\'t resolve into an object!')
+    }
+
+    if (!Object.keys(config).length) {
+        throw new Error('Input appears to be empty!')
+    }
+
+    return [config, format]
 }
 
 exports.twodee = (model, debug) => {

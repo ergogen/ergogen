@@ -11,15 +11,15 @@
     "bin": "./src/cli.js",
     "scripts": {
         "build": "rollup -c",
-        "test": "mocha -r chai/register-should test/index.js",
+        "test": "mocha -r test/helpers/register test/index.js",
         "coverage": "nyc --reporter=html --reporter=text npm test"
     },
     "dependencies": {
-        "kle-serial": "github:mrzealot/kle-serial",
         "@jscad/openjscad": "github:mrzealot/oldjscad",
+        "chai-as-promised": "^7.1.1",
         "fs-extra": "^9.0.1",
         "js-yaml": "^3.14.0",
-        "json5": "^2.2.0",
+        "kle-serial": "github:mrzealot/kle-serial",
         "makerjs": "github:mrzealot/maker.js-dist",
         "mathjs": "^8.1.1",
         "yargs": "^15.4.1"
@@ -37,9 +37,6 @@
         "all": true,
         "include": [
             "src/**/*.js"
-        ],
-        "exclude": [
-            "src/cli.js"
         ]
     }
 }
