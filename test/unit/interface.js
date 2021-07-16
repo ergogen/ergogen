@@ -13,6 +13,9 @@ const kle = load('atreus_kle.json')
 
 describe('Interface', function() {
 
+    this.timeout(120000)
+    this.slow(120000)
+
     it('debug', async function() {
         // to check whether the output has "private" exports
         const underscore = obj => {

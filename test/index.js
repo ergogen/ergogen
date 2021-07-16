@@ -32,6 +32,7 @@ const cap = s => s.charAt(0).toUpperCase() + s.slice(1)
 
 const test = function(input_path) {
     this.timeout(120000)
+    this.slow(120000)
     title = path.basename(input_path, '.yaml').split('_').join(' ')
     it(title, async function() {
         const input = yaml.load(fs.readFileSync(input_path).toString())
@@ -99,4 +100,50 @@ if (what) {
             }
         })
     }
+}
+
+// End-to-end tests to actually drive the CLI as well
+// --what filter is 'cli'
+// --dump is meaningless (just use the CLI itself)
+
+const read = (d, p) => fs.readFileSync(path.join(d, p)).toString()
+const exists = (d, p) => fs.existsSync(path.join(d, p))
+const { execSync } = require('child_process')
+const dircompare = require('dir-compare')
+
+if (!what || what.includes('cli')) {
+    describe('CLI', function() {
+        this.timeout(120000)
+        this.slow(120000)
+        for (const t of glob.sync(path.join(__dirname, 'cli/*'))) {
+            it(cap(path.basename(t).split('_').join(' ')), function() {
+                const command = read(t, 'command')
+                const output_path = exists(t, 'path') ? read(t, 'path') : 'output'
+                const version_regex = /\bv\d+\.\d+\.\d+\b/
+                // correct execution
+                if (exists(t, 'log')) {
+                    const ref_log = read(t, 'log').replace(version_regex, '<version>')
+                    const actual_log = execSync(command).toString().replace(version_regex, '<version>')
+                    actual_log.should.equal(ref_log)
+                    const comp_res = dircompare.compareSync(output_path, path.join(t, 'reference'), {
+                        compareContent: true
+                    })
+                    comp_res.same.should.be.true
+                    fs.removeSync(output_path)
+                } else {
+                    const ref_error = read(t, 'error').replace(version_regex, '<version>')
+                    try {
+                        execSync(command, {stdio: 'pipe'})
+                        throw 'should_have_thrown'
+                    } catch (ex) {
+                        if (ex === 'should_have_thrown') {
+                            throw new Error('This command should have thrown!')
+                        }
+                        const actual_error = ex.stderr.toString().replace(version_regex, '<version>')
+                        actual_error.should.equal(ref_error)
+                    }
+                }
+            })
+        }
+    })
 }
