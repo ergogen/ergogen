@@ -1,0 +1,1 @@
+node src/cli.js test/cli/bad_input/bad.yaml
