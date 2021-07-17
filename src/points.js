@@ -40,6 +40,9 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key,
 
     // column layout
 
+    if (!Object.keys(cols).length) {
+        cols.default = {}
+    }
     let first_col = true
     for (let [col_name, col] of Object.entries(cols)) {
 
@@ -218,8 +221,8 @@ const perform_mirror = exports._perform_mirror = (point, axis) => {
 exports.parse = (config, units) => {
 
     // config sanitization
-    a.unexpected(config, 'points', ['units', 'zones', 'key', 'rotate', 'mirror'])
-    const zones = a.sane(config.zones || {}, 'points.zones', 'object')()
+    a.unexpected(config, 'points', ['zones', 'key', 'rotate', 'mirror'])
+    const zones = a.sane(config.zones, 'points.zones', 'object')()
     const global_key = a.sane(config.key || {}, 'points.key', 'object')()
     const global_rotate = a.sane(config.rotate || 0, 'points.rotate', 'number')(units)
     const global_mirror = config.mirror

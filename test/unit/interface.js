@@ -51,7 +51,8 @@ describe('Interface', function() {
             ergogen.process(kle, true, logger).should.be.rejectedWith('KLE'),
             ergogen.process('not an object', true, logger).should.be.rejectedWith('object'),
             ergogen.process({}, true, logger).should.be.rejectedWith('empty'),
-            ergogen.process({not_points: {}}, true, () => {}).should.be.rejectedWith('any points')
+            ergogen.process({not_points: {}}, true, () => {}).should.be.rejectedWith('points clause'),
+            ergogen.process({points: {zones: {}}}, true, () => {}).should.be.rejectedWith('any points')
         ])
     })
     

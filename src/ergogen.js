@@ -37,9 +37,12 @@ const process = async (raw, debug=false, logger=()=>{}) => {
     
     logger('Parsing points...')
     if (!config.points) {
-        throw new Error('Input does not contain any points!')
+        throw new Error('Input does not contain a points clause!')
     }
     const points = points_lib.parse(config.points, units)
+    if (!Object.keys(points).length) {
+        throw new Error('Input does not contain any points!')
+    }
     if (debug) {
         results.points = points
         results.demo = io.twodee(points_lib.visualize(points), debug)
