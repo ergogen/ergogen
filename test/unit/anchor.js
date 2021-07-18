@@ -1,4 +1,4 @@
-const anchor = require('../../src/anchor')
+const {parse} = require('../../src/anchor')
 const Point = require('../../src/point')
 const {check} = require('../helpers/point')
 
@@ -13,17 +13,17 @@ describe('Anchor', function() {
     it('params', function() {
         // an empty anchor definition leads to the default point
         check(
-            anchor({}, 'name')(),
+            parse({}, 'name')(),
             [0, 0, 0, {}]
         )
         // unexpected check can be disabled
         check(
-            anchor({unexpected_key: true}, 'name', {}, false)(),
+            parse({unexpected_key: true}, 'name', {}, false)(),
             [0, 0, 0, {}]
         )
         // default point can be overridden
         check(
-            anchor({}, 'name', {}, true, new Point(1, 1))(),
+            parse({}, 'name', {}, true, new Point(1, 1))(),
             [1, 1, 0, {}]
         )
     })
@@ -31,12 +31,12 @@ describe('Anchor', function() {
     it('ref', function() {
         // single reference
         check(
-            anchor({ref: 'o'}, 'name', points)(),
+            parse({ref: 'o'}, 'name', points)(),
             [0, 0, 0, {label: 'o'}]
         )
         // average of multiple references (metadata gets ignored)
         check(
-            anchor({ref: ['o', 'ten']}, 'name', points)(),
+            parse({ref: ['o', 'ten']}, 'name', points)(),
             [5, 5, 5, {}]
         )
     })
@@ -44,12 +44,12 @@ describe('Anchor', function() {
     it('shift', function() {
         // normal shift
         check(
-            anchor({shift: [1, 1]}, 'name')(),
+            parse({shift: [1, 1]}, 'name')(),
             [1, 1, 0, {}]
         )
         // shift should respect mirrored points (and invert along the x axis)
         check(
-            anchor({ref: 'mirror', shift: [1, 1]}, 'name', points)(),
+            parse({ref: 'mirror', shift: [1, 1]}, 'name', points)(),
             [19, 1, 0, {mirrored: true}]
         )
     })
@@ -57,13 +57,13 @@ describe('Anchor', function() {
     it('orient', function() {
         // an orient by itself is equal to rotation
         check(
-            anchor({orient: 10}, 'name')(),
+            parse({orient: 10}, 'name')(),
             [0, 0, 10, {}]
         )
         // orient acts before shifting
         // so when we orient to the right, an upward shift goes to the right
         check(
-            anchor({orient: -90, shift: [0, 1]}, 'name')(),
+            parse({orient: -90, shift: [0, 1]}, 'name')(),
             [1, 0, -90, {}]
         )
     })
@@ -71,13 +71,13 @@ describe('Anchor', function() {
     it('rotate', function() {
         // basic rotation
         check(
-            anchor({rotate: 10}, 'name')(),
+            parse({rotate: 10}, 'name')(),
             [0, 0, 10, {}]
         )
         // rotate acts *after* shifting
         // so even tho we rotate to the right, an upward shift does go upward
         check(
-            anchor({shift: [0, 1], rotate: -90}, 'name')(),
+            parse({shift: [0, 1], rotate: -90}, 'name')(),
             [0, 1, -90, {}]
         )
     })
@@ -85,16 +85,16 @@ describe('Anchor', function() {
     it('affect', function() {
         // affect can restrict which point fields (x, y, r) are affected by the transformations
         check(
-            anchor({orient: -90, shift: [0, 1], rotate: 10, affect: 'r'}, 'name')(),
+            parse({orient: -90, shift: [0, 1], rotate: 10, affect: 'r'}, 'name')(),
             [0, 0, -80, {}]
         )
         check(
-            anchor({orient: -90, shift: [0, 1], rotate: 10, affect: 'xy'}, 'name')(),
+            parse({orient: -90, shift: [0, 1], rotate: 10, affect: 'xy'}, 'name')(),
             [1, 0, 0, {}]
         )
         // affects can also be arrays (example same as above)
         check(
-            anchor({orient: -90, shift: [0, 1], rotate: 10, affect: ['x', 'y']}, 'name')(),
+            parse({orient: -90, shift: [0, 1], rotate: 10, affect: ['x', 'y']}, 'name')(),
             [1, 0, 0, {}]
         )
     })
@@ -102,7 +102,7 @@ describe('Anchor', function() {
     it('array', function() {
         // basic multi-anchor
         check(
-            anchor([
+            parse([
                 {shift: [1, 1]},
                 {rotate: 10}
             ], 'name')(),

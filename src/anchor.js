@@ -2,12 +2,23 @@ const u = require('./utils')
 const a = require('./assert')
 const Point = require('./point')
 
-const anchor = module.exports = (raw, name, points={}, check_unexpected=true, default_point=new Point()) => units => {
+const mirror_ref = exports.mirror = (ref, mirror) => {
+    if (mirror) {
+        if (ref.startsWith('mirror_')) {
+            return ref.substring(7)
+        } else {
+            return 'mirror_' + ref
+        }
+    }
+    return ref
+}
+
+const anchor = exports.parse = (raw, name, points={}, check_unexpected=true, default_point=new Point(), mirror=false) => units => {
     if (a.type(raw)() == 'array') {
         // recursive call with incremental default_point mods, according to `affect`s
         let current = default_point.clone()
         for (const step of raw) {
-            current = anchor(step, name, points, check_unexpected, current)(units)
+            current = anchor(step, name, points, check_unexpected, current, mirror)(units)
         }
         return current
     }
@@ -19,16 +30,18 @@ const anchor = module.exports = (raw, name, points={}, check_unexpected=true, de
             let x = 0, y = 0, r = 0
             const len = raw.ref.length
             for (const ref of raw.ref) {
-                a.assert(points[ref], `Unknown point reference "${ref}" in anchor "${name}"!`)
-                const resolved = points[ref]
+                const parsed_ref = mirror_ref(ref, mirror)
+                a.assert(points[parsed_ref], `Unknown point reference "${parsed_ref}" in anchor "${name}"!`)
+                const resolved = points[parsed_ref]
                 x += resolved.x
                 y += resolved.y
                 r += resolved.r
             }
             point = new Point(x / len, y / len, r / len)
         } else {
-            a.assert(points[raw.ref], `Unknown point reference "${raw.ref}" in anchor "${name}"!`)
-            point = points[raw.ref].clone()
+            const parsed_ref = mirror_ref(raw.ref, mirror)
+            a.assert(points[parsed_ref], `Unknown point reference "${parsed_ref}" in anchor "${name}"!`)
+            point = points[parsed_ref].clone()
         }
     }
     if (raw.orient !== undefined) {

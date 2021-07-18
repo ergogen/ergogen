@@ -2,7 +2,7 @@ const m = require('makerjs')
 const u = require('./utils')
 const a = require('./assert')
 const prep = require('./prepare')
-const make_anchor = require('./anchor')
+const anchor_lib = require('./anchor')
 
 const push_rotation = exports._push_rotation = (list, angle, origin) => {
     let candidate = origin
@@ -194,7 +194,7 @@ const parse_axis = exports._parse_axis = (config, name, points, units) => {
         const mirror_obj = a.sane(config || {}, name, 'object')()
         const distance = a.sane(mirror_obj.distance || 0, `${name}.distance`, 'number')(units)
         delete mirror_obj.distance
-        let axis = make_anchor(mirror_obj, name, points)(units).x
+        let axis = anchor_lib.parse(mirror_obj, name, points)(units).x
         axis += distance / 2
         return axis
     } else return config
@@ -235,7 +235,7 @@ exports.parse = (config, units) => {
     for (let [zone_name, zone] of Object.entries(zones)) {
 
         // extracting keys that are handled here, not at the zone render level
-        const anchor = make_anchor(zone.anchor || {}, `points.zones.${zone_name}.anchor`, all_points)(units)
+        const anchor = anchor_lib.parse(zone.anchor || {}, `points.zones.${zone_name}.anchor`, all_points)(units)
         const rotate = a.sane(zone.rotate || 0, `points.zones.${zone_name}.rotate`, 'number')(units)
         const mirror = zone.mirror
         delete zone.anchor

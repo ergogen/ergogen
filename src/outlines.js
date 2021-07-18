@@ -4,7 +4,7 @@ const a = require('./assert')
 const o = require('./operation')
 const Point = require('./point')
 const prep = require('./prepare')
-const make_anchor = require('./anchor')
+const anchor_lib = require('./anchor')
 
 const rectangle = (w, h, corner, bevel, name='') => {
     const error = (dim, val) => `Rectangle for "${name}" isn't ${dim} enough for its corner and bevel (${val} - 2 * ${corner} - 2 * ${bevel} <= 0)!`
@@ -41,9 +41,9 @@ const layout = exports._layout = (config = {}, points = {}, units = {}) => {
     
         for (const y of ['top', 'bottom']) {
             a.unexpected(gval[y], `outlines.glue.${gkey}.${y}`, ['left', 'right'])
-            gval[y].left = make_anchor(gval[y].left, `outlines.glue.${gkey}.${y}.left`, points)
+            gval[y].left = anchor_lib.parse(gval[y].left, `outlines.glue.${gkey}.${y}.left`, points)
             if (a.type(gval[y].right)(units) != 'number') {
-                gval[y].right = make_anchor(gval[y].right, `outlines.glue.${gkey}.${y}.right`, points)
+                gval[y].right = anchor_lib.parse(gval[y].right, `outlines.glue.${gkey}.${y}.right`, points)
             }
         }
     
@@ -148,7 +148,7 @@ const layout = exports._layout = (config = {}, points = {}, units = {}) => {
                     return u.line([anchor, -1000], [anchor, 1000])
                 }
 
-                // if it wasn't a number, then it's a (possibly relative) achor
+                // if it wasn't a number, then it's a (possibly relative) anchor
                 const from = anchor(relative_units).clone()
                 const to = from.clone().shift([from.meta.mirrored ? -1 : 1, 0])
 
@@ -244,43 +244,45 @@ exports.parse = (config = {}, points = {}, units = {}) => {
 
             let arg
             let anchor
+            const anchor_def = part.anchor || {}
             switch (part.type) {
                 case 'keys':
                     arg = layout_fn(part, name, expected)
                     break
                 case 'rectangle':
-                    a.unexpected(part, name, expected.concat(['ref', 'shift', 'rotate', 'size', 'corner', 'bevel', 'mirror']))
+                    a.unexpected(part, name, expected.concat(['anchor', 'size', 'corner', 'bevel', 'mirror']))
                     const size = a.wh(part.size, `${name}.size`)(units)
                     const rec_units = prep.extend({
                         sx: size[0],
                         sy: size[1]
                     }, units)
-                    anchor = make_anchor(part, name, points, false)(rec_units)
+                    anchor = anchor_lib.parse(anchor_def, `${name}.anchor`, points)(rec_units)
                     const corner = a.sane(part.corner || 0, `${name}.corner`, 'number')(rec_units)
                     const bevel = a.sane(part.bevel || 0, `${name}.bevel`, 'number')(rec_units)
                     const rect_mirror = a.sane(part.mirror || false, `${name}.mirror`, 'boolean')()
                     const rect = rectangle(size[0], size[1], corner, bevel, name)
                     arg = anchor.position(u.deepcopy(rect))
                     if (rect_mirror) {
-                        const mirror_part = u.deepcopy(part)
-                        a.assert(mirror_part.ref, `Field "${name}.ref" must be speficied if mirroring is required!`)
-                        mirror_part.ref = `mirror_${mirror_part.ref}`
-                        anchor = make_anchor(mirror_part, name, points, false)(rec_units)
+                        const mirror_anchor = u.deepcopy(anchor_def)
+                        a.assert(mirror_anchor.ref, `Field "${name}.anchor.ref" must be speficied if mirroring is required!`)
+                        anchor = anchor_lib.parse(mirror_anchor, `${name}.anchor --> mirror`, points, undefined, undefined, true)(rec_units)
                         const mirror_rect = m.model.moveRelative(u.deepcopy(rect), [-size[0], 0])
                         arg = u.union(arg, anchor.position(mirror_rect))
                     }
                     break
                 case 'circle':
-                    a.unexpected(part, name, expected.concat(['ref', 'shift', 'rotate', 'radius', 'mirror']))
-                    anchor = make_anchor(part, name, points, false)(units)
+                    a.unexpected(part, name, expected.concat(['anchor', 'radius', 'mirror']))
                     const radius = a.sane(part.radius, `${name}.radius`, 'number')(units)
+                    const circle_units = prep.extend({
+                        r: radius
+                    }, units)
+                    anchor = anchor_lib.parse(anchor_def, `${name}.anchor`, points)(circle_units)
                     const circle_mirror = a.sane(part.mirror || false, `${name}.mirror`, 'boolean')()
                     arg = u.circle(anchor.p, radius)
                     if (circle_mirror) {
-                        const mirror_part = u.deepcopy(part)
-                        a.assert(mirror_part.ref, `Field "${name}.ref" must be speficied if mirroring is required!`)
-                        mirror_part.ref = `mirror_${mirror_part.ref}`
-                        anchor = make_anchor(mirror_part, name, points, false)(units)
+                        const mirror_anchor = u.deepcopy(anchor_def)
+                        a.assert(mirror_anchor.ref, `Field "${name}.anchor.ref" must be speficied if mirroring is required!`)
+                        anchor = anchor_lib.parse(mirror_anchor, `${name}.anchor --> mirror`, points, undefined, undefined, true)(circle_units)
                         arg = u.union(arg, u.circle(anchor.p, radius))
                     }
                     break
@@ -294,12 +296,15 @@ exports.parse = (config = {}, points = {}, units = {}) => {
                     let last_anchor = new Point()
                     let poly_index = 0
                     for (const poly_point of poly_points) {
-                        if (poly_index == 0 && poly_mirror) {
-                            a.assert(poly_point.ref, `Field "${name}.ref" must be speficied if mirroring is required!`)
-                            poly_mirror_x = (points[poly_point.ref].x + points[`mirror_${poly_point.ref}`].x) / 2
-                        }
                         const poly_name = `${name}.points[${++poly_index}]`
-                        last_anchor = make_anchor(poly_point, poly_name, points, true, last_anchor)(units)
+                        if (poly_index == 1 && poly_mirror) {
+                            a.assert(poly_point.ref, `Field "${poly_name}.ref" must be speficied if mirroring is required!`)
+                            const mirrored_ref = anchor_lib.mirror(poly_point.ref, poly_mirror)
+                            a.assert(points[poly_point.ref], `Field "${poly_name}.ref" does not name an existing point!`)
+                            a.assert(points[mirrored_ref], `The mirror of field "${poly_name}.ref" ("${mirrored_ref}") does not name an existing point!`)
+                            poly_mirror_x = (points[poly_point.ref].x + points[mirrored_ref].x) / 2
+                        }
+                        last_anchor = anchor_lib.parse(poly_point, poly_name, points, true, last_anchor)(units)
                         parsed_points.push(last_anchor.p)
                         mirror_points.push(last_anchor.clone().mirror(poly_mirror_x).p)
                     }
