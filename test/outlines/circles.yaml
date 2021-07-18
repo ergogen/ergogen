@@ -1,0 +1,26 @@
+points:
+  zones:
+    matrix: {}
+  mirror: 20
+outlines:
+  exports:
+    outline:
+      main:
+        type: keys
+        side: both
+        size: 20
+        bound: false
+      middle_circle:
+        type: circle
+        anchor:
+          ref:
+            - matrix_default_default
+            - mirror_matrix_default_default
+        radius: 15
+      outside_circles:
+        type: circle
+        anchor:
+          ref: matrix_default_default
+          shift: [-10, 10]
+        radius: 5
+        mirror: true
