@@ -312,11 +312,11 @@ exports.parse = (config, units) => {
     return filtered
 }
 
-exports.visualize = (points) => {
+exports.visualize = (points, units) => {
     const models = {}
     for (const [pname, p] of Object.entries(points)) {
-        const w = (p.meta.width * 19) - 1
-        const h = (p.meta.height * 19) - 1
+        const w = (p.meta.width * units.u) - 1
+        const h = (p.meta.height * units.u) - 1
         const rect = u.rect(w, h, [-w/2, -h/2])
         models[pname] = p.position(rect)
     }

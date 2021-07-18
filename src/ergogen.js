@@ -45,7 +45,7 @@ const process = async (raw, debug=false, logger=()=>{}) => {
     }
     if (debug) {
         results.points = points
-        results.demo = io.twodee(points_lib.visualize(points), debug)
+        results.demo = io.twodee(points_lib.visualize(points, units), debug)
     }
 
     logger('Generating outlines...')

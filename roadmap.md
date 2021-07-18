@@ -6,10 +6,6 @@
 
 ### Major
 
-- For rectangles and other non-`keys` outline types, upgrade `ref` to full anchor support (including multi-anchors!)
-- Base key-level defaults (and many other things) around u's
-    - Possibly breaking, as from here on out, changing `u` affects more than it did before
-
 ### Minor
 
 - Global column-level attributes like spread
@@ -19,7 +15,6 @@
 - Add a way to globally enable/disable references (`ref_hide`)
 - SVG input (for individual outlines, or even combinations parsed by line color, etc.)
 - Look into gr_curve to possibly add beziers to the kicad conversion
-- Support opting out of gluing altogether
 - Support specifying keys/labels for the pcb section (not just blindly assuming all)
 - Should add `p`, `pcx`, and `pcy` as units for padding calculations
 - Add snappable line footprint
@@ -66,6 +61,9 @@
         - Units separated to their own block at the front
         - Key-level `width` and `height` are supported during visualization
         - This key-level example should probably be added from discord: https://discord.com/channels/714176584269168732/759825860617437204/773104093546676244
+        - Change outline fields to have their full anchor support documented
+        - Mention the ability to opt out of gluing!
+        - Key-level defaults are based around u's, not 19!
 - Contribution guidelines
     - including test commands (npm test, npm run coverage, --what switch, --dump switch)
 - Changelog, Roadmap
