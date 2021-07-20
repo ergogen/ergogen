@@ -1,97 +1,43 @@
-const webui_version = '1.2.0'
+const webui_version = '1.3.0'
 
 //
-// Generator stuff
+// ZIP helper
 //
-
-const deepcopy = input => JSON.parse(JSON.stringify(input))
-
-const drawing = (model, mode='dxf') => {
-    const assembly = makerjs.model.originate({
-        models: {
-            export: deepcopy(model)
-        },
-        units: 'mm'
-    })
-    if (mode == 'dxf') {
-        return makerjs.exporter.toDXF(assembly)
-    } else {
-        return makerjs.exporter.toSVG(assembly, {
-            stroke: 'white'
-        })
-    }
-}
-
-const generate = (raw, debug) => {
-
-    console.log('Interpreting the input...')
-    let input
-    try {
-        input = jsyaml.safeLoad(raw)
-        console.log('YAML input format detected.')
-    } catch (yamlex) {
-        try {
-            input = JSON.parse(raw)
-            console.log('JSON input format detected.')
-        } catch (jsonex) {
-            try {
-                input = new Function(raw)()
-                console.log('JS code input format detected.')
-            } catch (codeex) {
-                console.log('YAML exception:', yamlex)
-                console.log('JSON exception:', jsonex)
-                console.log('Code exception:', codeex)
-                throw new Error('Input is not valid YAML, JSON, or JS code!')
-            }
-        }
-    }
-    if (!input) {
-        throw new Error('Input appears to be empty!')
-    }
-    if (!input.points) {
-        throw new Error('Input does not contain any points!')
-    }
-    console.log('Loaded input:', input)
-
-
-    const logger = m => console.log(m)
-    const res = ergogen.process(input, debug, logger)
-
-    return {
-        raw,
-        canonical: input,
-        points: res.points,
-        outlines: res.outlines,
-        pcbs: res.pcbs,
-        cases: res.cases
-    }
-}
 
 const zipup = results => {
     const zip = new JSZip()
-    const zip_source = zip.folder('source')
-    zip_source.file('raw.txt', results.raw)
-    zip_source.file('canonical.yaml', jsyaml.dump(results.canonical, {indent: 4}))
+
+    if (debug) {
+        const zip_source = zip.folder('source')
+        zip_source.file('raw.txt', results.raw)
+        zip_source.file('canonical.yaml', jsyaml.dump(results.canonical, {indent: 4}))
+    }
 
     if (debug) {
         const zip_points = zip.folder('points')
-        zip_points.file('demo.dxf', drawing(ergogen.visualize(results.points.data)))
-        zip_points.file('points.yaml', jsyaml.dump(results.points.data, {indent: 4}))
+        zip_points.file('demo.dxf', results.demo.dxf)
+        zip_points.file('demo.svg', results.demo.svg)
+        zip_points.file('demo.yaml', jsyaml.dump(results.demo.yaml, {indent: 4}))
+        zip_points.file('points.yaml', jsyaml.dump(results.points, {indent: 4}))
+        zip_points.file('units.yaml', jsyaml.dump(results.units, {indent: 4}))
     }
 
     const zip_outlines = zip.folder('outlines')
     for (const [name, outline] of Object.entries(results.outlines)) {
-        zip_outlines.file(`${name}.dxf`, drawing(outline))
-    }
-    
-    const zip_pcbs = zip.folder('pcbs')
-    for (const [pcb_name, pcb_text] of Object.entries(results.pcbs)) {
-        zip_pcbs.file(`${pcb_name}.kicad_pcb`, pcb_text)
+        zip_outlines.file(`${name}.dxf`, outline.dxf)
+        zip_outlines.file(`${name}.svg`, outline.svg)
+        zip_outlines.file(`${name}.yaml`, jsyaml.dump(outline.yaml, {indent: 4}))
     }
     
     const zip_cases = zip.folder('cases')
-    for (const [case_name, case_text] of Object.entries(results.cases)) {
-        zip_cases.file(`${case_name}.jscad`, case_text)
+    for (const [case_name, _case] of Object.entries(results.cases)) {
+        zip_cases.file(`${case_name}.stl`, _case.stl)
+        zip_cases.file(`${case_name}.jscad`, _case.jscad)
+    }
+
+    const zip_pcbs = zip.folder('pcbs')
+    for (const [pcb_name, pcb_text] of Object.entries(results.pcbs)) {
+        zip_pcbs.file(`${pcb_name}.kicad_pcb`, pcb_text)
     }
 
     zip.generateAsync({type: 'blob'}).then(function(content) {
@@ -223,7 +169,7 @@ const svg_callback = svg_text => _ => {
 }
 
 let jscad_inited = false
-const jscad_callback = val => {
+const jscad_callback = val => _ => {
     if (!jscad_inited) {
         window.gProcessor = myjscad.setup()
         jscad_inited = true
@@ -287,11 +233,12 @@ $(function() {
         $res.removeClass('d-none').empty()
         msg('warning', 'Generating...').appendTo($res)
 
-        setTimeout(function() {
+        setTimeout(async function() {
 
             try {
 
-                const results = generate(raw, debug)
+                const results = await ergogen.process(raw, debug, m => console.log(m))
+                console.log('Ergogen processing finished.', results)
                 $res.empty()
                 const con = ' in the console'
 
@@ -307,31 +254,31 @@ $(function() {
                     make_row('source', 'canonical', 'yaml', jsyaml.dump(results.canonical, {indent: 4}), yaml_callback, con).appendTo($tbody)
                     make_divider().appendTo($tbody)
                 
-                    const points_demo = ergogen.visualize(results.points.data)
-                    make_row('points', 'demo', 'dxf', drawing(points_demo), svg_callback(drawing(points_demo, 'svg'))).appendTo($tbody)
-                    make_row('points', 'points', 'yaml', jsyaml.dump(results.points.data, {indent: 4}), yaml_callback, con).appendTo($tbody)
+                    make_row('points', 'demo', 'dxf', results.demo.dxf, svg_callback(results.demo.svg)).appendTo($tbody)
+                    make_row('points', 'points', 'yaml', jsyaml.dump(results.points, {indent: 4}), yaml_callback, con).appendTo($tbody)
+                    make_row('points', 'units', 'yaml', jsyaml.dump(results.units, {indent: 4}), yaml_callback, con).appendTo($tbody)
                     make_divider().appendTo($tbody)
                 }
                 
                 for (const [name, outline] of Object.entries(results.outlines)) {
-                    make_row('outlines', name, 'dxf', drawing(outline), svg_callback(drawing(outline, 'svg'))).appendTo($tbody)
+                    empty_res = false
+                    make_row('outlines', name, 'dxf', outline.dxf, svg_callback(outline.svg)).appendTo($tbody)
                 }
                 if (Object.entries(results.outlines).length) {
+                    make_divider().appendTo($tbody)
+                }
+
+                for (const [case_name, _case] of Object.entries(results.cases)) {
                     empty_res = false
+                    make_row('cases', case_name, 'jscad', _case.stl, jscad_callback(_case.jscad)).appendTo($tbody)
+                }
+                if (Object.entries(results.cases).length) {
                     make_divider().appendTo($tbody)
                 }
                 
                 for (const [pcb_name, pcb_text] of Object.entries(results.pcbs)) {
+                    empty_res = false
                     make_row('pcbs', pcb_name, 'kicad_pcb', pcb_text, text_callback, con).appendTo($tbody)
-                }
-                if (Object.entries(results.pcbs).length) {
-                    empty_res = false
-                    make_divider().appendTo($tbody)
-                }
-                
-                for (const [case_name, case_text] of Object.entries(results.cases)) {
-                    empty_res = false
-                    make_row('cases', case_name, 'jscad', case_text, jscad_callback).appendTo($tbody)
                 }
                 
                 // everything as a zip

@@ -46644,7 +46644,7 @@ function Processor(containerdiv, options) {
     debug: false,
     libraries: [],
     openJsCadPath: '',
-    useAsync: true,
+    useAsync: false, // myjscad mod: turned this off, so that it works synchronously!
     useSync: true,
     viewer: {}
     // apply all options found
@@ -47202,6 +47202,10 @@ Processor.prototype = {
     return convertToBlob(prepareOutput(objects, { format: format }));
   },
 
+  myjscad_generate_output: function(format) {
+    return prepareOutput(this.currentObjects, { format: format })
+  },
+
   formatInfo: function formatInfo(format) {
     return this.formats[format];
   },
@@ -47463,12 +47467,40 @@ function init() {
 
   window.myjscad = window.myjscad || {}
   window.myjscad.setup = function() {
-    gProcessor = new Processor(viewer);
+    if (!gProcessor) {
+      gProcessor = new Processor(viewer);
+    }
     return gProcessor;
   }
 
   window.myjscad.load = function(code, name) {
     gProcessor.setJsCad(code, name);
+  }
+
+  // interface for the `@jscad/openjscad` package
+  window.myjscad.compile = function(code) {
+    window.myjscad.setup()
+    window.myjscad.load(code, 'dummy')
+    // the geometry is now stored in the processor
+    // so the following call to `generateOutput` will have access to it anyway
+    // we can return any dummy value, as long as we do it wrapped in a Promise
+    return new Promise((resolve, reject) => { resolve('dummy') })
+  }
+  
+  window.myjscad.generateOutput = function(format, geometry) {
+    const result = gProcessor.myjscad_generate_output(format)
+    // the original call is
+    // jscad.generateOutput('stla', compiled).asBuffer().toString()
+    // so we shim this by returning something that can be handled exactly this way
+    return {
+      asBuffer: () => {
+        return {
+          toString: () => {
+            return result.data[0]
+          }
+        }
+      }
+    }
   }
 }
 
