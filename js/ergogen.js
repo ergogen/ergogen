@@ -1,16 +1,21 @@
 /*!
- * ergogen v2.0.0
+ * Ergogen v3.0.0
  * https://zealot.hu/ergogen
  */
 
 (function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('makerjs'), require('mathjs')) :
-	typeof define === 'function' && define.amd ? define(['makerjs', 'mathjs'], factory) :
-	(global = global || self, global.ergogen = factory(global.makerjs, global.math));
-}(this, (function (makerjs, mathjs) { 'use strict';
+	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('makerjs'), require('js-yaml'), require('@jscad/openjscad'), require('mathjs'), require('kle-serial')) :
+	typeof define === 'function' && define.amd ? define(['makerjs', 'js-yaml', '@jscad/openjscad', 'mathjs', 'kle-serial'], factory) :
+	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.ergogen = factory(global.makerjs, global.jsyaml, global.myjscad, global.math, global.kle));
+}(this, (function (makerjs, jsYaml, openjscad, mathjs, kleSerial) { 'use strict';
 
-	makerjs = makerjs && Object.prototype.hasOwnProperty.call(makerjs, 'default') ? makerjs['default'] : makerjs;
-	mathjs = mathjs && Object.prototype.hasOwnProperty.call(mathjs, 'default') ? mathjs['default'] : mathjs;
+	function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
+
+	var makerjs__default = /*#__PURE__*/_interopDefaultLegacy(makerjs);
+	var jsYaml__default = /*#__PURE__*/_interopDefaultLegacy(jsYaml);
+	var openjscad__default = /*#__PURE__*/_interopDefaultLegacy(openjscad);
+	var mathjs__default = /*#__PURE__*/_interopDefaultLegacy(mathjs);
+	var kleSerial__default = /*#__PURE__*/_interopDefaultLegacy(kleSerial);
 
 	function createCommonjsModule(fn, basedir, module) {
 		return module = {
@@ -32,7 +37,7 @@
 	    return JSON.parse(JSON.stringify(value))
 	};
 
-	const deep = exports.deep = (obj, key, val) => {
+	exports.deep = (obj, key, val) => {
 	    const levels = key.split('.');
 	    const last = levels.pop();
 	    let step = obj;
@@ -50,11 +55,11 @@
 	};
 
 	const line = exports.line = (a, b) => {
-	    return new makerjs.paths.Line(a, b)
+	    return new makerjs__default['default'].paths.Line(a, b)
 	};
 
 	exports.circle = (p, r) => {
-	    return {paths: {circle: new makerjs.paths.Circle(p, r)}}
+	    return {paths: {circle: new makerjs__default['default'].paths.Circle(p, r)}}
 	};
 
 	exports.rect = (w, h, o=[0, 0]) => {
@@ -64,7 +69,7 @@
 	        bottom: line([w, 0], [0, 0]),
 	        left:   line([0, 0], [0, h])
 	    };
-	    return makerjs.model.move({paths: res}, o)
+	    return makerjs__default['default'].model.move({paths: res}, o)
 	};
 
 	exports.poly = (arr) => {
@@ -84,19 +89,19 @@
 	const farPoint = [1234.1234, 2143.56789];
 
 	exports.union = (a, b) => {
-	    return makerjs.model.combine(a, b, false, true, false, true, {
+	    return makerjs__default['default'].model.combine(a, b, false, true, false, true, {
 	        farPoint
 	    })
 	};
 
 	exports.subtract = (a, b) => {
-	    return makerjs.model.combine(a, b, false, true, true, false, {
+	    return makerjs__default['default'].model.combine(a, b, false, true, true, false, {
 	        farPoint
 	    })
 	};
 
 	exports.intersect = (a, b) => {
-	    return makerjs.model.combine(a, b, true, false, true, false, {
+	    return makerjs__default['default'].model.combine(a, b, true, false, true, false, {
 	        farPoint
 	    })
 	};
@@ -135,7 +140,7 @@
 
 	    shift(s, relative=true) {
 	        if (relative) {
-	            s = makerjs.point.rotate(s, this.r);
+	            s = makerjs__default['default'].point.rotate(s, this.r);
 	        }
 	        this.x += s[0];
 	        this.y += s[1];
@@ -143,7 +148,7 @@
 	    }
 
 	    rotate(angle, origin=[0, 0]) {
-	        this.p = makerjs.point.rotate(this.p, angle, origin);
+	        this.p = makerjs__default['default'].point.rotate(this.p, angle, origin);
 	        this.r += angle;
 	        return this
 	    }
@@ -164,7 +169,7 @@
 	    }
 
 	    position(model) {
-	        return makerjs.model.moveRelative(makerjs.model.rotate(model, this.r), this.p)
+	        return makerjs__default['default'].model.moveRelative(makerjs__default['default'].model.rotate(model, this.r), this.p)
 	    }
 
 	    rect(size=14) {
@@ -175,7 +180,7 @@
 
 	var assert_1 = createCommonjsModule(function (module, exports) {
 	const mathnum = exports.mathnum = raw => units => {
-	    return mathjs.evaluate(`${raw}`, units || {})
+	    return mathjs__default['default'].evaluate(`${raw}`, units || {})
 	};
 
 	const assert = exports.assert = (exp, msg) => {
@@ -200,14 +205,14 @@
 	    return val
 	};
 
-	const detect_unexpected = exports.detect_unexpected = (obj, name, expected) => {
+	exports.unexpected = (obj, name, expected) => {
 	    const sane_obj = sane(obj, name, 'object')();
 	    for (const key of Object.keys(sane_obj)) {
 	        assert(expected.includes(key), `Unexpected key "${key}" within field "${name}"!`);
 	    }
 	};
 
-	const _in = exports.in = (raw, name, arr) => {
+	exports.in = (raw, name, arr) => {
 	    assert(arr.includes(raw), `Field "${name}" should be one of [${arr.join(', ')}]!`);
 	    return raw
 	};
@@ -224,11 +229,11 @@
 	};
 
 	const numarr = exports.numarr = (raw, name, length) => units => arr(raw, name, length, 'number', 0)(units);
-	const strarr = exports.strarr = (raw, name) => arr(raw, name, 0, 'string', '')();
+	exports.strarr = (raw, name) => arr(raw, name, 0, 'string', '')();
 
 	const xy = exports.xy = (raw, name) => units => numarr(raw, name, 2)(units);
 
-	const wh = exports.wh = (raw, name) => units => {
+	exports.wh = (raw, name) => units => {
 	    if (!Array.isArray(raw)) raw = [raw, raw];
 	    return xy(raw, name)(units)
 	};
@@ -239,6 +244,161 @@
 	    return numarr(raw, name, 4, 'number', 0)(units)
 	};
 	});
+
+	var convert = (config, logger) => {
+	    const keyboard = kleSerial__default['default'].Serial.deserialize(config);
+	    const result = {points: {zones: {}}, pcbs: {main: {}}};
+
+	    // if the keyboard notes are valid YAML/JSON, they get added to each key as metadata
+	    let meta;
+	    try {
+	        meta = jsYaml__default['default'].load(keyboard.meta.notes);
+	    } catch (ex) {
+	        // notes were not valid YAML/JSON, oh well...
+	    }
+	    meta = meta || {};
+
+	    let index = 1;
+	    for (const key of keyboard.keys) {
+	        const id = `key${index++}`;
+	        const colid = `${id}col`;
+	        const rowid = `${id}row`;
+	        // we try to look at the first non-empty label
+	        const label = key.labels.filter(e => !!e)[0] || ''; 
+
+	        // PCB nets can be specified through key labels
+	        let row_net = id;
+	        let col_net = 'GND';
+	        if (label.match(/^\d+_\d+$/)) {
+	            const parts = label.split('_');
+	            row_net = `row_${parts[0]}`;
+	            col_net = `col_${parts[1]}`;
+	        }
+
+	        // need to account for keycap sizes, as KLE anchors
+	        // at the corners, while we consider the centers
+	        const x = key.x + (key.width - 1) / 2;
+	        const y = key.y + (key.height - 1) / 2;
+	        
+	        // KLE deals in absolute rotation origins so we calculate
+	        // a relative difference as an origin for the column rotation
+	        // again, considering corner vs. center with the extra half width/height
+	        const diff_x = key.rotation_x - (key.x + key.width / 2);
+	        const diff_y = key.rotation_y - (key.y + key.height / 2);
+
+	        // anchoring the per-key zone to the KLE-computed coords
+	        const converted = {
+	            anchor: {
+	                shift: [`${x} u`, `${-y} u`],
+	            },
+	            columns: {}
+	        };
+	        
+	        // adding a column-level rotation with origin
+	        converted.columns[colid] = {
+	            rotate: -key.rotation_angle,
+	            origin: [`${diff_x} u`, `${-diff_y} u`],
+	            rows: {}
+	        };
+	        
+	        // passing along metadata to each key
+	        converted.columns[colid].rows[rowid] = utils.deepcopy(meta);
+	        converted.columns[colid].rows[rowid].width = key.width;
+	        converted.columns[colid].rows[rowid].height = key.height;
+	        converted.columns[colid].rows[rowid].label = label;
+	        converted.columns[colid].rows[rowid].column_net = col_net;
+	        converted.columns[colid].rows[rowid].row_net = row_net;
+	        
+	        result.points.zones[id] = converted;
+	    }
+
+	    return result
+	};
+
+	var kle_1 = {
+		convert: convert
+	};
+
+	var interpret = (raw, logger) => {
+	    let config = raw;
+	    let format = 'OBJ';
+	    if (assert_1.type(raw)() == 'string') {
+	        try {
+	            config = jsYaml__default['default'].safeLoad(raw);
+	            format = 'YAML';
+	        } catch (yamlex) {
+	            try {
+	                config = new Function(raw)();
+	                assert_1.assert(
+	                    assert_1.type(config)() == 'object',
+	                    'Input JS Code doesn\'t resolve into an object!'
+	                );
+	                format = 'JS';
+	            } catch (codeex) {
+	                logger('YAML exception:', yamlex);
+	                logger('Code exception:', codeex);
+	                throw new Error('Input is not valid YAML, JSON, or JS Code!')
+	            }
+	        }
+	    }
+	    
+	    try {
+	        // assume it's KLE and try to convert it
+	        config = kle_1.convert(config, logger);
+	        format = 'KLE';
+	    } catch (kleex) {
+	        // nope... nevermind
+	    }
+
+	    if (assert_1.type(config)() != 'object') {
+	        throw new Error('Input doesn\'t resolve into an object!')
+	    }
+
+	    if (!Object.keys(config).length) {
+	        throw new Error('Input appears to be empty!')
+	    }
+
+	    return [config, format]
+	};
+
+	var twodee = (model, debug) => {
+	    const assembly = makerjs__default['default'].model.originate({
+	        models: {
+	            export: utils.deepcopy(model)
+	        },
+	        units: 'mm'
+	    });
+
+	    const result = {
+	        dxf: makerjs__default['default'].exporter.toDXF(assembly),
+	    };
+	    if (debug) {
+	        result.yaml = assembly;
+	        result.svg = makerjs__default['default'].exporter.toSVG(assembly);
+	    }
+	    return result
+	};
+
+	var threedee = async (script, debug) => {
+	    const compiled = await new Promise((resolve, reject) => {
+	        openjscad__default['default'].compile(script, {}).then(compiled => {
+	            resolve(compiled);
+	        });
+	    });
+	    const result = {
+	        stl: openjscad__default['default'].generateOutput('stla', compiled).asBuffer().toString()
+	    };
+	    if (debug) {
+	        result.jscad = script;
+	    }
+	    return result
+	};
+
+	var io = {
+		interpret: interpret,
+		twodee: twodee,
+		threedee: threedee
+	};
 
 	var prepare = createCommonjsModule(function (module, exports) {
 	const _extend = exports._extend = (to, from) => {
@@ -350,17 +510,51 @@
 	});
 	});
 
-	var anchor_1 = createCommonjsModule(function (module) {
-	const anchor = module.exports = (raw, name, points={}, check_unexpected=true, default_point=new point()) => units => {
+	const default_units = {
+	    u: 19,
+	    cx: 18,
+	    cy: 17
+	};
+
+	var parse$1 = (config = {}) => {
+	    const raw_units = prepare.extend(
+	        default_units,
+	        assert_1.sane(config.units || {}, 'units', 'object')(),
+	        assert_1.sane(config.variables || {}, 'variables', 'object')()
+	    );
+	    const units = {};
+	    for (const [key, val] of Object.entries(raw_units)) {
+	        units[key] = assert_1.mathnum(val)(units);
+	    }
+	    return units
+	};
+
+	var units = {
+		parse: parse$1
+	};
+
+	var anchor_1 = createCommonjsModule(function (module, exports) {
+	const mirror_ref = exports.mirror = (ref, mirror) => {
+	    if (mirror) {
+	        if (ref.startsWith('mirror_')) {
+	            return ref.substring(7)
+	        } else {
+	            return 'mirror_' + ref
+	        }
+	    }
+	    return ref
+	};
+
+	const anchor = exports.parse = (raw, name, points={}, check_unexpected=true, default_point=new point(), mirror=false) => units => {
 	    if (assert_1.type(raw)() == 'array') {
 	        // recursive call with incremental default_point mods, according to `affect`s
-	        let current = () => default_point.clone();
+	        let current = default_point.clone();
 	        for (const step of raw) {
-	            current = anchor(step, name, points, check_unexpected, current(units));
+	            current = anchor(step, name, points, check_unexpected, current, mirror)(units);
 	        }
 	        return current
 	    }
-	    if (check_unexpected) assert_1.detect_unexpected(raw, name, ['ref', 'orient', 'shift', 'rotate', 'affect']);
+	    if (check_unexpected) assert_1.unexpected(raw, name, ['ref', 'orient', 'shift', 'rotate', 'affect']);
 	    let point$1 = default_point.clone();
 	    if (raw.ref !== undefined) {
 	        if (assert_1.type(raw.ref)() == 'array') {
@@ -368,42 +562,43 @@
 	            let x = 0, y = 0, r = 0;
 	            const len = raw.ref.length;
 	            for (const ref of raw.ref) {
-	                assert_1.assert(points[ref], `Unknown point reference "${ref}" in anchor "${name}"!`);
-	                const resolved = points[ref];
+	                const parsed_ref = mirror_ref(ref, mirror);
+	                assert_1.assert(points[parsed_ref], `Unknown point reference "${parsed_ref}" in anchor "${name}"!`);
+	                const resolved = points[parsed_ref];
 	                x += resolved.x;
 	                y += resolved.y;
 	                r += resolved.r;
 	            }
 	            point$1 = new point(x / len, y / len, r / len);
 	        } else {
-	            assert_1.assert(points[raw.ref], `Unknown point reference "${raw.ref}" in anchor "${name}"!`);
-	            point$1 = points[raw.ref].clone();
+	            const parsed_ref = mirror_ref(raw.ref, mirror);
+	            assert_1.assert(points[parsed_ref], `Unknown point reference "${parsed_ref}" in anchor "${name}"!`);
+	            point$1 = points[parsed_ref].clone();
 	        }
 	    }
 	    if (raw.orient !== undefined) {
-	        point$1.r += assert_1.sane(raw.orient || 0, `${name}.orient`, 'number')(units);
+	        point$1.r += assert_1.sane(raw.orient, `${name}.orient`, 'number')(units);
 	    }
 	    if (raw.shift !== undefined) {
-	        let xyval = assert_1.wh(raw.shift || [0, 0], `${name}.shift`)(units);
+	        let xyval = assert_1.wh(raw.shift, `${name}.shift`)(units);
 	        if (point$1.meta.mirrored) {
 	            xyval[0] = -xyval[0];
 	        }
 	        point$1.shift(xyval, true);
 	    }
 	    if (raw.rotate !== undefined) {
-	        point$1.r += assert_1.sane(raw.rotate || 0, `${name}.rotate`, 'number')(units);
+	        point$1.r += assert_1.sane(raw.rotate, `${name}.rotate`, 'number')(units);
 	    }
 	    if (raw.affect !== undefined) {
 	        const candidate = point$1;
 	        point$1 = default_point.clone();
-	        const valid_affects = ['x', 'y', 'r'];
-	        let affect = raw.affect || valid_affects;
+	        let affect = raw.affect;
 	        if (assert_1.type(affect)() == 'string') affect = affect.split('');
 	        affect = assert_1.strarr(affect, `${name}.affect`);
 	        let i = 0;
-	        for (const a of affect) {
-	            a._in(a, `${name}.affect[${++i}]`, valid_affects);
-	            point$1[a] = candidate[a];
+	        for (const aff of affect) {
+	            assert_1.in(aff, `${name}.affect[${++i}]`, ['x', 'y', 'r']);
+	            point$1[aff] = candidate[aff];
 	        }
 	    }
 	    return point$1
@@ -414,7 +609,7 @@
 	const push_rotation = exports._push_rotation = (list, angle, origin) => {
 	    let candidate = origin;
 	    for (const r of list) {
-	        candidate = makerjs.point.rotate(candidate, r.angle, r.origin);
+	        candidate = makerjs__default['default'].point.rotate(candidate, r.angle, r.origin);
 	    }
 	    list.push({
 	        angle: angle,
@@ -426,7 +621,7 @@
 
 	    // zone-wide sanitization
 
-	    assert_1.detect_unexpected(zone, `points.zones.${zone_name}`, ['columns', 'rows', 'key']);
+	    assert_1.unexpected(zone, `points.zones.${zone_name}`, ['columns', 'rows', 'key']);
 	    // the anchor comes from "above", because it needs other zones too (for references)
 	    const cols = assert_1.sane(zone.columns || {}, `points.zones.${zone_name}.columns`, 'object')();
 	    const zone_wide_rows = assert_1.sane(zone.rows || {}, `points.zones.${zone_name}.rows`, 'object')();
@@ -447,6 +642,9 @@
 
 	    // column layout
 
+	    if (!Object.keys(cols).length) {
+	        cols.default = {};
+	    }
 	    let first_col = true;
 	    for (let [col_name, col] of Object.entries(cols)) {
 
@@ -454,7 +652,7 @@
 
 	        col = col || {};
 
-	        assert_1.detect_unexpected(
+	        assert_1.unexpected(
 	            col,
 	            `points.zones.${zone_name}.columns.${col_name}`,
 	            ['stagger', 'spread', 'rotate', 'origin', 'rows', 'row_overrides', 'key']
@@ -598,7 +796,7 @@
 	        const mirror_obj = assert_1.sane(config || {}, name, 'object')();
 	        const distance = assert_1.sane(mirror_obj.distance || 0, `${name}.distance`, 'number')(units);
 	        delete mirror_obj.distance;
-	        let axis = anchor_1(mirror_obj, name, points)(units).x;
+	        let axis = anchor_1.parse(mirror_obj, name, points)(units).x;
 	        axis += distance / 2;
 	        return axis
 	    } else return config
@@ -622,22 +820,11 @@
 	    return ['', null]
 	};
 
-	exports.parse = (config = {}) => {
-
-	    // parsing units
-	    const raw_units = prepare.extend({
-	        u: 19,
-	        cx: 18,
-	        cy: 17
-	    }, assert_1.sane(config.units || {}, 'points.units', 'object')());
-	    const units = {};
-	    for (const [key, val] of Object.entries(raw_units)) {
-	        units[key] = assert_1.mathnum(val)(units);
-	    }
+	exports.parse = (config, units) => {
 
 	    // config sanitization
-	    assert_1.detect_unexpected(config, 'points', ['units', 'zones', 'key', 'rotate', 'mirror']);
-	    const zones = assert_1.sane(config.zones || {}, 'points.zones', 'object')();
+	    assert_1.unexpected(config, 'points', ['zones', 'key', 'rotate', 'mirror']);
+	    const zones = assert_1.sane(config.zones, 'points.zones', 'object')();
 	    const global_key = assert_1.sane(config.key || {}, 'points.key', 'object')();
 	    const global_rotate = assert_1.sane(config.rotate || 0, 'points.rotate', 'number')(units);
 	    const global_mirror = config.mirror;
@@ -650,7 +837,7 @@
 	    for (let [zone_name, zone] of Object.entries(zones)) {
 
 	        // extracting keys that are handled here, not at the zone render level
-	        const anchor = anchor_1(zone.anchor || {}, `points.zones.${zone_name}.anchor`, all_points)(units);
+	        const anchor = anchor_1.parse(zone.anchor || {}, `points.zones.${zone_name}.anchor`, all_points)(units);
 	        const rotate = assert_1.sane(zone.rotate || 0, `points.zones.${zone_name}.rotate`, 'number')(units);
 	        const mirror = zone.mirror;
 	        delete zone.anchor;
@@ -724,14 +911,14 @@
 	    }
 
 	    // done
-	    return [filtered, units]
+	    return filtered
 	};
 
-	exports.visualize = (points) => {
+	exports.visualize = (points, units) => {
 	    const models = {};
 	    for (const [pname, p] of Object.entries(points)) {
-	        const w = (p.meta.width * 19) - 1;
-	        const h = (p.meta.height * 19) - 1;
+	        const w = (p.meta.width * units.u) - 1;
+	        const h = (p.meta.height * units.u) - 1;
 	        const rect = utils.rect(w, h, [-w/2, -h/2]);
 	        models[pname] = p.position(rect);
 	    }
@@ -770,10 +957,21 @@
 	    const ch = h - mod;
 	    assert_1.assert(ch >= 0, error('tall', h));
 
-	    let res = new makerjs.models.Rectangle(cw, ch);
-	    if (bevel > 0) res = makerjs.model.outline(res, bevel, 2);
-	    if (corner > 0) res = makerjs.model.outline(res, corner, 0);
-	    return makerjs.model.moveRelative(res, [corner + bevel, corner + bevel])
+	    let res = new makerjs__default['default'].models.Rectangle(cw, ch);
+	    if (bevel) {
+	        res = utils.poly([
+	            [-bevel, 0],
+	            [-bevel, ch],
+	            [0, ch + bevel],
+	            [cw, ch + bevel],
+	            [cw + bevel, ch],
+	            [cw + bevel, 0],
+	            [cw, -bevel],
+	            [0, -bevel]
+	        ]);
+	    }
+	    if (corner > 0) res = makerjs__default['default'].model.outline(res, corner, 0);
+	    return makerjs__default['default'].model.moveRelative(res, [corner + bevel, corner + bevel])
 	};
 
 	const layout = exports._layout = (config = {}, points = {}, units = {}) => {
@@ -782,13 +980,13 @@
 
 	    const parsed_glue = utils.deepcopy(assert_1.sane(config, 'outlines.glue', 'object')());
 	    for (let [gkey, gval] of Object.entries(parsed_glue)) {
-	        assert_1.detect_unexpected(gval, `outlines.glue.${gkey}`, ['top', 'bottom', 'waypoints', 'extra']);
+	        assert_1.unexpected(gval, `outlines.glue.${gkey}`, ['top', 'bottom', 'waypoints', 'extra']);
 	    
 	        for (const y of ['top', 'bottom']) {
-	            assert_1.detect_unexpected(gval[y], `outlines.glue.${gkey}.${y}`, ['left', 'right']);
-	            gval[y].left = anchor_1(gval[y].left, `outlines.glue.${gkey}.${y}.left`, points);
+	            assert_1.unexpected(gval[y], `outlines.glue.${gkey}.${y}`, ['left', 'right']);
+	            gval[y].left = anchor_1.parse(gval[y].left, `outlines.glue.${gkey}.${y}.left`, points);
 	            if (assert_1.type(gval[y].right)(units) != 'number') {
-	                gval[y].right = anchor_1(gval[y].right, `outlines.glue.${gkey}.${y}.right`, points);
+	                gval[y].right = anchor_1.parse(gval[y].right, `outlines.glue.${gkey}.${y}.right`, points);
 	            }
 	        }
 	    
@@ -796,7 +994,7 @@
 	        let wi = 0;
 	        gval.waypoints = gval.waypoints.map(w => {
 	            const name = `outlines.glue.${gkey}.waypoints[${++wi}]`;
-	            assert_1.detect_unexpected(w, name, ['percent', 'width']);
+	            assert_1.unexpected(w, name, ['percent', 'width']);
 	            w.percent = assert_1.sane(w.percent, name + '.percent', 'number')(units);
 	            w.width = assert_1.wh(w.width, name + '.width')(units);
 	            return w
@@ -812,7 +1010,7 @@
 
 	        // Layout params sanitization
 
-	        assert_1.detect_unexpected(params, `${export_name}`, expected.concat(['side', 'tags', 'glue', 'size', 'corner', 'bevel', 'bound']));
+	        assert_1.unexpected(params, `${export_name}`, expected.concat(['side', 'tags', 'glue', 'size', 'corner', 'bevel', 'bound']));
 	        const size = assert_1.wh(params.size, `${export_name}.size`)(units);
 	        const relative_units = prepare.extend({
 	            sx: size[0],
@@ -847,7 +1045,7 @@
 
 	                // the original position
 	                let rect = rectangle(to_x - from_x, to_y - from_y, corner, bevel, `${export_name}.size`);
-	                rect = makerjs.model.moveRelative(rect, [from_x, from_y]);
+	                rect = makerjs__default['default'].model.moveRelative(rect, [from_x, from_y]);
 
 	                // extra binding "material", if necessary
 	                if (bound) {
@@ -893,7 +1091,7 @@
 	                    return utils.line([anchor, -1000], [anchor, 1000])
 	                }
 
-	                // if it wasn't a number, then it's a (possibly relative) achor
+	                // if it wasn't a number, then it's a (possibly relative) anchor
 	                const from = anchor(relative_units).clone();
 	                const to = from.clone().shift([from.meta.mirrored ? -1 : 1, 0]);
 
@@ -902,7 +1100,7 @@
 
 	            const tll = get_line(glue_def.top.left);
 	            const trl = get_line(glue_def.top.right);
-	            const tip = makerjs.path.converge(tll, trl);
+	            const tip = makerjs__default['default'].path.converge(tll, trl);
 	            if (!tip) {
 	                throw new Error(`Top lines don't intersect in glue "${computed_glue_name}"!`)
 	            }
@@ -911,7 +1109,7 @@
 	    
 	            const bll = get_line(glue_def.bottom.left);
 	            const brl = get_line(glue_def.bottom.right);
-	            const bip = makerjs.path.converge(bll, brl);
+	            const bip = makerjs__default['default'].path.converge(bll, brl);
 	            if (!bip) {
 	                throw new Error(`Bottom lines don't intersect in glue "${computed_glue_name}"!`)
 	            }
@@ -961,7 +1159,7 @@
 	};
 
 	exports.parse = (config = {}, points = {}, units = {}) => {
-	    assert_1.detect_unexpected(config, 'outline', ['glue', 'exports']);
+	    assert_1.unexpected(config, 'outline', ['glue', 'exports']);
 	    const layout_fn = layout(config.glue, points, units);
 
 	    const outlines = {};
@@ -989,62 +1187,83 @@
 
 	            let arg;
 	            let anchor;
+	            const anchor_def = part.anchor || {};
 	            switch (part.type) {
 	                case 'keys':
 	                    arg = layout_fn(part, name, expected);
 	                    break
 	                case 'rectangle':
-	                    assert_1.detect_unexpected(part, name, expected.concat(['ref', 'shift', 'rotate', 'size', 'corner', 'bevel', 'mirror']));
+	                    assert_1.unexpected(part, name, expected.concat(['anchor', 'size', 'corner', 'bevel', 'mirror']));
 	                    const size = assert_1.wh(part.size, `${name}.size`)(units);
 	                    const rec_units = prepare.extend({
 	                        sx: size[0],
 	                        sy: size[1]
 	                    }, units);
-	                    anchor = anchor_1(part, name, points, false)(rec_units);
+	                    anchor = anchor_1.parse(anchor_def, `${name}.anchor`, points)(rec_units);
 	                    const corner = assert_1.sane(part.corner || 0, `${name}.corner`, 'number')(rec_units);
 	                    const bevel = assert_1.sane(part.bevel || 0, `${name}.bevel`, 'number')(rec_units);
 	                    const rect_mirror = assert_1.sane(part.mirror || false, `${name}.mirror`, 'boolean')();
 	                    const rect = rectangle(size[0], size[1], corner, bevel, name);
 	                    arg = anchor.position(utils.deepcopy(rect));
 	                    if (rect_mirror) {
-	                        const mirror_part = utils.deepcopy(part);
-	                        assert_1.assert(mirror_part.ref, `Field "${name}.ref" must be speficied if mirroring is required!`);
-	                        mirror_part.ref = `mirror_${mirror_part.ref}`;
-	                        anchor = anchor_1(mirror_part, name, points, false)(rec_units);
-	                        const mirror_rect = makerjs.model.moveRelative(utils.deepcopy(rect), [-size[0], 0]);
+	                        const mirror_anchor = utils.deepcopy(anchor_def);
+	                        assert_1.assert(mirror_anchor.ref, `Field "${name}.anchor.ref" must be speficied if mirroring is required!`);
+	                        anchor = anchor_1.parse(mirror_anchor, `${name}.anchor --> mirror`, points, undefined, undefined, true)(rec_units);
+	                        const mirror_rect = makerjs__default['default'].model.moveRelative(utils.deepcopy(rect), [-size[0], 0]);
 	                        arg = utils.union(arg, anchor.position(mirror_rect));
 	                    }
 	                    break
 	                case 'circle':
-	                    assert_1.detect_unexpected(part, name, expected.concat(['ref', 'shift', 'rotate', 'radius', 'mirror']));
-	                    anchor = anchor_1(part, name, points, false)(units);
+	                    assert_1.unexpected(part, name, expected.concat(['anchor', 'radius', 'mirror']));
 	                    const radius = assert_1.sane(part.radius, `${name}.radius`, 'number')(units);
+	                    const circle_units = prepare.extend({
+	                        r: radius
+	                    }, units);
+	                    anchor = anchor_1.parse(anchor_def, `${name}.anchor`, points)(circle_units);
 	                    const circle_mirror = assert_1.sane(part.mirror || false, `${name}.mirror`, 'boolean')();
 	                    arg = utils.circle(anchor.p, radius);
 	                    if (circle_mirror) {
-	                        const mirror_part = utils.deepcopy(part);
-	                        assert_1.assert(mirror_part.ref, `Field "${name}.ref" must be speficied if mirroring is required!`);
-	                        mirror_part.ref = `mirror_${mirror_part.ref}`;
-	                        anchor = anchor_1(mirror_part, name, points, false)(units);
+	                        const mirror_anchor = utils.deepcopy(anchor_def);
+	                        assert_1.assert(mirror_anchor.ref, `Field "${name}.anchor.ref" must be speficied if mirroring is required!`);
+	                        anchor = anchor_1.parse(mirror_anchor, `${name}.anchor --> mirror`, points, undefined, undefined, true)(circle_units);
 	                        arg = utils.union(arg, utils.circle(anchor.p, radius));
 	                    }
 	                    break
 	                case 'polygon':
-	                    assert_1.detect_unexpected(part, name, expected.concat(['points']));
+	                    assert_1.unexpected(part, name, expected.concat(['points', 'mirror']));
 	                    const poly_points = assert_1.sane(part.points, `${name}.points`, 'array')();
+	                    const poly_mirror = assert_1.sane(part.mirror || false, `${name.mirror}`, 'boolean')();
 	                    const parsed_points = [];
+	                    const mirror_points = [];
+	                    let poly_mirror_x = 0;
 	                    let last_anchor = new point();
 	                    let poly_index = 0;
 	                    for (const poly_point of poly_points) {
 	                        const poly_name = `${name}.points[${++poly_index}]`;
-	                        const anchor = anchor_1(poly_point, poly_name, points, true, last_anchor)(units);
-	                        parsed_points.push(anchor.p);
+	                        if (poly_index == 1 && poly_mirror) {
+	                            assert_1.assert(poly_point.ref, `Field "${poly_name}.ref" must be speficied if mirroring is required!`);
+	                            const mirrored_ref = anchor_1.mirror(poly_point.ref, poly_mirror);
+	                            assert_1.assert(points[poly_point.ref], `Field "${poly_name}.ref" does not name an existing point!`);
+	                            assert_1.assert(points[mirrored_ref], `The mirror of field "${poly_name}.ref" ("${mirrored_ref}") does not name an existing point!`);
+	                            poly_mirror_x = (points[poly_point.ref].x + points[mirrored_ref].x) / 2;
+	                        }
+	                        last_anchor = anchor_1.parse(poly_point, poly_name, points, true, last_anchor)(units);
+	                        parsed_points.push(last_anchor.p);
+	                        mirror_points.push(last_anchor.clone().mirror(poly_mirror_x).p);
 	                    }
 	                    arg = utils.poly(parsed_points);
+	                    if (poly_mirror) {
+	                        arg = utils.union(arg, utils.poly(mirror_points));
+	                    }
 	                    break
 	                case 'outline':
+	                    assert_1.unexpected(part, name, expected.concat(['name', 'fillet']));
 	                    assert_1.assert(outlines[part.name], `Field "${name}.name" does not name an existing outline!`);
+	                    const fillet = assert_1.sane(part.fillet || 0, `${name}.fillet`, 'number')(units);
 	                    arg = utils.deepcopy(outlines[part.name]);
+	                    if (fillet) {
+	                        arg.models.fillets = makerjs__default['default'].chain.fillet(makerjs__default['default'].model.findSingleChain(arg), fillet);
+	                    }
 	                    break
 	                default:
 	                    throw new Error(`Field "${name}.type" (${part.type}) does not name a valid outline part type!`)
@@ -1053,8 +1272,8 @@
 	            result = op(result, arg);
 	        }
 
-	        makerjs.model.originate(result);
-	        makerjs.model.simplify(result);
+	        makerjs__default['default'].model.originate(result);
+	        makerjs__default['default'].model.simplify(result);
 	        outlines[key] = result;
 	    }
 
@@ -1117,7 +1336,7 @@
 	            }
 	            const part_qname = `cases.${case_name}.${part_name}`;
 	            const part_var = `${case_name}__part_${part_name}`;
-	            assert_1.detect_unexpected(part, part_qname, ['type', 'name', 'extrude', 'shift', 'rotate', 'operation']);
+	            assert_1.unexpected(part, part_qname, ['type', 'name', 'extrude', 'shift', 'rotate', 'operation']);
 	            const type = assert_1.in(part.type || 'outline', `${part_qname}.type`, ['outline', 'case']);
 	            const name = assert_1.sane(part.name, `${part_qname}.name`, 'string')();
 	            const shift = assert_1.numarr(part.shift || [0, 0, 0], `${part_qname}.shift`, 3)(units);
@@ -1130,7 +1349,7 @@
 	                const outline = outlines[name];
 	                assert_1.assert(outline, `Field "${part_qname}.name" does not name a valid outline!`);
 	                if (!scripts[name]) {
-	                    scripts[name] = makerjs.exporter.toJscadScript(outline, {
+	                    scripts[name] = makerjs__default['default'].exporter.toJscadScript(outline, {
 	                        functionName: `${name}_outline_fn`,
 	                        extrude: extrude,
 	                        indent: 4
@@ -1197,111 +1416,11 @@
 		parse: parse
 	};
 
-	var mx = {
-	  nets: ['from', 'to'],
-	  params: {
-	    class: 'S'
-	  },
-	  body: p => `
-
-    (module MX (layer F.Cu) (tedit 5DD4F656)
-
-      ${p.at /* parametric position */}
-
-      ${'' /* footprint reference */}
-      (fp_text reference "${p.ref}" (at 0 0) (layer F.SilkS) ${p.ref_hide} (effects (font (size 1.27 1.27) (thickness 0.15))))
-      (fp_text value "" (at 0 0) (layer F.SilkS) hide (effects (font (size 1.27 1.27) (thickness 0.15))))
-
-      ${''/* corner marks */}
-      (fp_line (start -7 -6) (end -7 -7) (layer Dwgs.User) (width 0.15))
-      (fp_line (start -7 7) (end -6 7) (layer Dwgs.User) (width 0.15))
-      (fp_line (start -6 -7) (end -7 -7) (layer Dwgs.User) (width 0.15))
-      (fp_line (start -7 7) (end -7 6) (layer Dwgs.User) (width 0.15))
-      (fp_line (start 7 6) (end 7 7) (layer Dwgs.User) (width 0.15))
-      (fp_line (start 7 -7) (end 6 -7) (layer Dwgs.User) (width 0.15))
-      (fp_line (start 6 7) (end 7 7) (layer Dwgs.User) (width 0.15))
-      (fp_line (start 7 -7) (end 7 -6) (layer Dwgs.User) (width 0.15))
-      
-      ${''/* pins */}
-      (pad 1 thru_hole circle (at 2.54 -5.08) (size 2.286 2.286) (drill 1.4986) (layers *.Cu *.Mask) ${p.net.from})
-      (pad 2 thru_hole circle (at -3.81 -2.54) (size 2.286 2.286) (drill 1.4986) (layers *.Cu *.Mask) ${p.net.to})
-
-      ${''/* middle shaft */}
-      (pad "" np_thru_hole circle (at 0 0) (size 3.9878 3.9878) (drill 3.9878) (layers *.Cu *.Mask))
-
-      ${''/* stabilizers */}
-      (pad "" np_thru_hole circle (at 5.08 0) (size 1.7018 1.7018) (drill 1.7018) (layers *.Cu *.Mask))
-      (pad "" np_thru_hole circle (at -5.08 0) (size 1.7018 1.7018) (drill 1.7018) (layers *.Cu *.Mask))
-    )
-
-  `
-	};
-
-	var mx_hotswap = {
-	    nets: ['from', 'to'],
-	    params: {
-	      class: 'S'
-	    },
-	    body: p => `
-  
-      (module MX_Hotswap (layer F.Cu) (tedit 5DD4F656)
-
-        ${p.at /* parametric position */}
-  
-        ${'' /* footprint reference */}
-        (fp_text reference "${p.ref}" (at 7.1 8.2) (layer F.SilkS) ${p.ref_hide} (effects (font (size 1.27 1.27) (thickness 0.15))))
-        (fp_text value "" (at 0 0) (layer F.SilkS) hide (effects (font (size 1.27 1.27) (thickness 0.15))))
-        
-        ${'' /* silk stuff */}
-        (fp_line (start -7 7) (end -6 7) (layer Dwgs.User) (width 0.15))
-        (fp_line (start 7 -7) (end 7 -6) (layer Dwgs.User) (width 0.15))
-        (fp_line (start -7 -7) (end -6 -7) (layer Dwgs.User) (width 0.15))
-        (fp_line (start 7 7) (end 7 6) (layer Dwgs.User) (width 0.15))
-        (fp_line (start 6 7) (end 7 7) (layer Dwgs.User) (width 0.15))
-        (fp_line (start -7 6) (end -7 7) (layer Dwgs.User) (width 0.15))
-        (fp_line (start 7 -7) (end 6 -7) (layer Dwgs.User) (width 0.15))
-        (fp_line (start -7 -6) (end -7 -7) (layer Dwgs.User) (width 0.15))
-        (fp_line (start -9.525 9.525) (end -9.525 -9.525) (layer Dwgs.User) (width 0.15))
-        (fp_line (start 9.525 9.525) (end -9.525 9.525) (layer Dwgs.User) (width 0.15))
-        (fp_line (start 9.525 -9.525) (end 9.525 9.525) (layer Dwgs.User) (width 0.15))
-        (fp_line (start -9.525 -9.525) (end 9.525 -9.525) (layer Dwgs.User) (width 0.15))
-        (fp_line (start -5.8 -4.05) (end -5.8 -4.7) (layer B.SilkS) (width 0.3))
-        (fp_line (start -5.3 -1.6) (end -5.3 -3.399999) (layer B.SilkS) (width 0.8))
-        (fp_line (start -4.17 -5.1) (end -4.17 -2.86) (layer B.SilkS) (width 3))
-        (fp_line (start 4.2 -3.25) (end 2.9 -3.3) (layer B.SilkS) (width 0.5))
-        (fp_line (start 3.9 -6) (end 3.9 -3.5) (layer B.SilkS) (width 1))
-        (fp_line (start 2.6 -4.8) (end -4.1 -4.8) (layer B.SilkS) (width 3.5))
-        (fp_line (start 4.4 -3) (end 4.4 -6.6) (layer B.SilkS) (width 0.15))
-        (fp_line (start 4.38 -4) (end 4.38 -6.25) (layer B.SilkS) (width 0.15))
-        (fp_line (start -5.9 -3.95) (end -5.7 -3.95) (layer B.SilkS) (width 0.15))
-        (fp_line (start -5.65 -5.55) (end -5.65 -1.1) (layer B.SilkS) (width 0.15))
-        (fp_line (start -5.9 -4.7) (end -5.9 -3.95) (layer B.SilkS) (width 0.15))
-        (fp_line (start -5.65 -1.1) (end -2.62 -1.1) (layer B.SilkS) (width 0.15))
-        (fp_line (start -0.4 -3) (end 4.4 -3) (layer B.SilkS) (width 0.15))
-        (fp_line (start 4.4 -6.6) (end -3.800001 -6.6) (layer B.SilkS) (width 0.15))
-        (fp_arc (start -0.465 -0.83) (end -0.4 -3) (angle -84) (layer B.SilkS) (width 0.15))
-        (fp_arc (start -3.9 -4.6) (end -3.800001 -6.6) (angle -90) (layer B.SilkS) (width 0.15))
-        (fp_arc (start -0.865 -1.23) (end -0.8 -3.4) (angle -84) (layer B.SilkS) (width 1))
-        (fp_line (start -5.45 -1.3) (end -3 -1.3) (layer B.SilkS) (width 0.5))
-        (fp_line (start 4.25 -6.4) (end 3 -6.4) (layer B.SilkS) (width 0.4))
-
-        ${'' /* holes */}
-        (pad "" np_thru_hole circle (at 2.54 -5.08) (size 3 3) (drill 3) (layers *.Cu *.Mask))
-        (pad "" np_thru_hole circle (at -3.81 -2.54) (size 3 3) (drill 3) (layers *.Cu *.Mask))
-        (pad "" np_thru_hole circle (at -5.08 0) (size 1.9 1.9) (drill 1.9) (layers *.Cu *.Mask))
-        (pad "" np_thru_hole circle (at 5.08 0) (size 1.9 1.9) (drill 1.9) (layers *.Cu *.Mask))
-        (pad "" np_thru_hole circle (at 0 0 90) (size 4.1 4.1) (drill 4.1) (layers *.Cu *.Mask))
-
-        ${'' /* net pads */}
-        (pad 1 smd rect (at -7.085 -2.54 180) (size 2.55 2.5) (layers B.Cu B.Paste B.Mask) ${p.net.from})
-        (pad 2 smd rect (at 5.842 -5.08 180) (size 2.55 2.5) (layers B.Cu B.Paste B.Mask) ${p.net.to})
-      )
-  
-    `
-	  };
-
 	var alps = {
-	    nets: ['from', 'to'],
+	    nets: {
+	        from: undefined,
+	        to: undefined
+	    },
 	    params: {
 	        class: 'S'
 	    },
@@ -1326,152 +1445,248 @@
         (fp_line (start 7 -7) (end 7 -6) (layer Dwgs.User) (width 0.15))
 
         ${''/* pins */}
-        (pad 1 thru_hole circle (at 2.5 -4.5) (size 2.25 2.25) (drill 1.47) (layers *.Cu *.Mask) ${p.net.from})
-        (pad 2 thru_hole circle (at -2.5 -4) (size 2.25 2.25) (drill 1.47) (layers *.Cu *.Mask) ${p.net.to})
+        (pad 1 thru_hole circle (at 2.5 -4.5) (size 2.25 2.25) (drill 1.47) (layers *.Cu *.Mask) ${p.net.from.str})
+        (pad 2 thru_hole circle (at -2.5 -4) (size 2.25 2.25) (drill 1.47) (layers *.Cu *.Mask) ${p.net.to.str})
     )
 
     `
 	};
 
-	var choc = {
-	    nets: ['from', 'to'],
+	var button = {
+	    nets: {
+	        from: undefined,
+	        to: undefined
+	    },
 	    params: {
-	        class: 'S'
+	        class: 'B', // for Button
+	        side: 'F'
 	    },
 	    body: p => `
+    
+    (module E73:SW_TACT_ALPS_SKQGABE010 (layer F.Cu) (tstamp 5BF2CC94)
 
-    (module PG1350 (layer F.Cu) (tedit 5DD50112)
+        (descr "Low-profile SMD Tactile Switch, https://www.e-switch.com/product-catalog/tact/product-lines/tl3342-series-low-profile-smt-tact-switch")
+        (tags "SPST Tactile Switch")
 
         ${p.at /* parametric position */}
-
         ${'' /* footprint reference */}
         (fp_text reference "${p.ref}" (at 0 0) (layer F.SilkS) ${p.ref_hide} (effects (font (size 1.27 1.27) (thickness 0.15))))
         (fp_text value "" (at 0 0) (layer F.SilkS) hide (effects (font (size 1.27 1.27) (thickness 0.15))))
-
-        ${''/* corner marks */}
-        (fp_line (start -7 -6) (end -7 -7) (layer Dwgs.User) (width 0.15))
-        (fp_line (start -7 7) (end -6 7) (layer Dwgs.User) (width 0.15))
-        (fp_line (start -6 -7) (end -7 -7) (layer Dwgs.User) (width 0.15))
-        (fp_line (start -7 7) (end -7 6) (layer Dwgs.User) (width 0.15))
-        (fp_line (start 7 6) (end 7 7) (layer Dwgs.User) (width 0.15))
-        (fp_line (start 7 -7) (end 6 -7) (layer Dwgs.User) (width 0.15))
-        (fp_line (start 6 7) (end 7 7) (layer Dwgs.User) (width 0.15))
-        (fp_line (start 7 -7) (end 7 -6) (layer Dwgs.User) (width 0.15))
-
-        ${''/* pins */}
-        (pad 1 thru_hole circle (at 5 -3.8) (size 2.032 2.032) (drill 1.27) (layers *.Cu *.Mask) ${p.net.from})
-        (pad 2 thru_hole circle (at 0 -5.9) (size 2.032 2.032) (drill 1.27) (layers *.Cu *.Mask) ${p.net.to})
         
-        ${''/* middle shaft */}
-        (pad "" np_thru_hole circle (at 0 0) (size 3.429 3.429) (drill 3.429) (layers *.Cu *.Mask))
-        
-        ${''/* stabilizers */}
-        (pad "" np_thru_hole circle (at 5.5 0) (size 1.7018 1.7018) (drill 1.7018) (layers *.Cu *.Mask))
-        (pad "" np_thru_hole circle (at -5.5 0) (size 1.7018 1.7018) (drill 1.7018) (layers *.Cu *.Mask))
-    )
-
-    `
-	};
-
-	var choc_hotswap = {
-	    nets: ['from', 'to'],
-	    params: {
-	        class: 'S'
-	    },
-	    body: p => `
-
-    (module Kailh_socket_PG1350_optional (layer F.Cu) (tedit 5DD50F3F)
-
-        ${p.at /* parametric position */}   
-  
-        ${'' /* footprint reference */}
-        (fp_text reference "${p.ref}" (at 0 -8.255) (layer F.SilkS) ${p.ref_hide}
-            (effects (font (size 1 1) (thickness 0.15))))
-        (fp_text value "" (at 0 8.25) (layer F.Fab)
-            (effects (font (size 1 1) (thickness 0.15))))       
-        
-        ${''/* corner marks */}
-        (fp_line (start -2.6 -3.1) (end 2.6 -3.1) (layer Eco2.User) (width 0.15))
-        (fp_line (start 2.6 -3.1) (end 2.6 -6.3) (layer Eco2.User) (width 0.15))
-        (fp_line (start 2.6 -6.3) (end -2.6 -6.3) (layer Eco2.User) (width 0.15))
-        (fp_line (start -2.6 -3.1) (end -2.6 -6.3) (layer Eco2.User) (width 0.15))
-        (fp_line (start -7 -6) (end -7 -7) (layer F.SilkS) (width 0.15))
-        (fp_line (start -7 7) (end -6 7) (layer F.SilkS) (width 0.15))
-        (fp_line (start -6 -7) (end -7 -7) (layer F.SilkS) (width 0.15))
-        (fp_line (start -7 7) (end -7 6) (layer F.SilkS) (width 0.15))
-        (fp_line (start 7 6) (end 7 7) (layer F.SilkS) (width 0.15))
-        (fp_line (start 7 -7) (end 6 -7) (layer F.SilkS) (width 0.15))
-        (fp_line (start 6 7) (end 7 7) (layer F.SilkS) (width 0.15))
-        (fp_line (start 7 -7) (end 7 -6) (layer F.SilkS) (width 0.15))
-        
-        (fp_line (start -6.9 6.9) (end 6.9 6.9) (layer Eco2.User) (width 0.15))
-        (fp_line (start 6.9 -6.9) (end -6.9 -6.9) (layer Eco2.User) (width 0.15))
-        (fp_line (start 6.9 -6.9) (end 6.9 6.9) (layer Eco2.User) (width 0.15))
-        (fp_line (start -6.9 6.9) (end -6.9 -6.9) (layer Eco2.User) (width 0.15))
-        
-        ${''/* Outline */}
-        (fp_line (start -7.5 -7.5) (end 7.5 -7.5) (layer F.Fab) (width 0.15))
-        (fp_line (start 7.5 -7.5) (end 7.5 7.5) (layer F.Fab) (width 0.15))
-        (fp_line (start 7.5 7.5) (end -7.5 7.5) (layer F.Fab) (width 0.15))
-        (fp_line (start -7.5 7.5) (end -7.5 -7.5) (layer F.Fab) (width 0.15))
-        
-        ${''/* hotswap marks */}
-        (fp_line (start 7 -1.5) (end 7 -2) (layer B.SilkS) (width 0.15))
-        (fp_line (start -1.5 -8.2) (end 1.5 -8.2) (layer B.SilkS) (width 0.15))
-        (fp_line (start -2 -7.7) (end -1.5 -8.2) (layer B.SilkS) (width 0.15))
-        (fp_line (start -1.5 -3.7) (end 1 -3.7) (layer B.SilkS) (width 0.15))
-        (fp_line (start 7 -5.6) (end 7 -6.2) (layer B.SilkS) (width 0.15))
-        (fp_line (start -2 -4.2) (end -1.5 -3.7) (layer B.SilkS) (width 0.15))
-        (fp_line (start 7 -6.2) (end 2.5 -6.2) (layer B.SilkS) (width 0.15))
-        (fp_line (start 2 -6.7) (end 2 -7.7) (layer B.SilkS) (width 0.15))
-        (fp_line (start 1.5 -8.2) (end 2 -7.7) (layer B.SilkS) (width 0.15))
-        (fp_line (start 2.5 -1.5) (end 7 -1.5) (layer B.SilkS) (width 0.15))
-        (fp_line (start 2.5 -2.2) (end 2.5 -1.5) (layer B.SilkS) (width 0.15))
-        (fp_line (start 9.5 -2.5) (end 7 -2.5) (layer B.Fab) (width 0.12))
-        (fp_line (start -2 -4.75) (end -4.5 -4.75) (layer B.Fab) (width 0.12))
-        (fp_line (start -4.5 -4.75) (end -4.5 -7.25) (layer B.Fab) (width 0.12))
-        (fp_line (start -4.5 -7.25) (end -2 -7.25) (layer B.Fab) (width 0.12))
-        (fp_line (start 9.5 -5) (end 9.5 -2.5) (layer B.Fab) (width 0.12))
-        (fp_line (start -2 -4.25) (end -2 -7.7) (layer B.Fab) (width 0.12))
-        (fp_line (start 2.5 -2.2) (end 2.5 -1.5) (layer B.Fab) (width 0.15))
-        (fp_line (start 2.5 -1.5) (end 7 -1.5) (layer B.Fab) (width 0.15))
-        (fp_line (start 1.5 -8.2) (end 2 -7.7) (layer B.Fab) (width 0.15))
-        (fp_line (start 2 -6.7) (end 2 -7.7) (layer B.Fab) (width 0.15))
-        (fp_line (start 7 -6.2) (end 2.5 -6.2) (layer B.Fab) (width 0.15))
-        (fp_line (start -2 -4.2) (end -1.5 -3.7) (layer B.Fab) (width 0.15))
-        (fp_line (start -1.5 -3.7) (end 1 -3.7) (layer B.Fab) (width 0.15))
-        (fp_line (start -2 -7.7) (end -1.5 -8.2) (layer B.Fab) (width 0.15))
-        (fp_line (start -1.5 -8.2) (end 1.5 -8.2) (layer B.Fab) (width 0.15))
-        (fp_line (start 7 -1.5) (end 7 -6.2) (layer B.Fab) (width 0.12))
-        (fp_line (start 7 -5) (end 9.5 -5) (layer B.Fab) (width 0.12))
-        (fp_arc (start 2.5 -6.7) (end 2 -6.7) (angle -90) (layer B.Fab) (width 0.15))
-        (fp_arc (start 1 -2.2) (end 2.5 -2.2) (angle -90) (layer B.Fab) (width 0.15))
-        (fp_arc (start 1 -2.2) (end 2.5 -2.2) (angle -90) (layer B.SilkS) (width 0.15))
-        (fp_arc (start 2.5 -6.7) (end 2 -6.7) (angle -90) (layer B.SilkS) (width 0.15))
-        
-        ${'' /* holes */}
-        (pad "" np_thru_hole circle (at -5.5 0) (size 1.7018 1.7018) (drill 1.7018) (layers *.Cu *.Mask))
-        (pad "" np_thru_hole circle (at 5.5 0) (size 1.7018 1.7018) (drill 1.7018) (layers *.Cu *.Mask))
-        (pad "" np_thru_hole circle (at 5 -3.75) (size 3 3) (drill 3) (layers *.Cu *.Mask))
-        (pad "" np_thru_hole circle (at 0 0) (size 3.429 3.429) (drill 3.429) (layers *.Cu *.Mask))
-        (pad "" np_thru_hole circle (at 0 -5.95) (size 3 3) (drill 3) (layers *.Cu *.Mask))
-        
+        ${'' /* outline */}
+        (fp_line (start 2.75 1.25) (end 1.25 2.75) (layer ${p.param.side}.SilkS) (width 0.15))
+        (fp_line (start 2.75 -1.25) (end 1.25 -2.75) (layer ${p.param.side}.SilkS) (width 0.15))
+        (fp_line (start 2.75 -1.25) (end 2.75 1.25) (layer ${p.param.side}.SilkS) (width 0.15))
+        (fp_line (start -1.25 2.75) (end 1.25 2.75) (layer ${p.param.side}.SilkS) (width 0.15))
+        (fp_line (start -1.25 -2.75) (end 1.25 -2.75) (layer ${p.param.side}.SilkS) (width 0.15))
+        (fp_line (start -2.75 1.25) (end -1.25 2.75) (layer ${p.param.side}.SilkS) (width 0.15))
+        (fp_line (start -2.75 -1.25) (end -1.25 -2.75) (layer ${p.param.side}.SilkS) (width 0.15))
+        (fp_line (start -2.75 -1.25) (end -2.75 1.25) (layer ${p.param.side}.SilkS) (width 0.15))
         
         ${'' /* pins */}
-        (pad 2 thru_hole circle (at -5 3.8) (size 2.032 2.032) (drill 1.27) (layers *.Cu *.Mask))
-        (pad 1 thru_hole circle (at 0 5.9) (size 2.032 2.032) (drill 1.27) (layers *.Cu *.Mask))
-        
-        ${'' /* net pads */}
-        (pad 1 smd rect (at -3.275 -5.95) (size 2.6 2.6) (layers B.Cu B.Paste B.Mask)  ${p.net.from})
-        (pad 2 smd rect (at 8.275 -3.75) (size 2.6 2.6) (layers B.Cu B.Paste B.Mask)  ${p.net.to})
+        (pad 1 smd rect (at -3.1 -1.85 ${p.rot}) (size 1.8 1.1) (layers ${p.param.side}.Cu ${p.param.side}.Paste ${p.param.side}.Mask) ${p.net.from.str})
+        (pad 1 smd rect (at 3.1 -1.85 ${p.rot}) (size 1.8 1.1) (layers ${p.param.side}.Cu ${p.param.side}.Paste ${p.param.side}.Mask) ${p.net.from.str})
+        (pad 2 smd rect (at -3.1 1.85 ${p.rot}) (size 1.8 1.1) (layers ${p.param.side}.Cu ${p.param.side}.Paste ${p.param.side}.Mask) ${p.net.to.str})
+        (pad 2 smd rect (at 3.1 1.85 ${p.rot}) (size 1.8 1.1) (layers ${p.param.side}.Cu ${p.param.side}.Paste ${p.param.side}.Mask) ${p.net.to.str})
     )
-
-
+    
     `
 	};
 
+	// Kailh Choc PG1350
+	// Nets
+	//    from: corresponds to pin 1
+	//    to: corresponds to pin 2
+	// Params
+	//    hotswap: default is false
+	//      if true, will include holes and pads for Kailh choc hotswap sockets
+	//    reverse: default is false
+	//      if true, will flip the footprint such that the pcb can be reversible
+	//    keycaps: default is false
+	//      if true, will add choc sized keycap box around the footprint
+	// 
+	// note: hotswap and reverse can be used simultaneously
+
+	var choc = {
+	  nets: {
+	    from: undefined,
+	    to: undefined
+	  },
+	  params: {
+	    class: 'S',
+	    hotswap: false,
+	    reverse: false,
+	    keycaps: false
+	  },
+	  body: p => {
+	    const standard = `
+      (module PG1350 (layer F.Cu) (tedit 5DD50112)
+      ${p.at /* parametric position */}
+
+      ${'' /* footprint reference */}
+      (fp_text reference "${p.ref}" (at 0 0) (layer F.SilkS) ${p.ref_hide} (effects (font (size 1.27 1.27) (thickness 0.15))))
+      (fp_text value "" (at 0 0) (layer F.SilkS) hide (effects (font (size 1.27 1.27) (thickness 0.15))))
+
+      ${''/* corner marks */}
+      (fp_line (start -7 -6) (end -7 -7) (layer Dwgs.User) (width 0.15))
+      (fp_line (start -7 7) (end -6 7) (layer Dwgs.User) (width 0.15))
+      (fp_line (start -6 -7) (end -7 -7) (layer Dwgs.User) (width 0.15))
+      (fp_line (start -7 7) (end -7 6) (layer Dwgs.User) (width 0.15))
+      (fp_line (start 7 6) (end 7 7) (layer Dwgs.User) (width 0.15))
+      (fp_line (start 7 -7) (end 6 -7) (layer Dwgs.User) (width 0.15))
+      (fp_line (start 6 7) (end 7 7) (layer Dwgs.User) (width 0.15))
+      (fp_line (start 7 -7) (end 7 -6) (layer Dwgs.User) (width 0.15))      
+      
+      ${''/* middle shaft */}
+      (pad "" np_thru_hole circle (at 0 0) (size 3.429 3.429) (drill 3.429) (layers *.Cu *.Mask))
+        
+      ${''/* stabilizers */}
+      (pad "" np_thru_hole circle (at 5.5 0) (size 1.7018 1.7018) (drill 1.7018) (layers *.Cu *.Mask))
+      (pad "" np_thru_hole circle (at -5.5 0) (size 1.7018 1.7018) (drill 1.7018) (layers *.Cu *.Mask))
+      `;
+	    const keycap = `
+      ${'' /* keycap marks */}
+      (fp_line (start -9 -8.5) (end 9 -8.5) (layer Dwgs.User) (width 0.15))
+      (fp_line (start 9 -8.5) (end 9 8.5) (layer Dwgs.User) (width 0.15))
+      (fp_line (start 9 8.5) (end -9 8.5) (layer Dwgs.User) (width 0.15))
+      (fp_line (start -9 8.5) (end -9 -8.5) (layer Dwgs.User) (width 0.15))
+      `;
+	    function pins(def_neg, def_pos, def_side) {
+	      if(p.param.hotswap) {
+	        return `
+          ${'' /* holes */}
+          (pad "" np_thru_hole circle (at ${def_pos}5 -3.75) (size 3 3) (drill 3) (layers *.Cu *.Mask))
+          (pad "" np_thru_hole circle (at 0 -5.95) (size 3 3) (drill 3) (layers *.Cu *.Mask))
+      
+          ${'' /* net pads */}
+          (pad 1 smd rect (at ${def_neg}3.275 -5.95 ${p.rot}) (size 2.6 2.6) (layers ${def_side}.Cu ${def_side}.Paste ${def_side}.Mask)  ${p.net.from.str})
+          (pad 2 smd rect (at ${def_pos}8.275 -3.75 ${p.rot}) (size 2.6 2.6) (layers ${def_side}.Cu ${def_side}.Paste ${def_side}.Mask)  ${p.net.to.str})
+        `
+	      } else {
+	          return `
+            ${''/* pins */}
+            (pad 1 thru_hole circle (at ${def_pos}5 -3.8) (size 2.032 2.032) (drill 1.27) (layers *.Cu *.Mask) ${p.net.from.str})
+            (pad 2 thru_hole circle (at ${def_pos}0 -5.9) (size 2.032 2.032) (drill 1.27) (layers *.Cu *.Mask) ${p.net.to.str})
+          `
+	      }
+	    }
+	    if(p.param.reverse) {
+	      return `
+        ${standard}
+        ${p.param.keycaps ? keycap : ''}
+        ${pins('-', '', 'B')}
+        ${pins('', '-', 'F')})
+        `
+	    } else {
+	      return `
+        ${standard}
+        ${p.param.keycaps ? keycap : ''}
+        ${pins('-', '', 'B')})
+        `
+	    }
+	  }
+	};
+
+	// Kailh Choc PG1232
+	// Nets
+	//    from: corresponds to pin 1
+	//    to: corresponds to pin 2
+	// Params
+	//    reverse: default is false
+	//      if true, will flip the footprint such that the pcb can be reversible 
+	//    keycaps: default is false
+	//      if true, will add choc sized keycap box around the footprint
+
+	var chocmini = {
+	    nets: {
+	      from: undefined,
+	      to: undefined
+	    },
+	    params: {
+	      class: 'S',
+			  side: 'F',
+			  reverse: false,
+	      keycaps: false
+	    },
+	    body: p => {
+		    const standard = `
+        (module lib:Kailh_PG1232 (layer F.Cu) (tedit 5E1ADAC2)
+        ${p.at /* parametric position */} 
+
+        ${'' /* footprint reference */}        
+        (fp_text reference "${p.ref}" (at 0 0) (layer F.SilkS) ${p.ref_hide} (effects (font (size 1.27 1.27) (thickness 0.15))))
+        (fp_text value Kailh_PG1232 (at 0 -7.3) (layer F.Fab) (effects (font (size 1 1) (thickness 0.15))))
+
+        ${'' /* corner marks */}
+        (fp_line (start -7.25 -6.75) (end -6.25 -6.75) (layer Dwgs.User) (width 0.15))
+        (fp_line (start -7.25 -6.75) (end -7.25 -5.75) (layer Dwgs.User) (width 0.15))
+
+        (fp_line (start -7.25 6.75) (end -6.25 6.75) (layer Dwgs.User) (width 0.15))
+        (fp_line (start -7.25 6.75) (end -7.25 5.75) (layer Dwgs.User) (width 0.15))
+
+        (fp_line (start 7.25 -6.75) (end 6.25 -6.75) (layer Dwgs.User) (width 0.15))
+        (fp_line (start 7.25 -6.75) (end 7.25 -5.75) (layer Dwgs.User) (width 0.15))
+
+        (fp_line (start 7.25 6.75) (end 6.25 6.75) (layer Dwgs.User) (width 0.15))
+        (fp_line (start 7.25 6.75) (end 7.25 5.75) (layer Dwgs.User) (width 0.15))
+
+
+        (fp_line (start 2.8 -5.35) (end -2.8 -5.35) (layer Dwgs.User) (width 0.15))
+        (fp_line (start -2.8 -3.2) (end 2.8 -3.2) (layer Dwgs.User) (width 0.15))
+        (fp_line (start 2.8 -3.2) (end 2.8 -5.35) (layer Dwgs.User) (width 0.15))
+        (fp_line (start -2.8 -3.2) (end -2.8 -5.35) (layer Dwgs.User) (width 0.15))
+        
+        ${''/* middle shaft */}        	 
+        (fp_line (start 2.25 2.6) (end 5.8 2.6) (layer Edge.Cuts) (width 0.12))
+        (fp_line (start -2.25 2.6) (end -5.8 2.6) (layer Edge.Cuts) (width 0.12))
+        (fp_line (start 2.25 3.6) (end 2.25 2.6) (layer Edge.Cuts) (width 0.12))
+        (fp_line (start -2.25 3.6) (end 2.25 3.6) (layer Edge.Cuts) (width 0.12))
+        (fp_line (start -2.25 2.6) (end -2.25 3.6) (layer Edge.Cuts) (width 0.12))
+        (fp_line (start -5.8 2.6) (end -5.8 -2.95) (layer Edge.Cuts) (width 0.12))
+        (fp_line (start 5.8 -2.95) (end 5.8 2.6) (layer Edge.Cuts) (width 0.12))
+        (fp_line (start -5.8 -2.95) (end 5.8 -2.95) (layer Edge.Cuts) (width 0.12))
+        
+        ${''/* stabilizers */}    
+        (pad 3 thru_hole circle (at 5.3 -4.75) (size 1.6 1.6) (drill 1.1) (layers *.Cu *.Mask) (clearance 0.2))
+        (pad 4 thru_hole circle (at -5.3 -4.75) (size 1.6 1.6) (drill 1.1) (layers *.Cu *.Mask) (clearance 0.2))
+      `;
+	      const keycap = `
+        ${'' /* keycap marks */}
+        (fp_line (start -9 -8.5) (end 9 -8.5) (layer Dwgs.User) (width 0.15))
+        (fp_line (start 9 -8.5) (end 9 8.5) (layer Dwgs.User) (width 0.15))
+        (fp_line (start 9 8.5) (end -9 8.5) (layer Dwgs.User) (width 0.15))
+        (fp_line (start -9 8.5) (end -9 -8.5) (layer Dwgs.User) (width 0.15))
+        `;
+	      function pins(def_neg, def_pos) {
+	        return `
+        ${''/* pins */}
+        (pad 1 thru_hole circle (at ${def_neg}4.58 5.1) (size 1.6 1.6) (drill 1.1) (layers *.Cu *.Mask) ${p.net.from.str} (clearance 0.2))
+        (pad 2 thru_hole circle (at ${def_pos}2 5.4) (size 1.6 1.6) (drill 1.1) (layers *.Cu *.Mask) ${p.net.to.str} (clearance 0.2))
+			  `
+	      }
+	      if(p.param.reverse){
+	        return `
+          ${standard}
+          ${p.param.keycaps ? keycap : ''}
+          ${pins('-', '')}
+          ${pins('', '-')})
+
+          `
+	      } else {
+	        return `
+          ${standard}
+          ${p.param.keycaps ? keycap : ''}
+          ${pins('-', '')})
+          `
+	      }
+	    }
+	  };
+
 	var diode = {
-	    nets: ['from', 'to'],
+	    nets: {
+	        from: undefined,
+	        to: undefined
+	    },
 	    params: {
 	        class: 'D'
 	    },
@@ -1503,254 +1718,26 @@
         (fp_line (start -0.75 0) (end -0.35 0) (layer B.SilkS) (width 0.1))
     
         ${''/* SMD pads on both sides */}
-        (pad 1 smd rect (at -1.65 0 ${p.rot}) (size 0.9 1.2) (layers F.Cu F.Paste F.Mask) ${p.net.to})
-        (pad 2 smd rect (at 1.65 0 ${p.rot}) (size 0.9 1.2) (layers B.Cu B.Paste B.Mask) ${p.net.from})
-        (pad 1 smd rect (at -1.65 0 ${p.rot}) (size 0.9 1.2) (layers B.Cu B.Paste B.Mask) ${p.net.to})
-        (pad 2 smd rect (at 1.65 0 ${p.rot}) (size 0.9 1.2) (layers F.Cu F.Paste F.Mask) ${p.net.from})
+        (pad 1 smd rect (at -1.65 0 ${p.rot}) (size 0.9 1.2) (layers F.Cu F.Paste F.Mask) ${p.net.to.str})
+        (pad 2 smd rect (at 1.65 0 ${p.rot}) (size 0.9 1.2) (layers B.Cu B.Paste B.Mask) ${p.net.from.str})
+        (pad 1 smd rect (at -1.65 0 ${p.rot}) (size 0.9 1.2) (layers B.Cu B.Paste B.Mask) ${p.net.to.str})
+        (pad 2 smd rect (at 1.65 0 ${p.rot}) (size 0.9 1.2) (layers F.Cu F.Paste F.Mask) ${p.net.from.str})
         
         ${''/* THT terminals */}
-        (pad 1 thru_hole circle (at 3.81 0 ${p.rot}) (size 1.905 1.905) (drill 0.9906) (layers *.Cu *.Mask) ${p.net.from})
-        (pad 2 thru_hole rect (at -3.81 0 ${p.rot}) (size 1.778 1.778) (drill 0.9906) (layers *.Cu *.Mask) ${p.net.to})
+        (pad 1 thru_hole circle (at 3.81 0 ${p.rot}) (size 1.905 1.905) (drill 0.9906) (layers *.Cu *.Mask) ${p.net.from.str})
+        (pad 2 thru_hole rect (at -3.81 0 ${p.rot}) (size 1.778 1.778) (drill 0.9906) (layers *.Cu *.Mask) ${p.net.to.str})
     )
   
-    `
-	};
-
-	var promicro = {
-	  static_nets: [
-	    'RAW', 'GND', 'RST', 'VCC',
-	    'P21', 'P20', 'P19', 'P18',
-	    'P15', 'P14', 'P16', 'P10',
-	    'P1', 'P0', 'P2', 'P3', 'P4',
-	    'P5', 'P6', 'P7', 'P8', 'P9'
-	  ],
-	  params: {
-	    class: 'C' // for Controller
-	  },
-	  body: p => `
-  
-    (module ProMicro (layer F.Cu) (tedit 5B307E4C)
-    
-      ${p.at /* parametric position */}
-
-      ${'' /* footprint reference */}
-      (fp_text reference "${p.ref}" (at 0 0) (layer F.SilkS) ${p.ref_hide} (effects (font (size 1.27 1.27) (thickness 0.15))))
-      (fp_text value "" (at 0 0) (layer F.SilkS) hide (effects (font (size 1.27 1.27) (thickness 0.15))))
-    
-      ${''/* illustration of the (possible) USB port overhang */}
-      (fp_line (start -19.304 -3.81) (end -14.224 -3.81) (layer Dwgs.User) (width 0.15))
-      (fp_line (start -19.304 3.81) (end -19.304 -3.81) (layer Dwgs.User) (width 0.15))
-      (fp_line (start -14.224 3.81) (end -19.304 3.81) (layer Dwgs.User) (width 0.15))
-      (fp_line (start -14.224 -3.81) (end -14.224 3.81) (layer Dwgs.User) (width 0.15))
-    
-      ${''/* component outline */}
-      (fp_line (start -17.78 8.89) (end 15.24 8.89) (layer F.SilkS) (width 0.15))
-      (fp_line (start 15.24 8.89) (end 15.24 -8.89) (layer F.SilkS) (width 0.15))
-      (fp_line (start 15.24 -8.89) (end -17.78 -8.89) (layer F.SilkS) (width 0.15))
-      (fp_line (start -17.78 -8.89) (end -17.78 8.89) (layer F.SilkS) (width 0.15))
-      
-      ${''/* extra border around "RAW", in case the rectangular shape is not distinctive enough */}
-      (fp_line (start -15.24 6.35) (end -12.7 6.35) (layer F.SilkS) (width 0.15))
-      (fp_line (start -15.24 6.35) (end -15.24 8.89) (layer F.SilkS) (width 0.15))
-      (fp_line (start -12.7 6.35) (end -12.7 8.89) (layer F.SilkS) (width 0.15))
-    
-      ${''/* pin names */}
-      (fp_text user RAW (at -13.97 4.8 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-      (fp_text user GND (at -11.43 4.8 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-      (fp_text user RST (at -8.89 4.8 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-      (fp_text user VCC (at -6.35 4.8 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-      (fp_text user P21 (at -3.81 4.8 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-      (fp_text user P20 (at -1.27 4.8 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-      (fp_text user P19 (at 1.27 4.8 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-      (fp_text user P18 (at 3.81 4.8 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-      (fp_text user P15 (at 6.35 4.8 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-      (fp_text user P14 (at 8.89 4.8 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-      (fp_text user P16 (at 11.43 4.8 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-      (fp_text user P10 (at 13.97 4.8 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-    
-      (fp_text user P01 (at -13.97 -4.8 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-      (fp_text user P00 (at -11.43 -4.8 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-      (fp_text user GND (at -8.89 -4.8 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-      (fp_text user GND (at -6.35 -4.8 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-      (fp_text user P02 (at -3.81 -4.8 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-      (fp_text user P03 (at -1.27 -4.8 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-      (fp_text user P04 (at 1.27 -4.8 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-      (fp_text user P05 (at 3.81 -4.8 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-      (fp_text user P06 (at 6.35 -4.8 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-      (fp_text user P07 (at 8.89 -4.8 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-      (fp_text user P08 (at 11.43 -4.8 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-      (fp_text user P09 (at 13.97 -4.8 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-    
-      ${''/* and now the actual pins */}
-      (pad 1 thru_hole rect (at -13.97 7.62 ${p.rot}) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.RAW})
-      (pad 2 thru_hole circle (at -11.43 7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.GND})
-      (pad 3 thru_hole circle (at -8.89 7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.RST})
-      (pad 4 thru_hole circle (at -6.35 7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.VCC})
-      (pad 5 thru_hole circle (at -3.81 7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P21})
-      (pad 6 thru_hole circle (at -1.27 7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P20})
-      (pad 7 thru_hole circle (at 1.27 7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P19})
-      (pad 8 thru_hole circle (at 3.81 7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P18})
-      (pad 9 thru_hole circle (at 6.35 7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P15})
-      (pad 10 thru_hole circle (at 8.89 7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P14})
-      (pad 11 thru_hole circle (at 11.43 7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P16})
-      (pad 12 thru_hole circle (at 13.97 7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P10})
-      
-      (pad 13 thru_hole circle (at -13.97 -7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P1})
-      (pad 14 thru_hole circle (at -11.43 -7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P0})
-      (pad 15 thru_hole circle (at -8.89 -7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.GND})
-      (pad 16 thru_hole circle (at -6.35 -7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.GND})
-      (pad 17 thru_hole circle (at -3.81 -7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P2})
-      (pad 18 thru_hole circle (at -1.27 -7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P3})
-      (pad 19 thru_hole circle (at 1.27 -7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P4})
-      (pad 20 thru_hole circle (at 3.81 -7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P5})
-      (pad 21 thru_hole circle (at 6.35 -7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P6})
-      (pad 22 thru_hole circle (at 8.89 -7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P7})
-      (pad 23 thru_hole circle (at 11.43 -7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P8})
-      (pad 24 thru_hole circle (at 13.97 -7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P9})
-    )
-  `
-	};
-
-	var slider = {
-	    nets: ['from', 'to'],
-	    params: {
-	        class: 'T', // for Toggle (?)
-	        side: 'F'
-	    },
-	    body: p => {
-
-	        const left = p.param.side == 'F' ? '-' : '';
-	        const right = p.param.side == 'F' ? '' : '-';
-
-	        return `
-        
-        (module E73:SPDT_C128955 (layer F.Cu) (tstamp 5BF2CC3C)
-
-            ${p.at /* parametric position */}
-
-            ${'' /* footprint reference */}
-            (fp_text reference "${p.ref}" (at 0 0) (layer F.SilkS) ${p.ref_hide} (effects (font (size 1.27 1.27) (thickness 0.15))))
-            (fp_text value "" (at 0 0) (layer F.SilkS) hide (effects (font (size 1.27 1.27) (thickness 0.15))))
-            
-            ${'' /* outline */}
-            (fp_line (start 1.95 -1.35) (end -1.95 -1.35) (layer ${p.param.side}.SilkS) (width 0.15))
-            (fp_line (start 0 -1.35) (end -3.3 -1.35) (layer ${p.param.side}.SilkS) (width 0.15))
-            (fp_line (start -3.3 -1.35) (end -3.3 1.5) (layer ${p.param.side}.SilkS) (width 0.15))
-            (fp_line (start -3.3 1.5) (end 3.3 1.5) (layer ${p.param.side}.SilkS) (width 0.15))
-            (fp_line (start 3.3 1.5) (end 3.3 -1.35) (layer ${p.param.side}.SilkS) (width 0.15))
-            (fp_line (start 0 -1.35) (end 3.3 -1.35) (layer ${p.param.side}.SilkS) (width 0.15))
-            
-            ${'' /* extra indicator for the slider */}
-            (fp_line (start -1.95 -3.85) (end 1.95 -3.85) (layer Dwgs.User) (width 0.15))
-            (fp_line (start 1.95 -3.85) (end 1.95 -1.35) (layer Dwgs.User) (width 0.15))
-            (fp_line (start -1.95 -1.35) (end -1.95 -3.85) (layer Dwgs.User) (width 0.15))
-            
-            ${'' /* bottom cutouts */}
-            (pad "" np_thru_hole circle (at 1.5 0) (size 1 1) (drill 0.9) (layers *.Cu *.Mask))
-            (pad "" np_thru_hole circle (at -1.5 0) (size 1 1) (drill 0.9) (layers *.Cu *.Mask))
-
-            ${'' /* pins */}
-            (pad 1 smd rect (at ${right}2.25 2.075 ${p.rot}) (size 0.9 1.25) (layers ${p.param.side}.Cu ${p.param.side}.Paste ${p.param.side}.Mask) ${p.net.from})
-            (pad 2 smd rect (at ${left}0.75 2.075 ${p.rot}) (size 0.9 1.25) (layers ${p.param.side}.Cu ${p.param.side}.Paste ${p.param.side}.Mask) ${p.net.to})
-            (pad 3 smd rect (at ${left}2.25 2.075 ${p.rot}) (size 0.9 1.25) (layers ${p.param.side}.Cu ${p.param.side}.Paste ${p.param.side}.Mask))
-            
-            ${'' /* side mounts */}
-            (pad "" smd rect (at 3.7 -1.1 ${p.rot}) (size 0.9 0.9) (layers ${p.param.side}.Cu ${p.param.side}.Paste ${p.param.side}.Mask))
-            (pad "" smd rect (at 3.7 1.1 ${p.rot}) (size 0.9 0.9) (layers ${p.param.side}.Cu ${p.param.side}.Paste ${p.param.side}.Mask))
-            (pad "" smd rect (at -3.7 1.1 ${p.rot}) (size 0.9 0.9) (layers ${p.param.side}.Cu ${p.param.side}.Paste ${p.param.side}.Mask))
-            (pad "" smd rect (at -3.7 -1.1 ${p.rot}) (size 0.9 0.9) (layers ${p.param.side}.Cu ${p.param.side}.Paste ${p.param.side}.Mask))
-        )
-        
-        `
-	    }
-	};
-
-	var button = {
-	    nets: ['from', 'to'],
-	    params: {
-	        class: 'B', // for Button
-	        side: 'F'
-	    },
-	    body: p => `
-    
-    (module E73:SW_TACT_ALPS_SKQGABE010 (layer F.Cu) (tstamp 5BF2CC94)
-
-        (descr "Low-profile SMD Tactile Switch, https://www.e-switch.com/product-catalog/tact/product-lines/tl3342-series-low-profile-smt-tact-switch")
-        (tags "SPST Tactile Switch")
-
-        ${p.at /* parametric position */}
-        ${'' /* footprint reference */}
-        (fp_text reference "${p.ref}" (at 0 0) (layer F.SilkS) ${p.ref_hide} (effects (font (size 1.27 1.27) (thickness 0.15))))
-        (fp_text value "" (at 0 0) (layer F.SilkS) hide (effects (font (size 1.27 1.27) (thickness 0.15))))
-        
-        ${'' /* outline */}
-        (fp_line (start 2.75 1.25) (end 1.25 2.75) (layer ${p.param.side}.SilkS) (width 0.15))
-        (fp_line (start 2.75 -1.25) (end 1.25 -2.75) (layer ${p.param.side}.SilkS) (width 0.15))
-        (fp_line (start 2.75 -1.25) (end 2.75 1.25) (layer ${p.param.side}.SilkS) (width 0.15))
-        (fp_line (start -1.25 2.75) (end 1.25 2.75) (layer ${p.param.side}.SilkS) (width 0.15))
-        (fp_line (start -1.25 -2.75) (end 1.25 -2.75) (layer ${p.param.side}.SilkS) (width 0.15))
-        (fp_line (start -2.75 1.25) (end -1.25 2.75) (layer ${p.param.side}.SilkS) (width 0.15))
-        (fp_line (start -2.75 -1.25) (end -1.25 -2.75) (layer ${p.param.side}.SilkS) (width 0.15))
-        (fp_line (start -2.75 -1.25) (end -2.75 1.25) (layer ${p.param.side}.SilkS) (width 0.15))
-        
-        ${'' /* pins */}
-        (pad 1 smd rect (at -3.1 -1.85 ${p.rot}) (size 1.8 1.1) (layers ${p.param.side}.Cu ${p.param.side}.Paste ${p.param.side}.Mask) ${p.net.from})
-        (pad 1 smd rect (at 3.1 -1.85 ${p.rot}) (size 1.8 1.1) (layers ${p.param.side}.Cu ${p.param.side}.Paste ${p.param.side}.Mask) ${p.net.from})
-        (pad 2 smd rect (at -3.1 1.85 ${p.rot}) (size 1.8 1.1) (layers ${p.param.side}.Cu ${p.param.side}.Paste ${p.param.side}.Mask) ${p.net.to})
-        (pad 2 smd rect (at 3.1 1.85 ${p.rot}) (size 1.8 1.1) (layers ${p.param.side}.Cu ${p.param.side}.Paste ${p.param.side}.Mask) ${p.net.to})
-    )
-    
-    `
-	};
-
-	var rgb = {
-	    static_nets: ['VCC', 'GND'],
-	    nets: ['din', 'dout'],
-	    params: {
-	        class: 'L', // for Led
-	        side: 'F'
-	    },
-	    body: p => `
-    
-        (module WS2812B (layer F.Cu) (tedit 53BEE615)
-
-            ${p.at /* parametric position */}
-
-            ${'' /* footprint reference */}
-            (fp_text reference "${p.ref}" (at 0 0) (layer F.SilkS) ${p.ref_hide} (effects (font (size 1.27 1.27) (thickness 0.15))))
-            (fp_text value "" (at 0 0) (layer F.SilkS) hide (effects (font (size 1.27 1.27) (thickness 0.15))))
-
-            (fp_line (start -1.75 -1.75) (end -1.75 1.75) (layer ${p.param.side}.SilkS) (width 0.15))
-            (fp_line (start -1.75 1.75) (end 1.75 1.75) (layer ${p.param.side}.SilkS) (width 0.15))
-            (fp_line (start 1.75 1.75) (end 1.75 -1.75) (layer ${p.param.side}.SilkS) (width 0.15))
-            (fp_line (start 1.75 -1.75) (end -1.75 -1.75) (layer ${p.param.side}.SilkS) (width 0.15))
-
-            (fp_line (start -2.5 -2.5) (end -2.5 2.5) (layer ${p.param.side}.SilkS) (width 0.15))
-            (fp_line (start -2.5 2.5) (end 2.5 2.5) (layer ${p.param.side}.SilkS) (width 0.15))
-            (fp_line (start 2.5 2.5) (end 2.5 -2.5) (layer ${p.param.side}.SilkS) (width 0.15))
-            (fp_line (start 2.5 -2.5) (end -2.5 -2.5) (layer ${p.param.side}.SilkS) (width 0.15))
-
-            (fp_poly (pts (xy 4 2.2) (xy 4 0.375) (xy 5 1.2875)) (layer ${p.param.side}.SilkS) (width 0.1))
-
-            (pad 1 smd rect (at -2.2 -0.875 ${p.rot}) (size 2.6 1) (layers ${p.param.side}.Cu ${p.param.side}.Paste ${p.param.side}.Mask) ${p.net.VCC})
-            (pad 2 smd rect (at -2.2 0.875 ${p.rot}) (size 2.6 1) (layers ${p.param.side}.Cu ${p.param.side}.Paste ${p.param.side}.Mask) ${p.net.dout})
-            (pad 3 smd rect (at 2.2 0.875 ${p.rot}) (size 2.6 1) (layers ${p.param.side}.Cu ${p.param.side}.Paste ${p.param.side}.Mask) ${p.net.GND})
-            (pad 4 smd rect (at 2.2 -0.875 ${p.rot}) (size 2.6 1) (layers ${p.param.side}.Cu ${p.param.side}.Paste ${p.param.side}.Mask) ${p.net.din})
-
-            (pad 11 smd rect (at -2.5 -1.6 ${p.rot}) (size 2 1.2) (layers ${p.param.side}.Cu ${p.param.side}.Paste ${p.param.side}.Mask) ${p.net.VCC})
-            (pad 22 smd rect (at -2.5 1.6 ${p.rot}) (size 2 1.2) (layers ${p.param.side}.Cu ${p.param.side}.Paste ${p.param.side}.Mask) ${p.net.dout})
-            (pad 33 smd rect (at 2.5 1.6 ${p.rot}) (size 2 1.2) (layers ${p.param.side}.Cu ${p.param.side}.Paste ${p.param.side}.Mask) ${p.net.GND})
-            (pad 44 smd rect (at 2.5 -1.6 ${p.rot}) (size 2 1.2) (layers ${p.param.side}.Cu ${p.param.side}.Paste ${p.param.side}.Mask) ${p.net.din})
-            
-        )
-    
     `
 	};
 
 	var jstph = {
-	    nets: ['pos', 'neg'],
+	    nets: {
+	        pos: undefined,
+	        neg: undefined
+	    },
 	    params: {
-	        class: 'J',
+	        class: 'JST',
 	        side: 'F'
 	    },
 	    body: p => `
@@ -1778,18 +1765,208 @@
         (fp_line (start -1 1.5) (end -1 2.0) (layer ${p.param.side}.SilkS) (width 0.15))
         (fp_line (start -1.25 1.75) (end -0.75 1.75) (layer ${p.param.side}.SilkS) (width 0.15))
 
-        (pad 1 thru_hole rect (at -1 0 ${p.rot}) (size 1.2 1.7) (drill 0.75) (layers *.Cu *.Mask) ${p.net.pos})
-        (pad 2 thru_hole oval (at 1 0 ${p.rot}) (size 1.2 1.7) (drill 0.75) (layers *.Cu *.Mask) ${p.net.neg})
+        (pad 1 thru_hole rect (at -1 0 ${p.rot}) (size 1.2 1.7) (drill 0.75) (layers *.Cu *.Mask) ${p.net.pos.str})
+        (pad 2 thru_hole oval (at 1 0 ${p.rot}) (size 1.2 1.7) (drill 0.75) (layers *.Cu *.Mask) ${p.net.neg.str})
             
     )
     
     `
 	};
 
-	var pad = {
-	    nets: ['net'],
+	var jumper = {
+	    nets: {
+	        from: undefined,
+	        to: undefined
+	    },
 	    params: {
-	        class: 'P',
+	      class: 'J',
+		  side: 'F'
+	    },
+	    body: p => `
+        (module lib:Jumper (layer F.Cu) (tedit 5E1ADAC2)
+        ${p.at /* parametric position */} 
+
+        ${'' /* footprint reference */}        
+        (fp_text reference "${p.ref}" (at 0 0) (layer F.SilkS) ${p.ref_hide} (effects (font (size 1.27 1.27) (thickness 0.15))))
+        (fp_text value Jumper (at 0 -7.3) (layer F.Fab) (effects (font (size 1 1) (thickness 0.15))))
+
+        ${'' /* pins */}
+        (pad 1 smd rect (at -0.50038 0 ${p.rot}) (size 0.635 1.143) (layers ${p.param.side}.Cu ${p.param.side}.Paste ${p.param.side}.Mask)
+        (clearance 0.1905) ${p.net.from.str})
+        (pad 2 smd rect (at 0.50038 0 ${p.rot}) (size 0.635 1.143) (layers ${p.param.side}.Cu ${p.param.side}.Paste ${p.param.side}.Mask)
+        (clearance 0.1905) ${p.net.to.str}))
+    `
+	};
+
+	// Any MX switch
+	// Nets
+	//    from: corresponds to pin 1
+	//    to: corresponds to pin 2
+	// Params
+	//    hotswap: default is false
+	//      if true, will include holes and pads for Kailh MX hotswap sockets
+	//    reverse: default is false
+	//      if true, will flip the footprint such that the pcb can be reversible 
+	//    keycaps: default is false
+	//      if true, will add choc sized keycap box around the footprint
+	//
+	// note: hotswap and reverse can be used simultaneously
+
+	var mx = {
+	  nets: {
+	    from: undefined,
+	    to: undefined
+	  },
+	  params: {
+	      class: 'S',
+	      hotswap: false,
+	      reverse: false,
+	      keycaps: false
+	  },
+	  body: p => {
+	    const standard = `
+      (module MX (layer F.Cu) (tedit 5DD4F656)
+      ${p.at /* parametric position */}
+
+      ${'' /* footprint reference */}
+      (fp_text reference "${p.ref}" (at 0 0) (layer F.SilkS) ${p.ref_hide} (effects (font (size 1.27 1.27) (thickness 0.15))))
+      (fp_text value "" (at 0 0) (layer F.SilkS) hide (effects (font (size 1.27 1.27) (thickness 0.15))))
+
+      ${''/* corner marks */}
+      (fp_line (start -7 -6) (end -7 -7) (layer Dwgs.User) (width 0.15))
+      (fp_line (start -7 7) (end -6 7) (layer Dwgs.User) (width 0.15))
+      (fp_line (start -6 -7) (end -7 -7) (layer Dwgs.User) (width 0.15))
+      (fp_line (start -7 7) (end -7 6) (layer Dwgs.User) (width 0.15))
+      (fp_line (start 7 6) (end 7 7) (layer Dwgs.User) (width 0.15))
+      (fp_line (start 7 -7) (end 6 -7) (layer Dwgs.User) (width 0.15))
+      (fp_line (start 6 7) (end 7 7) (layer Dwgs.User) (width 0.15))
+      (fp_line (start 7 -7) (end 7 -6) (layer Dwgs.User) (width 0.15))
+    
+      ${''/* middle shaft */}
+      (pad "" np_thru_hole circle (at 0 0) (size 3.9878 3.9878) (drill 3.9878) (layers *.Cu *.Mask))
+
+      ${''/* stabilizers */}
+      (pad "" np_thru_hole circle (at 5.08 0) (size 1.7018 1.7018) (drill 1.7018) (layers *.Cu *.Mask))
+      (pad "" np_thru_hole circle (at -5.08 0) (size 1.7018 1.7018) (drill 1.7018) (layers *.Cu *.Mask))
+      `;
+	    const keycap = `
+      ${'' /* keycap marks */}
+      (fp_line (start -9.5 -9.5) (end 9.5 -9.5) (layer Dwgs.User) (width 0.15))
+      (fp_line (start 9.5 -9.5) (end 9.5 9.5) (layer Dwgs.User) (width 0.15))
+      (fp_line (start 9.5 9.5) (end -9.5 9.5) (layer Dwgs.User) (width 0.15))
+      (fp_line (start -9.5 9.5) (end -9.5 -9.5) (layer Dwgs.User) (width 0.15))
+      `;
+	    function pins(def_neg, def_pos, def_side) {
+	      if(p.param.hotswap) {
+	        return `
+        ${'' /* holes */}
+        (pad "" np_thru_hole circle (at ${def_pos}2.54 -5.08) (size 3 3) (drill 3) (layers *.Cu *.Mask))
+        (pad "" np_thru_hole circle (at ${def_neg}3.81 -2.54) (size 3 3) (drill 3) (layers *.Cu *.Mask))
+        
+        ${'' /* net pads */}
+        (pad 1 smd rect (at ${def_neg}7.085 -2.54 180) (size 2.55 2.5) (layers ${def_side}.Cu ${def_side}.Paste ${def_side}.Mask) ${p.net.from.str})
+        (pad 2 smd rect (at ${def_pos}5.842 -5.08 180) (size 2.55 2.5) (layers ${def_side}.Cu ${def_side}.Paste ${def_side}.Mask) ${p.net.to.str})
+        `
+	      } else {
+	          return `
+            ${''/* pins */}
+            (pad 1 thru_hole circle (at ${def_pos}2.54 -5.08) (size 2.286 2.286) (drill 1.4986) (layers *.Cu *.Mask) ${p.net.from.str})
+            (pad 2 thru_hole circle (at ${def_neg}3.81 -2.54) (size 2.286 2.286) (drill 1.4986) (layers *.Cu *.Mask) ${p.net.to.str})
+          `
+	      }
+	    }
+	    if(p.param.reverse){
+	      return `
+        ${standard}
+        ${p.param.keycaps ? keycap : ''}
+        ${pins('-', '', 'B')}
+        ${pins('', '-', 'F')})
+        `
+	    } else {
+	      return `
+        ${standard}
+        ${p.param.keycaps ? keycap : ''}
+        ${pins('-', '', 'B')})
+        `
+	    }
+	  }
+	};
+
+	var oled = {
+	    nets: {
+	      SDA: undefined,
+	      SCL: undefined,
+	      VCC: 'VCC',
+	      GND: 'GND'
+	    },
+	    params: {
+	      class: 'OLED',
+		    side: 'F'
+	    },
+	    body: p => `
+        (module lib:OLED_headers (layer F.Cu) (tedit 5E1ADAC2)
+        ${p.at /* parametric position */} 
+
+        ${'' /* footprint reference */}        
+        (fp_text reference "${p.ref}" (at 0 0) (layer F.SilkS) ${p.ref_hide} (effects (font (size 1.27 1.27) (thickness 0.15))))
+        (fp_text value OLED (at 0 -7.3) (layer F.Fab) (effects (font (size 1 1) (thickness 0.15))))
+
+        ${'' /* pins */}
+        (pad 4 thru_hole oval (at 1.6 2.18 ${p.rot+270}) (size 1.7 1.7) (drill 1) (layers *.Cu *.Mask)
+        ${p.net.SDA.str})
+        (pad 3 thru_hole oval (at 1.6 4.72 ${p.rot+270}) (size 1.7 1.7) (drill 1) (layers *.Cu *.Mask)
+        ${p.net.SCL.str})
+        (pad 2 thru_hole oval (at 1.6 7.26 ${p.rot+270}) (size 1.7 1.7) (drill 1) (layers *.Cu *.Mask)
+        ${p.net.VCC.str})
+        (pad 1 thru_hole rect (at 1.6 9.8 ${p.rot+270}) (size 1.7 1.7) (drill 1) (layers *.Cu *.Mask)
+        ${p.net.GND.str})
+        )
+        `
+	};
+
+	var omron = {
+	    nets: {
+	        from: undefined,
+	        to: undefined
+	    },
+	    params: {
+	        class: 'S'
+	    },
+	    body: p => `
+    
+    (module OMRON_B3F-4055 (layer F.Cu) (tstamp 5BF2CC94)
+
+        ${p.at /* parametric position */}
+        ${'' /* footprint reference */}
+        (fp_text reference "${p.ref}" (at 0 0) (layer F.SilkS) ${p.ref_hide} (effects (font (size 1.27 1.27) (thickness 0.15))))
+        (fp_text value "" (at 0 0) (layer F.SilkS) hide (effects (font (size 1.27 1.27) (thickness 0.15))))
+        
+        ${'' /* stabilizers */}
+        (pad "" np_thru_hole circle (at 0 -4.5) (size 1.8 1.8) (drill 1.8) (layers *.Cu *.Mask))
+        (pad "" np_thru_hole circle (at 0 4.5) (size 1.8 1.8) (drill 1.8) (layers *.Cu *.Mask))
+
+        ${'' /* switch marks */}
+        (fp_line (start -6 -6) (end 6 -6) (layer Dwgs.User) (width 0.15))
+        (fp_line (start 6 -6) (end 6 6) (layer Dwgs.User) (width 0.15))
+        (fp_line (start 6 6) (end -6 6) (layer Dwgs.User) (width 0.15))
+        (fp_line (start -6 6) (end -6 -6) (layer Dwgs.User) (width 0.15))
+
+        ${'' /* pins */}
+        (pad 1 np_thru_hole circle (at 6.25 -2.5) (size 1.2 1.2) (drill 1.2) (layers *.Cu *.Mask) ${p.net.from.str})
+        (pad 2 np_thru_hole circle (at -6.25 -2.5) (size 1.2 1.2) (drill 1.2) (layers *.Cu *.Mask) ${p.net.from.str})
+        (pad 3 np_thru_hole circle (at 6.25 2.5) (size 1.2 1.2) (drill 1.2) (layers *.Cu *.Mask) ${p.net.to.str})
+        (pad 4 np_thru_hole circle (at -6.25 2.5 ) (size 1.2 1.2) (drill 1.2) (layers *.Cu *.Mask) ${p.net.to.str})
+    )
+    
+    `
+	};
+
+	var pad = {
+	    nets: {
+	        net: undefined
+	    },
+	    params: {
+	        class: 'PAD',
 	        width: 1,
 	        height: 1,
 	        front: true,
@@ -1815,7 +1992,7 @@
 	            if (align == 'up') y += p.param.height / 2 + plus;
 	            if (align == 'down') y -= p.param.height / 2 + plus;
 	            const text = `(fp_text user ${p.param.text} (at ${x} ${y} ${p.rot}) (layer ${side}.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15)) ${mirror}))`;
-	            return `(pad 1 smd rect (at 0 0 ${p.rot}) (size ${p.param.width} ${p.param.height}) (layers ${side}.Cu ${side}.Paste ${side}.Mask) ${p.net.net})\n${text}`
+	            return `(pad 1 smd rect (at 0 0 ${p.rot}) (size ${p.param.width} ${p.param.height}) (layers ${side}.Cu ${side}.Paste ${side}.Mask) ${p.net.net.str})\n${text}`
 	        };
 
 	        return `
@@ -1838,10 +2015,205 @@
 	    }
 	};
 
-	var rotary = {
-	    nets: ['A', 'B', 'C', 'from', 'to'],
+	// Arduino ProMicro atmega32u4au
+	// Params
+	//  orientation: default is down
+	//    if down, power led will face the pcb
+	//    if up, power led will face away from pcb
+
+	var promicro = {
+	  nets: {
+	    RAW: 'RAW',
+	    GND: 'GND',
+	    RST: 'RST',
+	    VCC: 'VCC',
+	    P21: 'P21',
+	    P20: 'P20',
+	    P19: 'P19',
+	    P18: 'P18',
+	    P15: 'P15',
+	    P14: 'P14',
+	    P16: 'P16',
+	    P10: 'P10',
+	    P1: 'P1',
+	    P0: 'P0',
+	    P2: 'P2',
+	    P3: 'P3',
+	    P4: 'P4',
+	    P5: 'P5',
+	    P6: 'P6',
+	    P7: 'P7',
+	    P8: 'P8',
+	    P9: 'P9',
+	  },
+	  params: {
+	    class: 'MCU',
+	    orientation: 'down'
+	  },
+	  body: p => {
+	    const standard = `
+      (module ProMicro (layer F.Cu) (tedit 5B307E4C)
+      ${p.at /* parametric position */}
+
+      ${'' /* footprint reference */}
+      (fp_text reference "${p.ref}" (at 0 0) (layer F.SilkS) ${p.ref_hide} (effects (font (size 1.27 1.27) (thickness 0.15))))
+      (fp_text value "" (at 0 0) (layer F.SilkS) hide (effects (font (size 1.27 1.27) (thickness 0.15))))
+    
+      ${''/* illustration of the (possible) USB port overhang */}
+      (fp_line (start -19.304 -3.81) (end -14.224 -3.81) (layer Dwgs.User) (width 0.15))
+      (fp_line (start -19.304 3.81) (end -19.304 -3.81) (layer Dwgs.User) (width 0.15))
+      (fp_line (start -14.224 3.81) (end -19.304 3.81) (layer Dwgs.User) (width 0.15))
+      (fp_line (start -14.224 -3.81) (end -14.224 3.81) (layer Dwgs.User) (width 0.15))
+    
+      ${''/* component outline */}
+      (fp_line (start -17.78 8.89) (end 15.24 8.89) (layer F.SilkS) (width 0.15))
+      (fp_line (start 15.24 8.89) (end 15.24 -8.89) (layer F.SilkS) (width 0.15))
+      (fp_line (start 15.24 -8.89) (end -17.78 -8.89) (layer F.SilkS) (width 0.15))
+      (fp_line (start -17.78 -8.89) (end -17.78 8.89) (layer F.SilkS) (width 0.15))
+      `;
+	    function pins(def_neg, def_pos) {
+	      return `
+        ${''/* extra border around "RAW", in case the rectangular shape is not distinctive enough */}
+        (fp_line (start -15.24 ${def_pos}6.35) (end -12.7 ${def_pos}6.35) (layer F.SilkS) (width 0.15))
+        (fp_line (start -15.24 ${def_pos}6.35) (end -15.24 ${def_pos}8.89) (layer F.SilkS) (width 0.15))
+        (fp_line (start -12.7 ${def_pos}6.35) (end -12.7 ${def_pos}8.89) (layer F.SilkS) (width 0.15))
+      
+        ${''/* pin names */}
+        (fp_text user RAW (at -13.97 ${def_pos}4.8 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+        (fp_text user GND (at -11.43 ${def_pos}4.8 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+        (fp_text user RST (at -8.89 ${def_pos}4.8 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+        (fp_text user VCC (at -6.35 ${def_pos}4.8 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+        (fp_text user P21 (at -3.81 ${def_pos}4.8 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+        (fp_text user P20 (at -1.27 ${def_pos}4.8 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+        (fp_text user P19 (at 1.27 ${def_pos}4.8 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+        (fp_text user P18 (at 3.81 ${def_pos}4.8 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+        (fp_text user P15 (at 6.35 ${def_pos}4.8 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+        (fp_text user P14 (at 8.89 ${def_pos}4.8 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+        (fp_text user P16 (at 11.43 ${def_pos}4.8 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+        (fp_text user P10 (at 13.97 ${def_pos}4.8 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+      
+        (fp_text user P01 (at -13.97 ${def_neg}4.8 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+        (fp_text user P00 (at -11.43 ${def_neg}4.8 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+        (fp_text user GND (at -8.89 ${def_neg}4.8 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+        (fp_text user GND (at -6.35 ${def_neg}4.8 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+        (fp_text user P02 (at -3.81 ${def_neg}4.8 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+        (fp_text user P03 (at -1.27 ${def_neg}4.8 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+        (fp_text user P04 (at 1.27 ${def_neg}4.8 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+        (fp_text user P05 (at 3.81 ${def_neg}4.8 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+        (fp_text user P06 (at 6.35 ${def_neg}4.8 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+        (fp_text user P07 (at 8.89 ${def_neg}4.8 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+        (fp_text user P08 (at 11.43 ${def_neg}4.8 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+        (fp_text user P09 (at 13.97 ${def_neg}4.8 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+      
+        ${''/* and now the actual pins */}
+        (pad 1 thru_hole rect (at -13.97 ${def_pos}7.62 ${p.rot}) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.RAW.str})
+        (pad 2 thru_hole circle (at -11.43 ${def_pos}7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.GND.str})
+        (pad 3 thru_hole circle (at -8.89 ${def_pos}7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.RST.str})
+        (pad 4 thru_hole circle (at -6.35 ${def_pos}7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.VCC.str})
+        (pad 5 thru_hole circle (at -3.81 ${def_pos}7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P21.str})
+        (pad 6 thru_hole circle (at -1.27 ${def_pos}7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P20.str})
+        (pad 7 thru_hole circle (at 1.27 ${def_pos}7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P19.str})
+        (pad 8 thru_hole circle (at 3.81 ${def_pos}7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P18.str})
+        (pad 9 thru_hole circle (at 6.35 ${def_pos}7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P15.str})
+        (pad 10 thru_hole circle (at 8.89 ${def_pos}7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P14.str})
+        (pad 11 thru_hole circle (at 11.43 ${def_pos}7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P16.str})
+        (pad 12 thru_hole circle (at 13.97 ${def_pos}7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P10.str})
+        
+        (pad 13 thru_hole circle (at -13.97 ${def_neg}7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P1.str})
+        (pad 14 thru_hole circle (at -11.43 ${def_neg}7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P0.str})
+        (pad 15 thru_hole circle (at -8.89 ${def_neg}7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.GND.str})
+        (pad 16 thru_hole circle (at -6.35 ${def_neg}7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.GND.str})
+        (pad 17 thru_hole circle (at -3.81 ${def_neg}7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P2.str})
+        (pad 18 thru_hole circle (at -1.27 ${def_neg}7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P3.str})
+        (pad 19 thru_hole circle (at 1.27 ${def_neg}7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P4.str})
+        (pad 20 thru_hole circle (at 3.81 ${def_neg}7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P5.str})
+        (pad 21 thru_hole circle (at 6.35 ${def_neg}7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P6.str})
+        (pad 22 thru_hole circle (at 8.89 ${def_neg}7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P7.str})
+        (pad 23 thru_hole circle (at 11.43 ${def_neg}7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P8.str})
+        (pad 24 thru_hole circle (at 13.97 ${def_neg}7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P9.str})
+      `
+	    }
+	    if(p.param.orientation == 'down') {
+	      return `
+        ${standard}
+        ${pins('-', '')})
+        `
+	    } else {
+	      return `
+        ${standard}
+        ${pins('', '-')})
+        `
+	    }
+	  }
+	};
+
+	var rgb = {
+	    nets: {
+	        din: undefined,
+	        dout: undefined,
+	        VCC: 'VCC',
+	        GND: 'GND'
+	    },
 	    params: {
-	        class: 'R'
+	        class: 'LED',
+	        side: 'F'
+	    },
+	    body: p => `
+    
+        (module WS2812B (layer F.Cu) (tedit 53BEE615)
+
+            ${p.at /* parametric position */}
+
+            ${'' /* footprint reference */}
+            (fp_text reference "${p.ref}" (at 0 0) (layer F.SilkS) ${p.ref_hide} (effects (font (size 1.27 1.27) (thickness 0.15))))
+            (fp_text value "" (at 0 0) (layer F.SilkS) hide (effects (font (size 1.27 1.27) (thickness 0.15))))
+
+            (fp_line (start -1.75 -1.75) (end -1.75 1.75) (layer ${p.param.side}.SilkS) (width 0.15))
+            (fp_line (start -1.75 1.75) (end 1.75 1.75) (layer ${p.param.side}.SilkS) (width 0.15))
+            (fp_line (start 1.75 1.75) (end 1.75 -1.75) (layer ${p.param.side}.SilkS) (width 0.15))
+            (fp_line (start 1.75 -1.75) (end -1.75 -1.75) (layer ${p.param.side}.SilkS) (width 0.15))
+
+            (fp_line (start -2.5 -2.5) (end -2.5 2.5) (layer ${p.param.side}.SilkS) (width 0.15))
+            (fp_line (start -2.5 2.5) (end 2.5 2.5) (layer ${p.param.side}.SilkS) (width 0.15))
+            (fp_line (start 2.5 2.5) (end 2.5 -2.5) (layer ${p.param.side}.SilkS) (width 0.15))
+            (fp_line (start 2.5 -2.5) (end -2.5 -2.5) (layer ${p.param.side}.SilkS) (width 0.15))
+
+            (fp_poly (pts (xy 4 2.2) (xy 4 0.375) (xy 5 1.2875)) (layer ${p.param.side}.SilkS) (width 0.1))
+
+            (pad 1 smd rect (at -2.2 -0.875 ${p.rot}) (size 2.6 1) (layers ${p.param.side}.Cu ${p.param.side}.Paste ${p.param.side}.Mask) ${p.net.VCC.str})
+            (pad 2 smd rect (at -2.2 0.875 ${p.rot}) (size 2.6 1) (layers ${p.param.side}.Cu ${p.param.side}.Paste ${p.param.side}.Mask) ${p.net.dout.str})
+            (pad 3 smd rect (at 2.2 0.875 ${p.rot}) (size 2.6 1) (layers ${p.param.side}.Cu ${p.param.side}.Paste ${p.param.side}.Mask) ${p.net.GND.str})
+            (pad 4 smd rect (at 2.2 -0.875 ${p.rot}) (size 2.6 1) (layers ${p.param.side}.Cu ${p.param.side}.Paste ${p.param.side}.Mask) ${p.net.din.str})
+
+            (pad 11 smd rect (at -2.5 -1.6 ${p.rot}) (size 2 1.2) (layers ${p.param.side}.Cu ${p.param.side}.Paste ${p.param.side}.Mask) ${p.net.VCC.str})
+            (pad 22 smd rect (at -2.5 1.6 ${p.rot}) (size 2 1.2) (layers ${p.param.side}.Cu ${p.param.side}.Paste ${p.param.side}.Mask) ${p.net.dout.str})
+            (pad 33 smd rect (at 2.5 1.6 ${p.rot}) (size 2 1.2) (layers ${p.param.side}.Cu ${p.param.side}.Paste ${p.param.side}.Mask) ${p.net.GND.str})
+            (pad 44 smd rect (at 2.5 -1.6 ${p.rot}) (size 2 1.2) (layers ${p.param.side}.Cu ${p.param.side}.Paste ${p.param.side}.Mask) ${p.net.din.str})
+            
+        )
+    
+    `
+	};
+
+	// EC11 rotary encoder
+	//
+	// Nets
+	//    from: corresponds to switch pin 1 (for button presses)
+	//    to: corresponds to switch pin 2 (for button presses)
+	//    A: corresponds to pin 1 (for rotary)
+	//    B: corresponds to pin 2 (for rotary, should be GND)
+	//    C: corresponds to pin 3 (for rotary)
+
+	var rotary = {
+	    nets: {
+	        from: undefined,
+	        to: undefined,
+	        A: undefined,
+	        B: undefined,
+	        C: undefined
+	    },
+	    params: {
+	        class: 'ROT'
 	    },
 	    body: p => `
         (module rotary_encoder (layer F.Cu) (tedit 603326DE)
@@ -1883,11 +2255,11 @@
             (fp_circle (center -0.12 -0.04) (end 2.88 -0.04) (layer F.Fab) (width 0.12))
 
             ${''/* pin names */}
-            (pad A thru_hole rect (at -7.62 -2.54) (size 2 2) (drill 1) (layers *.Cu *.Mask) ${p.net.A}))
-            (pad C thru_hole circle (at -7.62 -0.04) (size 2 2) (drill 1) (layers *.Cu *.Mask) ${p.net.B}))
-            (pad B thru_hole circle (at -7.62 2.46) (size 2 2) (drill 1) (layers *.Cu *.Mask) ${p.net.C}))
-            (pad 1 thru_hole circle (at 6.88 -2.54) (size 1.5 1.5) (drill 1) (layers *.Cu *.Mask) ${p.net.from}))
-            (pad 2 thru_hole circle (at 6.88 2.46) (size 1.5 1.5) (drill 1) (layers *.Cu *.Mask) ${p.net.to})
+            (pad A thru_hole rect (at -7.62 -2.54) (size 2 2) (drill 1) (layers *.Cu *.Mask) ${p.net.A.str}))
+            (pad C thru_hole circle (at -7.62 -0.04) (size 2 2) (drill 1) (layers *.Cu *.Mask) ${p.net.C.str}))
+            (pad B thru_hole circle (at -7.62 2.46) (size 2 2) (drill 1) (layers *.Cu *.Mask) ${p.net.B.str}))
+            (pad 1 thru_hole circle (at 6.88 -2.54) (size 1.5 1.5) (drill 1) (layers *.Cu *.Mask) ${p.net.from.str}))
+            (pad 2 thru_hole circle (at 6.88 2.46) (size 1.5 1.5) (drill 1) (layers *.Cu *.Mask) ${p.net.to.str})
 
             ${''/* Legs */}
             (pad "" thru_hole rect (at -0.12 -5.64) (size 3.2 2) (drill oval 2.8 1.5) (layers *.Cu *.Mask)))
@@ -1896,20 +2268,273 @@
     `
 	};
 
+	// Panasonic EVQWGD001 horizontal rotary encoder
+	//
+	//   __________________
+	//  (f) (t)         | |
+	//  | (1)           | |
+	//  | (2)           | |
+	//  | (3)           | |
+	//  | (4)           | |
+	//  |_( )___________|_|
+	//
+	// Nets
+	//    from: corresponds to switch pin 1 (for button presses)
+	//    to: corresponds to switch pin 2 (for button presses)
+	//    A: corresponds to pin 1 (for rotary)
+	//    B: corresponds to pin 2 (for rotary, should be GND)
+	//    C: corresponds to pin 3 (for rotary)
+	//    D: corresponds to pin 4 (for rotary, unused)
+	// Params
+	//    reverse: default is false
+	//      if true, will flip the footprint such that the pcb can be reversible
+
+
+	var scrollwheel = {
+	    nets: {
+	      from: undefined,
+	      to: undefined,
+	      A: undefined,
+	      B: undefined,
+	      C: undefined,
+	      D: undefined
+	    },
+	    params: {
+	      class: 'S',
+			  reverse: false
+	    },
+	    body: p => {
+	      standard = `
+        (module RollerEncoder_Panasonic_EVQWGD001 (layer F.Cu) (tedit 6040A10C)
+        ${p.at /* parametric position */}   
+        (fp_text reference REF** (at 0 0 ${p.rot}) (layer F.Fab) (effects (font (size 1 1) (thickness 0.15))))
+        (fp_text value RollerEncoder_Panasonic_EVQWGD001 (at -0.1 9 ${p.rot}) (layer F.Fab) (effects (font (size 1 1) (thickness 0.15))))
+        
+        ${'' /* corner marks */}
+        (fp_line (start -8.4 -6.4) (end 8.4 -6.4) (layer Dwgs.User) (width 0.12))
+        (fp_line (start 8.4 -6.4) (end 8.4 7.4) (layer Dwgs.User) (width 0.12))
+        (fp_line (start 8.4 7.4) (end -8.4 7.4) (layer Dwgs.User) (width 0.12))
+        (fp_line (start -8.4 7.4) (end -8.4 -6.4) (layer Dwgs.User) (width 0.12))
+      `;
+	      function pins(def_neg, def_pos) {
+	        return `
+          ${'' /* edge cuts */}
+          (fp_line (start ${def_pos}9.8 7.3) (end ${def_pos}9.8 -6.3) (layer Edge.Cuts) (width 0.15))
+          (fp_line (start ${def_pos}7.4 -6.3) (end ${def_pos}7.4 7.3) (layer Edge.Cuts) (width 0.15))
+          (fp_line (start ${def_pos}9.5 -6.6) (end ${def_pos}7.7 -6.6) (layer Edge.Cuts) (width 0.15))
+          (fp_line (start ${def_pos}7.7 7.6) (end ${def_pos}9.5 7.6) (layer Edge.Cuts) (width 0.15))
+          (fp_arc (start ${def_pos}7.7 7.3) (end ${def_pos}7.4 7.3) (angle ${def_neg}90) (layer Edge.Cuts) (width 0.15))
+          (fp_arc (start ${def_pos}9.5 7.3) (end ${def_pos}9.5 7.6) (angle ${def_neg}90) (layer Edge.Cuts) (width 0.15))
+          (fp_arc (start ${def_pos}7.7 -6.3) (end ${def_pos}7.7 -6.6) (angle ${def_neg}90) (layer Edge.Cuts) (width 0.15))
+          (fp_arc (start ${def_pos}9.5 -6.3) (end ${def_pos}9.8 -6.3) (angle ${def_neg}90) (layer Edge.Cuts) (width 0.15))
+
+          ${'' /* pins */}
+          (pad S1 thru_hole circle (at ${def_neg}6.85 -6.2 ${p.rot}) (size 1.6 1.6) (drill 0.9) (layers *.Cu *.Mask) ${p.net.from.str})
+          (pad S2 thru_hole circle (at ${def_neg}5 -6.2 ${p.rot}) (size 1.6 1.6) (drill 0.9) (layers *.Cu *.Mask) ${p.net.to.str})
+          (pad A thru_hole circle (at ${def_neg}5.625 -3.81 ${p.rot}) (size 1.6 1.6) (drill 0.9) (layers *.Cu *.Mask) ${p.net.A.str})
+          (pad B thru_hole circle (at ${def_neg}5.625 -1.27 ${p.rot}) (size 1.6 1.6) (drill 0.9) (layers *.Cu *.Mask) ${p.net.B.str})
+          (pad C thru_hole circle (at ${def_neg}5.625 1.27 ${p.rot}) (size 1.6 1.6) (drill 0.9) (layers *.Cu *.Mask) ${p.net.C.str})
+          (pad D thru_hole circle (at ${def_neg}5.625 3.81 ${p.rot}) (size 1.6 1.6) (drill 0.9) (layers *.Cu *.Mask) ${p.net.D.str})
+
+          ${'' /* stabilizer */}
+          (pad "" np_thru_hole circle (at ${def_neg}5.625 6.3 ${p.rot}) (size 1.5 1.5) (drill 1.5) (layers *.Cu *.Mask))
+        `
+	    }
+	    if(p.param.reverse) {
+	      return `
+        ${standard}
+        ${pins('-', '')}
+        ${pins('', '-')})
+        `
+	    } else {
+	      return `
+        ${standard}
+        ${pins('-', '')})
+        `
+	    }
+	  }
+	};
+
+	var slider = {
+	    nets: {
+	        from: undefined,
+	        to: undefined
+	    },
+	    params: {
+	        class: 'T', // for Toggle
+	        side: 'F'
+	    },
+	    body: p => {
+
+	        const left = p.param.side == 'F' ? '-' : '';
+	        const right = p.param.side == 'F' ? '' : '-';
+
+	        return `
+        
+        (module E73:SPDT_C128955 (layer F.Cu) (tstamp 5BF2CC3C)
+
+            ${p.at /* parametric position */}
+
+            ${'' /* footprint reference */}
+            (fp_text reference "${p.ref}" (at 0 0) (layer F.SilkS) ${p.ref_hide} (effects (font (size 1.27 1.27) (thickness 0.15))))
+            (fp_text value "" (at 0 0) (layer F.SilkS) hide (effects (font (size 1.27 1.27) (thickness 0.15))))
+            
+            ${'' /* outline */}
+            (fp_line (start 1.95 -1.35) (end -1.95 -1.35) (layer ${p.param.side}.SilkS) (width 0.15))
+            (fp_line (start 0 -1.35) (end -3.3 -1.35) (layer ${p.param.side}.SilkS) (width 0.15))
+            (fp_line (start -3.3 -1.35) (end -3.3 1.5) (layer ${p.param.side}.SilkS) (width 0.15))
+            (fp_line (start -3.3 1.5) (end 3.3 1.5) (layer ${p.param.side}.SilkS) (width 0.15))
+            (fp_line (start 3.3 1.5) (end 3.3 -1.35) (layer ${p.param.side}.SilkS) (width 0.15))
+            (fp_line (start 0 -1.35) (end 3.3 -1.35) (layer ${p.param.side}.SilkS) (width 0.15))
+            
+            ${'' /* extra indicator for the slider */}
+            (fp_line (start -1.95 -3.85) (end 1.95 -3.85) (layer Dwgs.User) (width 0.15))
+            (fp_line (start 1.95 -3.85) (end 1.95 -1.35) (layer Dwgs.User) (width 0.15))
+            (fp_line (start -1.95 -1.35) (end -1.95 -3.85) (layer Dwgs.User) (width 0.15))
+            
+            ${'' /* bottom cutouts */}
+            (pad "" np_thru_hole circle (at 1.5 0) (size 1 1) (drill 0.9) (layers *.Cu *.Mask))
+            (pad "" np_thru_hole circle (at -1.5 0) (size 1 1) (drill 0.9) (layers *.Cu *.Mask))
+
+            ${'' /* pins */}
+            (pad 1 smd rect (at ${right}2.25 2.075 ${p.rot}) (size 0.9 1.25) (layers ${p.param.side}.Cu ${p.param.side}.Paste ${p.param.side}.Mask) ${p.net.from.str})
+            (pad 2 smd rect (at ${left}0.75 2.075 ${p.rot}) (size 0.9 1.25) (layers ${p.param.side}.Cu ${p.param.side}.Paste ${p.param.side}.Mask) ${p.net.to.str})
+            (pad 3 smd rect (at ${left}2.25 2.075 ${p.rot}) (size 0.9 1.25) (layers ${p.param.side}.Cu ${p.param.side}.Paste ${p.param.side}.Mask))
+            
+            ${'' /* side mounts */}
+            (pad "" smd rect (at 3.7 -1.1 ${p.rot}) (size 0.9 0.9) (layers ${p.param.side}.Cu ${p.param.side}.Paste ${p.param.side}.Mask))
+            (pad "" smd rect (at 3.7 1.1 ${p.rot}) (size 0.9 0.9) (layers ${p.param.side}.Cu ${p.param.side}.Paste ${p.param.side}.Mask))
+            (pad "" smd rect (at -3.7 1.1 ${p.rot}) (size 0.9 0.9) (layers ${p.param.side}.Cu ${p.param.side}.Paste ${p.param.side}.Mask))
+            (pad "" smd rect (at -3.7 -1.1 ${p.rot}) (size 0.9 0.9) (layers ${p.param.side}.Cu ${p.param.side}.Paste ${p.param.side}.Mask))
+        )
+        
+        `
+	    }
+	};
+
+	// TRRS-PJ-320A-dual
+	//     _________________
+	//    | (1)     (3) (4)|
+	//    |                |
+	//    |___(2)__________|
+	//
+	// Nets
+	//    A: corresponds to pin 1
+	//    B: corresponds to pin 2
+	//    C: corresponds to pin 3
+	//    D: corresponds to pin 4
+	// Params
+	//    reverse: default is false
+	//      if true, will flip the footprint such that the pcb can be reversible
+	//    symmetric: default is false
+	//      if true, will only work if reverse is also true
+	//      this will cause the footprint to be symmetrical on each half
+	//      pins 1 and 2 must be identical if symmetric is true, as they will overlap
+
+	var trrs = {
+	  nets: {
+	    A: undefined,
+	    B: undefined,
+	    C: undefined,
+	    D: undefined
+	  },
+	  params: {
+	    class: 'TRRS',
+	    reverse: false,
+	    symmetric: false
+	  },
+	  body: p => {
+	    const standard = `
+      (module TRRS-PJ-320A-dual (layer F.Cu) (tedit 5970F8E5)
+
+      ${p.at /* parametric position */}   
+
+      ${'' /* footprint reference */}
+      (fp_text reference REF** (at 0 14.2) (layer Dwgs.User) (effects (font (size 1 1) (thickness 0.15))))
+      (fp_text value TRRS-PJ-320A-dual (at 0 -5.6) (layer F.Fab) (effects (font (size 1 1) (thickness 0.15))))
+
+      ${''/* corner marks */}
+      (fp_line (start 0.5 -2) (end -5.1 -2) (layer Dwgs.User) (width 0.15))
+      (fp_line (start -5.1 0) (end -5.1 -2) (layer Dwgs.User) (width 0.15))
+      (fp_line (start 0.5 0) (end 0.5 -2) (layer Dwgs.User) (width 0.15))
+      (fp_line (start -5.35 0) (end -5.35 12.1) (layer Dwgs.User) (width 0.15))
+      (fp_line (start 0.75 0) (end 0.75 12.1) (layer Dwgs.User) (width 0.15))
+      (fp_line (start 0.75 12.1) (end -5.35 12.1) (layer Dwgs.User) (width 0.15))
+      (fp_line (start 0.75 0) (end -5.35 0) (layer Dwgs.User) (width 0.15))
+
+      ${''/* stabilizers */}
+      (pad "" np_thru_hole circle (at -2.3 8.6) (size 1.5 1.5) (drill 1.5) (layers *.Cu *.Mask))
+      (pad "" np_thru_hole circle (at -2.3 1.6) (size 1.5 1.5) (drill 1.5) (layers *.Cu *.Mask))
+      `;
+	    function pins(def_neg, def_pos) {
+	      return `
+        (pad 1 thru_hole oval (at ${def_neg} 11.3 ${p.rot}) (size 1.6 2.2) (drill oval 0.9 1.5) (layers *.Cu *.Mask) ${p.net.A.str})
+        (pad 2 thru_hole oval (at ${def_pos} 10.2 ${p.rot}) (size 1.6 2.2) (drill oval 0.9 1.5) (layers *.Cu *.Mask) ${p.net.B.str})
+        (pad 3 thru_hole oval (at ${def_pos} 6.2 ${p.rot}) (size 1.6 2.2) (drill oval 0.9 1.5) (layers *.Cu *.Mask) ${p.net.C.str})
+        (pad 4 thru_hole oval (at ${def_pos} 3.2 ${p.rot}) (size 1.6 2.2) (drill oval 0.9 1.5) (layers *.Cu *.Mask) ${p.net.D.str})
+      `
+	    }
+	    if(p.param.reverse & p.param.symmetric) {
+	      return `
+        ${standard}
+        ${pins('0', '-4.6')}
+        ${pins('-4.6', '0')})
+      `
+	    } else if(p.param.reverse) {
+	        return `
+          ${standard}
+          ${pins('-4.6', '0')}
+          ${pins('4.6', '0')})
+        `
+	      } else {
+	        return `
+          ${standard}
+          ${pins('-4.6', '0')})
+        `
+	      }
+	  }
+	};
+
+	// Via
+	// Nets
+	//		net: the net this via should be connected to
+
+	var via = {
+	    nets: {
+	      net: undefined
+	    },
+	    body: p => `
+      (module VIA-0.6mm (layer F.Cu) (tedit 591DBFB0)
+      ${p.at /* parametric position */}   
+      ${'' /* footprint reference */}
+      (fp_text reference REF** (at 0 1.4) (layer F.SilkS) hide (effects (font (size 1 1) (thickness 0.15))))
+      (fp_text value VIA-0.6mm (at 0 -1.4) (layer F.Fab) hide (effects (font (size 1 1) (thickness 0.15))))
+
+      ${'' /* via */}
+      (pad 1 thru_hole circle (at 0 0) (size 0.6 0.6) (drill 0.3) (layers *.Cu) (zone_connect 2) ${p.net.net.str})
+      )
+    `
+	};
+
 	var footprints = {
-	    mx: mx,
-	    mx_hotswap: mx_hotswap,
 	    alps: alps,
-	    choc: choc,
-	    choc_hotswap: choc_hotswap,
-	    diode: diode,
-	    promicro: promicro,
-	    slider: slider,
 	    button: button,
-	    rgb: rgb,
+	    choc: choc,
+	    chocmini: chocmini,
+	    diode: diode,
 	    jstph: jstph,
+	    jumper: jumper,
+	    mx: mx,
+	    oled: oled,
+	    omron: omron,
 	    pad: pad,
-	    rotary: rotary
+	    promicro: promicro,
+	    rgb: rgb,
+	    rotary: rotary,
+	    scrollwheel: scrollwheel,
+	    slider: slider,
+	    trrs: trrs,
+	    via: via,
 	};
 
 	var pcbs = createCommonjsModule(function (module, exports) {
@@ -2026,7 +2651,7 @@
 	const makerjs2kicad = exports._makerjs2kicad = (model, layer='Edge.Cuts') => {
 	    const grs = [];
 	    const xy = val => `${val[0]} ${-val[1]}`;
-	    makerjs.model.walk(model, {
+	    makerjs__default['default'].model.walk(model, {
 	        onPath: wp => {
 	            const p = wp.pathContext;
 	            switch (p.type) {
@@ -2037,12 +2662,12 @@
 	                    const arc_center = p.origin;
 	                    const angle_start = p.startAngle > p.endAngle ? p.startAngle - 360 : p.startAngle;
 	                    const angle_diff = Math.abs(p.endAngle - angle_start);
-	                    const arc_end = makerjs.point.rotate(makerjs.point.add(arc_center, [p.radius, 0]), angle_start, arc_center);
+	                    const arc_end = makerjs__default['default'].point.rotate(makerjs__default['default'].point.add(arc_center, [p.radius, 0]), angle_start, arc_center);
 	                    grs.push(`(gr_arc (start ${xy(arc_center)}) (end ${xy(arc_end)}) (angle ${-angle_diff}) (layer ${layer}) (width 0.15))`);
 	                    break
 	                case 'circle':
 	                    const circle_center = p.origin;
-	                    const circle_end = makerjs.point.add(circle_center, [p.radius, 0]);
+	                    const circle_end = makerjs__default['default'].point.add(circle_center, [p.radius, 0]);
 	                    grs.push(`(gr_circle (center ${xy(circle_center)}) (end ${xy(circle_end)}) (layer ${layer}) (width 0.15))`);
 	                    break
 	                default:
@@ -2054,61 +2679,90 @@
 	};
 
 
+
+	exports.inject_footprint = (name, fp) => {
+	    footprints[name] = fp;
+	};
+
 	const footprint = exports._footprint = (config, name, points, point, net_indexer, component_indexer, units) => {
 
 	    if (config === false) return ''
-	    
+
 	    // config sanitization
-	    assert_1.detect_unexpected(config, name, ['type', 'anchor', 'nets', 'params']);
+	    assert_1.unexpected(config, name, ['type', 'anchor', 'nets', 'anchors', 'params']);
 	    const type = assert_1.in(config.type, `${name}.type`, Object.keys(footprints));
-	    let anchor = anchor_1(config.anchor || {}, `${name}.anchor`, points, true, point)(units);
+	    let anchor = anchor_1.parse(config.anchor || {}, `${name}.anchor`, points, true, point)(units);
 	    const nets = assert_1.sane(config.nets || {}, `${name}.nets`, 'object')();
+	    const anchors = assert_1.sane(config.anchors || {}, `${name}.anchors`, 'object')();
 	    const params = assert_1.sane(config.params || {}, `${name}.params`, 'object')();
 
 	    // basic setup
 	    const fp = footprints[type];
 	    const parsed_params = {};
 
-	    // footprint positioning
-	    parsed_params.at = `(at ${anchor.x} ${-anchor.y} ${anchor.r})`;
-	    parsed_params.rot = anchor.r;
-
-	    // connecting static nets
-	    parsed_params.net = {};
-	    for (const net of (fp.static_nets || [])) {
-	        const index = net_indexer(net);
-	        parsed_params.net[net] = `(net ${index} "${net}")`;
-	    }
-
-	    // connecting parametric nets
-	    for (const net_ref of (fp.nets || [])) {
-	        let net = nets[net_ref];
-	        assert_1.sane(net, `${name}.nets.${net_ref}`, 'string')();
-	        if (net.startsWith('=') && point) {
-	            const indirect = net.substring(1);
-	            net = point.meta[indirect];
-	            assert_1.sane(net, `${name}.nets.${net_ref} --> ${point.meta.name}.${indirect}`, 'string')();
-	        }
-	        const index = net_indexer(net);
-	        parsed_params.net[net_ref] = `(net ${index} "${net}")`;
-	    }
-
-	    // connecting other, non-net parameters
+	    // connecting other, non-net, non-anchor parameters
 	    parsed_params.param = {};
-	    for (const param of (Object.keys(fp.params || {}))) {
-	        let value = params[param] === undefined ? fp.params[param] : params[param];
-	        if (value === undefined) throw new Error(`Field "${name}.params.${param}" is missing!`)
+	    for (const [param_name, param_value] of Object.entries(prepare.extend(fp.params || {}, params))) {
+	        let value = param_value;
 	        if (assert_1.type(value)() == 'string' && value.startsWith('=') && point) {
 	            const indirect = value.substring(1);
 	            value = point.meta[indirect];
-	            if (value === undefined) throw new Error(`Field "${name}.params.${param} --> ${point.meta.name}.${indirect}" is missing!`)
+	            if (value === undefined) {
+	                throw new Error(`Indirection "${name}.params.${param}" --> "${point.meta.name}.${indirect}" to undefined value!`)
+	            }
 	        }
-	        parsed_params.param[param] = value;
+	        parsed_params.param[param_name] = value;
 	    }
 
 	    // reference
-	    parsed_params.ref = component_indexer(parsed_params.param.class || '_');
+	    const component_ref = parsed_params.ref = component_indexer(parsed_params.param.class || '_');
 	    parsed_params.ref_hide = 'hide'; // TODO: make this parametric?
+
+	    // footprint positioning
+	    parsed_params.at = `(at ${anchor.x} ${-anchor.y} ${anchor.r})`;
+	    parsed_params.rot = anchor.r;
+	    parsed_params.xy = (x, y) => {
+	        const new_anchor = anchor_1.parse({
+	            shift: [x, -y]
+	        }, '_internal_footprint_xy', points, true, anchor)(units);
+	        return `${new_anchor.x} ${-new_anchor.y}`
+	    };
+
+	    // connecting nets
+	    parsed_params.net = {};
+	    for (const [net_name, net_value] of Object.entries(prepare.extend(fp.nets || {}, nets))) {
+	        let net = assert_1.sane(net_value, `${name}.nets.${net_name}`, 'string')();
+	        if (net.startsWith('=') && point) {
+	            const indirect = net.substring(1);
+	            net = point.meta[indirect];
+	            net = assert_1.sane(net, `${name}.nets.${net_name} --> ${point.meta.name}.${indirect}`, 'string')();
+	        }
+	        const index = net_indexer(net);
+	        parsed_params.net[net_name] = {
+	            name: net,
+	            index: index,
+	            str: `(net ${index} "${net}")`
+	        };
+	    }
+
+	    // allowing footprints to add dynamic nets
+	    parsed_params.local_net = suffix => {
+	        const net = `${component_ref}_${suffix}`;
+	        const index = net_indexer(net);
+	        return {
+	            name: net,
+	            index: index,
+	            str: `(net ${index} "${net}")`
+	        }
+	    };
+
+	    // parsing anchor-type parameters
+	    parsed_params.anchors = {};
+	    for (const [anchor_name, anchor_config] of Object.entries(prepare.extend(fp.anchors || {}, anchors))) {
+	        let parsed_anchor = anchor_1.parse(anchor_config || {}, `${name}.anchors.${anchor_name}`, points, true, anchor)(units);
+	        parsed_anchor.y = -parsed_anchor.y;
+	        parsed_params.anchors[anchor_name] = parsed_anchor;
+	    }
 
 	    return fp.body(parsed_params)
 	};
@@ -2121,7 +2775,7 @@
 	    for (const [pcb_name, pcb_config] of Object.entries(pcbs)) {
 
 	        // config sanitization
-	        assert_1.detect_unexpected(pcb_config, `pcbs.${pcb_name}`, ['outlines', 'footprints']);
+	        assert_1.unexpected(pcb_config, `pcbs.${pcb_name}`, ['outlines', 'footprints']);
 
 	        // outline conversion
 	        if (assert_1.type(pcb_config.outlines)() == 'array') {
@@ -2196,53 +2850,85 @@
 	};
 	});
 
-	const noop = () => {};
+	const process = async (raw, debug=false, logger=()=>{}) => {
+
+	    const prefix = 'Interpreting format: ';
+	    let empty = true;
+	    let [config, format] = io.interpret(raw, logger);
+	    let suffix = format;
+	    if (format == 'KLE') {
+	        suffix = `${format} (Auto-debug)`;
+	        debug = true;
+	    }
+	    logger(prefix + suffix);
+	    
+	    logger('Preprocessing input...');
+	    config = prepare.unnest(config);
+	    config = prepare.inherit(config);
+	    const results = {};
+	    if (debug) {
+	        results.raw = raw;
+	        results.canonical = utils.deepcopy(config);
+	    }
+
+	    logger('Calculating variables...');
+	    const units$1 = units.parse(config);
+	    if (debug) {
+	        results.units = units$1;
+	    }
+
+	    
+	    logger('Parsing points...');
+	    if (!config.points) {
+	        throw new Error('Input does not contain a points clause!')
+	    }
+	    const points$1 = points.parse(config.points, units$1);
+	    if (!Object.keys(points$1).length) {
+	        throw new Error('Input does not contain any points!')
+	    }
+	    if (debug) {
+	        results.points = points$1;
+	        results.demo = io.twodee(points.visualize(points$1, units$1), debug);
+	    }
+
+	    logger('Generating outlines...');
+	    const outlines$1 = outlines.parse(config.outlines || {}, points$1, units$1);
+	    results.outlines = {};
+	    for (const [name, outline] of Object.entries(outlines$1)) {
+	        if (!debug && name.startsWith('_')) continue
+	        results.outlines[name] = io.twodee(outline, debug);
+	        empty = false;
+	    }
+
+	    logger('Extruding cases...');
+	    const cases$1 = cases.parse(config.cases || {}, outlines$1, units$1);
+	    results.cases = {};
+	    for (const [case_name, case_script] of Object.entries(cases$1)) {
+	        if (!debug && case_name.startsWith('_')) continue
+	        results.cases[case_name] = await io.threedee(case_script, debug);
+	        empty = false;
+	    }
+
+	    logger('Scaffolding PCBs...');
+	    const pcbs$1 = pcbs.parse(config.pcbs || {}, points$1, outlines$1, units$1);
+	    results.pcbs = {};
+	    for (const [pcb_name, pcb_text] of Object.entries(pcbs$1)) {
+	        if (!debug && pcb_name.startsWith('_')) continue
+	        results.pcbs[pcb_name] = pcb_text;
+	        empty = false;
+	    }
+
+	    if (!debug && empty) {
+	        logger('Output would be empty, rerunning in debug mode...');
+	        return process(raw, true, () => {})
+	    }
+	    return results
+	};
 
 	var ergogen = {
-	    version: '2.0.0',
-	    process: (config, debug=false, logger=noop) => {
-
-	        logger('Preparing input...');
-	        config = prepare.unnest(config);
-	        config = prepare.inherit(config);
-	        const results = {};
-
-	        logger('Parsing points...');
-	        const [points$1, units] = points.parse(config.points);
-	        if (debug) {
-	            results.points = {
-	                data: points$1,
-	                units: units
-	            };
-	        }
-
-	        logger('Generating outlines...');
-	        const outlines$1 = outlines.parse(config.outlines || {}, points$1, units);
-	        results.outlines = {};
-	        for (const [name, outline] of Object.entries(outlines$1)) {
-	            if (!debug && name.startsWith('_')) continue
-	            results.outlines[name] = outline;
-	        }
-
-	        logger('Extruding cases...');
-	        const cases$1 = cases.parse(config.cases || {}, outlines$1, units);
-	        results.cases = {};
-	        for (const [case_name, case_text] of Object.entries(cases$1)) {
-	            if (!debug && case_name.startsWith('_')) continue
-	            results.cases[case_name] = case_text;
-	        }
-
-	        logger('Scaffolding PCBs...');
-	        const pcbs$1 = pcbs.parse(config.pcbs || {}, points$1, outlines$1, units);
-	        results.pcbs = {};
-	        for (const [pcb_name, pcb_text] of Object.entries(pcbs$1)) {
-	            if (!debug && pcb_name.startsWith('_')) continue
-	            results.pcbs[pcb_name] = pcb_text;
-	        }
-
-	        return results
-	    },
-	    visualize: points.visualize
+	    version: '3.0.0',
+	    process,
+	    inject_footprint: pcbs.inject_footprint
 	};
 
 	return ergogen;

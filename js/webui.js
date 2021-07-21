@@ -25,14 +25,18 @@ const zipup = results => {
     const zip_outlines = zip.folder('outlines')
     for (const [name, outline] of Object.entries(results.outlines)) {
         zip_outlines.file(`${name}.dxf`, outline.dxf)
-        zip_outlines.file(`${name}.svg`, outline.svg)
-        zip_outlines.file(`${name}.yaml`, jsyaml.dump(outline.yaml, {indent: 4}))
+        if (debug) {
+            zip_outlines.file(`${name}.svg`, outline.svg)
+            zip_outlines.file(`${name}.yaml`, jsyaml.dump(outline.yaml, {indent: 4}))
+        }
     }
     
     const zip_cases = zip.folder('cases')
     for (const [case_name, _case] of Object.entries(results.cases)) {
         zip_cases.file(`${case_name}.stl`, _case.stl)
-        zip_cases.file(`${case_name}.jscad`, _case.jscad)
+        if (debug) {
+            zip_cases.file(`${case_name}.jscad`, _case.jscad)
+        }
     }
 
     const zip_pcbs = zip.folder('pcbs')
@@ -270,7 +274,7 @@ $(function() {
 
                 for (const [case_name, _case] of Object.entries(results.cases)) {
                     empty_res = false
-                    make_row('cases', case_name, 'jscad', _case.stl, jscad_callback(_case.jscad)).appendTo($tbody)
+                    make_row('cases', case_name, 'stl', _case.stl, jscad_callback(_case.jscad)).appendTo($tbody)
                 }
                 if (Object.entries(results.cases).length) {
                     make_divider().appendTo($tbody)

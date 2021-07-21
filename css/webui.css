@@ -206,3 +206,7 @@ div.dropdown.bootstrap-select {
 #debug {
   max-width: 50px;
 }
+
+#svg-viewer svg, #svg-viewer svg g {
+  stroke: white !important;
+}
