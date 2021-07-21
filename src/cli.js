@@ -67,9 +67,7 @@ const single = (data, rel) => {
     if (!data) return
     const abs = path.join(args.o, rel)
     fs.mkdirpSync(path.dirname(abs))
-    if (abs.endsWith('.json')) {
-        fs.writeJSONSync(abs, data, {spaces: 4})
-    } else if (abs.endsWith('.yaml')) {
+    if (abs.endsWith('.yaml')) {
         fs.writeFileSync(abs, yaml.dump(data, {indent: 4}))
     } else {
         fs.writeFileSync(abs, data)
@@ -79,9 +77,9 @@ const single = (data, rel) => {
 const composite = (data, rel) => {
     if (!data) return
     const abs = path.join(args.o, rel)
-    if (data.json) {
+    if (data.yaml) {
         fs.mkdirpSync(path.dirname(abs))
-        fs.writeJSONSync(abs + '.json', data.json, {spaces: 4})
+        fs.writeFileSync(abs + '.yaml', yaml.dump(data.yaml, {indent: 4}))
     }
     for (const format of ['svg', 'dxf', 'jscad', 'stl']) {
         if (data[format]) {
@@ -101,11 +99,11 @@ if (args.clean) {
 console.log('Writing output to disk...')
 fs.mkdirpSync(args.o)
 
-single(results.raw, 'raw.txt')
-single(results.canonical, 'canonical.yaml')
-single(results.units, 'units.json')
+single(results.raw, 'source/raw.txt')
+single(results.canonical, 'source/canonical.yaml')
 
-single(results.points, 'points/points.json')
+single(results.units, 'points/units.yaml')
+single(results.points, 'points/points.yaml')
 composite(results.demo, 'points/demo')
 
 for (const [name, outline] of Object.entries(results.outlines)) {

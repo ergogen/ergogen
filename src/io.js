@@ -60,7 +60,7 @@ exports.twodee = (model, debug) => {
         dxf: makerjs.exporter.toDXF(assembly),
     }
     if (debug) {
-        result.json = assembly
+        result.yaml = assembly
         result.svg = makerjs.exporter.toSVG(assembly)
     }
     return result
