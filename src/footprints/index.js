@@ -12,7 +12,7 @@ module.exports = {
     omron: require('./omron'),
     pad: require('./pad'),
     promicro: require('./promicro'),
-    rawkicad: require('./rawkicad'),
+    holyiot: require('./holyiot'),
     rgb: require('./rgb'),
     rotary: require('./rotary'),
     scrollwheel: require('./scrollwheel'),
