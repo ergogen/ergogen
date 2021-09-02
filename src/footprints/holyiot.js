@@ -1,8 +1,4 @@
-// Arduino ProMicro atmega32u4au
-// Params
-//  orientation: default is down
-//    if down, power led will face the pcb
-//    if up, power led will face away from pcb
+// Holyiot 18010 nRF52840 module
 
 module.exports = {
   nets: {
@@ -30,8 +26,7 @@ module.exports = {
     P9: 'P9',
   },
   params: {
-    class: 'MCU',
-    orientation: 'down'
+    class: 'MCU'
   },
   body: p => `
       ${'' /* footprint reference */}
