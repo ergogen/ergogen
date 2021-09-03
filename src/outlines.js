@@ -38,7 +38,7 @@ const layout = exports._layout = (config = {}, points = {}, units = {}) => {
     const parsed_glue = u.deepcopy(a.sane(config, 'outlines.glue', 'object')())
     for (let [gkey, gval] of Object.entries(parsed_glue)) {
         a.unexpected(gval, `outlines.glue.${gkey}`, ['top', 'bottom', 'waypoints', 'extra'])
-    
+
         for (const y of ['top', 'bottom']) {
             a.unexpected(gval[y], `outlines.glue.${gkey}.${y}`, ['left', 'right'])
             gval[y].left = anchor_lib.parse(gval[y].left, `outlines.glue.${gkey}.${y}.left`, points)
@@ -46,7 +46,7 @@ const layout = exports._layout = (config = {}, points = {}, units = {}) => {
                 gval[y].right = anchor_lib.parse(gval[y].right, `outlines.glue.${gkey}.${y}.right`, points)
             }
         }
-    
+
         gval.waypoints = a.sane(gval.waypoints || [], `outlines.glue.${gkey}.waypoints`, 'array')(units)
         let wi = 0
         gval.waypoints = gval.waypoints.map(w => {
@@ -111,18 +111,18 @@ const layout = exports._layout = (config = {}, points = {}, units = {}) => {
                     if (p.meta.mirrored) {
                         bind = [bind[0], bind[3], bind[2], bind[1]]
                     }
-    
+
                     const bt = to_y + Math.max(bind[0], 0)
                     const br = to_x + Math.max(bind[1], 0)
                     const bd = from_y - Math.max(bind[2], 0)
                     const bl = from_x - Math.max(bind[3], 0)
-    
+
                     if (bind[0] || bind[1]) rect = u.union(rect, u.rect(br, bt))
                     if (bind[1] || bind[2]) rect = u.union(rect, u.rect(br, -bd, [0, bd]))
                     if (bind[2] || bind[3]) rect = u.union(rect, u.rect(-bl, -bd, [bl, bd]))
                     if (bind[3] || bind[0]) rect = u.union(rect, u.rect(-bl, bt, [bl, 0]))
                 }
-                
+
                 // positioning and unioning the resulting shape
                 rect = p.position(rect)
                 if (p.meta.mirrored) {
@@ -163,7 +163,7 @@ const layout = exports._layout = (config = {}, points = {}, units = {}) => {
             }
             const tlp = u.eq(tll.origin, tip) ? tll.end : tll.origin
             const trp = u.eq(trl.origin, tip) ? trl.end : trl.origin
-    
+
             const bll = get_line(glue_def.bottom.left)
             const brl = get_line(glue_def.bottom.right)
             const bip = m.path.converge(bll, brl)
@@ -172,7 +172,7 @@ const layout = exports._layout = (config = {}, points = {}, units = {}) => {
             }
             const blp = u.eq(bll.origin, bip) ? bll.end : bll.origin
             const brp = u.eq(brl.origin, bip) ? brl.end : brl.origin
-    
+
             const left_waypoints = []
             const right_waypoints = []
 
@@ -185,18 +185,18 @@ const layout = exports._layout = (config = {}, points = {}, units = {}) => {
                 left_waypoints.push([left_x, center_y])
                 right_waypoints.unshift([right_x, center_y])
             }
-            
+
             let waypoints
             const is_split = a.type(glue_def.top.right)(relative_units) == 'number'
             if (is_split) {
                 waypoints = [tip, tlp]
-                .concat(left_waypoints)
-                .concat([blp, bip])
+                    .concat(left_waypoints)
+                    .concat([blp, bip])
             } else {
                 waypoints = [trp, tip, tlp]
-                .concat(left_waypoints)
-                .concat([blp, bip, brp])
-                .concat(right_waypoints)
+                    .concat(left_waypoints)
+                    .concat([blp, bip, brp])
+                    .concat(right_waypoints)
             }
 
             glue = u.poly(waypoints)
@@ -314,11 +314,27 @@ exports.parse = (config = {}, points = {}, units = {}) => {
                     }
                     break
                 case 'svgpath':
-                    a.unexpected(part, name, expected.concat(['anchor', 'path']))
+                    a.unexpected(part, name, expected.concat(['anchor', 'path', 'mirror']))
                     const svgpath = a.sane(part.path, `${name}.path`, 'string')()
+                    const svgpath_mirror = a.sane(part.mirror || false, `${name}.mirror`, 'boolean')()
+                    let svgPathModel = null;
                     anchor = anchor_lib.parse(anchor_def, `${name}.anchor`, points)()
 
-                    arg = m.importer.fromSVGPathData(svgpath);
+                    try {
+                        svgPathModel = m.importer.fromSVGPathData(svgpath);
+                        arg = anchor.position(u.deepcopy(svgPathModel))
+                    } catch (e) {
+                        throw new Error(`Field "${name}.type" (${part.type}) failed to parse SVG path data`)
+                    }
+
+                    if (svgpath_mirror) {
+                        const mirror_anchor = u.deepcopy(anchor_def)
+                        a.assert(mirror_anchor.ref, `Field "${name}.anchor.ref" must be speficied if mirroring is required!`)
+                        anchor = anchor_lib.parse(mirror_anchor, `${name}.anchor --> mirror`, points, undefined, undefined, true)()
+
+                        arg = u.union(arg, anchor.position(m.model.mirror(u.deepcopy(svgPathModel), true, false)))
+                    }
+
                     break
                 case 'outline':
                     a.unexpected(part, name, expected.concat(['name', 'fillet']))
