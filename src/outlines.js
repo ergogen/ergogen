@@ -234,7 +234,7 @@ exports.parse = (config = {}, points = {}, units = {}) => {
                 part = o.operation(part, {outline: Object.keys(outlines)})
             }
             const expected = ['type', 'operation']
-            part.type = a.in(part.type || 'outline', `${name}.type`, ['keys', 'rectangle', 'circle', 'polygon', 'outline'])
+            part.type = a.in(part.type || 'outline', `${name}.type`, ['keys', 'rectangle', 'circle', 'polygon', 'outline', 'svgpath'])
             part.operation = a.in(part.operation || 'add', `${name}.operation`, ['add', 'subtract', 'intersect', 'stack'])
 
             let op = u.union
@@ -312,6 +312,13 @@ exports.parse = (config = {}, points = {}, units = {}) => {
                     if (poly_mirror) {
                         arg = u.union(arg, u.poly(mirror_points))
                     }
+                    break
+                case 'svgpath':
+                    a.unexpected(part, name, expected.concat(['anchor', 'path']))
+                    const svgpath = a.sane(part.path, `${name}.path`, 'string')()
+                    anchor = anchor_lib.parse(anchor_def, `${name}.anchor`, points)()
+
+                    arg = m.importer.fromSVGPathData(svgpath);
                     break
                 case 'outline':
                     a.unexpected(part, name, expected.concat(['name', 'fillet']))
