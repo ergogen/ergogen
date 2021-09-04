@@ -2,18 +2,20 @@
 
 The whole Ergogen config is a single YAML file.
 If you prefer JSON over YAML, feel free to use it, conversion is trivial and the generator will detect the input format.
-The important thing is that the data should contain the following keys:
+The important thing is that the data can contain the following keys:
 
 ```yaml
-points: <points config...>
-outlines: <outline config...>
-cases: <case config...>
-pcbs: <pcb config...>
+units: <units config...> # optional
+points: <points config...> # required
+outlines: <outline config...> #optional
+cases: <case config...> #optional
+pcbs: <pcb config...> #optional
 ```
 
-The `points` section describes the core of the layout: the positions of the keys.
-The `outlines` section then uses these points to generate plate, case, and PCB outlines.
-The `cases` section details how the case outlines are to be 3D-ized to form a 3D-printable object.
+The `units` section allows you to set additional units which can be used in the rest of your config  
+The `points` section describes the core of the layout: the positions of the keys.  
+The `outlines` section then uses these points to generate plate, case, and PCB outlines.  
+The `cases` section details how the case outlines are to be 3D-ized to form a 3D-printable object.  
 Finally, the `pcbs` section is used to configure KiCAD PCB templates.
 
 In the following, we'll have an in-depth discussion about each of these.
@@ -143,6 +145,51 @@ Otherwise, we can begin with the actual keyboard-related layout...
 
 
 
+## Units
+
+We start with an optional `units` clause, where we can define units to use in relative calculations.  
+The three predefined ones are `u` (=19mm), `cx` (=18mm, named for "Choc X distance"), and `cy` (=17mm, named for "Choc Y distance").
+But we can add any other (or modify these predefined ones), or even use an existing measure in calculating a new value (for example, `double: 2 u`).
+Recall how each string that can be interpreted as a math formula will be treated like a number, so this is a great way to add math-level variables to your config.
+
+```
+units:
+  a: cy - 7
+  b: a * 1.5
+```
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## Points
 
 A point in this context refers to a 2D point `[x,y]` with a rotation/orientation `r` added in.
@@ -157,9 +204,6 @@ Points can be described as follows:
 
 ```yaml
 points:
-    units:
-        name: val
-        ...
     zones:
         my_zone_name:
             anchor:
@@ -178,12 +222,7 @@ points:
         ...
 ```
 
-We start with a `units` clause, where we can define units to use in relative calculations.
-The three predefined ones are `u` (=19mm), `cx` (=18mm, named for "Choc X distance"), and `cy` (=17mm, named for "Choc Y distance").
-But we can add any other (or modify these predefined ones), or even use an existing measure in calculating a new value (for example, `double: 2 u`).
-Recall how each string that can be interpreted as a math formula will be treated like a number, so this is a great way to add math-level variables to your config.
-
-Then comes the `zones` key, under which we can define the individual, named zones.
+We start with a `zones` clause, under which we can define the individual, named zones.
 `anchors` are used to, well, anchor the zone to something.
 It's the `[0, 0]` origin with a 0 degree orientation by default, but it can be changed to any other pre-existing point. (Consequently, the first zone can't use a ref, because there isn't any yet.)
 The `ref` field can also be an array of references, in which case their average is used -- mostly useful for anchoring to the center, by averaging a key and its mirror; see later.
@@ -284,7 +323,6 @@ Indeed:
 
 ```yaml
 points:
-    units: <mentioned at the beginning...>
     zones: <what we talked about so far...>
     key: <global key def>
     rotate: num # default = 0
