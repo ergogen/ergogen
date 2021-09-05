@@ -314,8 +314,8 @@ exports.parse = (config, units) => {
 
 exports.visualize = (points, units) => {
     const models = {}
-    x_unit = units.visual_x || (units.u - 1)
-    y_unit = units.visual_y || (units.u - 1)
+    const x_unit = units.visual_x || (units.u - 1)
+    const y_unit = units.visual_y || (units.u - 1)
     for (const [pname, p] of Object.entries(points)) {
         const w = p.meta.width * x_unit
         const h = p.meta.height * y_unit
