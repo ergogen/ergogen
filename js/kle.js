@@ -64,6 +64,14 @@ const Keyboard = /** @class */ (function () {
     return Keyboard;
 }());
 exports.Keyboard = Keyboard;
+const Serial = /** @class */ (function () {
+    function Serial() {
+        this.deserialize = null;
+        this.parse = null;
+    }
+    return Serial;
+}());
+exports.Serial = Serial;
 (function (exports) {
     // Helper to copy an object; doesn't handle loops/circular refs, etc.
     function copy(o) {
@@ -244,5 +252,5 @@ exports.Keyboard = Keyboard;
         }
         return kbd;
     }
-    exports.deserialize = deserialize;
+    exports.Serial.deserialize = deserialize;
 })(exports);
