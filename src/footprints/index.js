@@ -16,6 +16,7 @@ module.exports = {
     rotary: require('./rotary'),
     scrollwheel: require('./scrollwheel'),
     slider: require('./slider'),
+    tactswitch: require('./tactswitch'),
     trrs: require('./trrs'),
     via: require('./via'),
 }

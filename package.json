@@ -1,6 +1,6 @@
 {
     "name": "ergogen",
-    "version": "3.0.0",
+    "version": "9.9.9-mveerd-tact-switch",
     "description": "Ergonomic keyboard layout generator",
     "author": "Bán Dénes <mr@zealot.hu>",
     "license": "MIT",
