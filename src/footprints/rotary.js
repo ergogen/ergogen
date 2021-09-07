@@ -65,8 +65,8 @@ module.exports = {
             (pad 2 thru_hole circle (at 6.88 2.46) (size 1.5 1.5) (drill 1) (layers *.Cu *.Mask) ${p.net.to.str})
 
             ${''/* Legs */}
-            (pad "" thru_hole rect (at -0.12 -5.64) (size 3.2 2) (drill oval 2.8 1.5) (layers *.Cu *.Mask)))
-            (pad "" thru_hole rect (at -0.12 5.56) (size 3.2 2) (drill oval 2.8 1.5) (layers *.Cu *.Mask)))
+            (pad "" thru_hole rect (at -0.12 -5.64) (size 3.2 2) (drill oval 2.8 1.5) (layers *.Cu *.Mask))
+            (pad "" thru_hole rect (at -0.12 5.56) (size 3.2 2) (drill oval 2.8 1.5) (layers *.Cu *.Mask))
         )
     `
 }
