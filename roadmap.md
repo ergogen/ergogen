@@ -10,7 +10,7 @@
 
 - Global column-level attributes like spread
 - More generic anchors or distances?
-    - Intersect support for anchor affects clauses, which (combined with the math formulas and possible trigonometric functions) should allow for every use case we've discussed so far
+    - Intersect support for anchor affect clauses, which (combined with the math formulas and possible trigonometric functions) should allow for every use case we've discussed so far
 - Add a way to propagate creator/board/version info from the pcb section to the kicad template
 - Add a way to globally enable/disable references (`ref_hide`)
 - SVG input (for individual outlines, or even combinations parsed by line color, etc.)

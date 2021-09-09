@@ -33,7 +33,7 @@
                                         "description": "Add rotation after translation",
                                         "type": "number"
                                     },
-                                    "affects": {
+                                    "affect": {
                                         "description": "Affect only certain dimensions of the anchor",
                                         "type": "string"
                                     }

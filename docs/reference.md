@@ -167,7 +167,7 @@ points:
                 orient: num # default = 0
                 shift: [x, y] # default = [0, 0]
                 rotate: num # default = 0
-                affects: string containing any of x, y, or r # default = xyr
+                affect: string containing any of x, y, or r # default = xyr
             columns:
                 column_name: <column def>
                 ...
@@ -191,7 +191,7 @@ This initial position can then be changed with the `orient`, `shift`, and `rotat
 `shift` adds extra translation, while the difference between `orient` and `rotate` is whether they add their rotation before or after the translation.
 
 Also note that anywhere an anchor can be specified, a list of anchors is also valid.
-It would be meaningless, though, if each subsequent anchor would override the previous one, so the `affects` clause helps to affect only certain dimensions of the anchor.
+It would be meaningless, though, if each subsequent anchor would override the previous one, so the `affect` clause helps to affect only certain dimensions of the anchor.
 It can be declared using a string containing any of `x`, `y`, or `r`, which stand for the x and y coordinates and the rotation of the anchor, respectively.
 
 Once we know _where_ to start, we can describe the `columns` of our layout.
