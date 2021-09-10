@@ -319,7 +319,14 @@ exports.parse = (config = {}, points = {}, units = {}) => {
                     const fillet = a.sane(part.fillet || 0, `${name}.fillet`, 'number')(units)
                     arg = u.deepcopy(outlines[part.name])
                     if (fillet) {
-                        arg.models.fillets = m.chain.fillet(m.model.findSingleChain(arg), fillet)
+                        const chains = m.model.findChains(arg);
+
+                        if (Array.isArray(chains)){
+                            chains.forEach((chain, i) => {
+                                arg.models[`fillet_${i}`] = m.chain.fillet(chain, fillet);
+                            });
+                        }
+
                     }
                     break
                 default:
