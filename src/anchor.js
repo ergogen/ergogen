@@ -45,17 +45,27 @@ const anchor = exports.parse = (raw, name, points={}, check_unexpected=true, def
         }
     }
     if (raw.orient !== undefined) {
-        point.r += a.sane(raw.orient, `${name}.orient`, 'number')(units)
+        let rval = a.sane(raw.orient, `${name}.orient`, 'number')(units)
+        if (mirror) {
+          point.r -= rval
+        } else {
+          point.r += rval
+        }
     }
     if (raw.shift !== undefined) {
         let xyval = a.wh(raw.shift, `${name}.shift`)(units)
-        if (point.meta.mirrored) {
+        if (mirror) {
             xyval[0] = -xyval[0]
         }
         point.shift(xyval, true)
     }
     if (raw.rotate !== undefined) {
-        point.r += a.sane(raw.rotate, `${name}.rotate`, 'number')(units)
+        let rval = a.sane(raw.rotate, `${name}.rotate`, 'number')(units)
+        if (mirror) {
+          point.r -= rval
+        } else {
+          point.r += rval
+        }
     }
     if (raw.affect !== undefined) {
         const candidate = point
