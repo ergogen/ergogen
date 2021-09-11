@@ -269,7 +269,11 @@ exports.parse = (config = {}, points = {}, units = {}) => {
                     arg = anchor.position(u.deepcopy(rect))
                     if (rect_mirror) {
                         const mirror_anchor = u.deepcopy(anchor_def)
-                        a.assert(mirror_anchor.ref, `Field "${name}.anchor.ref" must be speficied if mirroring is required!`)
+                        const fieldName = Array.isArray(mirror_anchor) ? `${name}.anchor.0.ref` : `${name}.anchor.ref`;
+                        a.assert(
+                            mirror_anchor.ref || (Array.isArray(mirror_anchor) && mirror_anchor[0].ref),
+                            `Field "${fieldName}" must be specified if mirroring is required!`
+                        )
                         anchor = anchor_lib.parse(mirror_anchor, `${name}.anchor --> mirror`, points, undefined, undefined, true)(rec_units)
                         arg = u.union(arg, anchor.position(u.deepcopy(rect)))
                     }
@@ -285,7 +289,11 @@ exports.parse = (config = {}, points = {}, units = {}) => {
                     arg = u.circle(anchor.p, radius)
                     if (circle_mirror) {
                         const mirror_anchor = u.deepcopy(anchor_def)
-                        a.assert(mirror_anchor.ref, `Field "${name}.anchor.ref" must be speficied if mirroring is required!`)
+                        const fieldName = Array.isArray(mirror_anchor) ? `${name}.anchor.0.ref` : `${name}.anchor.ref`;
+                        a.assert(
+                            mirror_anchor.ref || (Array.isArray(mirror_anchor) && mirror_anchor[0].ref),
+                            `Field "${fieldName}" must be specified if mirroring is required!`
+                        )
                         anchor = anchor_lib.parse(mirror_anchor, `${name}.anchor --> mirror`, points, undefined, undefined, true)(circle_units)
                         arg = u.union(arg, u.circle(anchor.p, radius))
                     }
