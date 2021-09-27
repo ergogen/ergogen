@@ -4,6 +4,7 @@ module.exports = {
     choc: require('./choc'),
     chocmini: require('./chocmini'),
     diode: require('./diode'),
+    holyiot: require('./holyiot'),
     jstph: require('./jstph'),
     jumper: require('./jumper'),
     mountinghole: require('./mountinghole'),
