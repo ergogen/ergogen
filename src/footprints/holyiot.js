@@ -76,7 +76,8 @@ module.exports = {
         (fp_line (start 9.5 -11.2) (end 9.5 -6.2) (layer Dwgs.User) (width 0.12))
         (fp_line (start 9.5 -6.2) (end -9.5 -6.2) (layer Dwgs.User) (width 0.12))
         (fp_line (start -9.5 -6.2) (end -9.5 -11.2) (layer Dwgs.User) (width 0.12))
-        (fp_text user "Add keepout (pour, via, tracks) on all layers here" (at 1.5 -12.5) (layer Dwgs.User)
+
+        (fp_text user "Add keepout" (at 0 -9 ${ p.rot }) (layer Dwgs.User)
           (effects (font (size 1 1) (thickness 0.15)))
         )
         (pad 1 smd rect (at -6.75 -5.7 ${ p.rot }) (size 1.524 0.7) (layers F.Cu F.Paste F.Mask)  ${ p.net.GND.str })
