@@ -54,7 +54,7 @@ module.exports = {
         SWDCLK: 'SWDCLK',
         SWDIO: 'SWDIO',
         VBUS: 'VBUS',
-        VDD: 'VDD',
+        VDD: 'VDD'
     },
     params: {
         class: 'MCU'
@@ -102,7 +102,7 @@ module.exports = {
         (pad 20 smd rect (at 1.1 9 ${ 90 + p.rot }) (size 1.524 0.7) (layers F.Cu F.Paste F.Mask) ${ p.net.P019.str })
         (pad 21 smd rect (at 2.2 9 ${ 90 + p.rot }) (size 1.524 0.7) (layers F.Cu F.Paste F.Mask) ${ p.net.P018.str })
         (pad 22 smd rect (at 3.3 9 ${ 90 + p.rot }) (size 1.524 0.7) (layers F.Cu F.Paste F.Mask) ${ p.net.VBUS.str })
-        (pad 23 smd rect (at 4.4 9 ${ 90 + p.rot }) (size 1.524 0.7) (layers F.Cu F.Paste F.Mask) ${ p.net.PDMIN.str })
+        (pad 23 smd rect (at 4.4 9 ${ 90 + p.rot }) (size 1.524 0.7) (layers F.Cu F.Paste F.Mask) ${ p.net.DMIN.str })
         (pad 24 smd rect (at 5.5 9 ${ 90 + p.rot }) (size 1.524 0.7) (layers F.Cu F.Paste F.Mask) ${ p.net.DPLUS.str })
         (pad 25 smd rect (at 6.75 7.5 ${ 180 + p.rot }) (size 1.524 0.7) (layers F.Cu F.Paste F.Mask) ${ p.net.GND.str })
         (pad 26 smd rect (at 6.75 6.4 ${ 180 + p.rot }) (size 1.524 0.7) (layers F.Cu F.Paste F.Mask) ${ p.net.P022.str })
