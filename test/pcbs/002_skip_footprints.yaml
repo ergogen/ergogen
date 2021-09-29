@@ -1,0 +1,25 @@
+points:
+  zones:
+    matrix:
+      columns:
+        one:
+      rows:
+        only:
+outlines:
+  exports:
+    edge:
+      - type: keys
+        side: left
+        size: [u, u]
+pcbs:
+  main:
+    include_keys: false
+    outlines:
+      edge:
+        outline: edge
+    footprints:
+      trace:
+        type: trace_test
+        anchor:
+          shift: [1, 1]
+          rotate: 30
