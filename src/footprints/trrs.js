@@ -49,8 +49,8 @@ module.exports = {
       (fp_line (start 0.75 0) (end -5.35 0) (layer Dwgs.User) (width 0.15))
 
       ${''/* stabilizers */}
-      (pad "" np_thru_hole circle (at -2.3 8.6) (size 1.5 1.5) (drill 1.5) (layers *.Cu *.Mask))
-      (pad "" np_thru_hole circle (at -2.3 1.6) (size 1.5 1.5) (drill 1.5) (layers *.Cu *.Mask))
+      (pad "" np_thru_hole circle (at -2.3 8.6) (size 1.2 1.2) (drill 1.2) (layers *.Cu *.Mask))
+      (pad "" np_thru_hole circle (at -2.3 1.6) (size 1.2 1.2) (drill 1.2) (layers *.Cu *.Mask))
       `
     function pins(def_neg, def_pos) {
       return `
