@@ -1,14 +1,15 @@
 // TRRS-PJ-320A-dual
 //     _________________
-//    | (1)     (3) (4)|
+//    |   (2)   (3) (4)|
 //    |                |
-//    |___(2)__________|
+//    |_(1)____________|
 //
 // Nets
-//    A: corresponds to pin 1
-//    B: corresponds to pin 2
-//    C: corresponds to pin 3
-//    D: corresponds to pin 4
+//    A: corresponds to pin 1 (sleeve)
+//    B: corresponds to pin 2 (outer ring)
+//    C: corresponds to pin 3 (inner ring)
+//    D: corresponds to pin 4 (tip)
+//    Please note that this naming might not correspond to what is used in other boards; namely crkbd
 // Params
 //    reverse: default is false
 //      if true, will flip the footprint such that the pcb can be reversible
