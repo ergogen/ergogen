@@ -69,8 +69,7 @@ module.exports = {
     } else if(p.param.reverse) {
         return `
           ${standard}
-          ${pins('-4.6', '0')}
-          ${pins('4.6', '0')})
+          ${pins('0', '-4.6')})
         `
       } else {
         return `
