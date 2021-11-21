@@ -1,0 +1,18 @@
+points:
+  zones:
+    matrix:
+      columns:
+        left:
+        right:
+      rows:
+        bottom:
+        top:
+    extra:
+      rotate: 5
+      anchor:
+        ref: matrix_right_top
+      individual:
+        first:
+          anchor:
+            ref: matrix_right_top
+            shift: [8,8]

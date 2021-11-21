@@ -15,11 +15,23 @@ const push_rotation = exports._push_rotation = (list, angle, origin) => {
     })
 }
 
-const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key, units) => {
+const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key, units, all_points) => {
 
     // zone-wide sanitization
 
-    a.unexpected(zone, `points.zones.${zone_name}`, ['columns', 'rows', 'key'])
+    // for zones with only individual points, fake them as one column with many rows
+    a.unexpected(zone, `points.zones.${zone_name}`, ['columns', 'rows', 'individual', 'key'])
+    let individual = false
+    if (zone.individual) {
+        individual = true
+        for (const key of Object.keys(zone)) {
+            if(['columns', 'rows'].includes(key)){
+              throw new Error(`Keys "${key}" and "individual" within field "points.zones.${zone_name}" are exclusive!`)
+            }
+        }
+        zone.columns = {'': undefined}
+        zone.rows = zone.individual
+    }
     // the anchor comes from "above", because it needs other zones too (for references)
     const cols = a.sane(zone.columns || {}, `points.zones.${zone_name}.columns`, 'object')()
     const zone_wide_rows = a.sane(zone.rows || {}, `points.zones.${zone_name}.rows`, 'object')()
@@ -176,6 +188,16 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key,
             for (const r of rotations) {
                 point.rotate(r.angle, r.origin)
             }
+
+            // If in a zone with individual points and if an anchor is specified,
+            // use that anchor. And mark the key!
+            if (individual){
+                if (Object.keys(zone.rows[key.row]).includes('anchor')){
+                    point = anchor_lib.parse(zone.rows[key.row]['anchor'] || {}, `${key.name}.anchor`, all_points)(units)
+                }
+                key.individual = true
+            }
+
             point.shift(key.shift)
             point.r += key.rotate
             point.meta = key
@@ -243,7 +265,7 @@ exports.parse = (config, units) => {
         delete zone.mirror
 
         // creating new points
-        const new_points = render_zone(zone_name, zone, anchor, global_key, units)
+        const new_points = render_zone(zone_name, zone, anchor, global_key, units, all_points)
 
         // adjusting new points
         for (const [new_name, new_point] of Object.entries(new_points)) {
@@ -253,8 +275,8 @@ exports.parse = (config, units) => {
                 throw new Error(`Key "${new_name}" defined more than once!`)
             }
 
-            // per-zone rotation
-            if (rotate) {
+            // per-zone rotation (not, if individual anchors where specified)
+            if (rotate && !new_point.meta.individual) {
                 new_point.rotate(rotate)
             }
         }
