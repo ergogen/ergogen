@@ -55,7 +55,11 @@ const anchor = exports.parse = (raw, name, points={}, check_unexpected=true, def
         point.shift(xyval, true)
     }
     if (raw.rotate !== undefined) {
-        point.r += a.sane(raw.rotate, `${name}.rotate`, 'number')(units)
+        let angle = a.sane(raw.rotate, `${name}.rotate`, 'number')(units)
+        if (point.meta.mirrored) {
+            angle = -angle
+        } 
+        point.r += angle
     }
     if (raw.affect !== undefined) {
         const candidate = point
