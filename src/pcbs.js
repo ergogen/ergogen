@@ -154,9 +154,10 @@ const footprint = exports._footprint = (config, name, points, point, net_indexer
     if (config === false) return ''
 
     // config sanitization
-    a.unexpected(config, name, ['type', 'anchor', 'nets', 'anchors', 'params'])
+    a.unexpected(config, name, ['type', 'anchor', 'nets', 'anchors', 'params', 'mirror_anchor'])
     const type = a.in(config.type, `${name}.type`, Object.keys(footprint_types))
-    let anchor = anchor_lib.parse(config.anchor || {}, `${name}.anchor`, points, true, point)(units)
+    const mirror_anchor = a.sane(config.mirror_anchor || true, `${name}.mirror_anchor`, 'boolean')()
+    let anchor = anchor_lib.parse(config.anchor || {}, `${name}.anchor`, points, true, point, mirror=(mirror_anchor && point && point.meta.mirrored))(units)
     const nets = a.sane(config.nets || {}, `${name}.nets`, 'object')()
     const anchors = a.sane(config.anchors || {}, `${name}.anchors`, 'object')()
     const params = a.sane(config.params || {}, `${name}.params`, 'object')()
