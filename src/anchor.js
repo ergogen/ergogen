@@ -45,7 +45,11 @@ const anchor = exports.parse = (raw, name, points={}, check_unexpected=true, def
         }
     }
     if (raw.orient !== undefined) {
-        point.r += a.sane(raw.orient, `${name}.orient`, 'number')(units)
+        let angle = a.sane(raw.orient, `${name}.orient`, 'number')(units)
+        if (point.meta.mirrored) {
+            angle = -angle
+        } 
+        point.r += angle
     }
     if (raw.shift !== undefined) {
         let xyval = a.wh(raw.shift, `${name}.shift`)(units)
@@ -62,8 +66,9 @@ const anchor = exports.parse = (raw, name, points={}, check_unexpected=true, def
         point.r += angle
     }
     if (raw.affect !== undefined) {
-        const candidate = point
+        const candidate = point.clone()
         point = default_point.clone()
+        point.meta = candidate.meta
         let affect = raw.affect
         if (a.type(affect)() == 'string') affect = affect.split('')
         affect = a.strarr(affect, `${name}.affect`)
