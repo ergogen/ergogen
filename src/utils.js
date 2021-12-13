@@ -1,6 +1,22 @@
 const m = require('makerjs')
 
-exports.deepcopy = (value) => JSON.parse(JSON.stringify(value))
+exports.deepcopy = value => {
+    if (value === undefined) return undefined
+    return JSON.parse(JSON.stringify(value))
+}
+
+const deep = exports.deep = (obj, key, val) => {
+    const levels = key.split('.')
+    const last = levels.pop()
+    let step = obj
+    for (const level of levels) {
+        step[level] = step[level] || {}
+        step = step[level]
+    }
+    if (val === undefined) return step[last]
+    step[last] = val
+    return obj
+}
 
 const eq = exports.eq = (a=[], b=[]) => {
     return a[0] === b[0] && a[1] === b[1]

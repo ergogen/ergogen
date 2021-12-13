@@ -1,0 +1,13 @@
+points:
+  zones:
+    matrix:
+      columns:
+        left:
+        right:
+          stagger: 5
+          spread: 25
+          rotate: 5
+          origin: [-9, -9]
+      rows:
+        bottom:
+        top:

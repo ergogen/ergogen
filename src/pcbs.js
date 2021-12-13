@@ -1,8 +1,6 @@
 const m = require('makerjs')
-const u = require('./utils')
 const a = require('./assert')
-
-const Point = require('./point')
+const make_anchor = require('./anchor')
 
 const kicad_prefix = `
 (kicad_pcb (version 20171130) (host pcbnew 5.1.6)
@@ -145,16 +143,16 @@ const makerjs2kicad = exports._makerjs2kicad = (model, layer='Edge.Cuts') => {
 }
 
 const footprint_types = require('./footprints')
-const footprint = exports._footprint = (config, name, points, point, net_indexer, component_indexer) => {
+const footprint = exports._footprint = (config, name, points, point, net_indexer, component_indexer, units) => {
 
     if (config === false) return ''
     
     // config sanitization
     a.detect_unexpected(config, name, ['type', 'anchor', 'nets', 'params'])
     const type = a.in(config.type, `${name}.type`, Object.keys(footprint_types))
-    let anchor = a.anchor(config.anchor || {}, `${name}.anchor`, points, true, point)
-    const nets = a.sane(config.nets || {}, `${name}.nets`, 'object')
-    const params = a.sane(config.params || {}, `${name}.params`, 'object')
+    let anchor = make_anchor(config.anchor || {}, `${name}.anchor`, points, true, point)(units)
+    const nets = a.sane(config.nets || {}, `${name}.nets`, 'object')()
+    const params = a.sane(config.params || {}, `${name}.params`, 'object')()
 
     // basic setup
     const fp = footprint_types[type]
@@ -174,11 +172,11 @@ const footprint = exports._footprint = (config, name, points, point, net_indexer
     // connecting parametric nets
     for (const net_ref of (fp.nets || [])) {
         let net = nets[net_ref]
-        a.sane(net, `${name}.nets.${net_ref}`, 'string')
-        if (net.startsWith('!') && point) {
+        a.sane(net, `${name}.nets.${net_ref}`, 'string')()
+        if (net.startsWith('=') && point) {
             const indirect = net.substring(1)
             net = point.meta[indirect]
-            a.sane(net, `${name}.nets.${net_ref} --> ${point.meta.name}.${indirect}`, 'string')
+            a.sane(net, `${name}.nets.${net_ref} --> ${point.meta.name}.${indirect}`, 'string')()
         }
         const index = net_indexer(net)
         parsed_params.net[net_ref] = `(net ${index} "${net}")`
@@ -189,7 +187,7 @@ const footprint = exports._footprint = (config, name, points, point, net_indexer
     for (const param of (Object.keys(fp.params || {}))) {
         let value = params[param] === undefined ? fp.params[param] : params[param]
         if (value === undefined) throw new Error(`Field "${name}.params.${param}" is missing!`)
-        if (a.type(value) == 'string' && value.startsWith('!') && point) {
+        if (a.type(value)() == 'string' && value.startsWith('=') && point) {
             const indirect = value.substring(1)
             value = point.meta[indirect]
             if (value === undefined) throw new Error(`Field "${name}.params.${param} --> ${point.meta.name}.${indirect}" is missing!`)
@@ -204,9 +202,9 @@ const footprint = exports._footprint = (config, name, points, point, net_indexer
     return fp.body(parsed_params)
 }
 
-exports.parse = (config, points, outlines) => {
+exports.parse = (config, points, outlines, units) => {
 
-    const pcbs = a.sane(config || {}, 'pcbs', 'object')
+    const pcbs = a.sane(config || {}, 'pcbs', 'object')()
     const results = {}
 
     for (const [pcb_name, pcb_config] of Object.entries(pcbs)) {
@@ -215,14 +213,14 @@ exports.parse = (config, points, outlines) => {
         a.detect_unexpected(pcb_config, `pcbs.${pcb_name}`, ['outlines', 'footprints'])
 
         // outline conversion
-        if (a.type(pcb_config.outlines) == 'array') {
+        if (a.type(pcb_config.outlines)() == 'array') {
             pcb_config.outlines = {...pcb_config.outlines}
         }
-        const config_outlines = a.sane(pcb_config.outlines || {}, `pcbs.${pcb_name}.outlines`, 'object')
+        const config_outlines = a.sane(pcb_config.outlines || {}, `pcbs.${pcb_name}.outlines`, 'object')()
         const kicad_outlines = {}
         for (const [outline_name, outline] of Object.entries(config_outlines)) {
             const ref = a.in(outline.outline, `pcbs.${pcb_name}.outlines.${outline_name}.outline`, Object.keys(outlines))
-            const layer = a.sane(outline.layer || 'Edge.Cuts', `pcbs.${pcb_name}.outlines.${outline_name}.outline`, 'string')
+            const layer = a.sane(outline.layer || 'Edge.Cuts', `pcbs.${pcb_name}.outlines.${outline_name}.outline`, 'string')()
             kicad_outlines[outline_name] = makerjs2kicad(outlines[ref], layer)
         }
 
@@ -248,17 +246,17 @@ exports.parse = (config, points, outlines) => {
         // key-level footprints
         for (const [p_name, point] of Object.entries(points)) {
             for (const [f_name, f] of Object.entries(point.meta.footprints || {})) {
-                footprints.push(footprint(f, `${p_name}.footprints.${f_name}`, points, point, net_indexer, component_indexer))
+                footprints.push(footprint(f, `${p_name}.footprints.${f_name}`, points, point, net_indexer, component_indexer, units))
             }
         }
 
         // global one-off footprints
-        if (a.type(pcb_config.footprints) == 'array') {
+        if (a.type(pcb_config.footprints)() == 'array') {
             pcb_config.footprints = {...pcb_config.footprints}
         }
-        const global_footprints = a.sane(pcb_config.footprints || {}, `pcbs.${pcb_name}.footprints`, 'object')
+        const global_footprints = a.sane(pcb_config.footprints || {}, `pcbs.${pcb_name}.footprints`, 'object')()
         for (const [gf_name, gf] of Object.entries(global_footprints)) {
-            footprints.push(footprint(gf, `pcbs.${pcb_name}.footprints.${gf_name}`, points, undefined, net_indexer, component_indexer))
+            footprints.push(footprint(gf, `pcbs.${pcb_name}.footprints.${gf_name}`, points, undefined, net_indexer, component_indexer, units))
         }
 
         // finalizing nets

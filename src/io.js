@@ -15,6 +15,7 @@ exports.dump_model = (model, file='model', debug=false) => {
     fs.mkdirpSync(path.dirname(`${file}.dxf`))
     fs.writeFileSync(`${file}.dxf`, m.exporter.toDXF(assembly))
     if (debug) {
+        fs.writeFileSync(`${file}.svg`, m.exporter.toSVG(assembly))
         fs.writeJSONSync(`${file}.json`, assembly, {spaces: 4})
     }
 }

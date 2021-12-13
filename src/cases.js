@@ -1,10 +1,10 @@
 const m = require('makerjs')
-const u = require('./utils')
 const a = require('./assert')
+const o = require('./operation')
 
-exports.parse = (config, outlines) => {
+exports.parse = (config, outlines, units) => {
 
-    const cases_config = a.sane(config, 'cases', 'object')
+    const cases_config = a.sane(config, 'cases', 'object')()
 
     const scripts = {}
     const cases = {}
@@ -39,19 +39,18 @@ exports.parse = (config, outlines) => {
     for (let [case_name, case_config] of Object.entries(cases_config)) {
 
         // config sanitization
-        case_config = a.inherit('cases', case_name, cases_config)
-        if (a.type(case_config) == 'array') {
+        if (a.type(case_config)() == 'array') {
             case_config = {...case_config}
         }
-        const parts = a.sane(case_config, `cases.${case_name}`, 'object')
+        const parts = a.sane(case_config, `cases.${case_name}`, 'object')()
 
         const body = []
         const case_dependencies = []
         const outline_dependencies = []
         let first = true
         for (let [part_name, part] of Object.entries(parts)) {
-            if (a.type(part) == 'string') {
-                part = a.op_str(part, {
+            if (a.type(part)() == 'string') {
+                part = o.operation(part, {
                     outline: Object.keys(outlines),
                     case: Object.keys(cases)
                 }, ['case', 'outline'])
@@ -60,14 +59,14 @@ exports.parse = (config, outlines) => {
             const part_var = `${case_name}__part_${part_name}`
             a.detect_unexpected(part, part_qname, ['type', 'name', 'extrude', 'shift', 'rotate', 'operation'])
             const type = a.in(part.type || 'outline', `${part_qname}.type`, ['outline', 'case'])
-            const name = a.sane(part.name, `${part_qname}.name`, 'string')
-            const shift = a.numarr(part.shift || [0, 0, 0], `${part_qname}.shift`, 3)
-            const rotate = a.numarr(part.rotate || [0, 0, 0], `${part_qname}.rotate`, 3)
+            const name = a.sane(part.name, `${part_qname}.name`, 'string')()
+            const shift = a.numarr(part.shift || [0, 0, 0], `${part_qname}.shift`, 3)(units)
+            const rotate = a.numarr(part.rotate || [0, 0, 0], `${part_qname}.rotate`, 3)(units)
             const operation = a.in(part.operation || 'add', `${part_qname}.operation`, ['add', 'subtract', 'intersect'])
 
             let base
             if (type == 'outline') {
-                const extrude = a.sane(part.extrude || 1, `${part_qname}.extrude`, 'number')
+                const extrude = a.sane(part.extrude || 1, `${part_qname}.extrude`, 'number')(units)
                 const outline = outlines[name]
                 a.assert(outline, `Field "${part_qname}.name" does not name a valid outline!`)
                 if (!scripts[name]) {

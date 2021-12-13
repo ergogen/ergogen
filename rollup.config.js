@@ -4,7 +4,7 @@ import replace from '@rollup/plugin-replace'
 
 export default {
   input: 'src/ergogen.js',
-  external: ['makerjs', 'js-yaml'],
+  external: ['makerjs', 'js-yaml', 'mathjs'],
   output: {
     name: 'ergogen',
     file: 'dist/ergogen.js',
@@ -12,7 +12,8 @@ export default {
     banner: `/*!\n * ergogen v${pkg.version}\n * https://zealot.hu/ergogen\n */\n`,
     globals: {
       'makerjs': 'makerjs',
-      'js-yaml': 'jsyaml'
+      'js-yaml': 'jsyaml',
+      'mathjs': 'math'
     }
   },
   plugins: [
