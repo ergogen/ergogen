@@ -1,6 +1,6 @@
 {
     "name": "ergogen",
-    "version": "3.0.0",
+    "version": "3.0.1",
     "description": "Ergonomic keyboard layout generator",
     "author": "Bán Dénes <mr@zealot.hu>",
     "license": "MIT",

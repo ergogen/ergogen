@@ -7,6 +7,9 @@ describe('Prepare', function() {
             d: 2,
             'e.f': 3
         }}).should.deep.equal({a: {b: {c: {d: 2, e: {f: 3}}}}})
+        p.unnest({'root': [{
+            'a.b': 1
+        }]}).should.deep.equal({root: [{a: {b: 1}}]})
     })
 
     it('extend', function() {

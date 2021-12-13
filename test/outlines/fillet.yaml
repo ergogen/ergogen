@@ -1,0 +1,22 @@
+points:
+  key:
+    padding: cy
+    bind: 0.1
+  zones:
+    matrix:
+      columns:
+        one:
+        two:
+      rows:
+        bottom:
+        top:
+outlines:
+  exports:
+    base:
+      - type: keys
+        side: left
+        size: cy
+    fillet:
+      - type: outline
+        name: base
+        fillet: 2

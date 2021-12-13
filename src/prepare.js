@@ -33,14 +33,26 @@ const extend = exports.extend = (...args) => {
 }
 
 const traverse = exports.traverse = (config, root, breadcrumbs, op) => {
-    if (a.type(config)() !== 'object') return config
-    const result = {}
-    for (const [key, val] of Object.entries(config)) {
-        breadcrumbs.push(key)
-        op(result, key, traverse(val, root, breadcrumbs, op), root, breadcrumbs)
-        breadcrumbs.pop()
+    if (a.type(config)() == 'object') {
+        const result = {}
+        for (const [key, val] of Object.entries(config)) {
+            breadcrumbs.push(key)
+            op(result, key, traverse(val, root, breadcrumbs, op), root, breadcrumbs)
+            breadcrumbs.pop()
+        }
+        return result
+    } else if (a.type(config)() == 'array') {
+        const result = []
+        let index = 0
+        for (const val of config) {
+            breadcrumbs.push(`[${index}]`)
+            result[index] = traverse(val, root, breadcrumbs, op)
+            breadcrumbs.pop()
+            index++
+        }
+        return result
     }
-    return result
+    return config
 }
 
 exports.unnest = config => traverse(config, config, [], (target, key, val) => {

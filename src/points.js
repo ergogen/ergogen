@@ -61,7 +61,7 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key,
             'number'
         )(units)
         col.spread = a.sane(
-            col.spread || (first_col ? 0 : 'u'),
+            col.spread !== undefined ? col.spread : (first_col ? 0 : 'u'),
             `points.zones.${zone_name}.columns.${col_name}.spread`,
             'number'
         )(units)
@@ -314,9 +314,11 @@ exports.parse = (config, units) => {
 
 exports.visualize = (points, units) => {
     const models = {}
+    const x_unit = units.visual_x || (units.u - 1)
+    const y_unit = units.visual_y || (units.u - 1)
     for (const [pname, p] of Object.entries(points)) {
-        const w = (p.meta.width * units.u) - 1
-        const h = (p.meta.height * units.u) - 1
+        const w = p.meta.width * x_unit
+        const h = p.meta.height * y_unit
         const rect = u.rect(w, h, [-w/2, -h/2])
         models[pname] = p.position(rect)
     }
