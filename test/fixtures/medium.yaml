@@ -1,0 +1,9 @@
+points.zones.matrix:
+  columns.col: {}
+outlines.exports:
+  export:
+    - type: 'keys'
+      side: 'left'
+      size: 18
+pcbs:
+  export: {}

@@ -57,7 +57,7 @@ exports.parse = (config, outlines, units) => {
             }
             const part_qname = `cases.${case_name}.${part_name}`
             const part_var = `${case_name}__part_${part_name}`
-            a.detect_unexpected(part, part_qname, ['type', 'name', 'extrude', 'shift', 'rotate', 'operation'])
+            a.unexpected(part, part_qname, ['type', 'name', 'extrude', 'shift', 'rotate', 'operation'])
             const type = a.in(part.type || 'outline', `${part_qname}.type`, ['outline', 'case'])
             const name = a.sane(part.name, `${part_qname}.name`, 'string')()
             const shift = a.numarr(part.shift || [0, 0, 0], `${part_qname}.shift`, 3)(units)

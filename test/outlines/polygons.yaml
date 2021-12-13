@@ -1,0 +1,29 @@
+points:
+  zones:
+    matrix: {}
+  mirror: 20
+outlines:
+  exports:
+    outline:
+      main:
+        type: keys
+        side: both
+        size: 20
+        bound: false
+      middle_poly:
+        type: polygon
+        points:
+          - ref:
+              - matrix_default_default
+              - mirror_matrix_default_default
+            shift: [0, 20]
+          - shift: [20, -40]
+          - shift: [-40, 0]
+      outside_polys:
+        type: polygon
+        points:
+          - ref: matrix_default_default
+            shift: [-10, 15]
+          - shift: [5, -10]
+          - shift: [-10, 0]
+        mirror: true

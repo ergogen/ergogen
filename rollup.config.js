@@ -4,16 +4,18 @@ import replace from '@rollup/plugin-replace'
 
 export default {
   input: 'src/ergogen.js',
-  external: ['makerjs', 'js-yaml', 'mathjs'],
+  external: ['makerjs', 'js-yaml', 'mathjs', 'kle-serial', '@jscad/openjscad'],
   output: {
     name: 'ergogen',
     file: 'dist/ergogen.js',
     format: 'umd',
-    banner: `/*!\n * ergogen v${pkg.version}\n * https://zealot.hu/ergogen\n */\n`,
+    banner: `/*!\n * Ergogen v${pkg.version}\n * https://zealot.hu/ergogen\n */\n`,
     globals: {
       'makerjs': 'makerjs',
       'js-yaml': 'jsyaml',
-      'mathjs': 'math'
+      'mathjs': 'math',
+      'kle-serial': 'kle',
+      '@jscad/openjscad': 'myjscad'
     }
   },
   plugins: [

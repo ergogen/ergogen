@@ -2,7 +2,7 @@ const m = require('makerjs')
 const u = require('./utils')
 const a = require('./assert')
 const prep = require('./prepare')
-const make_anchor = require('./anchor')
+const anchor_lib = require('./anchor')
 
 const push_rotation = exports._push_rotation = (list, angle, origin) => {
     let candidate = origin
@@ -19,7 +19,7 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key,
 
     // zone-wide sanitization
 
-    a.detect_unexpected(zone, `points.zones.${zone_name}`, ['columns', 'rows', 'key'])
+    a.unexpected(zone, `points.zones.${zone_name}`, ['columns', 'rows', 'key'])
     // the anchor comes from "above", because it needs other zones too (for references)
     const cols = a.sane(zone.columns || {}, `points.zones.${zone_name}.columns`, 'object')()
     const zone_wide_rows = a.sane(zone.rows || {}, `points.zones.${zone_name}.rows`, 'object')()
@@ -40,6 +40,9 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key,
 
     // column layout
 
+    if (!Object.keys(cols).length) {
+        cols.default = {}
+    }
     let first_col = true
     for (let [col_name, col] of Object.entries(cols)) {
 
@@ -47,7 +50,7 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key,
 
         col = col || {}
 
-        a.detect_unexpected(
+        a.unexpected(
             col,
             `points.zones.${zone_name}.columns.${col_name}`,
             ['stagger', 'spread', 'rotate', 'origin', 'rows', 'row_overrides', 'key']
@@ -191,7 +194,7 @@ const parse_axis = exports._parse_axis = (config, name, points, units) => {
         const mirror_obj = a.sane(config || {}, name, 'object')()
         const distance = a.sane(mirror_obj.distance || 0, `${name}.distance`, 'number')(units)
         delete mirror_obj.distance
-        let axis = make_anchor(mirror_obj, name, points)(units).x
+        let axis = anchor_lib.parse(mirror_obj, name, points)(units).x
         axis += distance / 2
         return axis
     } else return config
@@ -215,22 +218,11 @@ const perform_mirror = exports._perform_mirror = (point, axis) => {
     return ['', null]
 }
 
-exports.parse = (config = {}) => {
-
-    // parsing units
-    const raw_units = prep.extend({
-        u: 19,
-        cx: 18,
-        cy: 17
-    }, a.sane(config.units || {}, 'points.units', 'object')())
-    const units = {}
-    for (const [key, val] of Object.entries(raw_units)) {
-        units[key] = a.mathnum(val)(units)
-    }
+exports.parse = (config, units) => {
 
     // config sanitization
-    a.detect_unexpected(config, 'points', ['units', 'zones', 'key', 'rotate', 'mirror'])
-    const zones = a.sane(config.zones || {}, 'points.zones', 'object')()
+    a.unexpected(config, 'points', ['zones', 'key', 'rotate', 'mirror'])
+    const zones = a.sane(config.zones, 'points.zones', 'object')()
     const global_key = a.sane(config.key || {}, 'points.key', 'object')()
     const global_rotate = a.sane(config.rotate || 0, 'points.rotate', 'number')(units)
     const global_mirror = config.mirror
@@ -243,7 +235,7 @@ exports.parse = (config = {}) => {
     for (let [zone_name, zone] of Object.entries(zones)) {
 
         // extracting keys that are handled here, not at the zone render level
-        const anchor = make_anchor(zone.anchor || {}, `points.zones.${zone_name}.anchor`, all_points)(units)
+        const anchor = anchor_lib.parse(zone.anchor || {}, `points.zones.${zone_name}.anchor`, all_points)(units)
         const rotate = a.sane(zone.rotate || 0, `points.zones.${zone_name}.rotate`, 'number')(units)
         const mirror = zone.mirror
         delete zone.anchor
@@ -317,14 +309,14 @@ exports.parse = (config = {}) => {
     }
 
     // done
-    return [filtered, units]
+    return filtered
 }
 
-exports.visualize = (points) => {
+exports.visualize = (points, units) => {
     const models = {}
     for (const [pname, p] of Object.entries(points)) {
-        const w = (p.meta.width * 19) - 1
-        const h = (p.meta.height * 19) - 1
+        const w = (p.meta.width * units.u) - 1
+        const h = (p.meta.height * units.u) - 1
         const rect = u.rect(w, h, [-w/2, -h/2])
         models[pname] = p.position(rect)
     }

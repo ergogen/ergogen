@@ -1,0 +1,47 @@
+models:
+    export:
+        models:
+            matrix_col_row:
+                paths:
+                    top:
+                        type: line
+                        origin:
+                            - -9
+                            - 9
+                        end:
+                            - 9
+                            - 9
+                    right:
+                        type: line
+                        origin:
+                            - 9
+                            - 9
+                        end:
+                            - 9
+                            - -9
+                    bottom:
+                        type: line
+                        origin:
+                            - 9
+                            - -9
+                        end:
+                            - -9
+                            - -9
+                    left:
+                        type: line
+                        origin:
+                            - -9
+                            - -9
+                        end:
+                            - -9
+                            - 9
+                origin:
+                    - 0
+                    - 0
+        origin:
+            - 0
+            - 0
+units: mm
+origin:
+    - 0
+    - 0

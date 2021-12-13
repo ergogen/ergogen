@@ -1,6 +1,7 @@
 const m = require('makerjs')
 const a = require('./assert')
-const make_anchor = require('./anchor')
+const prep = require('./prepare')
+const anchor_lib = require('./anchor')
 
 const kicad_prefix = `
 (kicad_pcb (version 20171130) (host pcbnew 5.1.6)
@@ -143,61 +144,90 @@ const makerjs2kicad = exports._makerjs2kicad = (model, layer='Edge.Cuts') => {
 }
 
 const footprint_types = require('./footprints')
+
+exports.inject_footprint = (name, fp) => {
+    footprint_types[name] = fp
+}
+
 const footprint = exports._footprint = (config, name, points, point, net_indexer, component_indexer, units) => {
 
     if (config === false) return ''
-    
+
     // config sanitization
-    a.detect_unexpected(config, name, ['type', 'anchor', 'nets', 'params'])
+    a.unexpected(config, name, ['type', 'anchor', 'nets', 'anchors', 'params'])
     const type = a.in(config.type, `${name}.type`, Object.keys(footprint_types))
-    let anchor = make_anchor(config.anchor || {}, `${name}.anchor`, points, true, point)(units)
+    let anchor = anchor_lib.parse(config.anchor || {}, `${name}.anchor`, points, true, point)(units)
     const nets = a.sane(config.nets || {}, `${name}.nets`, 'object')()
+    const anchors = a.sane(config.anchors || {}, `${name}.anchors`, 'object')()
     const params = a.sane(config.params || {}, `${name}.params`, 'object')()
 
     // basic setup
     const fp = footprint_types[type]
     const parsed_params = {}
 
-    // footprint positioning
-    parsed_params.at = `(at ${anchor.x} ${-anchor.y} ${anchor.r})`
-    parsed_params.rot = anchor.r
-
-    // connecting static nets
-    parsed_params.net = {}
-    for (const net of (fp.static_nets || [])) {
-        const index = net_indexer(net)
-        parsed_params.net[net] = `(net ${index} "${net}")`
-    }
-
-    // connecting parametric nets
-    for (const net_ref of (fp.nets || [])) {
-        let net = nets[net_ref]
-        a.sane(net, `${name}.nets.${net_ref}`, 'string')()
-        if (net.startsWith('=') && point) {
-            const indirect = net.substring(1)
-            net = point.meta[indirect]
-            a.sane(net, `${name}.nets.${net_ref} --> ${point.meta.name}.${indirect}`, 'string')()
-        }
-        const index = net_indexer(net)
-        parsed_params.net[net_ref] = `(net ${index} "${net}")`
-    }
-
-    // connecting other, non-net parameters
+    // connecting other, non-net, non-anchor parameters
     parsed_params.param = {}
-    for (const param of (Object.keys(fp.params || {}))) {
-        let value = params[param] === undefined ? fp.params[param] : params[param]
-        if (value === undefined) throw new Error(`Field "${name}.params.${param}" is missing!`)
+    for (const [param_name, param_value] of Object.entries(prep.extend(fp.params || {}, params))) {
+        let value = param_value
         if (a.type(value)() == 'string' && value.startsWith('=') && point) {
             const indirect = value.substring(1)
             value = point.meta[indirect]
-            if (value === undefined) throw new Error(`Field "${name}.params.${param} --> ${point.meta.name}.${indirect}" is missing!`)
+            if (value === undefined) {
+                throw new Error(`Indirection "${name}.params.${param}" --> "${point.meta.name}.${indirect}" to undefined value!`)
+            }
         }
-        parsed_params.param[param] = value
+        parsed_params.param[param_name] = value
     }
 
     // reference
-    parsed_params.ref = component_indexer(parsed_params.param.class || '_')
+    const component_ref = parsed_params.ref = component_indexer(parsed_params.param.class || '_')
     parsed_params.ref_hide = 'hide' // TODO: make this parametric?
+
+    // footprint positioning
+    parsed_params.at = `(at ${anchor.x} ${-anchor.y} ${anchor.r})`
+    parsed_params.rot = anchor.r
+    parsed_params.xy = (x, y) => {
+        const new_anchor = anchor_lib.parse({
+            shift: [x, -y]
+        }, '_internal_footprint_xy', points, true, anchor)(units)
+        return `${new_anchor.x} ${-new_anchor.y}`
+    }
+
+    // connecting nets
+    parsed_params.net = {}
+    for (const [net_name, net_value] of Object.entries(prep.extend(fp.nets || {}, nets))) {
+        let net = a.sane(net_value, `${name}.nets.${net_name}`, 'string')()
+        if (net.startsWith('=') && point) {
+            const indirect = net.substring(1)
+            net = point.meta[indirect]
+            net = a.sane(net, `${name}.nets.${net_name} --> ${point.meta.name}.${indirect}`, 'string')()
+        }
+        const index = net_indexer(net)
+        parsed_params.net[net_name] = {
+            name: net,
+            index: index,
+            str: `(net ${index} "${net}")`
+        }
+    }
+
+    // allowing footprints to add dynamic nets
+    parsed_params.local_net = suffix => {
+        const net = `${component_ref}_${suffix}`
+        const index = net_indexer(net)
+        return {
+            name: net,
+            index: index,
+            str: `(net ${index} "${net}")`
+        }
+    }
+
+    // parsing anchor-type parameters
+    parsed_params.anchors = {}
+    for (const [anchor_name, anchor_config] of Object.entries(prep.extend(fp.anchors || {}, anchors))) {
+        let parsed_anchor = anchor_lib.parse(anchor_config || {}, `${name}.anchors.${anchor_name}`, points, true, anchor)(units)
+        parsed_anchor.y = -parsed_anchor.y
+        parsed_params.anchors[anchor_name] = parsed_anchor
+    }
 
     return fp.body(parsed_params)
 }
@@ -210,7 +240,7 @@ exports.parse = (config, points, outlines, units) => {
     for (const [pcb_name, pcb_config] of Object.entries(pcbs)) {
 
         // config sanitization
-        a.detect_unexpected(pcb_config, `pcbs.${pcb_name}`, ['outlines', 'footprints'])
+        a.unexpected(pcb_config, `pcbs.${pcb_name}`, ['outlines', 'footprints'])
 
         // outline conversion
         if (a.type(pcb_config.outlines)() == 'array') {

@@ -1,0 +1,34 @@
+{
+    "matrix_default_default": {
+        "x": 0,
+        "y": 0,
+        "r": 0,
+        "meta": {
+            "shift": [
+                0,
+                0
+            ],
+            "rotate": 0,
+            "padding": 19,
+            "width": 1,
+            "height": 1,
+            "skip": false,
+            "asym": "both",
+            "name": "matrix_default_default",
+            "colrow": "default_default",
+            "col": {
+                "stagger": 0,
+                "spread": 0,
+                "rotate": 0,
+                "origin": [
+                    0,
+                    0
+                ],
+                "rows": {},
+                "key": {},
+                "name": "default"
+            },
+            "row": "default"
+        }
+    }
+}

@@ -1,0 +1,37 @@
+points:
+  zones:
+    matrix:
+      columns:
+        one:
+      rows:
+        only:
+outlines:
+  exports:
+    edge:
+      - type: keys
+        side: left
+        size: [u, u]
+pcbs:
+  main:
+    outlines:
+      edge:
+        outline: edge
+    footprints:
+      trace:
+        type: trace_test
+        anchor:
+          shift: [1, 1]
+          rotate: 30
+      zone:
+        type: zone_test
+        anchor:
+          shift: [1, 1]
+          rotate: 30
+      dyn:
+        type: dynamic_net_test
+      anc:
+        type: anchor_test
+        anchors:
+          end:
+            ref: matrix_one_only
+            shift: [10, 10]

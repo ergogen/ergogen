@@ -1,0 +1,33 @@
+units:
+    a: 28 + u
+points:
+    zones:
+        matrix:
+            columns:
+                col: {}
+            rows:
+                row: {}
+outlines:
+    exports:
+        export:
+            -
+                type: keys
+                side: left
+                size: 18
+        _export:
+            -
+                type: keys
+                side: left
+                size: 18
+cases:
+    export:
+        -
+            name: export
+            extrude: 1
+    _export:
+        -
+            name: export
+            extrude: 1
+pcbs:
+    export: {}
+    _export: {}
