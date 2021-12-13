@@ -8,9 +8,11 @@
 
 - Move column-level attributes like spread to key-level to unify the structure
 - Generalize what shapes to be repeated when outlining `keys`
+- Place rectangles by their centers
 - Full per-point anchors
 - Collapse any raw shift or rotation under the anchor infrastructure
 - Merge, generalize, and uniform-ize footprints
+    - Template for creating them, built-in variables they can use, documentation, external links, etc.
     - Also considering how (or, on which layer) they define their silks, universal mirroring behaviour, etc.
 
 ### Minor
@@ -41,6 +43,7 @@
     - Also expand this to footprints (so, which footprints get applied to which pcb)
         - Or, at least, allow skipping per-key footprints
 - Generate ZMK shield from config
+- Export **to** KLE?
 
 
 ### Patch
