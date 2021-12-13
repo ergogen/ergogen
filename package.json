@@ -18,8 +18,8 @@
         "@jscad/openjscad": "github:ergogen/oldjscad",
         "fs-extra": "^10.0.0",
         "js-yaml": "^3.14.0",
-        "kle-serial": "github:ergogen/kle-serial",
-        "makerjs": "github:ergogen/maker.js-dist",
+        "kle-serial": "github:ergogen/kle-serial#ergogen",
+        "makerjs": "github:ergogen/maker.js#ergogen",
         "mathjs": "^10.0.0",
         "yargs": "^17.3.0"
     },
