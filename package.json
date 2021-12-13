@@ -4,9 +4,9 @@
     "description": "Ergonomic keyboard layout generator",
     "author": "Bán Dénes <mr@zealot.hu>",
     "license": "MIT",
-    "homepage": "https://zealot.hu/ergogen",
-    "repository": "github:mrzealot/ergogen",
-    "bugs": "https://github.com/mrzealot/ergogen/issues",
+    "homepage": "https://ergogen.xyz",
+    "repository": "github:ergogen/ergogen",
+    "bugs": "https://github.com/ergogen/ergogen/issues",
     "main": "./src/ergogen.js",
     "bin": "./src/cli.js",
     "scripts": {
@@ -15,11 +15,11 @@
         "coverage": "nyc --reporter=html --reporter=text npm test"
     },
     "dependencies": {
-        "@jscad/openjscad": "github:mrzealot/oldjscad",
+        "@jscad/openjscad": "github:ergogen/oldjscad",
         "fs-extra": "^10.0.0",
         "js-yaml": "^3.14.0",
-        "kle-serial": "github:mrzealot/kle-serial",
-        "makerjs": "github:mrzealot/maker.js-dist",
+        "kle-serial": "github:ergogen/kle-serial",
+        "makerjs": "github:ergogen/maker.js-dist",
         "mathjs": "^10.0.0",
         "yargs": "^17.3.0"
     },
