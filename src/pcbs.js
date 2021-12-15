@@ -149,7 +149,7 @@ exports.inject_footprint = (name, fp) => {
     footprint_types[name] = fp
 }
 
-const footprint = exports._footprint = (config, name, points, point, net_indexer, component_indexer, units) => {
+const footprint = exports._footprint = (config, name, points, point, net_indexer, component_indexer, units, extra) => {
 
     if (config === false) return ''
 
@@ -181,7 +181,7 @@ const footprint = exports._footprint = (config, name, points, point, net_indexer
 
     // reference
     const component_ref = parsed_params.ref = component_indexer(parsed_params.param.class || '_')
-    parsed_params.ref_hide = 'hide' // TODO: make this parametric?
+    parsed_params.ref_hide = extra.references ? '' : 'hide'
 
     // footprint positioning
     parsed_params.at = `(at ${anchor.x} ${-anchor.y} ${anchor.r})`
@@ -240,7 +240,8 @@ exports.parse = (config, points, outlines, units) => {
     for (const [pcb_name, pcb_config] of Object.entries(pcbs)) {
 
         // config sanitization
-        a.unexpected(pcb_config, `pcbs.${pcb_name}`, ['outlines', 'footprints'])
+        a.unexpected(pcb_config, `pcbs.${pcb_name}`, ['outlines', 'footprints', 'references'])
+        const references = a.sane(pcb_config.references || false, `pcbs.${pcb_name}.references`, 'boolean')()
 
         // outline conversion
         if (a.type(pcb_config.outlines)() == 'array') {
@@ -276,7 +277,7 @@ exports.parse = (config, points, outlines, units) => {
         // key-level footprints
         for (const [p_name, point] of Object.entries(points)) {
             for (const [f_name, f] of Object.entries(point.meta.footprints || {})) {
-                footprints.push(footprint(f, `${p_name}.footprints.${f_name}`, points, point, net_indexer, component_indexer, units))
+                footprints.push(footprint(f, `${p_name}.footprints.${f_name}`, points, point, net_indexer, component_indexer, units, {references}))
             }
         }
 
@@ -286,7 +287,7 @@ exports.parse = (config, points, outlines, units) => {
         }
         const global_footprints = a.sane(pcb_config.footprints || {}, `pcbs.${pcb_name}.footprints`, 'object')()
         for (const [gf_name, gf] of Object.entries(global_footprints)) {
-            footprints.push(footprint(gf, `pcbs.${pcb_name}.footprints.${gf_name}`, points, undefined, net_indexer, component_indexer, units))
+            footprints.push(footprint(gf, `pcbs.${pcb_name}.footprints.${gf_name}`, points, undefined, net_indexer, component_indexer, units, {references}))
         }
 
         // finalizing nets

@@ -1,0 +1,11 @@
+points.zones.matrix:
+  columns.one:
+  rows.only:
+pcbs:
+  shown:
+    references: true
+    footprints:
+      - type: references_test
+  hidden:
+    footprints:
+      - type: references_test
