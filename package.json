@@ -21,11 +21,12 @@
         "kle-serial": "github:ergogen/kle-serial#ergogen",
         "makerjs": "github:ergogen/maker.js#ergogen",
         "mathjs": "^10.0.0",
+        "semver": "^7.3.5",
         "yargs": "^17.3.0"
     },
     "devDependencies": {
         "@rollup/plugin-commonjs": "^21.0.1",
-        "@rollup/plugin-replace": "^3.0.0",
+        "@rollup/plugin-json": "^4.1.0",
         "chai": "^4.3.4",
         "chai-as-promised": "^7.1.1",
         "dir-compare": "^3.3.0",

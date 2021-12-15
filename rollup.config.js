@@ -1,10 +1,10 @@
 import pkg from './package.json'
+import json from '@rollup/plugin-json'
 import commonjs from '@rollup/plugin-commonjs'
-import replace from '@rollup/plugin-replace'
 
 export default {
   input: 'src/ergogen.js',
-  external: ['makerjs', 'js-yaml', 'mathjs', 'kle-serial', '@jscad/openjscad'],
+  external: ['makerjs', 'js-yaml', 'mathjs', 'kle-serial', '@jscad/openjscad', 'semver'],
   output: {
     name: 'ergogen',
     file: 'dist/ergogen.js',
@@ -15,13 +15,12 @@ export default {
       'js-yaml': 'jsyaml',
       'mathjs': 'math',
       'kle-serial': 'kle',
-      '@jscad/openjscad': 'myjscad'
+      '@jscad/openjscad': 'myjscad',
+      'semver': 'semver'
     }
   },
   plugins: [
-    commonjs(),
-    replace({
-      __ergogen_version: pkg.version
-    })
+    json(),
+    commonjs()
   ]
 }

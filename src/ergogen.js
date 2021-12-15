@@ -7,6 +7,9 @@ const outlines_lib = require('./outlines')
 const cases_lib = require('./cases')
 const pcbs_lib = require('./pcbs')
 
+const semver = require('semver')
+const version = require('../package.json').version
+
 const process = async (raw, debug=false, logger=()=>{}) => {
 
     const prefix = 'Interpreting format: '
@@ -28,12 +31,22 @@ const process = async (raw, debug=false, logger=()=>{}) => {
         results.canonical = u.deepcopy(config)
     }
 
+    if (config.meta && config.meta.engine) {
+        logger('Checking compatibility...')
+        const engine = semver.validRange(config.meta.engine)
+        if (!engine) {
+            throw new Error('Invalid config engine declaration!')
+        }
+        if (!semver.satisfies(version, engine)) {
+            throw new Error(`Current ergogen version (${version}) doesn\'t satisfy config's engine requirement (${engine})!`)
+        }
+    }
+
     logger('Calculating variables...')
     const units = units_lib.parse(config)
     if (debug) {
         results.units = units
     }
-
     
     logger('Parsing points...')
     if (!config.points) {
@@ -83,7 +96,7 @@ const process = async (raw, debug=false, logger=()=>{}) => {
 }
 
 module.exports = {
-    version: '__ergogen_version',
+    version,
     process,
     inject_footprint: pcbs_lib.inject_footprint
 }
