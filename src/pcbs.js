@@ -101,10 +101,22 @@ const kicad_suffix = `
 )
 `
 
-const kicad_netclass = `
+const kicad_default_netclass = `
   (net_class Default "This is the default net class."
     (clearance 0.2)
     (trace_width 0.25)
+    (via_dia 0.8)
+    (via_drill 0.4)
+    (uvia_dia 0.3)
+    (uvia_drill 0.1)
+    __ADD_NET
+  )
+`
+
+const kicad_power_netclass = `
+  (net_class Power "This is the power net class."
+    (clearance 0.2)
+    (trace_width 0.5)
     (via_dia 0.8)
     (via_drill 0.4)
     (uvia_dia 0.3)
@@ -291,20 +303,30 @@ exports.parse = (config, points, outlines, units) => {
 
         // finalizing nets
         const nets_arr = []
-        const add_nets_arr = []
+        const add_default_nets_arr = []
+        const add_power_nets_arr = []
         for (const [net, index] of Object.entries(nets)) {
             nets_arr.push(`(net ${index} "${net}")`)
-            add_nets_arr.push(`(add_net "${net}")`)
+            if (['vcc', 'vdd', 'raw', 'gnd'].includes(net.toLowerCase())) {
+                add_power_nets_arr.push(`(add_net "${net}")`)
+            } else {
+                add_default_nets_arr.push(`(add_net "${net}")`)
+            }
         }
 
-        const netclass = kicad_netclass.replace('__ADD_NET', add_nets_arr.join('\n'))
+        const power_filter = net => {}
+        const signal_filter = net => { !power_filter(net) }
+
+        const default_netclass = kicad_default_netclass.replace('__ADD_NET', add_default_nets_arr.join('\n'))
+        const power_netclass = kicad_power_netclass.replace('__ADD_NET', add_power_nets_arr.join('\n'))
         const nets_text = nets_arr.join('\n')
         const footprint_text = footprints.join('\n')
         const outline_text = Object.values(kicad_outlines).join('\n')
         results[pcb_name] = `
             ${kicad_prefix}
             ${nets_text}
-            ${netclass}
+            ${default_netclass}
+            ${power_netclass}
             ${footprint_text}
             ${outline_text}
             ${kicad_suffix}
