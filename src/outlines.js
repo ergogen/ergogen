@@ -135,8 +135,13 @@ const layout = exports._layout = (config = {}, points = {}, units = {}) => {
         if (side == 'left') return left
         if (side == 'right') return right
 
+        // allow opting out of gluing, when
+        // A) there are no glue definitions, or
+        // B) glue is explicitly set to false
+        const glue_opt_out = (!Object.keys(parsed_glue).length || params.glue === false)
+
         let glue = {models: {}}
-        if (bound && ['middle', 'both', 'glue'].includes(side)) {
+        if (bound && ['middle', 'both', 'glue'].includes(side) && !glue_opt_out) {
 
             const default_glue_name = Object.keys(parsed_glue)[0]
             const computed_glue_name = a.sane(params.glue || default_glue_name, `${export_name}.glue`, 'string')()
