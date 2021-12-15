@@ -21,8 +21,6 @@
 - More generic anchors or distances?
     - Intersect support for anchor affects clauses, which (combined with the math formulas and possible trigonometric functions) should allow for every use case we've discussed so far
 - Allow both object (as well as arrays) in multiple anchor refs
-- Add a way to propagate creator/board/version info from the pcb section to the kicad template
-- Add a way to globally enable/disable references (`ref_hide`)
 - SVG input (for individual outlines, or even combinations parsed by line color, etc.)
     - And once that's done, possibly even STL or other input for cases or pcb renders
 - Support text silk output to PCBs (in configurable fonts, through SVG?)
@@ -30,11 +28,8 @@
 - Look into gr_curve to possibly add beziers to the kicad conversion
     - Support curves (arcs as well as Béziers) in polygons
 - Support specifying keys/labels for the pcb section (not just blindly assuming all)
-- Should add `p`, `pcx`, and `pcy` as units for padding calculations
-    - Also `U` for 19.05 measurement
 - Add snappable line footprint
 - Layer-aware export from Maker.JS, so we can debug in the webui more easily
-- Support opting out of gluing, even when `bound`!
 - Add filleting syntax with `@`?
 - Eeschema support for pcbs
 - Outline expand and shrink access from makerjs
@@ -44,6 +39,11 @@
         - Or, at least, allow skipping per-key footprints
 - Generate ZMK shield from config
 - Export **to** KLE?
+- Per-footprint mirror support
+- A flag for footprints to be able to "resist" the mirroring-related special treatment of negative X shift, rotation, etc.
+- Include 3D models for kicad output for visualization
+- Look into kicad 5 vs. 6 output format
+- Update json schema and add syntax highlight to editors
 
 
 ### Patch
@@ -52,8 +52,6 @@
 - Implement `glue.extra`
 - Integration and end2end tests to get coverage to 100%
 - Fix the intersection of parallel lines when gluing
-- Patch mirrored rotations in anchors (and why this hasn't come up yet)
-- Fix filleting for internal regions
 - Add custom fillet implementation that considers line-line connections only
 
 
@@ -63,6 +61,8 @@
 ### Major
 
 - Change over to Cache's live preview implementation
+- Add missing KLE functionality
+- Create browserified version of semver lib
 
 ### Minor
 

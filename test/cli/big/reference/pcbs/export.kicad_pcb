@@ -4,9 +4,9 @@
 
   (page A3)
   (title_block
-    (title KEYBOARD_NAME_HERE)
-    (rev VERSION_HERE)
-    (company YOUR_NAME_HERE)
+    (title export)
+    (rev v1.0.0)
+    (company Unknown)
   )
 
   (general

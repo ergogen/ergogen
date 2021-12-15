@@ -113,4 +113,12 @@ exports.inject = (ergogen) => {
             `
         }
     })
+
+    ergogen.inject_footprint('references_test', {
+        nets: {},
+        params: {},
+        body: p => {
+            return `references ${p.ref_hide ? 'hidden' : 'shown'}`
+        }
+    })
 }
