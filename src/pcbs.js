@@ -234,7 +234,7 @@ const footprint = exports._footprint = (config, name, points, point, net_indexer
 
 exports.parse = (config, points, outlines, units) => {
 
-    const pcbs = a.sane(config || {}, 'pcbs', 'object')()
+    const pcbs = a.sane(config.pcbs || {}, 'pcbs', 'object')()
     const results = {}
 
     for (const [pcb_name, pcb_config] of Object.entries(pcbs)) {
@@ -301,8 +301,12 @@ exports.parse = (config, points, outlines, units) => {
         const nets_text = nets_arr.join('\n')
         const footprint_text = footprints.join('\n')
         const outline_text = Object.values(kicad_outlines).join('\n')
+        const personalized_prefix = kicad_prefix
+            .replace('KEYBOARD_NAME_HERE', pcb_name)
+            .replace('VERSION_HERE', config.meta && config.meta.version || 'v1.0.0')
+            .replace('YOUR_NAME_HERE', config.meta && config.meta.author || 'Unknown')
         results[pcb_name] = `
-            ${kicad_prefix}
+            ${personalized_prefix}
             ${nets_text}
             ${netclass}
             ${footprint_text}
