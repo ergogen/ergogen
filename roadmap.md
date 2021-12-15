@@ -44,6 +44,11 @@
         - Or, at least, allow skipping per-key footprints
 - Generate ZMK shield from config
 - Export **to** KLE?
+- Per-footprint mirror support
+- A flag for footprints to be able to "resist" the mirroring-related special treatment of negative X shift, rotation, etc.
+- Include 3D models for kicad output for visualization
+- Look into kicad 5 vs. 6 output format
+- Update json schema and add syntax highlight to editors
 
 
 ### Patch
@@ -52,8 +57,6 @@
 - Implement `glue.extra`
 - Integration and end2end tests to get coverage to 100%
 - Fix the intersection of parallel lines when gluing
-- Patch mirrored rotations in anchors (and why this hasn't come up yet)
-- Fix filleting for internal regions
 - Add custom fillet implementation that considers line-line connections only
 
 
@@ -63,6 +66,8 @@
 ### Major
 
 - Change over to Cache's live preview implementation
+- Add missing KLE functionality
+- Create browserified version of semver lib
 
 ### Minor
 
