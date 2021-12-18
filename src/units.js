@@ -5,7 +5,13 @@ const default_units = {
     U: 19.05,
     u: 19,
     cx: 18,
-    cy: 17
+    cy: 17,
+    $default_stagger: 0,
+    $default_spread: 'u',
+    $default_splay: 0,
+    $default_height: 'u-1',
+    $default_width: 'u-1',
+    $default_padding: 'u'
 }
 
 exports.parse = (config = {}) => {

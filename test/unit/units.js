@@ -1,11 +1,12 @@
 const u = require('../../src/units')
+const public = key => !key.startsWith('$')
 
 describe('Units', function() {
 
     it('defaults', function() {
         // check that an empty config has the default units (and nothing more)
         const def = u.parse({})
-        Object.keys(def).length.should.equal(4)
+        Object.keys(def).filter(public).length.should.equal(4)
         def.U.should.equal(19.05)
         def.u.should.equal(19)
         def.cx.should.equal(18)
@@ -20,7 +21,7 @@ describe('Units', function() {
                 b: 'a + 1'
             }
         })
-        Object.keys(res).length.should.equal(6)
+        Object.keys(res).filter(public).length.should.equal(6)
         res.a.should.equal(9)
         res.b.should.equal(10)
         // also check that order matters, which it should
@@ -42,7 +43,7 @@ describe('Units', function() {
                 a: 'U + 1'
             }
         })
-        Object.keys(res).length.should.equal(5)
+        Object.keys(res).filter(public).length.should.equal(5)
         res.a.should.equal(20.05)
     })
 
