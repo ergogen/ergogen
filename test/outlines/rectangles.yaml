@@ -16,12 +16,12 @@ outlines:
           ref:
             - matrix_default_default
             - mirror_matrix_default_default
-          shift: [-sx/2, 0]
+          shift: [0, sy/2]
         size: [20, 40]
       outside_rects:
         type: rectangle
         anchor:
           ref: matrix_default_default
-          shift: [-15, 5]
+          shift: [-10, 10]
         size: 10
         mirror: true

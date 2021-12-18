@@ -59,7 +59,7 @@ module.exports = class Point {
     }
 
     rect(size=14) {
-        let rect = u.rect(size, size, [-size/2, -size/2], this.meta.mirrored)
+        let rect = u.rect(size, size, [-size/2, -size/2])
         return this.position(rect)
     }
 }
