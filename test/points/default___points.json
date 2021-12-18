@@ -1,5 +1,5 @@
 {
-    "matrix_default_default": {
+    "matrix": {
         "x": 0,
         "y": 0,
         "r": 0,
@@ -21,7 +21,7 @@
             "padding": 19,
             "skip": false,
             "asym": "both",
-            "name": "matrix_default_default",
+            "name": "matrix",
             "col": {
                 "rows": {},
                 "key": {},

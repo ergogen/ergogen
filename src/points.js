@@ -206,6 +206,9 @@ exports.parse = (config, units) => {
     // rendering zones
     for (let [zone_name, zone] of Object.entries(zones)) {
 
+        // zone sanitization
+        zone = a.sane(zone || {}, `points.zones.${zone_name}`, 'object')()
+
         // extracting keys that are handled here, not at the zone render level
         const anchor = anchor_lib.parse(zone.anchor || {}, `points.zones.${zone_name}.anchor`, points)(units)
         const rotate = a.sane(zone.rotate || 0, `points.zones.${zone_name}.rotate`, 'number')(units)
@@ -215,7 +218,16 @@ exports.parse = (config, units) => {
         delete zone.mirror
 
         // creating new points
-        const new_points = render_zone(zone_name, zone, anchor, global_key, units)
+        let new_points = render_zone(zone_name, zone, anchor, global_key, units)
+
+        // simplifying the names in individual point "zones"
+        const new_keys = Object.keys(new_points)
+        const individual_key = `${zone_name}_default_default`
+        if (new_keys.length == 1 && new_keys[0] == individual_key) {
+            new_points[zone_name] = new_points[individual_key]
+            new_points[zone_name].meta.name = zone_name
+            delete new_points[individual_key]
+        }
 
         // adjusting new points
         for (const [new_name, new_point] of Object.entries(new_points)) {
