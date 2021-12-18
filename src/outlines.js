@@ -265,14 +265,13 @@ exports.parse = (config = {}, points = {}, units = {}) => {
                     const corner = a.sane(part.corner || 0, `${name}.corner`, 'number')(rec_units)
                     const bevel = a.sane(part.bevel || 0, `${name}.bevel`, 'number')(rec_units)
                     const rect_mirror = a.sane(part.mirror || false, `${name}.mirror`, 'boolean')()
-                    const rect = rectangle(size[0], size[1], corner, bevel, name)
+                    const rect = m.model.moveRelative(rectangle(size[0], size[1], corner, bevel, name), [-size[0]/2, -size[1]/2])
                     arg = anchor.position(u.deepcopy(rect))
                     if (rect_mirror) {
                         const mirror_anchor = u.deepcopy(anchor_def)
                         a.assert(mirror_anchor.ref, `Field "${name}.anchor.ref" must be speficied if mirroring is required!`)
                         anchor = anchor_lib.parse(mirror_anchor, `${name}.anchor --> mirror`, points, undefined, undefined, true)(rec_units)
-                        const mirror_rect = m.model.moveRelative(u.deepcopy(rect), [-size[0], 0])
-                        arg = u.union(arg, anchor.position(mirror_rect))
+                        arg = u.union(arg, anchor.position(u.deepcopy(rect)))
                     }
                     break
                 case 'circle':
