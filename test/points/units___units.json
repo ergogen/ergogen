@@ -4,5 +4,11 @@
     "cx": 18,
     "cy": 17,
     "a": 10,
-    "b": 15
+    "b": 15,
+    "$default_stagger": 0,
+    "$default_spread": 19,
+    "$default_splay": 0,
+    "$default_height": 18,
+    "$default_width": 18,
+    "$default_padding": 19
 }

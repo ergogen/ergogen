@@ -3,10 +3,10 @@ points:
     matrix:
       columns:
         left:
-        right:
+        right.key:
           stagger: 5
           spread: 25
-          rotate: 5
+          splay: 5
           origin: [-9, -9]
       rows:
         bottom:
