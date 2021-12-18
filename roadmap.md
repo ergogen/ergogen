@@ -6,17 +6,15 @@
 
 ### Major
 
-- Move column-level attributes like spread to key-level to unify the structure
 - Generalize what shapes to be repeated when outlining `keys`
-- Place rectangles by their centers
-- Full per-point anchors
-- Collapse any raw shift or rotation under the anchor infrastructure
 - Merge, generalize, and uniform-ize footprints
     - Template for creating them, built-in variables they can use, documentation, external links, etc.
     - Also considering how (or, on which layer) they define their silks, universal mirroring behaviour, etc.
 
 ### Minor
 
+- Key-level orient
+- 3D orient for cases
 - Allow shift/rotate for outlines (via `anchor_def`, probably)
 - More generic anchors or distances?
     - Intersect support for anchor affects clauses, which (combined with the math formulas and possible trigonometric functions) should allow for every use case we've discussed so far
