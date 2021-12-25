@@ -91,6 +91,7 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key,
             spread: first_col ? 0 : units.$default_spread,
             splay: units.$default_splay,
             origin: [0, 0],
+            orient: 0,
             shift: [0, 0],
             rotate: 0,
             width: units.$default_width,
@@ -118,6 +119,7 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key,
             key.spread = a.sane(key.spread, `${key.name}.spread`, 'number')(units)
             key.splay = a.sane(key.splay, `${key.name}.splay`, 'number')(units)
             key.origin = a.xy(key.origin, `${key.name}.origin`)(units)
+            key.orient = a.sane(key.orient, `${key.name}.orient`, 'number')(units)
             key.shift = a.xy(key.shift, `${key.name}.shift`)(units)
             key.rotate = a.sane(key.rotate, `${key.name}.rotate`, 'number')(units)
             key.width = a.sane(key.width, `${key.name}.width`, 'number')(units)
@@ -151,6 +153,7 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key,
             for (const r of rotations) {
                 point.rotate(r.angle, r.origin)
             }
+            point.r += key.orient
             point.shift(key.shift)
             point.r += key.rotate
             point.meta = key
