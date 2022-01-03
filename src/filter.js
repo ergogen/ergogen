@@ -6,17 +6,41 @@ const _true = () => true
 const _and = arr => p => arr.map(e => e(p)).reduce((a, b) => a && b)
 const _or = arr => p => arr.map(e => e(p)).reduce((a, b) => a || b)
 
-const similar = (a, b, name, units) => {
+const similar = (key, reference, name, units) => {
     let neg = false
 
-    if (b.startsWith('-')) {
+    if (reference.startsWith('-')) {
         neg = true
-        b = b.slice(1)
+        reference = reference.slice(1)
     }
 
-    if (b.startsWith('/')) {
-        //...
+    // support both string or regex as reference
+    let internal_tester = val => (''+val) == reference
+    if (reference.startsWith('/')) {
+        const regex_parts = reference.split('/')
+        regex_parts.shift() // remove starting slash
+        const flags = regex_parts.pop()
+        const regex = new RegExp(regex_parts.join('/'), flags)
+        internal_tester = val => regex.test(''+val)
     }
+
+    // support strings, arrays, or objects as key
+    const external_tester = point => {
+        const value = u.deep(point, key)
+        if (a.type(value)() == 'array') {
+            return value.some(subkey => internal_tester(subkey))
+        } else if (a.type(value)() == 'object') {
+            return Object.keys(value).some(subkey => internal_tester(subkey))
+        } else {
+            return internal_tester(value)
+        }
+    }
+
+    // negation happens at the end
+    if (neg) {
+        return point => !external_tester(point)
+    }
+    return external_tester
 }
 
 const comparators = {
@@ -27,28 +51,28 @@ const symbols = Object.keys(comparators)
 
 const simple = (exp, name, units) => {
 
-    let a = ['meta.name', 'meta.tags']
+    let keys = ['meta.name', 'meta.tags']
     let op = '~'
-    let b
+    let value
     const parts = exp.split(/\s+/g)
 
     // full case
     if (symbols.includes(parts[1])) {
-        a = parts[0].split(',')
+        keys = parts[0].split(',')
         op = parts[1]
-        b = parts.slice(2).join(' ')
+        value = parts.slice(2).join(' ')
     
-    // middle case, just an operator spec, default "a"
+    // middle case, just an operator spec, default "keys"
     } else if (symbols.includes(parts[0])) {
         op = parts[0]
-        b = parts.slice(1).join(' ')
+        value = parts.slice(1).join(' ')
 
-    // basic case, only "b"
+    // basic case, only "value"
     } else {
-        b = exp
+        value = exp
     }
 
-    return comparators[op](a, b, name, units)
+    return point => keys.some(key => comparators[op](key, value, name, units))
 }
 
 const complex = (config, name, units, aggregator=_and) => {
@@ -78,9 +102,11 @@ const complex = (config, name, units, aggregator=_and) => {
 
 exports.parse = (config, name, points={}, units={}) => {
     
+    // if a filter decl is an object, it is an anchor
     if (a.type(config)() == 'object') {
         return [anchor(config, name, points)(units)]
     }
 
+    // otherwise, it is treated as a condition to filter all available points
     return Object.values(points).filter(complex(config, name, units))
 }
