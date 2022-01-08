@@ -72,10 +72,10 @@ const simple = (exp, name, units) => {
         value = exp
     }
 
-    return point => keys.some(key => comparators[op](key, value, name, units))
+    return point => keys.some(key => comparators[op](key, value, name, units)(point))
 }
 
-const complex = (config, name, units, aggregator=_and) => {
+const complex = (config, name, units, aggregator=_or) => {
 
     // default is all points
     if (config === undefined) {

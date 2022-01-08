@@ -11,6 +11,8 @@
     - Template for creating them, built-in variables they can use, documentation, external links, etc.
     - Also considering how (or, on which layer) they define their silks, universal mirroring behaviour, etc.
     - https://en.wikipedia.org/wiki/Reference_designator#Designators
+- Kill glue
+- Revamp binding??
 
 ### Minor
 
