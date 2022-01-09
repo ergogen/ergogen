@@ -56,7 +56,7 @@ exports.poly = (arr) => {
 
 const farPoint = [1234.1234, 2143.56789]
 
-exports.union = (a, b) => {
+exports.union = exports.add = (a, b) => {
     return m.model.combine(a, b, false, true, false, true, {
         farPoint
     })
