@@ -54,6 +54,20 @@ exports.poly = (arr) => {
     return res
 }
 
+exports.bbox = (arr) => {
+    let minx = Infinity
+    let miny = Infinity
+    let maxx = -Infinity
+    let maxy = -Infinity
+    for (const p of arr) {
+        minx = Math.min(minx, p[0])
+        miny = Math.min(miny, p[1])
+        maxx = Math.max(maxx, p[0])
+        maxy = Math.max(maxy, p[1])
+    }
+    return {low: [minx, miny], high: [maxx, maxy]}
+}
+
 const farPoint = [1234.1234, 2143.56789]
 
 exports.union = exports.add = (a, b) => {

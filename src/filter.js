@@ -1,6 +1,7 @@
 const u = require('./utils')
 const a = require('./assert')
-const anchor = require('./anchor').parse
+const anchor_lib = require('./anchor')
+const anchor = anchor_lib.parse
 
 const _true = () => true
 const _and = arr => p => arr.map(e => e(p)).reduce((a, b) => a && b)
@@ -100,13 +101,26 @@ const complex = (config, name, units, aggregator=_or) => {
     }
 }
 
-exports.parse = (config, name, points={}, units={}) => {
+exports.parse = (config, name, points={}, units={}, include_mirrors=false) => {
     
+    let result = []
+
     // if a filter decl is an object, it is an anchor
     if (a.type(config)() == 'object') {
-        return [anchor(config, name, points)(units)]
+        result.push(anchor(config, name, points)(units))
+        if (include_mirrors) {
+            // this is strict: if the ref of the anchor doesn't have a mirror pair, it will error out
+            result.push(anchor(config, name, points, true, undefined, true)(units))
+        }
+        
+    // otherwise, it is treated as a condition to filter all available points
+    } else {
+        result = Object.values(points).filter(complex(config, name, units))
+        if (include_mirrors) {
+            // this is permissive: we only include mirrored versions if they exist, and don't fuss if they don't
+            result = result.concat(result.map(p => points[anchor_lib.mirror(p.meta.name)]).filter(p => !!p))
+        }
     }
 
-    // otherwise, it is treated as a condition to filter all available points
-    return Object.values(points).filter(complex(config, name, units))
+    return result
 }
