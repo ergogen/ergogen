@@ -7,7 +7,7 @@ const prep = require('./prepare')
 const anchor = require('./anchor').parse
 const filter = require('./filter').parse
 
-const binding = (base, point, units, origin=[0, 0]) => {
+const binding = (base, bbox, point, units) => {
 
     let bind = a.trbl(point.meta.bind || 0, `${point.meta.name}.bind`)(units)
     // if it's a mirrored key, we swap the left and right bind values
@@ -15,14 +15,10 @@ const binding = (base, point, units, origin=[0, 0]) => {
         bind = [bind[0], bind[3], bind[2], bind[1]]
     }
 
-    const bbox = m.measure.modelExtents(base)
-
-    // TODO transition to bbox + origin computation
-
-    const bt = h/2 + Math.max(bind[0], 0)
-    const br = w/2 + Math.max(bind[1], 0)
-    const bd = -h/2 - Math.max(bind[2], 0)
-    const bl = -w/2 - Math.max(bind[3], 0)
+    const bt = Math.max(bbox.high[1], 0) + Math.max(bind[0], 0)
+    const br = Math.max(bbox.high[0], 0) + Math.max(bind[1], 0)
+    const bd = Math.min(bbox.low[1], 0) - Math.max(bind[2], 0)
+    const bl = Math.min(bbox.low[0], 0) - Math.max(bind[3], 0)
 
     if (bind[0] || bind[1]) base = u.union(base, u.rect(br, bt))
     if (bind[1] || bind[2]) base = u.union(base, u.rect(br, -bd, [0, bd]))
@@ -69,8 +65,11 @@ const rectangle = (config, name, points, outlines, units) => {
             ])
         }
         if (corner > 0) rect = m.model.outline(rect, corner, 0)
-        rect = m.model.moveRelative(res, [corner + bevel, corner + bevel])
-        if (bound) rect = binding(rect, w, h, point, rec_units)
+        rect = m.model.moveRelative(res, [-cw/2, -ch/2])
+        if (bound) {
+            const bbox = {high: [w/2, h/2], low: [-w/2, -h/2]}
+            rect = binding(rect, bbox, point, rec_units)
+        }
         rect = point.position(rect)
 
         return rect
@@ -89,7 +88,10 @@ const circle = (config, name, points, outlines, units) => {
     // return shape function
     return (point, bound) => {
         let circle = u.circle([0, 0], radius)
-        if (bound) circle = binding(circle, radius, radius, point, circ_units)
+        if (bound) {
+            const bbox = {high: [radius, radius], low: [-radius, -radius]}
+            circle = binding(circle, bbox, point, circ_units)
+        }
         circle = point.position(circle)
         return circle
     }
@@ -112,8 +114,10 @@ const polygon = (config, name, points, outlines, units) => {
             parsed_points.push(last_anchor.p)
         }
         let poly = u.poly(parsed_points)
-        const bbox = u.bbox(parsed_points)
-        if (bound) poly = binding(poly, bbox.high[0] - bbox.low[0], bbox.high[1] - bbox.low[1], point, units)
+        if (bound) {
+            const bbox = u.bbox(parsed_points)
+            poly = binding(poly, bbox, point, units)
+        }
         poly = point.position(poly)
         return poly
     }
@@ -126,12 +130,13 @@ const outline = (config, name, points, outlines, units) => {
     a.assert(outlines[config.name], `Field "${name}.name" does not name an existing outline!`)
     const fillet = a.sane(config.fillet || 0, `${name}.fillet`, 'number')(units)
     const expand = a.sane(config.expand || 0, `${name}.expand`, 'number')(units)
-    const origin = a.xy(config.origin, `${name}.origin`)(units)
+    const joints = a.in(a.sane(config.joints || 0, `${name}.joints`, 'number')(units), `${name}.joints`, [0, 1, 2])
+    const origin = anchor(config.origin, `${name}.origin`, points)(units)
 
     // return shape function
     return (point, bound) => {
         let o = u.deepcopy(outlines[config.name])
-        o = m.model.moveRelative(o, [-origin[0], -origin[1]])
+        o = origin.unposition(o)
 
         if (fillet) {
             for (const [index, chain] of m.model.findChains(o).entries()) {
@@ -139,12 +144,14 @@ const outline = (config, name, points, outlines, units) => {
             }
         }
 
-        if (extend) {
-            // TODO
+        if (expand) {
+            o = m.model.outline(o, Math.abs(expand), joints, (expand < 0), {farPoint: u.farPoint})
         }
 
-        const bbox = m.measure.modelExtents(o)
-        if (bound) o = binding(o, bbox.high[0] - bbox.low[0], bbox.high[1] - bbox.low[1], point, units)
+        if (bound) {
+            const bbox = m.measure.modelExtents(o)
+            o = binding(o, bbox, point, units)
+        }
 
         o = point.position(o)
         return o
@@ -188,18 +195,19 @@ exports.parse = (config = {}, points = {}, units = {}) => {
 
             // process keys that are common to all part declarations
             const operation = u[a.in(part.operation || 'add', `${name}.operation`, ['add', 'subtract', 'intersect', 'stack'])]
-            const bound = a.sane(part.bound === undefined ? true : part.bound, `${name}.bound`, 'boolean')()
-            const mirror = a.sane(part.mirror || false, `${name}.mirror`, 'boolean')()
             const what = a.in(part.what || 'outline', `${name}.what`, ['rectangle', 'circle', 'polygon', 'outline'])
+            const bound_by_default = ['rectangle']
+            const bound = part.bound === undefined ? bound_by_default.includes(what) : !!part.bound
+            const mirror = a.sane(part.mirror || false, `${name}.mirror`, 'boolean')()
             // `where` is delayed until we have all, potentially what-dependent units
             // default where is the single default anchor (at [0,0])
             const where = units => filter(part.where || {}, `${name}.where`, points, units, mirror)
 
             // these keys are then removed, so ops can check their own unexpected keys without interference
             delete part.operation
+            delete part.what
             delete part.bound
             delete part.mirror
-            delete part.what
             delete part.where
 
             // a prototype "shape" maker (and its units) are computed

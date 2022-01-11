@@ -68,7 +68,7 @@ exports.bbox = (arr) => {
     return {low: [minx, miny], high: [maxx, maxy]}
 }
 
-const farPoint = [1234.1234, 2143.56789]
+const farPoint = exports.farPoint = [1234.1234, 2143.56789]
 
 exports.union = exports.add = (a, b) => {
     return m.model.combine(a, b, false, true, false, true, {
