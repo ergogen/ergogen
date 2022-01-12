@@ -265,7 +265,7 @@ exports.parse = (config, units) => {
 
         // per-zone mirroring for the new keys
         const axis = parse_axis(mirror, `points.zones.${zone_name}.mirror`, all_points, units)
-        if (axis) {
+        if (axis!==undefined) {
             for (const new_point of Object.values(new_points)) {
                 const [mname, mp] = perform_mirror(new_point, axis)
                 if (mp) {
@@ -290,7 +290,7 @@ exports.parse = (config, units) => {
     const global_axis = parse_axis(global_mirror, `points.mirror`, points, units)
     const global_mirrored_points = {}
     for (const point of Object.values(points)) {
-        if (global_axis && point.mirrored === undefined) {
+        if (global_axis!==undefined && point.mirrored === undefined) {
             const [mname, mp] = perform_mirror(point, global_axis)
             if (mp) {
                 global_mirrored_points[mname] = mp
