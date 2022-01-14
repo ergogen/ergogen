@@ -80,6 +80,13 @@ exports.inherit = config => traverse(config, config, [], (target, key, val, root
 })
 
 exports.parameterize = config => traverse(config, config, [], (target, key, val, root, breadcrumbs) => {
+
+    // we only care about objects
+    if (a.type(val)() !== 'object') {
+        target[key] = val
+        return 
+    }
+
     let params = val.$params
     let args = val.$args
 
@@ -108,7 +115,7 @@ exports.parameterize = config => traverse(config, config, [], (target, key, val,
     let str = JSON.stringify(val)
     const zip = rows => rows[0].map((_, i) => rows.map(row => row[i]))
     for (const [par, arg] of zip([params, args])) {
-        str = str.replace(new RegExp(`"${par}"`, 'g'), JSON.stringify(arg))
+        str = str.replace(new RegExp(`${par}`, 'g'), arg)
     }
     try {
         val = JSON.parse(str)

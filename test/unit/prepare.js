@@ -64,7 +64,23 @@ describe('Prepare', function() {
                 $args: [1]
             }
         }).decl.should.deep.equal({
-            a: 1
+            a: '1'
+        })
+
+        p.parameterize({
+            decl: {
+                normal_use: 'PAR1',
+                sub: {
+                    nested_use: 'PAR2 * 2'
+                },
+                $params: ['PAR1', 'PAR2'],
+                $args: ['text', 14]
+            }
+        }).decl.should.deep.equal({
+            normal_use: 'text',
+            sub: {
+                nested_use: '14 * 2',
+            }
         })
 
         p.parameterize.bind(this, {
@@ -84,7 +100,7 @@ describe('Prepare', function() {
             decl: {
                 a: 'PAR',
                 $params: ['PAR'],
-                $args: [undefined]
+                $args: ['in"jection']
             }
         }).should.throw('valid')
     })
