@@ -25,6 +25,7 @@ const process = async (raw, debug=false, logger=()=>{}) => {
     logger('Preprocessing input...')
     config = prepare.unnest(config)
     config = prepare.inherit(config)
+    config = prepare.parameterize(config)
     const results = {}
     if (debug) {
         results.raw = raw
