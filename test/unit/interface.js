@@ -56,6 +56,36 @@ describe('Interface', function() {
             ergogen.process({points: {zones: {}}}, true, () => {}).should.be.rejectedWith('any points')
         ])
     })
+
+    it('preprocessor', async function() {
+        return Promise.all([
+            // unnesting
+            ergogen.process({'points.zones.matrix': {}}).should.eventually.have.deep.property('canonical', {
+                points: {zones: {matrix: {}}}
+            }),
+            // inheritance
+            ergogen.process({
+                'points.zones.parent.key.a': 1,
+                'points.zones.child': {
+                    '$extends': 'points.zones.parent',
+                    'key.b': 2
+                }
+            }).should.eventually.have.deep.nested.property('canonical.points.zones.child.key', {
+                a: 1,
+                b: 2
+            }),
+            // parameterization
+            ergogen.process({
+                'points.zones.matrix.key': {
+                    a: 'PAR',
+                    $params: ['PAR'],
+                    $args: [1]
+                }
+            }).should.eventually.have.deep.nested.property('canonical.points.zones.matrix.key', {
+                a: '1'
+            })
+        ])
+    })
     
     it('engine', async function() {
         return Promise.all([
