@@ -49,6 +49,7 @@
 
 ### Patch
 
+- Check unexpected keys at top level, too
 - Better error handling for the fillet option?
 - Implement `glue.extra`
 - Integration and end2end tests to get coverage to 100%

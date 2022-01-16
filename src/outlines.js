@@ -32,16 +32,16 @@ const rectangle = (config, name, points, outlines, units) => {
 
     // prepare params
     a.unexpected(config, `${name}`, ['size', 'corner', 'bevel'])
-    const size = a.wh(params.size, `${export_name}.size`)(units)
+    const size = a.wh(config.size, `${name}.size`)(units)
     const rec_units = prep.extend({
         sx: size[0],
         sy: size[1]
     }, units)
-    const corner = a.sane(params.corner || 0, `${export_name}.corner`, 'number')(rec_units)
-    const bevel = a.sane(params.bevel || 0, `${export_name}.bevel`, 'number')(rec_units)
+    const corner = a.sane(config.corner || 0, `${name}.corner`, 'number')(rec_units)
+    const bevel = a.sane(config.bevel || 0, `${name}.bevel`, 'number')(rec_units)
 
-    // return shape function
-    return (point, bound) => {
+    // return shape function and its units
+    return [(point, bound) => {
 
         const error = (dim, val) => `Rectangle for "${name}" isn't ${dim} enough for its corner and bevel (${val} - 2 * ${corner} - 2 * ${bevel} <= 0)!`
         const [w, h] = size
@@ -65,7 +65,7 @@ const rectangle = (config, name, points, outlines, units) => {
             ])
         }
         if (corner > 0) rect = m.model.outline(rect, corner, 0)
-        rect = m.model.moveRelative(res, [-cw/2, -ch/2])
+        rect = m.model.moveRelative(rect, [-cw/2, -ch/2])
         if (bound) {
             const bbox = {high: [w/2, h/2], low: [-w/2, -h/2]}
             rect = binding(rect, bbox, point, rec_units)
@@ -73,7 +73,7 @@ const rectangle = (config, name, points, outlines, units) => {
         rect = point.position(rect)
 
         return rect
-    }
+    }, rec_units]
 }
 
 const circle = (config, name, points, outlines, units) => {
@@ -85,8 +85,8 @@ const circle = (config, name, points, outlines, units) => {
         r: radius
     }, units)
 
-    // return shape function
-    return (point, bound) => {
+    // return shape function and its units
+    return [(point, bound) => {
         let circle = u.circle([0, 0], radius)
         if (bound) {
             const bbox = {high: [radius, radius], low: [-radius, -radius]}
@@ -94,7 +94,7 @@ const circle = (config, name, points, outlines, units) => {
         }
         circle = point.position(circle)
         return circle
-    }
+    }, circ_units]
 }
 
 const polygon = (config, name, points, outlines, units) => {
@@ -103,10 +103,12 @@ const polygon = (config, name, points, outlines, units) => {
     a.unexpected(config, `${name}`, ['points'])
     const poly_points = a.sane(config.points, `${name}.points`, 'array')()
 
-    // return shape function
-    return (point, bound) => {
+    // return shape function and its units
+    return [(point, bound) => {
         const parsed_points = []
-        let last_anchor = new Point()
+        // the point starts at [0, 0] as it will be positioned later
+        // but we keep the metadata for potential mirroring purposes
+        let last_anchor = new Point(0, 0, 0, point.meta)
         let poly_index = -1
         for (const poly_point of poly_points) {
             const poly_name = `${name}.points[${++poly_index}]`
@@ -120,7 +122,7 @@ const polygon = (config, name, points, outlines, units) => {
         }
         poly = point.position(poly)
         return poly
-    }
+    }, units]
 }
 
 const outline = (config, name, points, outlines, units) => {
@@ -131,10 +133,10 @@ const outline = (config, name, points, outlines, units) => {
     const fillet = a.sane(config.fillet || 0, `${name}.fillet`, 'number')(units)
     const expand = a.sane(config.expand || 0, `${name}.expand`, 'number')(units)
     const joints = a.in(a.sane(config.joints || 0, `${name}.joints`, 'number')(units), `${name}.joints`, [0, 1, 2])
-    const origin = anchor(config.origin, `${name}.origin`, points)(units)
+    const origin = anchor(config.origin || {}, `${name}.origin`, points)(units)
 
-    // return shape function
-    return (point, bound) => {
+    // return shape function and its units
+    return [(point, bound) => {
         let o = u.deepcopy(outlines[config.name])
         o = origin.unposition(o)
 
@@ -155,7 +157,7 @@ const outline = (config, name, points, outlines, units) => {
 
         o = point.position(o)
         return o
-    }
+    }, units]
 }
 
 const whats = {
@@ -182,11 +184,11 @@ exports.parse = (config = {}, points = {}, units = {}) => {
         if (a.type(parts)() == 'array') {
             parts = {...parts}
         }
-        parts = a.sane(parts, `outlines.${key}`, 'object')()
+        parts = a.sane(parts, `outlines.${outline_name}`, 'object')()
         
         for (let [part_name, part] of Object.entries(parts)) {
             
-            const name = `outlines.${key}.${part_name}`
+            const name = `outlines.${outline_name}.${part_name}`
 
             // string part-shortcuts are expanded first
             if (a.type(part)() == 'string') {
@@ -200,8 +202,9 @@ exports.parse = (config = {}, points = {}, units = {}) => {
             const bound = part.bound === undefined ? bound_by_default.includes(what) : !!part.bound
             const mirror = a.sane(part.mirror || false, `${name}.mirror`, 'boolean')()
             // `where` is delayed until we have all, potentially what-dependent units
-            // default where is the single default anchor (at [0,0])
-            const where = units => filter(part.where || {}, `${name}.where`, points, units, mirror)
+            // default where is [0, 0], as per filter parsing
+            const original_where = part.where // need to save, so the delete's don't get rid of it below
+            const where = units => filter(original_where, `${name}.where`, points, units, mirror)
 
             // these keys are then removed, so ops can check their own unexpected keys without interference
             delete part.operation

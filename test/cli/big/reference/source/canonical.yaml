@@ -2,23 +2,18 @@ units:
     a: 28 + u
 points:
     zones:
-        matrix:
-            columns:
-                col: {}
-            rows:
-                row: {}
+        matrix: null
 outlines:
-    exports:
-        export:
-            -
-                type: keys
-                side: left
-                size: 18
-        _export:
-            -
-                type: keys
-                side: left
-                size: 18
+    export:
+        -
+            what: rectangle
+            where: true
+            size: 18
+    _export:
+        -
+            what: rectangle
+            where: true
+            size: 18
 cases:
     export:
         -

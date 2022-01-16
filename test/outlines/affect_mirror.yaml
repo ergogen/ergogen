@@ -10,46 +10,45 @@ points:
     ref: matrix_only_top
     distance: 30
 outlines:
-  exports:
-    test:
-      keys:
-        type: keys
-        side: both
-        size: 14
-        bound: false
-      rb:
-        type: rectangle
-        anchor:
-          - ref: mirror_matrix_only_bottom
-            # we do NOT specify `affect: xyr` here
-          - shift: [-3,-3]
-            orient: 30
-        size: [6,6]
-        operation: stack
-      rt:
-        type: rectangle
-        anchor:
-          - ref: mirror_matrix_only_top
-            affect: xyr
-          - shift: [-3,-3]
-            orient: 30
-        size: [6,6]
-        operation: stack
-      lb:
-        type: rectangle
-        anchor:
-          - ref: matrix_only_bottom
-            # again, no `affect: xyr`
-          - shift: [-3,-3]
-            orient: 30
-        size: [6,6]
-        operation: stack
-      lt:
-        type: rectangle
-        anchor:
-          - ref: matrix_only_top
-            affect: xyr
-          - shift: [-3,-3]
-            orient: 30
-        size: [6,6]
-        operation: stack
+  test:
+    keys:
+      what: rectangle
+      where: true
+      size: 14
+      bound: false
+    rb:
+      what: rectangle
+      where:
+        - ref: mirror_matrix_only_bottom
+          # we do NOT specify `affect: xyr` here
+        - shift: [-3,-3]
+          orient: 30
+      size: [6,6]
+      operation: stack
+    rt:
+      what: rectangle
+      where:
+        - ref: mirror_matrix_only_top
+          affect: xyr
+        - shift: [-3,-3]
+          orient: 30
+      size: [6,6]
+      operation: stack
+    lb:
+      what: rectangle
+      where:
+        - ref: matrix_only_bottom
+          # again, no `affect: xyr`
+        - shift: [-3,-3]
+          orient: 30
+      size: [6,6]
+      operation: stack
+    lt:
+      what: rectangle
+      where:
+        - ref: matrix_only_top
+          affect: xyr
+        - shift: [-3,-3]
+          orient: 30
+      size: [6,6]
+      operation: stack
