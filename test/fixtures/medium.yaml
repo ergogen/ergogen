@@ -1,9 +1,9 @@
 points.zones.matrix:
   columns.col: {}
-outlines.exports:
+outlines:
   export:
-    - type: 'keys'
-      side: 'left'
+    - what: rectangle
+      where: true
       size: 18
 pcbs:
   export: {}

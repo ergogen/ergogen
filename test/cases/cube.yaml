@@ -1,16 +1,10 @@
-points:
-    zones:
-        arst:
-            columns:
-                c1:
-                    rows:
-                        r1:
+points.zones.matrix: {}
 outlines:
-    exports:
-        square:
-            - type: rectangle
-              size: [5, 5]
+  square:
+    - what: rectangle
+      where: true
+      size: [5, 5]
 cases:
-    cube:
-        - name: square
-          extrude: 5
+  cube:
+    - name: square
+      extrude: 5

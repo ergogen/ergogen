@@ -3,24 +3,23 @@ points:
     matrix: {}
   mirror: 20
 outlines:
-  exports:
-    outline:
-      main:
-        type: keys
-        side: both
-        size: 20
-        bound: false
-      middle_circle:
-        type: circle
-        anchor:
-          ref:
-            - matrix
-            - mirror_matrix
-        radius: 15
-      outside_circles:
-        type: circle
-        anchor:
-          ref: matrix
-          shift: [-10, 10]
-        radius: 5
-        mirror: true
+  outline:
+    main:
+      what: rectangle
+      where: true
+      size: 20
+      bound: false
+    middle_circle:
+      what: circle
+      where:
+        ref:
+          - matrix
+          - mirror_matrix
+      radius: 15
+    outside_circles:
+      what: circle
+      where:
+        ref: matrix
+        shift: [-10, 10]
+      radius: 5
+      mirror: true

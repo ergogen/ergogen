@@ -13,10 +13,11 @@ describe('Filter', function() {
     const names = points => points.map(p => p.meta.name)
 
     it('similar', function() {
-        // no points filter to no points
-        filter(undefined, '', undefined).should.deep.equal([])
-        // and undefined config doesn't filter anything
-        filter(undefined, '', points).should.deep.equal(Object.values(points))
+        // an undefined config leads to a default point
+        filter(undefined, '', points).should.deep.equal([new Point()])
+        // true shouldn't filter anything, while false should filter everything
+        filter(true, '', points).should.deep.equal(Object.values(points))
+        filter(false, '', points).should.deep.equal([])
         // objects just propagate to anchor (and then wrap in array for consistency)
         filter({}, '', points).should.deep.equal([anchor({}, '', points)()])
         // simple name string

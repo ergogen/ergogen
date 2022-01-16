@@ -7,49 +7,39 @@ models:
                     - 0
                     - 0
             b:
-                models:
-                    a:
-                        models: {}
+                paths:
+                    ShapeLine1:
+                        type: line
                         origin:
-                            - 0
-                            - 0
-                    b:
-                        paths:
-                            ShapeLine1:
-                                type: line
-                                origin:
-                                    - -9
-                                    - -9
-                                end:
-                                    - 9
-                                    - -9
-                            ShapeLine2:
-                                type: line
-                                origin:
-                                    - 9
-                                    - -9
-                                end:
-                                    - 9
-                                    - 9
-                            ShapeLine3:
-                                type: line
-                                origin:
-                                    - 9
-                                    - 9
-                                end:
-                                    - -9
-                                    - 9
-                            ShapeLine4:
-                                type: line
-                                origin:
-                                    - -9
-                                    - 9
-                                end:
-                                    - -9
-                                    - -9
+                            - -9
+                            - -9
+                        end:
+                            - 9
+                            - -9
+                    ShapeLine2:
+                        type: line
                         origin:
-                            - 0
-                            - 0
+                            - 9
+                            - -9
+                        end:
+                            - 9
+                            - 9
+                    ShapeLine3:
+                        type: line
+                        origin:
+                            - 9
+                            - 9
+                        end:
+                            - -9
+                            - 9
+                    ShapeLine4:
+                        type: line
+                        origin:
+                            - -9
+                            - 9
+                        end:
+                            - -9
+                            - -9
                 origin:
                     - 0
                     - 0

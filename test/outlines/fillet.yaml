@@ -11,12 +11,11 @@ points:
         bottom:
         top:
 outlines:
-  exports:
-    base:
-      - type: keys
-        side: left
-        size: cy
-    fillet:
-      - type: outline
-        name: base
-        fillet: 2
+  base:
+    - what: rectangle
+      where: true
+      size: cy
+  fillet:
+    - what: outline
+      name: base
+      fillet: 2

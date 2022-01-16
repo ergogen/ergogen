@@ -1,9 +1,11 @@
 const u = require('./utils')
 const a = require('./assert')
 const anchor_lib = require('./anchor')
+const Point = require('./point')
 const anchor = anchor_lib.parse
 
 const _true = () => true
+const _false = () => false
 const _and = arr => p => arr.map(e => e(p)).reduce((a, b) => a && b)
 const _or = arr => p => arr.map(e => e(p)).reduce((a, b) => a || b)
 
@@ -78,20 +80,19 @@ const simple = (exp, name, units) => {
 
 const complex = (config, name, units, aggregator=_or) => {
 
-    // default is all points
-    if (config === undefined) {
-        return _true
-    }
-
-    // otherwise we branch by type
-    const type = a.type(config)()
+    // we branch by type
+    const type = a.type(config)(units)
     switch(type) {
+
+        // boolean --> either all or nothing
+        case 'boolean':
+            return config ? _true : _false
  
-        // base case is a string, meaning a simple/single filter
+        // string --> base case, meaning a simple/single filter
         case 'string':
             return simple(config, name, units)
         
-        // arrays are aggregated with alternating and/or conditions
+        // array --> aggregated simple filters with alternating and/or conditions
         case 'array':
             const alternate = aggregator == _and ? _or : _and
             return aggregator(config.map(elem => complex(elem, name, units, alternate)))
@@ -101,12 +102,22 @@ const complex = (config, name, units, aggregator=_or) => {
     }
 }
 
+const contains_object = (val) => {
+    if (a.type(val)() == 'object') return true
+    if (a.type(val)() == 'array') return val.some(el => contains_object(el))
+    return false
+}
+
 exports.parse = (config, name, points={}, units={}, include_mirrors=false) => {
     
     let result = []
 
-    // if a filter decl is an object, it is an anchor
-    if (a.type(config)() == 'object') {
+    // if a filter decl is undefined, it's just the default point at [0, 0]
+    if (config === undefined) {
+        result.push(new Point())
+
+    // if a filter decl is an object, or an array that contains an object at any depth, it is an anchor
+    } else if (contains_object(config)) {
         result.push(anchor(config, name, points)(units))
         if (include_mirrors) {
             // this is strict: if the ref of the anchor doesn't have a mirror pair, it will error out

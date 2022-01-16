@@ -1,4 +1,4 @@
-matrix_col_row:
+matrix:
     x: 0
     'y': 0
     r: 0
@@ -19,10 +19,10 @@ matrix_col_row:
         padding: 19
         skip: false
         asym: both
-        name: matrix_col_row
+        name: matrix
         col:
             rows: {}
             key: {}
-            name: col
-        row: row
-        colrow: col_row
+            name: default
+        row: default
+        colrow: default_default
