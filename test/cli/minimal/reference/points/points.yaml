@@ -19,10 +19,16 @@ matrix_col_row:
         padding: 19
         skip: false
         asym: both
-        name: matrix_col_row
-        col:
-            rows: {}
-            key: {}
-            name: col
-        row: row
         colrow: col_row
+        name: matrix_col_row
+        zone:
+            columns:
+                col: &ref_0
+                    rows: {}
+                    key: {}
+                    name: col
+            rows:
+                row: {}
+            name: matrix
+        col: *ref_0
+        row: row

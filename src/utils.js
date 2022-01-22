@@ -18,6 +18,20 @@ const deep = exports.deep = (obj, key, val) => {
     return obj
 }
 
+exports.template = (str, vals={}) => {
+    const regex = /\{\{([^}]*)\}\}/g
+    let res = str
+    let shift = 0
+    for (const match of str.matchAll(regex)) {
+        const replacement = deep(vals, match[1]) || ''
+        res = res.substring(0, match.index + shift)
+            + replacement
+            + res.substring(match.index + match[0].length)
+        shift += replacement.length - match[0].length
+    }
+    return res
+}
+
 const eq = exports.eq = (a=[], b=[]) => {
     return a[0] === b[0] && a[1] === b[1]
 }
