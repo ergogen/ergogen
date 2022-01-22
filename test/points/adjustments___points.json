@@ -22,14 +22,46 @@
             "padding": 19,
             "skip": false,
             "asym": "both",
+            "colrow": "left_bottom",
             "name": "matrix_left_bottom",
+            "zone": {
+                "columns": {
+                    "left": null,
+                    "right": {
+                        "key": {
+                            "stagger": 5,
+                            "spread": 25,
+                            "splay": 5,
+                            "origin": [
+                                -9,
+                                -9
+                            ]
+                        },
+                        "rows": {
+                            "top": {
+                                "orient": -90,
+                                "shift": [
+                                    0,
+                                    10
+                                ],
+                                "rotate": 90
+                            }
+                        },
+                        "name": "right"
+                    }
+                },
+                "rows": {
+                    "bottom": {},
+                    "top": {}
+                },
+                "name": "matrix"
+            },
             "col": {
                 "rows": {},
                 "key": {},
                 "name": "left"
             },
-            "row": "bottom",
-            "colrow": "left_bottom"
+            "row": "bottom"
         }
     },
     "matrix_left_top": {
@@ -55,14 +87,46 @@
             "padding": 19,
             "skip": false,
             "asym": "both",
+            "colrow": "left_top",
             "name": "matrix_left_top",
+            "zone": {
+                "columns": {
+                    "left": null,
+                    "right": {
+                        "key": {
+                            "stagger": 5,
+                            "spread": 25,
+                            "splay": 5,
+                            "origin": [
+                                -9,
+                                -9
+                            ]
+                        },
+                        "rows": {
+                            "top": {
+                                "orient": -90,
+                                "shift": [
+                                    0,
+                                    10
+                                ],
+                                "rotate": 90
+                            }
+                        },
+                        "name": "right"
+                    }
+                },
+                "rows": {
+                    "bottom": {},
+                    "top": {}
+                },
+                "name": "matrix"
+            },
             "col": {
                 "rows": {},
                 "key": {},
                 "name": "left"
             },
-            "row": "top",
-            "colrow": "left_top"
+            "row": "top"
         }
     },
     "matrix_right_bottom": {
@@ -88,7 +152,40 @@
             "padding": 19,
             "skip": false,
             "asym": "both",
+            "colrow": "right_bottom",
             "name": "matrix_right_bottom",
+            "zone": {
+                "columns": {
+                    "left": null,
+                    "right": {
+                        "key": {
+                            "stagger": 5,
+                            "spread": 25,
+                            "splay": 5,
+                            "origin": [
+                                -9,
+                                -9
+                            ]
+                        },
+                        "rows": {
+                            "top": {
+                                "orient": -90,
+                                "shift": [
+                                    0,
+                                    10
+                                ],
+                                "rotate": 90
+                            }
+                        },
+                        "name": "right"
+                    }
+                },
+                "rows": {
+                    "bottom": {},
+                    "top": {}
+                },
+                "name": "matrix"
+            },
             "col": {
                 "key": {
                     "stagger": 5,
@@ -111,8 +208,7 @@
                 },
                 "name": "right"
             },
-            "row": "bottom",
-            "colrow": "right_bottom"
+            "row": "bottom"
         }
     },
     "matrix_right_top": {
@@ -138,7 +234,40 @@
             "padding": 19,
             "skip": false,
             "asym": "both",
+            "colrow": "right_top",
             "name": "matrix_right_top",
+            "zone": {
+                "columns": {
+                    "left": null,
+                    "right": {
+                        "key": {
+                            "stagger": 5,
+                            "spread": 25,
+                            "splay": 5,
+                            "origin": [
+                                -9,
+                                -9
+                            ]
+                        },
+                        "rows": {
+                            "top": {
+                                "orient": -90,
+                                "shift": [
+                                    0,
+                                    10
+                                ],
+                                "rotate": 90
+                            }
+                        },
+                        "name": "right"
+                    }
+                },
+                "rows": {
+                    "bottom": {},
+                    "top": {}
+                },
+                "name": "matrix"
+            },
             "col": {
                 "key": {
                     "stagger": 5,
@@ -161,8 +290,7 @@
                 },
                 "name": "right"
             },
-            "row": "top",
-            "colrow": "right_top"
+            "row": "top"
         }
     }
 }

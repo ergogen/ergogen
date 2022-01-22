@@ -22,6 +22,19 @@ describe('Utils', function() {
         should.equal(u.deep(obj, 'non.existent.key'), undefined)
     })
 
+    it('template', function() {
+        u.template('arst').should.equal('arst')
+        u.template('{arst}}').should.equal('{arst}}')
+        u.template('{{arst}}').should.equal('')
+        u.template('{{arst}}', {arst: 'neio'}).should.equal('neio')
+        u.template('{{a}}_{{b}}', {a: 'c', b: 'd'}).should.equal('c_d')
+        u.template(
+            '{{longlonglong}}_{{short}}',
+            {longlonglong: 'long', short: 'shortshortshort'}
+        ).should.equal('long_shortshortshort')
+        u.template('{{a.b.c}}', {a: {b: {c: 'deep'}}}).should.equal('deep')
+    })
+
     it('eq', function() {
         // basic point usage
         u.eq([1, 2], [1, 2]).should.equal(true)

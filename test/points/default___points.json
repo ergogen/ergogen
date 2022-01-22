@@ -22,14 +22,17 @@
             "padding": 19,
             "skip": false,
             "asym": "both",
+            "colrow": "default_default",
             "name": "matrix",
+            "zone": {
+                "name": "matrix"
+            },
             "col": {
                 "rows": {},
                 "key": {},
                 "name": "default"
             },
-            "row": "default",
-            "colrow": "default_default"
+            "row": "default"
         }
     }
 }

@@ -72,10 +72,6 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key,
             'object'
         )()
 
-        // propagating object key to name field
-
-        col.name = col_name
-
         // combining row data from zone-wide defs and col-specific defs
 
         const actual_rows = Object.keys(prep.extend(zone_wide_rows, col.rows))
@@ -98,7 +94,9 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key,
             height: units.$default_height,
             padding: units.$default_padding,
             skip: false,
-            asym: 'both'
+            asym: 'both',
+            colrow: '{{col.name}}_{{row}}',
+            name: '{{zone.name}}_{{colrow}}'
         }
         for (const row of actual_rows) {
             const key = prep.extend(
@@ -110,10 +108,11 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key,
                 col.rows[row] || {}
             )
 
-            key.name = key.name || `${zone_name}_${col_name}_${row}`
+            key.zone = zone
+            key.zone.name = zone_name
             key.col = col
+            key.col.name = col_name
             key.row = row
-            key.colrow = `${col_name}_${row}`
 
             key.stagger = a.sane(key.stagger, `${key.name}.shift`, 'number')(units)
             key.spread = a.sane(key.spread, `${key.name}.spread`, 'number')(units)
@@ -127,6 +126,13 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key,
             key.padding = a.sane(key.padding, `${key.name}.padding`, 'number')(units)
             key.skip = a.sane(key.skip, `${key.name}.skip`, 'boolean')()
             key.asym = a.in(key.asym, `${key.name}.asym`, ['left', 'right', 'both'])
+
+            // templating support
+            for (const [k, v] of Object.entries(key)) {
+                if (a.type(v)(units) == 'string') {
+                    key[k] = u.template(v, key)
+                }
+            }
 
             keys.push(key)
         }

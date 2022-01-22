@@ -124,7 +124,7 @@ for (let w of cli_what) {
                 const command = read(t, 'command')
                 const output_path = exists(t, 'path') ? read(t, 'path') : 'output'
                 fs.removeSync(output_path)
-                const version_regex = /\bv\d+\.\d+\.\d+\b/
+                const version_regex = /\bv\d+\.\d+\.\d+(\-develop)?\b/
                 // correct execution
                 if (exists(t, 'log')) {
                     const ref_log = read(t, 'log').replace(version_regex, '<version>')
