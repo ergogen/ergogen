@@ -111,9 +111,15 @@ exports.stack = (a, b) => {
 }
 
 const semver = exports.semver = (str, name='') => {
-    const main = str.split('-')[0]
+    let main = str.split('-')[0]
+    if (main.startsWith('v')) {
+        main = main.substring(1)
+    }
+    while (main.split('.').length < 3) {
+        main += '.0'
+    }
     if (/^\d+\.\d+\.\d+$/.test(main)) {
-        const parts = main.split('.').map(v => parseInt(v))
+        const parts = main.split('.').map(part => parseInt(part, 10))
         return {major: parts[0], minor: parts[1], patch: parts[2]}
     } else throw new Error(`Invalid semver "${str}" at ${name}!`)
 }
