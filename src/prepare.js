@@ -73,7 +73,7 @@ exports.inherit = config => traverse(config, config, [], (target, key, val, root
             candidates = candidates.concat(parents)
             list.unshift(other)
         }
-        val = extend.apply(this, list)
+        val = extend.apply(null, list)
         delete val.$extends
     }
     target[key] = val
