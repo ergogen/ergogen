@@ -90,9 +90,9 @@ describe('Interface', function() {
     it('engine', async function() {
         return Promise.all([
             ergogen.process({'meta.engine': 'invalid'}).should.be.rejectedWith('Invalid'),
-            ergogen.process({'meta.engine': '^0.1.2'}).should.be.rejectedWith('satisfy'),
+            ergogen.process({'meta.engine': '0.1.2'}).should.be.rejectedWith('satisfy'),
             // no "points clause" means we're over the engine check, so it "succeeded"
-            ergogen.process({'meta.engine': `^${version}`}).should.be.rejectedWith('points clause')
+            ergogen.process({'meta.engine': `${version}`}).should.be.rejectedWith('points clause')
         ])
     })
     

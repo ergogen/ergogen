@@ -6,15 +6,16 @@
 
 ### Major
 
+- Anchor overhaul
+    - Recursive-ize anchors
+        - This will potentially cause `ref` to be ambiguous, so maybe introduce a separate `refs` plural?
+    - Add `orient`/`rotate` **towards** other anchors (again, recursively)
 - Restructure pcb point/footprint filtering
     - Use the same `what`/`where` infrastructure as outlines
     - Collapse params/nets/anchors into a single hierarchy from the user's POV
     - Add per-footprint mirror support
     - Add some way for footprints to be able to "resist" the mirroring-related special treatment of negative X shift, rotation, etc.
 - Add auto-bind
-- Recursive-ize anchors
-    - This will potentially cause `ref` to be ambiguous, so maybe introduce a separate `refs` plural?
-    - Plus add `orient`/`rotate` **towards** other anchors (again, recursively)
 - Merge, generalize, and uniform-ize footprints
     - Template for creating them, built-in variables they can use, documentation, external links, etc.
     - Also considering how (or, on which layer) they define their silks, universal mirroring behaviour, etc.

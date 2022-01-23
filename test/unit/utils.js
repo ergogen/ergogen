@@ -132,4 +132,19 @@ describe('Utils', function() {
         })
     })
 
+    it('semver', function() {
+        u.semver('1.2.3').should.deep.equal({major: 1, minor: 2, patch: 3})
+        u.semver('1.2.3-develop').should.deep.equal({major: 1, minor: 2, patch: 3})
+        u.semver.bind(this, 'invalid', 'name').should.throw()
+    })
+
+    it('satisfies', function() {
+        u.satisfies('1.2.3', '1.2.3').should.be.true
+        u.satisfies('1.2.3', '1.2.1').should.be.true
+        u.satisfies('1.2.3', '1.1.0').should.be.true
+        u.satisfies('1.2.3', '1.2.4').should.be.false
+        u.satisfies('1.2.3', '1.3.0').should.be.false
+        u.satisfies('1.2.3', '2.0.0').should.be.false
+    })
+
 })
