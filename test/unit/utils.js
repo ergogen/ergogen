@@ -115,7 +115,13 @@ describe('Utils', function() {
         u.poly([[0, 0], [1, 0], [1, 0], [1, 1]]).should.deep.equal(expected)
         // empty in, empty out
         u.poly([]).should.deep.equal({paths: {}})
+    })
 
+    it('poly', function() {
+        u.bbox([[0, 0], [1, 0], [1, 1]]).should.deep.equal({
+            high: [1, 1],
+            low: [0, 0]
+        })
     })
 
     it('combine helpers', function() {
