@@ -8,7 +8,9 @@ const ergogen = require('../src/ergogen')
 require('./helpers/mock_footprints').inject(ergogen)
 
 let what = process.env.npm_config_what
-let dump = process.env.npm_config_dump
+const dump = process.env.npm_config_dump
+
+
 
 // Unit tests
 // the --what switch supports each unit individually
@@ -21,12 +23,12 @@ for (const unit of glob.sync(path.join(__dirname, 'unit', '*.js'))) {
     require(`./unit/${base}.js`)
 }
 
+
+
 // Integration tests
 // the --what switch supports categories (like `points` and `outlines`)
 // as well as individual tests using slash-notation (like `points/000`)
-// the --dump switch can output actual results for easier reference creation
-// by default, json output is generated of the whole `actual`, but a raw,
-// type-specific representation can be written if a deep path is specified
+// the --dump switch can output the new results, overriding the old reference
 
 const cap = s => s.charAt(0).toUpperCase() + s.slice(1)
 
@@ -36,33 +38,9 @@ const test = function(input_path) {
     title = path.basename(input_path, '.yaml').split('_').join(' ')
     it(title, async function() {
         const input = yaml.load(fs.readFileSync(input_path).toString())
-        const actual = await ergogen.process(input, true)
+        const output = await ergogen.process(input, true)
 
-        // if we're just creating the reference, we can dump the current output
-        if (dump) {
-            // whole dump
-            if (dump === true || dump === 'true') {
-                const out = path.join(
-                    path.dirname(input_path),
-                    path.basename(input_path, '.yaml') + '___ref_candidate.json'
-                )
-                fs.writeJSONSync(out, actual, {spaces: 4})
-            // partial, type-specific dump
-            } else {
-                const part = u.deep(actual, dump)
-                const out = path.join(
-                    path.dirname(input_path),
-                    path.basename(input_path, '.yaml') + '___' + dump.split('.').join('_')
-                )
-                if (a.type(part)() == 'string') {
-                    fs.writeFileSync(out + '.txt', part)
-                } else {
-                    fs.writeJSONSync(out + '.json', part, {spaces: 4})
-                }
-            }
-        }
-
-        // compare actual vs. reference
+        // compare output vs. reference
         const base = path.join(path.dirname(input_path), path.basename(input_path, '.yaml'))
         for (const expected_path of glob.sync(base + '___*')) {
             let expected = fs.readFileSync(expected_path).toString()
@@ -70,7 +48,15 @@ const test = function(input_path) {
                 expected = JSON.parse(expected)
             }
             const comp_path = expected_path.split('___')[1].split('.')[0].split('_').join('.')
-            u.deep(actual, comp_path).should.deep.equal(expected)
+            const output_part = u.deep(output, comp_path)
+            if (dump) {
+                if (a.type(output_part)() == 'string') {
+                    fs.writeFileSync(expected_path, output_part)
+                } else {
+                    fs.writeJSONSync(expected_path, output_part, {spaces: 4})
+                }
+            }
+            output_part.should.deep.equal(expected)
         }
     })
 }
@@ -102,9 +88,11 @@ if (what) {
     }
 }
 
+
+
 // End-to-end tests to actually drive the CLI as well
-// --what filter is the same as above ('cli', or 'cli/prefix')
-// --dump saves the log, as well as prevents the output from being deleted
+// --what is the same as above ('cli', or 'cli/prefix')
+// --dump automatically overrides the old reference
 
 const read = (d, p) => fs.readFileSync(path.join(d, p)).toString()
 const exists = (d, p) => fs.existsSync(path.join(d, p))
@@ -132,18 +120,18 @@ for (let w of cli_what) {
                     if (dump) {
                         fs.writeFileSync(path.join(t, 'log'), actual_log)
                     }
-                    actual_log.should.equal(ref_log)
                     const comp_res = dircompare.compareSync(output_path, path.join(t, 'reference'), {
                         compareContent: true
                     })
                     if (dump) {
-                        fs.moveSync(output_path, path.join(t, 'output'), {overwrite: true})
+                        fs.moveSync(output_path, path.join(t, 'reference'), {overwrite: true})
                     } else {
                         fs.removeSync(output_path)
                     }
+                    actual_log.should.equal(ref_log)
                     comp_res.same.should.be.true
                 } else {
-                    const ref_error = read(t, 'error').replace(version_regex, '<version>')
+                    const ref_error = read(t, 'error')
                     try {
                         execSync(command, {stdio: 'pipe'})
                         throw 'should_have_thrown'
@@ -151,7 +139,7 @@ for (let w of cli_what) {
                         if (ex === 'should_have_thrown') {
                             throw new Error('This command should have thrown!')
                         }
-                        const actual_error = ex.stderr.toString().replace(version_regex, '<version>')
+                        const actual_error = ex.stderr.toString().split('\n')[0]
                         if (dump) {
                             fs.writeFileSync(path.join(t, 'error'), actual_error)
                         }
