@@ -198,8 +198,7 @@ exports.parse = (config = {}, points = {}, units = {}) => {
             // process keys that are common to all part declarations
             const operation = u[a.in(part.operation || 'add', `${name}.operation`, ['add', 'subtract', 'intersect', 'stack'])]
             const what = a.in(part.what || 'outline', `${name}.what`, ['rectangle', 'circle', 'polygon', 'outline'])
-            const bound_by_default = ['rectangle']
-            const bound = part.bound === undefined ? bound_by_default.includes(what) : !!part.bound
+            const bound = !!part.bound
             const mirror = a.sane(part.mirror || false, `${name}.mirror`, 'boolean')()
             // `where` is delayed until we have all, potentially what-dependent units
             // default where is [0, 0], as per filter parsing

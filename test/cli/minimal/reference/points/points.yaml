@@ -17,6 +17,7 @@ matrix_col_row:
         width: 18
         height: 18
         padding: 19
+        autobind: 10
         skip: false
         asym: both
         colrow: col_row
@@ -32,3 +33,8 @@ matrix_col_row:
             name: matrix
         col: *ref_0
         row: row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0

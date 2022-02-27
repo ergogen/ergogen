@@ -20,6 +20,7 @@
             "width": 18,
             "height": 18,
             "padding": 19,
+            "autobind": 10,
             "skip": false,
             "asym": "both",
             "colrow": "left_bottom",
@@ -57,7 +58,13 @@
                 "key": {},
                 "name": "left"
             },
-            "row": "bottom"
+            "row": "bottom",
+            "bind": [
+                10,
+                10,
+                0,
+                0
+            ]
         }
     },
     "matrix_left_home": {
@@ -81,6 +88,7 @@
             "width": 18,
             "height": 18,
             "padding": 19,
+            "autobind": 10,
             "skip": false,
             "asym": "both",
             "colrow": "left_home",
@@ -118,7 +126,13 @@
                 "key": {},
                 "name": "left"
             },
-            "row": "home"
+            "row": "home",
+            "bind": [
+                0,
+                10,
+                10,
+                0
+            ]
         }
     },
     "matrix_middle_bottom": {
@@ -142,6 +156,7 @@
             "width": 18,
             "height": 18,
             "padding": 19,
+            "autobind": 10,
             "skip": false,
             "asym": "both",
             "colrow": "middle_bottom",
@@ -181,7 +196,13 @@
                 "key": {},
                 "name": "middle"
             },
-            "row": "bottom"
+            "row": "bottom",
+            "bind": [
+                10,
+                0,
+                0,
+                10
+            ]
         }
     },
     "matrix_middle_home": {
@@ -205,6 +226,7 @@
             "width": 18,
             "height": 18,
             "padding": 19,
+            "autobind": 10,
             "skip": false,
             "asym": "both",
             "colrow": "middle_home",
@@ -244,7 +266,13 @@
                 "key": {},
                 "name": "middle"
             },
-            "row": "home"
+            "row": "home",
+            "bind": [
+                10,
+                10,
+                10,
+                10
+            ]
         }
     },
     "matrix_middle_top": {
@@ -268,6 +296,7 @@
             "width": 18,
             "height": 18,
             "padding": 19,
+            "autobind": 10,
             "skip": false,
             "asym": "both",
             "colrow": "middle_top",
@@ -307,7 +336,13 @@
                 "key": {},
                 "name": "middle"
             },
-            "row": "top"
+            "row": "top",
+            "bind": [
+                0,
+                10,
+                10,
+                0
+            ]
         }
     },
     "matrix_right_home": {
@@ -331,6 +366,7 @@
             "width": 18,
             "height": 18,
             "padding": 19,
+            "autobind": 10,
             "skip": false,
             "asym": "both",
             "colrow": "right_home",
@@ -374,7 +410,13 @@
                 },
                 "name": "right"
             },
-            "row": "home"
+            "row": "home",
+            "bind": [
+                10,
+                0,
+                0,
+                10
+            ]
         }
     },
     "matrix_right_top": {
@@ -398,6 +440,7 @@
             "width": 18,
             "height": 18,
             "padding": 19,
+            "autobind": 10,
             "skip": false,
             "asym": "both",
             "colrow": "right_top",
@@ -441,7 +484,13 @@
                 },
                 "name": "right"
             },
-            "row": "top"
+            "row": "top",
+            "bind": [
+                0,
+                0,
+                10,
+                10
+            ]
         }
     }
 }

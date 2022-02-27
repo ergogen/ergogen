@@ -44,7 +44,7 @@ const _in = exports.in = (raw, name, arr) => {
 const arr = exports.arr = (raw, name, length, _type, _default) => units => {
     assert(type(raw)(units) == 'array', `Field "${name}" should be an array!`)
     assert(length == 0 || raw.length == length, `Field "${name}" should be an array of length ${length}!`)
-    raw = raw.map(val => val || _default)
+    raw = raw.map(val => val === undefined ? _default : val)
     raw.map(val => assert(type(val)(units) == _type, `Field "${name}" should contain ${_type}s!`))
     if (_type == 'number') {
         raw = raw.map(val => mathnum(val)(units))
@@ -62,8 +62,8 @@ const wh = exports.wh = (raw, name) => units => {
     return xy(raw, name)(units)
 }
 
-exports.trbl = (raw, name) => units => {
+exports.trbl = (raw, name, _default=0) => units => {
     if (!Array.isArray(raw)) raw = [raw, raw, raw, raw]
     if (raw.length == 2) raw = [raw[1], raw[0], raw[1], raw[0]]
-    return numarr(raw, name, 4, 'number', 0)(units)
+    return arr(raw, name, 4, 'number', _default)(units)
 }

@@ -20,6 +20,7 @@
             "width": 18,
             "height": 18,
             "padding": 19,
+            "autobind": 10,
             "skip": false,
             "asym": "both",
             "colrow": "left_bottom",
@@ -40,7 +41,13 @@
                 "key": {},
                 "name": "left"
             },
-            "row": "bottom"
+            "row": "bottom",
+            "bind": [
+                10,
+                10,
+                0,
+                0
+            ]
         }
     },
     "matrix_left_top": {
@@ -64,6 +71,7 @@
             "width": 18,
             "height": 18,
             "padding": 19,
+            "autobind": 10,
             "skip": false,
             "asym": "both",
             "colrow": "left_top",
@@ -84,7 +92,13 @@
                 "key": {},
                 "name": "left"
             },
-            "row": "top"
+            "row": "top",
+            "bind": [
+                0,
+                10,
+                10,
+                0
+            ]
         }
     },
     "matrix_right_bottom": {
@@ -108,6 +122,7 @@
             "width": 18,
             "height": 18,
             "padding": 19,
+            "autobind": 10,
             "skip": false,
             "asym": "both",
             "colrow": "right_bottom",
@@ -128,7 +143,13 @@
                 "key": {},
                 "name": "right"
             },
-            "row": "bottom"
+            "row": "bottom",
+            "bind": [
+                10,
+                0,
+                0,
+                10
+            ]
         }
     },
     "matrix_right_top": {
@@ -152,6 +173,7 @@
             "width": 18,
             "height": 18,
             "padding": 19,
+            "autobind": 10,
             "skip": false,
             "asym": "both",
             "colrow": "right_top",
@@ -172,7 +194,13 @@
                 "key": {},
                 "name": "right"
             },
-            "row": "top"
+            "row": "top",
+            "bind": [
+                0,
+                0,
+                10,
+                10
+            ]
         }
     }
 }

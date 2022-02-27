@@ -43,6 +43,7 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key,
 
     // column layout
 
+    const col_minmax = {}
     if (!Object.keys(cols).length) {
         cols.default = {}
     }
@@ -52,6 +53,7 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key,
         // column-level sanitization
 
         col = col || {}
+        col_minmax[col_name] = {min: Infinity, max: -Infinity}
 
         a.unexpected(
             col,
@@ -93,6 +95,7 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key,
             width: units.$default_width,
             height: units.$default_height,
             padding: units.$default_padding,
+            autobind: units.$default_autobind,
             skip: false,
             asym: 'both',
             colrow: '{{col.name}}_{{row}}',
@@ -155,19 +158,81 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key,
         // actually laying out keys
 
         for (const key of keys) {
+
+            // copy the current column anchor
             let point = col_anchor.clone()
+
+            // apply transformations
             for (const r of rotations) {
                 point.rotate(r.angle, r.origin)
             }
             point.r += key.orient
             point.shift(key.shift)
             point.r += key.rotate
+
+            // save new key
             point.meta = key
             points[key.name] = point
+
+            // collect minmax stats for autobind
+            col_minmax[col_name].min = Math.min(col_minmax[col_name].min, point.y)
+            col_minmax[col_name].max = Math.max(col_minmax[col_name].max, point.y)
+
+            // advance the column anchor to the next position
             col_anchor.y += key.padding
         }
 
         first_col = false
+    }
+
+    // autobind
+
+    let col_names = Object.keys(col_minmax)
+    let col_index = 0
+    for (const [col_name, bounds] of Object.entries(col_minmax)) {
+        for (const point of Object.values(points)) {
+            if (point.meta.col.name != col_name) continue
+            if (!point.meta.autobind) continue
+            const autobind = a.sane(point.meta.autobind, `${point.meta.name}.autobind`, 'number')(units)
+            // specify default as -1, so we can recognize where it was left undefined even after number-ification
+            const bind = point.meta.bind = a.trbl(point.meta.bind, `${point.meta.name}.bind`, -1)(units)
+
+            // up
+            if (bind[0] == -1) {
+                if (point.y < bounds.max) bind[0] = autobind
+                else bind[0] = 0
+                
+            }
+
+            // right
+            if (bind[1] == -1) {
+                bind[1] = 0
+                if (col_index < col_names.length - 1) {
+                    const right = col_minmax[col_names[col_index + 1]]
+                    if (point.y >= right.min && point.y <= right.max) {
+                        bind[1] = autobind
+                    }
+                }
+            }
+
+            // down
+            if (bind[2] == -1) {
+                if (point.y > bounds.min) bind[2] = autobind
+                else bind[2] = 0
+            }
+
+            // left
+            if (bind[3] == -1) {
+                bind[3] = 0
+                if (col_index > 0) {
+                    const left = col_minmax[col_names[col_index - 1]]
+                    if (point.y >= left.min && point.y <= left.max) {
+                        bind[3] = autobind
+                    }
+                }
+            }
+        }
+        col_index++
     }
 
     return points

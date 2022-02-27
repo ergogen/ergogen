@@ -15,6 +15,7 @@ outlines:
     - what: rectangle
       where: true
       size: cy
+      bound: true
   fillet:
     - what: outline
       name: base

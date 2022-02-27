@@ -8,3 +8,4 @@ $default_splay: 0
 $default_height: 18
 $default_width: 18
 $default_padding: 19
+$default_autobind: 10
