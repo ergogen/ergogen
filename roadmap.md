@@ -6,20 +6,20 @@
 
 ### Major
 
-- Anchor overhaul
-    - Recursive-ize anchors
-        - This will potentially cause `ref` to be ambiguous, so maybe introduce a separate `refs` plural?
-    - Add `orient`/`rotate` **towards** other anchors (again, recursively)
 - Restructure pcb point/footprint filtering
     - Use the same `what`/`where` infrastructure as outlines
     - Collapse params/nets/anchors into a single hierarchy from the user's POV
     - Add per-footprint mirror support
     - Add some way for footprints to be able to "resist" the mirroring-related special treatment of negative X shift, rotation, etc.
 - Add auto-bind
-- Merge, generalize, and uniform-ize footprints
+- Merge, generalize, uniform-ize and externalize footprints!
+    - Separate npm package for dependency, onnx-like incremental opset versioning
     - Template for creating them, built-in variables they can use, documentation, external links, etc.
     - Also considering how (or, on which layer) they define their silks, universal mirroring behaviour, etc.
     - Rename class to designator in this context (https://en.wikipedia.org/wiki/Reference_designator#Designators)
+    - Include raw kicad footprint integrations
+        - pull torik's script to be able to convert raw kicad footprints into positionable ergogen ones
+        - have a `dummy` footprint which can just be updated from schematic
 
 ### Minor
 
@@ -49,6 +49,7 @@
 
 ### Patch
 
+- Prevent double mirroring (see discord "mirror_mirror_")
 - Check unexpected keys at top level, too
 - Better error handling for the fillet option?
 - Integration and end2end tests to get coverage to 100%

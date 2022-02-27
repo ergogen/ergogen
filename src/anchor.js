@@ -91,12 +91,23 @@ const anchor = exports.parse = (raw, name, points={}, default_point=new Point(),
     // Actual orient/shift/rotate/affect handling
     //
 
+    const rotator = (config, name, point) => {
+        // simple case: number gets added to point rotation
+        if (a.type(config)(units) == 'number') {
+            let angle = a.sane(config, name, 'number')(units)
+            if (point.meta.mirrored) {
+                angle = -angle
+            }
+            point.r += angle
+        // recursive case: points turns "towards" target anchor
+        } else {
+            const target = anchor(config, name, points, default_point, mirror)(units)
+            point.r = point.angle(target)
+        }
+    }
+
     if (raw.orient !== undefined) {
-        let angle = a.sane(raw.orient, `${name}.orient`, 'number')(units)
-        if (point.meta.mirrored) {
-            angle = -angle
-        } 
-        point.r += angle
+        rotator(raw.orient, `${name}.orient`, point)
     }
     if (raw.shift !== undefined) {
         let xyval = a.wh(raw.shift, `${name}.shift`)(units)
@@ -106,11 +117,7 @@ const anchor = exports.parse = (raw, name, points={}, default_point=new Point(),
         point.shift(xyval, true)
     }
     if (raw.rotate !== undefined) {
-        let angle = a.sane(raw.rotate, `${name}.rotate`, 'number')(units)
-        if (point.meta.mirrored) {
-            angle = -angle
-        } 
-        point.r += angle
+        rotator(raw.rotate, `${name}.rotate`, point)
     }
     if (raw.affect !== undefined) {
         const candidate = point.clone()

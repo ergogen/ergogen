@@ -66,4 +66,10 @@ module.exports = class Point {
         let rect = u.rect(size, size, [-size/2, -size/2])
         return this.position(rect)
     }
+
+    angle(other) {
+        const dx = other.x - this.x
+        const dy = other.y - this.y
+        return -Math.atan2(dx, dy) * (180 / Math.PI)
+    }
 }

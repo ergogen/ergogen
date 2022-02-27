@@ -83,6 +83,11 @@ describe('Anchor', function() {
             parse({orient: -90, shift: [0, 1]}, 'name')(),
             [1, 0, -90, {}]
         )
+        // orient towards another point (and then move a diagonal to get to [1, 1])
+        check(
+            parse({orient: 'ten', shift: [0, Math.SQRT2]}, 'name', points)(),
+            [1, 1, -45, {}]
+        )
     })
 
     it('rotate', function() {
@@ -96,6 +101,11 @@ describe('Anchor', function() {
         check(
             parse({shift: [0, 1], rotate: -90}, 'name')(),
             [0, 1, -90, {}]
+        )
+        // rotate towards another point
+        check(
+            parse({rotate: {shift: [-1, -1]}}, 'name')(),
+            [0, 0, 135, {}]
         )
     })
 
