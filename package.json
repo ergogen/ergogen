@@ -16,23 +16,23 @@
     },
     "dependencies": {
         "@jscad/openjscad": "github:ergogen/oldjscad",
-        "fs-extra": "^10.0.0",
-        "js-yaml": "^3.14.0",
+        "fs-extra": "^10.0.1",
+        "js-yaml": "^3.14.1",
         "kle-serial": "github:ergogen/kle-serial#ergogen",
         "makerjs": "github:ergogen/maker.js#ergogen",
-        "mathjs": "^10.0.0",
-        "yargs": "^17.3.0"
+        "mathjs": "^10.1.1",
+        "yargs": "^17.3.1"
     },
     "devDependencies": {
-        "@rollup/plugin-commonjs": "^21.0.1",
+        "@rollup/plugin-commonjs": "^21.0.2",
         "@rollup/plugin-json": "^4.1.0",
-        "chai": "^4.3.4",
+        "chai": "^4.3.6",
         "chai-as-promised": "^7.1.1",
-        "dir-compare": "^3.3.0",
+        "dir-compare": "^4.0.0",
         "glob": "^7.2.0",
-        "mocha": "^9.1.3",
+        "mocha": "^9.2.1",
         "nyc": "^15.1.0",
-        "rollup": "^2.61.1"
+        "rollup": "^2.68.0"
     },
     "nyc": {
         "all": true,

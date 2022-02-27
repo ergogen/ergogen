@@ -11,7 +11,6 @@
     - Collapse params/nets/anchors into a single hierarchy from the user's POV
     - Add per-footprint mirror support
     - Add some way for footprints to be able to "resist" the mirroring-related special treatment of negative X shift, rotation, etc.
-- Add auto-bind
 - Merge, generalize, uniform-ize and externalize footprints!
     - Separate npm package for dependency, onnx-like incremental opset versioning
     - Template for creating them, built-in variables they can use, documentation, external links, etc.
@@ -49,6 +48,7 @@
 
 ### Patch
 
+- YAML lib v4 update - breaking changes in how undefined is handled!
 - Prevent double mirroring (see discord "mirror_mirror_")
 - Check unexpected keys at top level, too
 - Better error handling for the fillet option?
