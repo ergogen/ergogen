@@ -12,7 +12,7 @@ outlines:
     middle_rect:
       what: rectangle
       where:
-        ref:
+        aggregate.parts:
           - matrix
           - mirror_matrix
         shift: [0, sy/2]

@@ -12,7 +12,7 @@ outlines:
     middle_circle:
       what: circle
       where:
-        ref:
+        aggregate.parts:
           - matrix
           - mirror_matrix
       radius: 15

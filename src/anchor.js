@@ -12,37 +12,85 @@ const mirror_ref = exports.mirror = (ref, mirror=true) => {
     return ref
 }
 
-const anchor = exports.parse = (raw, name, points={}, check_unexpected=true, default_point=new Point(), mirror=false) => units => {
-    if (a.type(raw)() == 'array') {
+const aggregator_common = ['parts', 'method']
+
+const aggregators = {
+    average: (config, name, parts) => {
+        a.unexpected(config, name, aggregator_common)
+        let x = 0, y = 0, r = 0
+        const len = parts.length
+        for (const part of parts) {
+            x += part.x
+            y += part.y
+            r += part.r
+        }
+        return new Point(x / len, y / len, r / len)
+    }
+}
+
+const anchor = exports.parse = (raw, name, points={}, default_point=new Point(), mirror=false) => units => {
+
+    //
+    // Anchor type handling
+    //
+
+    if (a.type(raw)() == 'string') {
+        raw = {ref: raw}
+    }
+
+    else if (a.type(raw)() == 'array') {
         // recursive call with incremental default_point mods, according to `affect`s
         let current = default_point.clone()
+        let index = 1
         for (const step of raw) {
-            current = anchor(step, name, points, check_unexpected, current, mirror)(units)
+            current = anchor(step, `${name}[${index++}]`, points, current, mirror)(units)
         }
         return current
     }
-    if (check_unexpected) a.unexpected(raw, name, ['ref', 'orient', 'shift', 'rotate', 'affect'])
+
+    a.unexpected(raw, name, ['ref', 'aggregate', 'orient', 'shift', 'rotate', 'affect'])
+
+    //
+    // Reference or aggregate handling
+    //
+    
     let point = default_point.clone()
+    if (raw.ref !== undefined && raw.aggregate !== undefined) {
+        throw new Error(`Fields "ref" and "aggregate" cannot appear together in anchor "${name}"!`)
+    }
+
     if (raw.ref !== undefined) {
-        if (a.type(raw.ref)() == 'array') {
-            // averaging multiple anchors
-            let x = 0, y = 0, r = 0
-            const len = raw.ref.length
-            for (const ref of raw.ref) {
-                const parsed_ref = mirror_ref(ref, mirror)
-                a.assert(points[parsed_ref], `Unknown point reference "${parsed_ref}" in anchor "${name}"!`)
-                const resolved = points[parsed_ref]
-                x += resolved.x
-                y += resolved.y
-                r += resolved.r
-            }
-            point = new Point(x / len, y / len, r / len)
-        } else {
+        // base case, resolve directly
+        if (a.type(raw.ref)() == 'string') {
             const parsed_ref = mirror_ref(raw.ref, mirror)
             a.assert(points[parsed_ref], `Unknown point reference "${parsed_ref}" in anchor "${name}"!`)
             point = points[parsed_ref].clone()
+        // recursive case
+        } else {
+            point = anchor(raw.ref, `${name}.ref`, points, default_point, mirror)(units)
         }
+        
     }
+
+    if (raw.aggregate !== undefined) {
+        raw.aggregate = a.sane(raw.aggregate, `${name}.aggregate`, 'object')()
+        raw.aggregate.method = a.sane(raw.aggregate.method || 'average', `${name}.aggregate.method`, 'string')()
+        a.assert(aggregators[raw.aggregate.method], `Unknown aggregator method "${raw.aggregate.method}" in anchor "${name}"!`)
+        raw.aggregate.parts = a.sane(raw.aggregate.parts || [], `${name}.aggregate.parts`, 'array')()
+
+        const parts = []
+        let index = 1
+        for (const part of raw.aggregate.parts) {
+            parts.push(anchor(part, `${name}.aggregate.parts[${index++}]`, points, default_point, mirror)(units))
+        }
+
+        point = aggregators[raw.aggregate.method](raw.aggregate, `${name}.aggregate`, parts)
+    }
+
+    //
+    // Actual orient/shift/rotate/affect handling
+    //
+
     if (raw.orient !== undefined) {
         let angle = a.sane(raw.orient, `${name}.orient`, 'number')(units)
         if (point.meta.mirrored) {
@@ -77,5 +125,6 @@ const anchor = exports.parse = (raw, name, points={}, check_unexpected=true, def
             point[aff] = candidate[aff]
         }
     }
+
     return point
 }

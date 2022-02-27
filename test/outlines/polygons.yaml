@@ -11,7 +11,7 @@ outlines:
       bound: false
     middle_poly:
       what: polygon
-      where.ref:
+      where.aggregate.parts:
         - matrix
         - mirror_matrix
       points:

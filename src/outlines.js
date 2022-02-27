@@ -112,7 +112,7 @@ const polygon = (config, name, points, outlines, units) => {
         let poly_index = -1
         for (const poly_point of poly_points) {
             const poly_name = `${name}.points[${++poly_index}]`
-            last_anchor = anchor(poly_point, poly_name, points, true, last_anchor)(units)
+            last_anchor = anchor(poly_point, poly_name, points, last_anchor)(units)
             parsed_points.push(last_anchor.p)
         }
         let poly = u.poly(parsed_points)

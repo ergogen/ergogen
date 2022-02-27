@@ -121,7 +121,7 @@ exports.parse = (config, name, points={}, units={}, include_mirrors=false) => {
         result.push(anchor(config, name, points)(units))
         if (include_mirrors) {
             // this is strict: if the ref of the anchor doesn't have a mirror pair, it will error out
-            result.push(anchor(config, name, points, true, undefined, true)(units))
+            result.push(anchor(config, name, points, undefined, true)(units))
         }
         
     // otherwise, it is treated as a condition to filter all available points

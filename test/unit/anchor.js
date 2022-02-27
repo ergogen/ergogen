@@ -6,8 +6,8 @@ describe('Anchor', function() {
 
     const points = {
         o: new Point(0, 0, 0, {label: 'o'}),
-        ten: new Point(10, 10, 10, {label: 'ten'}),
-        mirror: new Point(20, 0, 0, {mirrored: true})
+        ten: new Point(10, 10, -90, {label: 'ten'}),
+        mirror_ten: new Point(-10, 10, 90, {mirrored: true})
     }
 
     it('params', function() {
@@ -16,28 +16,45 @@ describe('Anchor', function() {
             parse({}, 'name')(),
             [0, 0, 0, {}]
         )
-        // unexpected check can be disabled
-        check(
-            parse({unexpected_key: true}, 'name', {}, false)(),
-            [0, 0, 0, {}]
-        )
-        // default point can be overridden
-        check(
-            parse({}, 'name', {}, true, new Point(1, 1))(),
-            [1, 1, 0, {}]
-        )
-    })
-
-    it('ref', function() {
         // single reference
         check(
             parse({ref: 'o'}, 'name', points)(),
             [0, 0, 0, {label: 'o'}]
         )
+        // default point can be overridden
+        check(
+            parse({}, 'name', {}, new Point(1, 1))(),
+            [1, 1, 0, {}]
+        )
+        // mirrored references can be forced
+        check(
+            parse({ref: 'ten'}, 'name', points, undefined, true)(),
+            [-10, 10, 90, {mirrored: true}]
+        )
+    })
+
+    it('recursive', function() {
+        // recursive references are supported (keeping metadata)
+        check(
+            parse({
+                ref: {
+                    ref: 'o',
+                    shift: [2, 2]
+                }
+            }, 'name', points)(),
+            [2, 2, 0, {label: 'o'}]
+        )
+    })
+
+    it('aggregate', function() {
         // average of multiple references (metadata gets ignored)
         check(
-            parse({ref: ['o', 'ten']}, 'name', points)(),
-            [5, 5, 5, {}]
+            parse({
+                aggregate: {
+                    parts: ['o', 'ten']
+                }
+            }, 'name', points)(),
+            [5, 5, -45, {}]
         )
     })
 
@@ -49,8 +66,8 @@ describe('Anchor', function() {
         )
         // shift should respect mirrored points (and invert along the x axis)
         check(
-            parse({ref: 'mirror', shift: [1, 1]}, 'name', points)(),
-            [19, 1, 0, {mirrored: true}]
+            parse({ref: 'mirror_ten', shift: [1, 1]}, 'name', points)(),
+            [-11, 9, 90, {mirrored: true}]
         )
     })
 
@@ -96,6 +113,14 @@ describe('Anchor', function() {
         check(
             parse({orient: -90, shift: [0, 1], rotate: 10, affect: ['x', 'y']}, 'name')(),
             [1, 0, 0, {}]
+        )
+    })
+
+    it('string', function() {
+        // basic string form
+        check(
+            parse('ten', 'name', points)(),
+            [10, 10, -90, {label: 'ten'}]
         )
     })
 
