@@ -6,6 +6,10 @@
 
 ### Major
 
+- key-level access to full anchors
+    - this could provide extra variables `padding`, `spread`, `splay` for custom layout purposes
+    - make row anchors cumulative, too (like columns), so fingers arcs and other edits can happen
+- remove `_default` suffix for only column keys (like for single point zones)
 - Restructure pcb point/footprint filtering
     - Use the same `what`/`where` infrastructure as outlines
     - Collapse params/nets/anchors into a single hierarchy from the user's POV
@@ -14,6 +18,7 @@
 - Merge, generalize, uniform-ize and externalize footprints!
     - Separate npm package for dependency, onnx-like incremental opset versioning
     - Template for creating them, built-in variables they can use, documentation, external links, etc.
+        - Add access to whole set of points + filtering logic, so they can implement their own connection logic as well maybe (see daisy chaining)
     - Also considering how (or, on which layer) they define their silks, universal mirroring behaviour, etc.
     - Rename class to designator in this context (https://en.wikipedia.org/wiki/Reference_designator#Designators)
     - Include raw kicad footprint integrations
@@ -44,6 +49,8 @@
 - Look into kicad 5 vs. 6 output format
 - Update json schema and add syntax highlight to editors
 - Support different netclasses
+- `round`, `pointy` and `beveled` symbolic constants for expand joint types
+    - also, string shorthands like `3)`, `5>` and `10]`
 
 
 ### Patch
@@ -54,7 +61,7 @@
 - Better error handling for the fillet option?
 - Integration and end2end tests to get coverage to 100%
 - Add custom fillet implementation that considers line-line connections only?
-
+- Empty nets should be allowed (to mean unconnected)
 
 
 ## WEBUI
