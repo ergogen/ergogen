@@ -27,6 +27,9 @@
 
 ### Minor
 
+- Shift/rotate/scale for outline elements before layout
+- Allow footprints to publish outlines
+    - Make these usable in the `outlines` section through a new `what`
 - 3D orient for cases
 - Post-process anchor for global (post-mirror!) orient/shift/rotate for everything
 - Even more extreme anchor stuff
@@ -61,6 +64,7 @@
 - Better error handling for the fillet option?
 - Integration and end2end tests to get coverage to 100%
 - Add custom fillet implementation that considers line-line connections only?
+- Add nicer filleting error messages when makerjs dies for some reason
 - Empty nets should be allowed (to mean unconnected)
 
 
