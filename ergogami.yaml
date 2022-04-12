@@ -92,7 +92,7 @@ points:
             spread: cx
             row_overrides: 
               bottom:
-                bind: [3 ,1, 0, 0]
+                bind: [34 ,1, 0, 0]
                 column_net: P9
 outlines:
   exports:
