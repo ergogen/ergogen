@@ -47,10 +47,10 @@ points:
                 bind: [0, 0, 0, 3]
                 column_net: P5
               home: 
-                bind: [0,0,3,1]
+                bind: [0, 0, 3, 1]
                 column_net: P16
               top: 
-                bind: [0,3,0,1]
+                bind: [0, 3, 0, 1]
                 column_net: P20
           middle: 
             spread: cx
@@ -59,10 +59,10 @@ points:
                 bind: [0, 3, 0, 3]
                 column_net: P6
               home: 
-                bind: [0,0,3,0]
+                bind: [0, 0, 3, 0]
                 column_net: P14
               top:
-                bind: [0,1,0,1]
+                bind: [0, 1, 0, 1]
                 column_net: P21
           index: 
             spread: cx
@@ -71,10 +71,10 @@ points:
                 bind: [0, 3, 0, 0]
                 column_net: P7
               home: 
-                bind: [0,0,3,0]
+                bind: [0, 0, 3, 0]
                 column_net: P15
               top: 
-                bind: [0,1,3,3]
+                bind: [0, 1, 3, 3]
                 column_net: P3
           inner:
             spread: cx
@@ -92,14 +92,14 @@ points:
             spread: cx
             row_overrides: 
               bottom:
-                bind: [34,1, 0, 0]
+                bind: [3 ,1, 0, 0]
                 column_net: P9
 outlines:
   exports:
     raw: 
       - type: keys
         side: left
-        size: [1cx , 1cx]
+        size: [1cx, 1cx]
       - type: rectangle
         size: [7, 5]
         anchor:
@@ -151,28 +151,28 @@ pcbs:
         type: via
         anchor: 
           ref: board_inner_top
-          shift: [16,3]
+          shift: [16, 3]
         nets: 
           net: RAW 
       via4:
         type: via
         anchor: 
           ref: board_inner_top
-          shift: [18,3]
+          shift: [18, 3]
         nets: 
           net: pos 
       via5:
         type: via
         anchor: 
           ref: board_inner_top
-          shift: [23,6.5]
+          shift: [23, 6.5]
         nets: 
           net: GND 
       via6:
         type: via
         anchor: 
           ref: board_inner_top
-          shift: [25,6.5]
+          shift: [25, 6.5]
         nets: 
           net: RST 
       b3u1000p:
@@ -192,5 +192,5 @@ pcbs:
           neg: GND
         anchor:
           ref: board_far_bottom
-          shift: [0.2 , 9]
+          shift: [0.2, 9]
           rotate: 90
