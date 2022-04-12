@@ -48,7 +48,7 @@ points:
                 column_net: P5
               home: 
                 bind: [0, 0, 0, 0]
-                column_net: P16
+                column_net: P18
               top: 
                 bind: [0, 0, 0, 0]
                 column_net: P3
