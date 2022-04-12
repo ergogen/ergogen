@@ -39,7 +39,7 @@ points:
                 column_net: P10
               top:
                 bind: [0, 0, 0, 1]
-                column_net: P3
+                column_net: P2
           ring:
             spread: cx
             rows: 
@@ -51,7 +51,7 @@ points:
                 column_net: P16
               top: 
                 bind: [0, 0, 0, 0]
-                column_net: P2
+                column_net: P3
           middle: 
             spread: cx
             rows: 
