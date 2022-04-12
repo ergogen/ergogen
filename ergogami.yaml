@@ -60,7 +60,7 @@ points:
                 column_net: P6
               home: 
                 bind: [0, 0, 0, 0]
-                column_net: P14
+                column_net: P15
               top:
                 bind: [0, 0, 0, 0]
                 column_net: P19
@@ -72,7 +72,7 @@ points:
                 column_net: P7
               home: 
                 bind: [0, 0, 0, 0]
-                column_net: P15
+                column_net: P14
               top:
                 bind: [0, 0, 0, 0]
                 column_net: P20
@@ -84,7 +84,7 @@ points:
                 column_net: P8
               home:
                 bind: [0, 0, 3, 0]
-                column_net: P18
+                column_net: P16
               top:
                 bind: [0, 1, 3, 3]
                 column_net: P21
