@@ -128,17 +128,22 @@ const polygon = (config, name, points, outlines, units) => {
 const outline = (config, name, points, outlines, units) => {
 
     // prepare params
-    a.unexpected(config, `${name}`, ['name', 'fillet', 'expand', 'origin'])
+    a.unexpected(config, `${name}`, ['name', 'fillet', 'expand', 'origin', 'scale'])
     a.assert(outlines[config.name], `Field "${name}.name" does not name an existing outline!`)
     const fillet = a.sane(config.fillet || 0, `${name}.fillet`, 'number')(units)
     const expand = a.sane(config.expand || 0, `${name}.expand`, 'number')(units)
     const joints = a.in(a.sane(config.joints || 0, `${name}.joints`, 'number')(units), `${name}.joints`, [0, 1, 2])
     const origin = anchor(config.origin || {}, `${name}.origin`, points)(units)
+    const scale = a.sane(config.scale || 1, `${name}.scale`, 'number')(units)
 
     // return shape function and its units
     return [(point, bound) => {
         let o = u.deepcopy(outlines[config.name])
         o = origin.unposition(o)
+
+        if (scale !== 1) {
+            o = m.model.scale(o, scale)
+        }
 
         if (fillet) {
             for (const [index, chain] of m.model.findChains(o).entries()) {

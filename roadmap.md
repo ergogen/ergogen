@@ -6,7 +6,6 @@
 
 ### Major
 
-- Gut standalone 3d output, only different scripts for different integrations
 - Key-level access to full anchors
     - this could provide extra variables `padding`, `spread`, `splay` for custom layout purposes
     - make row anchors cumulative, too (like columns), so fingers arcs and other edits can happen
@@ -27,7 +26,6 @@
 - Include raw kicad footprint integrations
     - pull torik's script to be able to convert raw kicad footprints into positionable ergogen ones
     - have a `dummy` footprint which can just be updated from schematic
-- Shift/rotate/scale for outline elements before layout
 - Allow footprints to publish outlines
     - Make these usable in the `outlines` section through a new `what`
 - 3D orient for cases
