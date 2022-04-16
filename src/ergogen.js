@@ -67,12 +67,12 @@ const process = async (raw, debug=false, logger=()=>{}) => {
         empty = false
     }
 
-    logger('Extruding cases...')
+    logger('Modeling cases...')
     const cases = cases_lib.parse(config.cases || {}, outlines, units)
     results.cases = {}
     for (const [case_name, case_script] of Object.entries(cases)) {
         if (!debug && case_name.startsWith('_')) continue
-        results.cases[case_name] = await io.threedee(case_script, debug)
+        results.cases[case_name] = {jscad: case_script}
         empty = false
     }
 

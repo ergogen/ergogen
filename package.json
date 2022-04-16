@@ -15,7 +15,6 @@
         "coverage": "nyc --reporter=html --reporter=text npm test"
     },
     "dependencies": {
-        "@jscad/openjscad": "github:ergogen/oldjscad",
         "fs-extra": "^10.0.1",
         "js-yaml": "^3.14.1",
         "kle-serial": "github:ergogen/kle-serial#ergogen",

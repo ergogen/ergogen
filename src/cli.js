@@ -81,7 +81,7 @@ const composite = (data, rel) => {
         fs.mkdirpSync(path.dirname(abs))
         fs.writeFileSync(abs + '.yaml', yaml.dump(data.yaml, {indent: 4}))
     }
-    for (const format of ['svg', 'dxf', 'jscad', 'stl']) {
+    for (const format of ['svg', 'dxf', 'jscad']) {
         if (data[format]) {
             fs.mkdirpSync(path.dirname(abs))
             fs.writeFileSync(abs + '.' + format, data[format])
