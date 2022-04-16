@@ -6,27 +6,27 @@
 
 ### Major
 
-- key-level access to full anchors
+- Gut standalone 3d output, only different scripts for different integrations
+- Key-level access to full anchors
     - this could provide extra variables `padding`, `spread`, `splay` for custom layout purposes
     - make row anchors cumulative, too (like columns), so fingers arcs and other edits can happen
-- remove `_default` suffix for only column keys (like for single point zones)
 - Restructure pcb point/footprint filtering
     - Use the same `what`/`where` infrastructure as outlines
     - Collapse params/nets/anchors into a single hierarchy from the user's POV
     - Add per-footprint mirror support
     - Add some way for footprints to be able to "resist" the mirroring-related special treatment of negative X shift, rotation, etc.
 - Merge, generalize, uniform-ize and externalize footprints!
-    - Separate npm package for dependency, onnx-like incremental opset versioning
+    - onnx-like incremental opset versioning
     - Template for creating them, built-in variables they can use, documentation, external links, etc.
         - Add access to whole set of points + filtering logic, so they can implement their own connection logic as well maybe (see daisy chaining)
     - Also considering how (or, on which layer) they define their silks, universal mirroring behaviour, etc.
     - Rename class to designator in this context (https://en.wikipedia.org/wiki/Reference_designator#Designators)
-    - Include raw kicad footprint integrations
-        - pull torik's script to be able to convert raw kicad footprints into positionable ergogen ones
-        - have a `dummy` footprint which can just be updated from schematic
 
 ### Minor
 
+- Include raw kicad footprint integrations
+    - pull torik's script to be able to convert raw kicad footprints into positionable ergogen ones
+    - have a `dummy` footprint which can just be updated from schematic
 - Shift/rotate/scale for outline elements before layout
 - Allow footprints to publish outlines
     - Make these usable in the `outlines` section through a new `what`

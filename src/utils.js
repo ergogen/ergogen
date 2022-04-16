@@ -26,7 +26,7 @@ exports.template = (str, vals={}) => {
         const replacement = deep(vals, match[1]) || ''
         res = res.substring(0, match.index + shift)
             + replacement
-            + res.substring(match.index + match[0].length)
+            + res.substring(match.index + shift + match[0].length)
         shift += replacement.length - match[0].length
     }
     return res
