@@ -1,8 +1,8 @@
 // TRRS-PJ-320A-dual
 //     _________________
-//    | (1)     (3) (4)|
+//    |    (2)  (3) (4)|
 //    |                |
-//    |___(2)__________|
+//    |_(1)____________|
 //
 // Nets
 //    A: corresponds to pin 1
@@ -36,7 +36,7 @@ module.exports = {
       ${p.at /* parametric position */}   
 
       ${'' /* footprint reference */}
-      (fp_text reference REF** (at 0 14.2) (layer Dwgs.User) (effects (font (size 1 1) (thickness 0.15))))
+      (fp_text reference "${p.ref}" (at 0 14.2) (layer Dwgs.User) (effects (font (size 1 1) (thickness 0.15))))
       (fp_text value TRRS-PJ-320A-dual (at 0 -5.6) (layer F.Fab) (effects (font (size 1 1) (thickness 0.15))))
 
       ${''/* corner marks */}
