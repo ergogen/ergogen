@@ -1,8 +1,24 @@
 // TRRS-PJ-320A-dual
+//
+// Normal footprint:
 //     _________________
-//    |    (2)  (3) (4)|
+//    |   (2)   (3) (4)|
 //    |                |
-//    |_(1)____________|
+//    | (1)            |
+//    |________________|
+// 
+// Reverse footprint:
+//     _________________
+//    |   (2)   (3) (4)|
+//    | (1)            |
+//    | (1)            |
+//    |___(2)___(3)_(4)|
+//
+// Reverse & symmetric footprint:
+//     _________________
+//    | (1|2)   (3) (4)|
+//    |                |
+//    |_(1|2)___(3)_(4)|
 //
 // Nets
 //    A: corresponds to pin 1
@@ -74,16 +90,16 @@ module.exports = {
         return `
           ${standard}
           ${stabilizers('-2.3')}
-          ${stabilizers('2.3')}
-          ${pins('-4.6', '0')}
-          ${pins('4.6', '0')})
+          ${stabilizers('0')}
+          ${pins('-2.3', '2.3')}
+          ${pins('0', '-4.6')})
         `
-      } else {
-        return `
-          ${standard}
-          ${stabilizers('-2.3')}
-          ${pins('-4.6', '0')})
-        `
-      }
+    } else {
+      return `
+        ${standard}
+        ${stabilizers('-2.3')}
+        ${pins('-4.6', '0')})
+      `
+    }
   }
 }
