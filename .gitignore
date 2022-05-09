@@ -117,4 +117,5 @@ dist
 
 # Project specific
 output
+input
 temp*
