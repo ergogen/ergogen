@@ -1,0 +1,186 @@
+points:
+   key:
+      padding: cy
+      footprints:
+          choc_hotswap:
+            type: choc
+            nets:
+              from: =column_net
+              to: GND
+            params:
+                keycaps: true
+                reverse: true
+                hotswap: true
+          choc:
+            type: choc
+            anchor:
+              rotate: 180
+            nets:
+              from: =column_net
+              to: GND
+            params:
+                keycaps: true
+                reverse: true
+   zones:
+    board:
+      rows:
+        home:
+        top:
+      columns:
+          pinkie:
+            rotate: 30
+            row_overrides: 
+             home:
+               bind: [1,2,1,1]
+               column_net: P1
+          ring:
+            spread: cx
+            stagger: 16
+            rows: 
+              home: 
+                bind: [0,0,3,1]
+                column_net: P21
+              top: 
+                bind: [0,0,0,1]
+                column_net: P20 
+          middle: 
+            spread: cx
+            stagger: -5
+            rows:
+              home: 
+                bind: [0,0,3,0]
+                column_net: P15
+              top:
+                column_net: P14
+                bind: [0,1,0,1]
+          index: 
+            spread: cx
+            stagger: -10
+            rotate: -5
+            rows: 
+              home: 
+                bind: [0,1,3,0]
+                column_net: P8
+              top: 
+                bind: [0,1,3,3]
+                column_net: P16
+    thumbfan:
+      anchor:
+        ref: board_index_home
+        shift: [-6, -7]
+      rows:
+        home:
+      columns:
+        home:
+          spread: 21.25
+          rotate: -25
+          origin: [-11.75, -10]
+          rows:
+            home:
+              column_net: P9
+        far:
+          spread: 18.5
+          rotate: -0
+          origin: [-7.5, -9]
+          rows:
+            home:
+              column_net: P10
+outlines:
+  exports:
+    raw: 
+      - type: keys
+        side: left
+        size: [1cx , 1cx]
+      - type: rectangle
+        size: [90.5, 37]
+        anchor:
+          ref: board_index_home
+          rotate: -25
+          shift: [-49.5, -12]
+    cutouta:
+      - type: outline
+        name: raw
+        fillet: 2
+    cutoutb:
+      - type: outline
+        name: cutouta
+        fillet: 1
+    cutout:
+      - type: outline
+        name: cutoutb
+        fillet: 0.5
+    keycap_outlines:
+      - type: keys
+        side: left
+        size: [1cx - 0.5, 1cy - 0.5] # Choc keycaps are 17.5 x 16.5
+        bound: false               
+pcbs:
+  flame:
+    outlines:
+      main:
+        outline: cutout
+    footprints:
+      promicro:
+        type: promicro_pretty
+        anchor:
+          ref: thumbfan_home_home
+          shift: [-39, -18]
+          rotate: 180
+      pcm12:
+        type: pcm12
+        anchor:
+          ref: thumbfan_home_home
+          shift: [-11, -25.5]
+          rotate: 0
+        nets:
+          from: pos  
+          to: RAW
+        params:
+          reverse: true 
+      via3:
+        type: via
+        anchor: 
+          ref: thumbfan_home_home
+          shift: [-9,-19]
+        nets: 
+          net: RAW 
+      via4:
+        type: via
+        anchor: 
+          ref: thumbfan_home_home
+          shift: [-13,-19]
+        nets: 
+          net: pos 
+      via5:
+        type: via
+        anchor: 
+          ref: thumbfan_home_home
+          shift: [-16,-3.5]
+        nets: 
+          net: GND 
+      via6:
+        type: via
+        anchor: 
+          ref: thumbfan_home_home
+          shift: [-13,-3.5]
+        nets: 
+          net: RST 
+      b3u1000p:
+        type: b3u1000p
+        nets:
+          r1: RST  
+          r2: GND
+        anchor:
+          ref: thumbfan_home_home
+          shift: [-14.5, -7]
+          rotate: 0
+        params:
+          reverse: true 
+      bat:
+        type: bat
+        nets: 
+          neg: GND
+        anchor:
+          ref: thumbfan_home_home
+          shift: [-15 , -12]
+          rotate: 90

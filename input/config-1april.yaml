@@ -1,0 +1,128 @@
+points:
+   key:
+      padding: cy
+      footprints:
+          choc_hotswap:
+            type: choc
+            nets:
+              from: =column_net
+              to: GND
+            params:
+                keycaps: true
+                reverse: true
+                hotswap: true
+          choc:
+            type: choc
+            anchor:
+              rotate: 180
+            nets:
+              from: =column_net
+              to: GND
+            params:
+                keycaps: true
+                reverse: true
+   zones:
+    board:
+      columns:
+          pinkie:
+            rows:
+             home:
+               bind: [1,2,1,1]
+               column_net: P1
+outlines:
+  exports:
+    raw: 
+      - type: keys
+        side: left
+        size: [1cx , 1cx]
+      - type: rectangle
+        size: [41.5, 20]
+        anchor:
+          ref: board_pinkie_home
+          shift: [-51.5, -10]
+    cutouta:
+      - type: outline
+        name: raw
+        fillet: 2
+    cutoutb:
+      - type: outline
+        name: cutouta
+        fillet: 1
+    cutout:
+      - type: outline
+        name: cutoutb
+        fillet: 0.5
+    keycap_outlines:
+      - type: keys
+        side: left
+        size: [1cx - 0.5, 1cy - 0.5] # Choc keycaps are 17.5 x 16.5
+        bound: false               
+pcbs:
+  1april:
+    outlines:
+      main:
+        outline: cutout
+    footprints:
+      promicro:
+        type: promicro_pretty
+        anchor:
+          ref: board_pinkie_home
+          shift: [-36, 0]
+      pcm12:
+        type: pcm12
+        anchor:
+          ref: board_pinkie_home
+          shift: [-15, 7.5]
+          rotate: 180
+        nets:
+          from: pos  
+          to: RAW
+        params:
+          reverse: true 
+      via3:
+        type: via
+        anchor: 
+          ref: board_pinkie_home
+          shift: [-16,4]
+        nets: 
+          net: RAW 
+      via4:
+        type: via
+        anchor: 
+          ref: board_pinkie_home
+          shift: [-14,4]
+        nets: 
+          net: pos 
+      via5:
+        type: via
+        anchor: 
+          ref: board_pinkie_home
+          shift: [-15,-3.5]
+        nets: 
+          net: GND 
+      via6:
+        type: via
+        anchor: 
+          ref: board_pinkie_home
+          shift: [-13,-3.5]
+        nets: 
+          net: RST 
+      b3u1000p:
+        type: b3u1000p
+        nets:
+          r1: RST  
+          r2: GND
+        anchor:
+          ref: board_pinkie_home
+          shift: [-14.5, -7]
+          rotate: 0
+        params:
+          reverse: true 
+      bat:
+        type: bat
+        nets: 
+          neg: GND
+        anchor:
+          ref: board_pinkie_home
+          shift: [-13 , 0]
+          rotate: 0
