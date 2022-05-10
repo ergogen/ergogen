@@ -1,8 +1,6 @@
 points:
    key:
       padding: cy
-      tags: 
-        1u: true
       footprints:
           choc_hotswap:
             type: choc
@@ -30,19 +28,14 @@ points:
         top:
       columns:
           pinkie:
-            rotate: 0
+            rotate: 30
             row_overrides: 
              home:
                bind: [1,2,1,1]
                column_net: P1
-               tags: 
-                15u: true
-                1u: false
-               rotate: 90
           ring:
-            spread: cx+0.5
-            stagger: 12
-            rotate: -5
+            spread: cx
+            stagger: 16
             rows: 
               home: 
                 bind: [0,0,3,1]
@@ -51,16 +44,15 @@ points:
                 bind: [0,0,0,1]
                 column_net: P20 
           middle: 
-            spread: cx+0.5
+            spread: cx
             stagger: -5
-            rotate: -5
             rows:
               home: 
-                bind: [5,0,3,5]
+                bind: [0,0,3,0]
                 column_net: P15
               top:
                 column_net: P14
-                bind: [0,1,0,5]
+                bind: [0,1,0,1]
           index: 
             spread: cx
             stagger: -10
@@ -75,38 +67,32 @@ points:
     thumbfan:
       anchor:
         ref: board_index_home
-        shift: [20, -18]
+        shift: [-6, -7]
       rows:
         home:
       columns:
         home:
-          rotate: -5
+          spread: 21.25
+          rotate: -25
+          origin: [-11.75, -10]
           rows:
             home:
               column_net: P9
-              tags: 
-                1u: false
-                15u: true
-              rotate: 90
         far:
-          spread: 17
-          stagger: -3
+          spread: 18.5
           rotate: -0
+          origin: [-7.5, -9]
           rows:
             home:
               column_net: P10
-              tags: 
-                1u: false
-                15u: truen
-              rotate: 90
 outlines:
   exports:
     raw: 
       - type: keys
         side: left
-        size: [1cx - 0.5 , 1cx -0.5]
+        size: [1cx , 1cx]
       - type: rectangle
-        size: [94.5, 39]
+        size: [90.5, 37]
         anchor:
           ref: board_index_home
           rotate: -25
@@ -127,16 +113,7 @@ outlines:
       - type: keys
         side: left
         size: [1cx - 0.5, 1cy - 0.5] # Choc keycaps are 17.5 x 16.5
-        bound: false    
-        tags: [1u]       
-    keycap_outlines15:
-      - type: keys
-        side: left
-        size: [1.5cx - 0.5, 1cy - 0.5] # Choc keycaps are 17.5 x 16.5
-        bound: false    
-        tags: [15u]       
-    preview:
-        [keycap_outlines,keycap_outlines15]
+        bound: false               
 pcbs:
   flame:
     outlines:
