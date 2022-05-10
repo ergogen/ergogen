@@ -136,10 +136,12 @@ for (let w of cli_what) {
                     const comp_res = dircompare.compareSync(output_path, path.join(t, 'reference'), {
                         compareContent: true
                     })
-                    comp_res.same.should.be.true
-                    if (!dump) {
+                    if (dump) {
+                        fs.moveSync(output_path, path.join(t, 'output'), {overwrite: true})
+                    } else {
                         fs.removeSync(output_path)
                     }
+                    comp_res.same.should.be.true
                 } else {
                     const ref_error = read(t, 'error').replace(version_regex, '<version>')
                     try {

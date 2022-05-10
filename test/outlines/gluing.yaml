@@ -42,3 +42,9 @@ outlines:
         bound: false
         size: 14
         operation: subtract
+    optout:
+      main:
+        type: keys
+        side: both
+        size: 20
+        glue: false

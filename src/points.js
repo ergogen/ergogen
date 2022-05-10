@@ -61,7 +61,7 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key,
             'number'
         )(units)
         col.spread = a.sane(
-            col.spread || (first_col ? 0 : 'u'),
+            col.spread !== undefined ? col.spread : (first_col ? 0 : 'u'),
             `points.zones.${zone_name}.columns.${col_name}.spread`,
             'number'
         )(units)

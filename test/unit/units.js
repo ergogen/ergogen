@@ -5,7 +5,8 @@ describe('Units', function() {
     it('defaults', function() {
         // check that an empty config has the default units (and nothing more)
         const def = u.parse({})
-        Object.keys(def).length.should.equal(3)
+        Object.keys(def).length.should.equal(4)
+        def.U.should.equal(19.05)
         def.u.should.equal(19)
         def.cx.should.equal(18)
         def.cy.should.equal(17)
@@ -19,7 +20,7 @@ describe('Units', function() {
                 b: 'a + 1'
             }
         })
-        Object.keys(res).length.should.equal(5)
+        Object.keys(res).length.should.equal(6)
         res.a.should.equal(9)
         res.b.should.equal(10)
         // also check that order matters, which it should
@@ -38,11 +39,11 @@ describe('Units', function() {
                 a: 'cx / 2',
             },
             variables: {
-                a: 'u + 1'
+                a: 'U + 1'
             }
         })
-        Object.keys(res).length.should.equal(4)
-        res.a.should.equal(20)
+        Object.keys(res).length.should.equal(5)
+        res.a.should.equal(20.05)
     })
 
 })
