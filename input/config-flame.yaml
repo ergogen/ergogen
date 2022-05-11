@@ -90,7 +90,7 @@ outlines:
     raw: 
       - type: keys
         side: left
-        size: [1cx , 1cx]
+        size: [1cx , 1cy]
       - type: rectangle
         size: [90.5, 37]
         anchor:
