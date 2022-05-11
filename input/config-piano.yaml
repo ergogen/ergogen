@@ -97,7 +97,7 @@ points:
               column_net: P10
               tags: 
                 1u: false
-                15u: truen
+                15u: true
               rotate: 90
 outlines:
   exports:
