@@ -30,7 +30,7 @@ points:
         top:
       columns:
           pinkie:
-            rotate: 0
+            rotate: 40
             row_overrides: 
              home:
                bind: [1,2,1,1]
@@ -138,23 +138,26 @@ outlines:
     preview:
         [keycap_outlines,keycap_outlines15]
 pcbs:
-  flame:
+  piano:
     outlines:
-      main:
+      board:
         outline: cutout
+      keycaps:
+        outline: preview
+        layer: Eco1.User
     footprints:
       promicro:
         type: promicro_pretty
         anchor:
-          ref: thumbfan_home_home
-          shift: [-39, -18]
-          rotate: 180
+          ref: board_pinkie_home
+          shift: [-17, -29.5]
+          rotate: 50
       pcm12:
         type: pcm12
         anchor:
           ref: thumbfan_home_home
-          shift: [-11, -25.5]
-          rotate: 0
+          shift: [-28, -13.5]
+          rotate: -110
         nets:
           from: pos  
           to: RAW
@@ -164,28 +167,28 @@ pcbs:
         type: via
         anchor: 
           ref: thumbfan_home_home
-          shift: [-9,-19]
+          shift: [3,10]
         nets: 
           net: RAW 
       via4:
         type: via
         anchor: 
           ref: thumbfan_home_home
-          shift: [-13,-19]
+          shift: [-3,10]
         nets: 
           net: pos 
       via5:
         type: via
         anchor: 
           ref: thumbfan_home_home
-          shift: [-16,-3.5]
+          shift: [3,20]
         nets: 
           net: GND 
       via6:
         type: via
         anchor: 
           ref: thumbfan_home_home
-          shift: [-13,-3.5]
+          shift: [-3,20]
         nets: 
           net: RST 
       b3u1000p:
@@ -195,8 +198,8 @@ pcbs:
           r2: GND
         anchor:
           ref: thumbfan_home_home
-          shift: [-14.5, -7]
-          rotate: 0
+          shift: [-14, 23]
+          rotate: -110
         params:
           reverse: true 
       bat:
@@ -205,5 +208,5 @@ pcbs:
           neg: GND
         anchor:
           ref: thumbfan_home_home
-          shift: [-15 , -12]
-          rotate: 90
+          shift: [12.5, 57]
+          rotate: -20
