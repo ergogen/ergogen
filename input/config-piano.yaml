@@ -90,7 +90,7 @@ points:
               rotate: 90
         far:
           spread: 17
-          stagger: -3
+          stagger: -5
           rotate: -0
           rows:
             home:
