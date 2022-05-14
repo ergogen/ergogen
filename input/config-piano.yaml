@@ -111,18 +111,10 @@ outlines:
           ref: board_index_home
           rotate: -25
           shift: [-49.5, -12]
-    cutouta:
+    cutout:
       - type: outline
         name: raw
         fillet: 2
-    cutoutb:
-      - type: outline
-        name: cutouta
-        fillet: 1
-    cutout:
-      - type: outline
-        name: cutoutb
-        fillet: 0.5
     keycap_outlines:
       - type: keys
         side: left
