@@ -1,0 +1,193 @@
+points:
+  zones:
+    matrix:
+      columns:
+        pinky:
+          spread: 18
+          rows:
+            bottom:
+              bind: [5, 0, 0, 0]
+              column_net: P15
+            home:
+              bind: [0, 5, 0, 0]
+              column_net: P18
+            top:
+              bind: [0, 5, 0, 0]
+              column_net: P18
+        ring:
+          spread: 18
+          stagger: 2
+          rows:
+            bottom:
+              bind: [5, 40, 5, 0]
+              column_net: P21
+            home:
+              bind: [5, 5, 5, 0]
+              column_net: P20
+            top:
+              bind: [0, 0, 5, 0]
+              column_net: P19
+        middle:
+          spread: 18
+          stagger: 3
+          rows:
+            bottom:
+              bind: [5, 5, 5, 0]
+              column_net: P7
+            home:
+              bind: 5
+              column_net: P8
+            top:
+              bind: [0, 0, 5, 0]
+              column_net: P9
+        index:
+          spread: 18
+          stagger: -2
+          rows:
+            bottom:
+              bind: [5, 5, 8, 36]
+              column_net: P4
+            home:
+              bind: 5
+              column_net: P5
+            top:
+              bind: [0, 0, 5, 0]
+              column_net: P6
+        inner:
+          spread: 18
+          stagger: -2
+          rows:
+            bottom:
+              bind: [10, 18.66, 15, 5]
+              column_net: P2
+            home:
+              bind: [5, 0, 5, 5]
+              column_net: P0
+            top:
+              bind: [0, 0, 0, 0]
+              column_net: P1
+      rows:
+        bottom:
+          padding: 17
+        home:
+          padding: 17
+        top:
+      key:
+        footprints:
+          choc_hotswap:
+            type: choc
+            nets:
+              from: =column_net
+              to: GND
+            params:
+              reverse: true
+              hotswap: true
+          via_col:
+            type: via
+            nets:
+              from: =column_net
+            anchor:
+              shift: [0, 17/2]
+          via_gnd:
+            type: via
+            nets:
+              from: GND
+            anchor:
+              shift: [0, -17/4]
+    thumb:
+      anchor:
+        ref: matrix_inner_bottom
+        shift: [-.75*18,-1.25*17]
+      columns:
+        first:
+          rows:
+            only:
+              column_net: P14
+              bind: [0, 5, 0, 0]
+        second:
+          spread: 18
+          rows:
+            only:
+              column_net: P16
+              bind: [0, 5, 0, 5]
+        third:
+          spread: 18
+          rows:
+            only:
+              column_net: P10
+              bind: [0, 0, 0, 5]
+      rows:
+        only:
+      key:
+        footprints:
+          choc_hotswap:
+            type: choc
+            nets:
+              from: =column_net
+              to: GND
+            params:
+              reverse: true
+              hotswap: true
+          via_col:
+            type: via
+            nets:
+              from: =column_net
+            anchor:
+              shift: [0, 17/2]
+          via_gnd:
+            type: via
+            nets:
+              from: GND
+            anchor:
+              shift: [0, -17/4]
+outlines:
+  exports:
+    switch_placement:
+      - operation: add
+        type: keys
+        side: left
+        size: 15
+        bound: false
+    raw:
+      main:
+        type: keys
+        side: left
+        size: 21
+        corner: 1
+    panel:
+      - type: outline
+        name: raw
+        fillet: 1
+    test:
+      - operation: add
+        name: panel
+      - operation: subtract
+        name: switch_placement
+pcbs:
+  sepia_officinalis:
+    outlines:
+      main:
+        outline: panel
+    footprints:
+      mcu:
+        type: promicro
+        anchor:
+          ref: matrix_inner_home
+          rotate: 270
+          shift: [20, -12]
+        params:
+          orientation: up
+      trrs:
+        type: trrs
+        nets:
+          A: GND
+          B: GND
+          C: P3
+          D: VCC
+        params:
+          reverse: true
+          symmetric: true
+        anchor:
+          ref: thumb_third_only
+          rotate: 285
+          shift: [4.17, 15]
