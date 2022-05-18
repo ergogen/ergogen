@@ -148,9 +148,9 @@ describe('promicro', function() {
         (fp_line (start 15.24 -8.89) (end -17.78 -8.89) (layer F.SilkS) (width 0.15))
         (fp_line (start -17.78 -8.89) (end -17.78 8.89) (layer F.SilkS) (width 0.15))
 
-        (fp_line (start -15.24 -6.35) (end -12.70 -6.35) (layer F.SilkS) (width 0.15))
-        (fp_line (start -15.24 -6.35) (end -15.24 -8.89) (layer F.SilkS) (width 0.15))
+        (fp_line (start -12.70 -6.35) (end -15.24 -6.35) (layer F.SilkS) (width 0.15))
         (fp_line (start -12.70 -6.35) (end -12.70 -8.89) (layer F.SilkS) (width 0.15))
+        (fp_line (start -15.24 -6.35) (end -15.24 -8.89) (layer F.SilkS) (width 0.15))
 
         (fp_text user RAW (at -13.97 -4.80 135) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
         (fp_text user GND (at -11.43 -4.80 135) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))

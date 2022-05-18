@@ -4,31 +4,43 @@
 //    if down, power led will face the pcb
 //    if up, power led will face away from pcb
 
+const pitch = 2.54
+const row_spacing = 6 * pitch
+
+const pins = [
+  // left
+  ['RAW', {shape: 'rect', angle: 45}],
+  ['GND', {}],
+  ['RST', {}],
+  ['VCC', {}],
+  ['P21', {}],
+  ['P20', {}],
+  ['P19', {}],
+  ['P18', {}],
+  ['P15', {}],
+  ['P14', {}],
+  ['P16', {}],
+  ['P10', {}],
+
+  // right
+  ['P1',  {silk: 'P01'}],
+  ['P0',  {silk: 'P00'}],
+  ['GND', {}],
+  ['GND', {}],
+  ['P2',  {silk: 'P02'}],
+  ['P3',  {silk: 'P03'}],
+  ['P4',  {silk: 'P04'}],
+  ['P5',  {silk: 'P05'}],
+  ['P6',  {silk: 'P06'}],
+  ['P7',  {silk: 'P07'}],
+  ['P8',  {silk: 'P08'}],
+  ['P9',  {silk: 'P09'}],
+]
+
+const pins_per_side = Math.ceil(pins.length / 2)
+
 module.exports = {
-  nets: {
-    RAW: 'RAW',
-    GND: 'GND',
-    RST: 'RST',
-    VCC: 'VCC',
-    P21: 'P21',
-    P20: 'P20',
-    P19: 'P19',
-    P18: 'P18',
-    P15: 'P15',
-    P14: 'P14',
-    P16: 'P16',
-    P10: 'P10',
-    P1: 'P1',
-    P0: 'P0',
-    P2: 'P2',
-    P3: 'P3',
-    P4: 'P4',
-    P5: 'P5',
-    P6: 'P6',
-    P7: 'P7',
-    P8: 'P8',
-    P9: 'P9',
-  },
+  nets: Object.fromEntries(pins.map(([name, _]) => [name, name])),
   params: {
     class: 'MCU',
     orientation: 'down'
@@ -54,78 +66,77 @@ module.exports = {
       (fp_line (start 15.24 -8.89) (end -17.78 -8.89) (layer F.SilkS) (width 0.15))
       (fp_line (start -17.78 -8.89) (end -17.78 8.89) (layer F.SilkS) (width 0.15))
       `
-    function pins(def_neg, def_pos) {
-      return `
-        ${''/* extra border around "RAW", in case the rectangular shape is not distinctive enough */}
-        (fp_line (start -15.24 ${def_pos}6.35) (end -12.70 ${def_pos}6.35) (layer F.SilkS) (width 0.15))
-        (fp_line (start -15.24 ${def_pos}6.35) (end -15.24 ${def_pos}8.89) (layer F.SilkS) (width 0.15))
-        (fp_line (start -12.70 ${def_pos}6.35) (end -12.70 ${def_pos}8.89) (layer F.SilkS) (width 0.15))
-      
-        ${''/* pin names */}
-        (fp_text user RAW (at -13.97 ${def_pos}4.80 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-        (fp_text user GND (at -11.43 ${def_pos}4.80 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-        (fp_text user RST (at -8.89 ${def_pos}4.80 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-        (fp_text user VCC (at -6.35 ${def_pos}4.80 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-        (fp_text user P21 (at -3.81 ${def_pos}4.80 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-        (fp_text user P20 (at -1.27 ${def_pos}4.80 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-        (fp_text user P19 (at 1.27 ${def_pos}4.80 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-        (fp_text user P18 (at 3.81 ${def_pos}4.80 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-        (fp_text user P15 (at 6.35 ${def_pos}4.80 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-        (fp_text user P14 (at 8.89 ${def_pos}4.80 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-        (fp_text user P16 (at 11.43 ${def_pos}4.80 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-        (fp_text user P10 (at 13.97 ${def_pos}4.80 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-      
-        (fp_text user P01 (at -13.97 ${def_neg}4.80 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-        (fp_text user P00 (at -11.43 ${def_neg}4.80 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-        (fp_text user GND (at -8.89 ${def_neg}4.80 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-        (fp_text user GND (at -6.35 ${def_neg}4.80 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-        (fp_text user P02 (at -3.81 ${def_neg}4.80 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-        (fp_text user P03 (at -1.27 ${def_neg}4.80 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-        (fp_text user P04 (at 1.27 ${def_neg}4.80 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-        (fp_text user P05 (at 3.81 ${def_neg}4.80 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-        (fp_text user P06 (at 6.35 ${def_neg}4.80 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-        (fp_text user P07 (at 8.89 ${def_neg}4.80 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-        (fp_text user P08 (at 11.43 ${def_neg}4.80 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-        (fp_text user P09 (at 13.97 ${def_neg}4.80 ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-      
-        ${''/* and now the actual pins */}
-        (pad 1 thru_hole rect (at -13.97 ${def_pos}7.62 ${p.rot}) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.RAW.str})
-        (pad 2 thru_hole circle (at -11.43 ${def_pos}7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.GND.str})
-        (pad 3 thru_hole circle (at -8.89 ${def_pos}7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.RST.str})
-        (pad 4 thru_hole circle (at -6.35 ${def_pos}7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.VCC.str})
-        (pad 5 thru_hole circle (at -3.81 ${def_pos}7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P21.str})
-        (pad 6 thru_hole circle (at -1.27 ${def_pos}7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P20.str})
-        (pad 7 thru_hole circle (at 1.27 ${def_pos}7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P19.str})
-        (pad 8 thru_hole circle (at 3.81 ${def_pos}7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P18.str})
-        (pad 9 thru_hole circle (at 6.35 ${def_pos}7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P15.str})
-        (pad 10 thru_hole circle (at 8.89 ${def_pos}7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P14.str})
-        (pad 11 thru_hole circle (at 11.43 ${def_pos}7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P16.str})
-        (pad 12 thru_hole circle (at 13.97 ${def_pos}7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P10.str})
-        
-        (pad 13 thru_hole circle (at -13.97 ${def_neg}7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P1.str})
-        (pad 14 thru_hole circle (at -11.43 ${def_neg}7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P0.str})
-        (pad 15 thru_hole circle (at -8.89 ${def_neg}7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.GND.str})
-        (pad 16 thru_hole circle (at -6.35 ${def_neg}7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.GND.str})
-        (pad 17 thru_hole circle (at -3.81 ${def_neg}7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P2.str})
-        (pad 18 thru_hole circle (at -1.27 ${def_neg}7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P3.str})
-        (pad 19 thru_hole circle (at 1.27 ${def_neg}7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P4.str})
-        (pad 20 thru_hole circle (at 3.81 ${def_neg}7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P5.str})
-        (pad 21 thru_hole circle (at 6.35 ${def_neg}7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P6.str})
-        (pad 22 thru_hole circle (at 8.89 ${def_neg}7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P7.str})
-        (pad 23 thru_hole circle (at 11.43 ${def_neg}7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P8.str})
-        (pad 24 thru_hole circle (at 13.97 ${def_neg}7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.net.P9.str})
-      `
+
+    const orientation = p.param.orientation == 'down' ? 1 : -1
+
+    function position(pin, row_distance) {
+      const row = pin % pins_per_side
+      const side = Math.floor(pin / pins_per_side) ? -1 : 1
+      return {
+        x: (row + 0.5 - pins_per_side / 2) * pitch,
+        y: orientation * side * row_distance / 2,
+      }
     }
-    if(p.param.orientation == 'down') {
-      return `
-        ${standard}
-        ${pins('-', '')})
-        `
-    } else {
-      return `
-        ${standard}
-        ${pins('', '-')})
-        `
+
+    function line(start, end) {
+      return `(fp_line (start ${start.x.toFixed(2)} ${start.y.toFixed(2)}) (end ${end.x.toFixed(2)} ${end.y.toFixed(2)}) (layer F.SilkS) (width 0.15))`
     }
+
+    function pin_silk(pin) {
+      return `(fp_text user ${pin.silk} (at ${pin.x.toFixed(2)} ${pin.y.toFixed(2)} ${p.rot + 90}) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))`
+    }
+
+    function thru_hole_pad(pad) {
+      return `(pad ${pad.number} thru_hole ${pad.shape} (at ${pad.x} ${pad.y} ${pad.angle}) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${pad.net})`
+    }
+
+    function square(center, width) {
+      const d = width / 2
+      const top_left = {
+        x: center.x - orientation * d,
+        y: center.y - orientation * d,
+      }
+      const bottom_right = {
+        x: center.x + orientation * d,
+        y: center.y + orientation * d,
+      }
+      const top_right = {
+        x: bottom_right.x,
+        y: top_left.y
+      }
+      const bottom_left = {
+        x: top_left.x,
+        y: bottom_right.y
+      }
+      return [
+        line(top_left, top_right),
+        line(top_left, bottom_left),
+        line(top_right, bottom_right),
+      ]
+    }
+
+    // extra border around "RAW", in case the rectangular shape is not distinctive enough
+    const silk_raw_border = square(position(0, row_spacing), pitch)
+
+    const silk = pins.map(([name, overrides], n) =>
+      pin_silk(Object.assign({
+        silk: name,
+      }, position(n, 9.6), overrides)))
+
+    const pads = pins.map(([name, overrides], n) =>
+      thru_hole_pad(Object.assign({
+        number: n + 1,
+        shape: 'circle',
+        angle: 0,
+        net: p.net[name].str,
+      }, position(n, row_spacing), overrides)))
+
+    return [
+      standard,
+      silk_raw_border.join('\n'),
+      silk.join('\n'),
+      pads.join('\n'),
+      ')',
+      ].join('\n')
   }
 }
