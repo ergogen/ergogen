@@ -1,6 +1,26 @@
 points:
   key:
     padding: cy
+    footprints:
+      choc_hotswap:
+        type: choc
+        nets:
+          from: =column_net
+          to: GND
+        params:
+          keycaps: true
+          reverse: true
+          hotswap: true
+      choc:
+        type: choc
+        anchor:
+          rotate: 180
+        nets:
+          from: =column_net
+          to: GND
+        params:
+          keycaps: true
+          reverse: true
   zones:
     main:
       rows:
@@ -10,21 +30,104 @@ points:
       columns:
         pinkie:
           spread: cx
+          rows:
+            bottom:
+              bind: [0, 0, 0, 0]
+              column_net: 
+            home:
+              bind: [0, 0, 0, 0]
+              column_net: 
+            top:
+              bind: [0, 0, 0, 0]
+              column_net: 
         ring:
+          stagger: 3
           spread: cx
+          rows:
+            bottom:
+              bind: [0, 0, 3, 0]
+              column_net: 
+            home:
+              bind: [0, 0, 0, 0]
+              column_net: 
+            top:
+              bind: [0, 0, 0, 0]
+              column_net: 
         middle:
+          stagger: 2
           spread: cx
+          rows:
+            bottom:
+              bind: [0, 0, 5, 0]
+              column_net: 
+            home:
+              bind: [0, 0, 0, 0]
+              column_net: 
+            top:
+              bind: [0, 0, 0, 0]
+              column_net: 
         index:
+          stagger: -2
           spread: cx
+          rows:
+            bottom:
+              bind: [0, 0, 0, 0]
+              column_net: 
+            home:
+              bind: [0, 0, 0, 0]
+              column_net: 
+            top:
+              bind: [0, 0, 0, 0]
+              column_net: 
         inner:
+          stagger: -1
           spread: cx
+          rows:
+            bottom:
+              bind: [0, cx, 0, 0]
+              column_net: 
+            home:
+              bind: [0, cx, 0, 0]
+              column_net: 
+            top:
+              bind: [0, 0, 0, 0]
+              column_net: 
     thumb:
       anchor:
         ref: main_index_bottom
-        shift: [0, -cy]
+        shift: [1, -(cy+1)]
+        rotate: -6
       rows:
         bottom:
       columns:
-        middle:
-        inner:
-        far:
+        first:
+          rows:
+            bottom:
+              bind: [0, 4, 0, 0]
+              column_net: 
+        second:
+          spread: cx-1
+          rotate: -15
+          origin: [-9, -9.5]
+          rows:
+            bottom:
+              bind: [4, 4, 0, 4]
+              column_net: 
+        third:
+          spread: cx-1
+          rotate: -15
+          origin: [-9, -9.5]
+          rows:
+            bottom:
+              bind: [0, 0, 0, 4]
+              column_net: 
+outlines:
+  exports:
+    raw:
+      - type: keys
+        side: left
+        size: [cx+1, cx+1]
+    cutout:
+      - type: outline
+        name: raw
+        fillet: 2
