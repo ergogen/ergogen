@@ -1,0 +1,30 @@
+points:
+  key:
+    padding: cy
+  zones:
+    main:
+      rows:
+        bottom:
+        home:
+        top:
+      columns:
+        pinkie:
+          spread: cx
+        ring:
+          spread: cx
+        middle:
+          spread: cx
+        index:
+          spread: cx
+        inner:
+          spread: cx
+    thumb:
+      anchor:
+        ref: main_index_bottom
+        shift: [0, -cy]
+      rows:
+        bottom:
+      columns:
+        middle:
+        inner:
+        far:
