@@ -33,8 +33,8 @@ points:
             rotate: 40
             row_overrides: 
              home:
-               bind: [1,2,1,1]
-               column_net: P1
+               bind: [0,5,2,5]
+               column_net: P10
                tags: 
                 15u: true
                 1u: false
@@ -46,10 +46,10 @@ points:
             rows: 
               home: 
                 bind: [0,0,3,1]
-                column_net: P21
+                column_net: P9
               top: 
                 bind: [0,0,0,1]
-                column_net: P20 
+                column_net: P8
           middle: 
             spread: cx+0.5
             stagger: -5
@@ -68,10 +68,10 @@ points:
             rows: 
               home: 
                 bind: [0,1,3,0]
-                column_net: P8
+                column_net: P4
               top: 
                 bind: [0,1,3,3]
-                column_net: P16
+                column_net: P5
     thumbfan:
       anchor:
         ref: board_index_home
@@ -83,7 +83,7 @@ points:
           rotate: -5
           rows:
             home:
-              column_net: P9
+              column_net: P0
               tags: 
                 1u: false
                 15u: true
@@ -94,7 +94,7 @@ points:
           rotate: -0
           rows:
             home:
-              column_net: P10
+              column_net: P1
               tags: 
                 1u: false
                 15u: true
@@ -106,7 +106,7 @@ outlines:
         side: left
         size: [1cx - 0.5 , 1cx -0.5]
       - type: rectangle
-        size: [94.5, 39]
+        size: [96.5, 40]
         anchor:
           ref: board_index_home
           rotate: -25
