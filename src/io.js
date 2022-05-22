@@ -1,6 +1,5 @@
 const yaml = require('js-yaml')
 const makerjs = require('makerjs')
-const jscad = require('@jscad/openjscad')
 
 const u = require('./utils')
 const a = require('./assert')
@@ -62,21 +61,6 @@ exports.twodee = (model, debug) => {
     if (debug) {
         result.yaml = assembly
         result.svg = makerjs.exporter.toSVG(assembly)
-    }
-    return result
-}
-
-exports.threedee = async (script, debug) => {
-    const compiled = await new Promise((resolve, reject) => {
-        jscad.compile(script, {}).then(compiled => {
-            resolve(compiled)
-        })
-    })
-    const result = {
-        stl: jscad.generateOutput('stla', compiled).asBuffer().toString()
-    }
-    if (debug) {
-        result.jscad = script
     }
     return result
 }

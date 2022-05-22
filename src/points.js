@@ -294,13 +294,16 @@ exports.parse = (config, units) => {
         // creating new points
         let new_points = render_zone(zone_name, zone, anchor, global_key, units)
 
-        // simplifying the names in individual point "zones"
-        const new_keys = Object.keys(new_points)
-        const individual_key = `${zone_name}_default_default`
-        if (new_keys.length == 1 && new_keys[0] == individual_key) {
-            new_points[zone_name] = new_points[individual_key]
-            new_points[zone_name].meta.name = zone_name
-            delete new_points[individual_key]
+        // simplifying the names in individual point "zones" and single-key columns
+        while (Object.keys(new_points).some(k => k.endsWith('_default'))) {
+            for (const key of Object.keys(new_points)) {
+                if (key.endsWith('_default')) {
+                    const new_key = key.slice(0, -8)
+                    new_points[new_key] = new_points[key]
+                    new_points[new_key].meta.name = new_key
+                    delete new_points[key]
+                }
+            }
         }
 
         // adjusting new points

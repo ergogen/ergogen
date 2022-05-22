@@ -1,1 +1,5 @@
-points.zones.matrix:
+points.zones:
+  matrix:
+  single_key_column:
+    columns:
+      named:
