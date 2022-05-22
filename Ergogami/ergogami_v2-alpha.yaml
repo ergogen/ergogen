@@ -32,65 +32,65 @@ points:
           spread: cx
           rows:
             bottom:
-              bind: [0, 0, 0, 0]
+              bind: [1, 1, 0, 0]
               column_net: 
             home:
-              bind: [0, 0, 0, 0]
+              bind: [1, 1, 1, 0]
               column_net: 
             top:
-              bind: [0, 0, 0, 0]
+              bind: [0, 1, 1, 0]
               column_net: 
         ring:
           stagger: 3
           spread: cx
           rows:
             bottom:
-              bind: [0, 0, 3, 0]
+              bind: [1, 1, 3, 1]
               column_net: 
             home:
-              bind: [0, 0, 0, 0]
+              bind: [1, 1, 1, 1]
               column_net: 
             top:
-              bind: [0, 0, 0, 0]
+              bind: [0, 1, 1, 0]
               column_net: 
         middle:
           stagger: 2
           spread: cx
           rows:
             bottom:
-              bind: [0, 0, 5, 0]
+              bind: [1, 1, 5, 1]
               column_net: 
             home:
-              bind: [0, 0, 0, 0]
+              bind: [1, 1, 1, 1]
               column_net: 
             top:
-              bind: [0, 0, 0, 0]
+              bind: [0, 0, 1, 0]
               column_net: 
         index:
           stagger: -2
           spread: cx
           rows:
             bottom:
-              bind: [0, 0, 3, 0]
+              bind: [1, 1, 3, 1]
               column_net: 
             home:
-              bind: [0, 0, 0, 0]
+              bind: [1, 1, 1, 1]
               column_net: 
             top:
-              bind: [0, 0, 0, 0]
+              bind: [0, 0, 1, 1]
               column_net: 
         inner:
           stagger: -1
           spread: cx
           rows:
             bottom:
-              bind: [0, cx, 0, 0]
+              bind: [1, cx, 0.5, 1]
               column_net: 
             home:
-              bind: [0, cx, 0, 0]
+              bind: [0.5, cx, 1, 1]
               column_net: 
             top:
-              bind: [0, 0, 0, 0]
+              bind: [0, 0, 1, 1]
               column_net: 
     thumb:
       anchor:
@@ -111,7 +111,7 @@ points:
           origin: [-9, -9.5]
           rows:
             bottom:
-              bind: [4, 1.5, 0, 4]
+              bind: [4, 4, 0, 4]
               column_net: 
         third:
           spread: cx-1
@@ -119,7 +119,7 @@ points:
           origin: [-9, -9.5]
           rows:
             bottom:
-              bind: [0, 0, 0, 1.5]
+              bind: [0, 0, 0, 4]
               column_net: 
 outlines:
   exports:
@@ -127,24 +127,33 @@ outlines:
       - type: keys
         side: left
         size: [cx, cx]
-      - type: rectangle
-        size: [20, 20]
-        anchor:
-          ref: thumb_first_bottom
-          shift: [-9, -9]
-          rotate: 45
+        corner: 2
       - type: rectangle
         size: [25, 23]
         anchor:
           ref: thumb_third_bottom
-          shift: [9, 9]
-          rotate: 138
-    cutout:
-      - type: outline
-        name: raw
-        fillet: 3
+          shift: [8.3, 8.5]
+          rotate: 135.5
     keycaps_outline:
       - type: keys
         side: left
         size: [cx-0.5, cy-0.5]
         bound: false
+    fillet_cutout:
+      - type: outline
+        name: raw
+        fillet: 4
+    cutout:
+      - type: outline
+        name: fillet_cutout
+        fillet: 0.5
+pcbs:
+  ergogami_v2:
+    outlines:
+      main:
+        outline: cutout
+    footprints:
+      promicro:
+        type: promicro_pretty
+        anchor:
+          ref: main_inner_bottom
