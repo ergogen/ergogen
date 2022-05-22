@@ -71,7 +71,7 @@ points:
           spread: cx
           rows:
             bottom:
-              bind: [0, 0, 0, 0]
+              bind: [0, 0, 3, 0]
               column_net: 
             home:
               bind: [0, 0, 0, 0]
@@ -111,7 +111,7 @@ points:
           origin: [-9, -9.5]
           rows:
             bottom:
-              bind: [4, 4, 0, 4]
+              bind: [4, 1.5, 0, 4]
               column_net: 
         third:
           spread: cx-1
@@ -119,15 +119,32 @@ points:
           origin: [-9, -9.5]
           rows:
             bottom:
-              bind: [0, 0, 0, 4]
+              bind: [0, 0, 0, 1.5]
               column_net: 
 outlines:
   exports:
     raw:
       - type: keys
         side: left
-        size: [cx+1, cx+1]
+        size: [cx, cx]
+      - type: rectangle
+        size: [20, 20]
+        anchor:
+          ref: thumb_first_bottom
+          shift: [-9, -9]
+          rotate: 45
+      - type: rectangle
+        size: [25, 23]
+        anchor:
+          ref: thumb_third_bottom
+          shift: [9, 9]
+          rotate: 138
     cutout:
       - type: outline
         name: raw
-        fillet: 2
+        fillet: 3
+    keycaps_outline:
+      - type: keys
+        side: left
+        size: [cx-0.5, cy-0.5]
+        bound: false
