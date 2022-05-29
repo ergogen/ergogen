@@ -18,6 +18,7 @@
     - onnx-like incremental opset versioning
     - Template for creating them, built-in variables they can use, documentation, external links, etc.
         - Add access to whole set of points + filtering logic, so they can implement their own connection logic as well maybe (see daisy chaining)
+        - footprint parameters inside the body should be `p.params.field` instead of `p.param.field` so it actually matches the options that you pass in
     - Also considering how (or, on which layer) they define their silks, universal mirroring behaviour, etc.
     - Rename class to designator in this context (https://en.wikipedia.org/wiki/Reference_designator#Designators)
 
@@ -29,6 +30,8 @@
 - Allow footprints to publish outlines
     - Make these usable in the `outlines` section through a new `what`
 - 3D orient for cases
+- Allow a generic `adjust` field for outlines that accepts an anchor
+    - This could swallow `origin` from `outline`
 - Post-process anchor for global (post-mirror!) orient/shift/rotate for everything
 - Even more extreme anchor stuff
     - Checkpoints, intersects, distances, weighted combinations?
@@ -51,7 +54,10 @@
 - Update json schema and add syntax highlight to editors
 - Support different netclasses
 - `round`, `pointy` and `beveled` symbolic constants for expand joint types
-    - also, string shorthands like `3)`, `5>` and `10]`
+    - Also, string shorthands like `3)`, `5>` and `10]`
+- Allow a potential filter for filleting (only on angles =90°, <45°, left turn vs. right turn when going clockwise, etc.)
+- Support cumulative handling of outline parts (i.e., add `fillet` as an generic option that applies to all the parts up to that point)
+    - Similar with adjust
 
 
 ### Patch
