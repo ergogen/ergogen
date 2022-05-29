@@ -41,7 +41,7 @@ const rectangle = (config, name, points, outlines, units) => {
     const bevel = a.sane(config.bevel || 0, `${name}.bevel`, 'number')(rec_units)
 
     // return shape function and its units
-    return [(point, bound) => {
+    return [() => {
 
         const error = (dim, val) => `Rectangle for "${name}" isn't ${dim} enough for its corner and bevel (${val} - 2 * ${corner} - 2 * ${bevel} <= 0)!`
         const [w, h] = size
@@ -66,13 +66,9 @@ const rectangle = (config, name, points, outlines, units) => {
         }
         if (corner > 0) rect = m.model.outline(rect, corner, 0)
         rect = m.model.moveRelative(rect, [-cw/2, -ch/2])
-        if (bound) {
-            const bbox = {high: [w/2, h/2], low: [-w/2, -h/2]}
-            rect = binding(rect, bbox, point, rec_units)
-        }
-        rect = point.position(rect)
+        const bbox = {high: [w/2, h/2], low: [-w/2, -h/2]}
 
-        return rect
+        return [rect, bbox]
     }, rec_units]
 }
 
@@ -86,14 +82,10 @@ const circle = (config, name, points, outlines, units) => {
     }, units)
 
     // return shape function and its units
-    return [(point, bound) => {
+    return [() => {
         let circle = u.circle([0, 0], radius)
-        if (bound) {
-            const bbox = {high: [radius, radius], low: [-radius, -radius]}
-            circle = binding(circle, bbox, point, circ_units)
-        }
-        circle = point.position(circle)
-        return circle
+        const bbox = {high: [radius, radius], low: [-radius, -radius]}
+        return [circle, bbox]
     }, circ_units]
 }
 
@@ -104,10 +96,10 @@ const polygon = (config, name, points, outlines, units) => {
     const poly_points = a.sane(config.points, `${name}.points`, 'array')()
 
     // return shape function and its units
-    return [(point, bound) => {
+    return [point => {
         const parsed_points = []
-        // the point starts at [0, 0] as it will be positioned later
-        // but we keep the metadata for potential mirroring purposes
+        // the poly starts at [0, 0] as it will be positioned later
+        // but we keep the point metadata for potential mirroring purposes
         let last_anchor = new Point(0, 0, 0, point.meta)
         let poly_index = -1
         for (const poly_point of poly_points) {
@@ -116,52 +108,24 @@ const polygon = (config, name, points, outlines, units) => {
             parsed_points.push(last_anchor.p)
         }
         let poly = u.poly(parsed_points)
-        if (bound) {
-            const bbox = u.bbox(parsed_points)
-            poly = binding(poly, bbox, point, units)
-        }
-        poly = point.position(poly)
-        return poly
+        const bbox = u.bbox(parsed_points)
+        return [poly, bbox]
     }, units]
 }
 
 const outline = (config, name, points, outlines, units) => {
 
     // prepare params
-    a.unexpected(config, `${name}`, ['name', 'fillet', 'expand', 'origin', 'scale'])
+    a.unexpected(config, `${name}`, ['name', 'origin'])
     a.assert(outlines[config.name], `Field "${name}.name" does not name an existing outline!`)
-    const fillet = a.sane(config.fillet || 0, `${name}.fillet`, 'number')(units)
-    const expand = a.sane(config.expand || 0, `${name}.expand`, 'number')(units)
-    const joints = a.in(a.sane(config.joints || 0, `${name}.joints`, 'number')(units), `${name}.joints`, [0, 1, 2])
     const origin = anchor(config.origin || {}, `${name}.origin`, points)(units)
-    const scale = a.sane(config.scale || 1, `${name}.scale`, 'number')(units)
-
+    
     // return shape function and its units
-    return [(point, bound) => {
+    return [() => {
         let o = u.deepcopy(outlines[config.name])
         o = origin.unposition(o)
-
-        if (scale !== 1) {
-            o = m.model.scale(o, scale)
-        }
-
-        if (fillet) {
-            for (const [index, chain] of m.model.findChains(o).entries()) {
-                o.models[`fillet_${index}`] = m.chain.fillet(chain, fillet)
-            }
-        }
-
-        if (expand) {
-            o = m.model.outline(o, Math.abs(expand), joints, (expand < 0), {farPoint: u.farPoint})
-        }
-
-        if (bound) {
-            const bbox = m.measure.modelExtents(o)
-            o = binding(o, bbox, point, units)
-        }
-
-        o = point.position(o)
-        return o
+        const bbox = m.measure.modelExtents(o)
+        return [o, bbox]
     }, units]
 }
 
@@ -170,6 +134,29 @@ const whats = {
     circle,
     polygon,
     outline
+}
+
+const expand_shorthand = (config, units) => {
+    if (a.type(config.expand)(units) == 'string') {
+        const prefix = config.expand.slice(0, -1)
+        const suffix = config.expand.slice(-1)
+        let expand = suffix
+        let joints = 0
+        
+        if (suffix == ')') ; // noop
+        else if (suffix == '>') joints = 1
+        else if (suffix == ']') joints = 2
+        else expand = config.expand
+        
+        config.expand = parseFloat(expand)
+        config.joints = config.joints || joints
+    }
+    
+    if (a.type(config.joints)(units) == 'string') {
+        if (config.joints == 'round') config.joints = 0
+        if (config.joints == 'pointy') config.joints = 1
+        if (config.joints == 'beveled') config.joints = 2
+    }
 }
 
 exports.parse = (config = {}, points = {}, units = {}) => {
@@ -205,10 +192,18 @@ exports.parse = (config = {}, points = {}, units = {}) => {
             const what = a.in(part.what || 'outline', `${name}.what`, ['rectangle', 'circle', 'polygon', 'outline'])
             const bound = !!part.bound
             const mirror = a.sane(part.mirror || false, `${name}.mirror`, 'boolean')()
+
             // `where` is delayed until we have all, potentially what-dependent units
             // default where is [0, 0], as per filter parsing
             const original_where = part.where // need to save, so the delete's don't get rid of it below
             const where = units => filter(original_where, `${name}.where`, points, units, mirror)
+            
+            const adjust = anchor(part.adjust || {}, `${name}.adjust`, points)(units)
+            const fillet = a.sane(part.fillet || 0, `${name}.fillet`, 'number')(units)
+            expand_shorthand(part, units)
+            const expand = a.sane(part.expand || 0, `${name}.expand`, 'number')(units)
+            const joints = a.in(a.sane(part.joints || 0, `${name}.joints`, 'number')(units), `${name}.joints`, [0, 1, 2])
+            const scale = a.sane(part.scale || 1, `${name}.scale`, 'number')(units)
 
             // these keys are then removed, so ops can check their own unexpected keys without interference
             delete part.operation
@@ -216,14 +211,40 @@ exports.parse = (config = {}, points = {}, units = {}) => {
             delete part.bound
             delete part.mirror
             delete part.where
+            delete part.adjust
+            delete part.fillet
+            delete part.expand
+            delete part.joints
+            delete part.scale
 
             // a prototype "shape" maker (and its units) are computed
             const [shape_maker, shape_units] = whats[what](part, name, points, outlines, units)
 
             // and then the shape is repeated for all where positions
             for (const w of where(shape_units)) {
-                const shape = shape_maker(w, bound)
+                const point = w.clone().shift(adjust.p).rotate(adjust.r, false)
+                let [shape, bbox] = shape_maker(point) // point is passed for mirroring metadata only...
+                if (bound) {
+                    shape = binding(shape, bbox, point, shape_units)
+                }
+                shape = point.position(shape) // ...actual positioning happens here
                 outlines[outline_name] = operation(outlines[outline_name], shape)
+            }
+
+            if (scale !== 1) {
+                outlines[outline_name] = m.model.scale(outlines[outline_name], scale)
+            }
+    
+            if (expand) {
+                outlines[outline_name] = m.model.outline(
+                    outlines[outline_name], Math.abs(expand), joints, (expand < 0), {farPoint: u.farPoint}
+                )
+            }
+
+            if (fillet) {
+                for (const [index, chain] of m.model.findChains(outlines[outline_name]).entries()) {
+                    outlines[outline_name].models[`fillet_${part_name}_${index}`] = m.chain.fillet(chain, fillet)
+                }
             }
         }
 

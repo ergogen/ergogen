@@ -69,7 +69,6 @@ const anchor = exports.parse = (raw, name, points={}, default_point=new Point(),
         } else {
             point = anchor(raw.ref, `${name}.ref`, points, default_point, mirror)(units)
         }
-        
     }
 
     if (raw.aggregate !== undefined) {
@@ -95,10 +94,7 @@ const anchor = exports.parse = (raw, name, points={}, default_point=new Point(),
         // simple case: number gets added to point rotation
         if (a.type(config)(units) == 'number') {
             let angle = a.sane(config, name, 'number')(units)
-            if (point.meta.mirrored) {
-                angle = -angle
-            }
-            point.r += angle
+            point.rotate(angle, false)
         // recursive case: points turns "towards" target anchor
         } else {
             const target = anchor(config, name, points, default_point, mirror)(units)
@@ -111,10 +107,7 @@ const anchor = exports.parse = (raw, name, points={}, default_point=new Point(),
     }
     if (raw.shift !== undefined) {
         let xyval = a.wh(raw.shift, `${name}.shift`)(units)
-        if (point.meta.mirrored) {
-            xyval[0] = -xyval[0]
-        }
-        point.shift(xyval, true)
+        point.shift(xyval)
     }
     if (raw.rotate !== undefined) {
         rotator(raw.rotate, `${name}.rotate`, point)

@@ -6,9 +6,6 @@
 
 ### Major
 
-- Key-level access to full anchors
-    - this could provide extra variables `padding`, `spread`, `splay` for custom layout purposes
-    - make row anchors cumulative, too (like columns), so fingers arcs and other edits can happen
 - Restructure pcb point/footprint filtering
     - Use the same `what`/`where` infrastructure as outlines
     - Collapse params/nets/anchors into a single hierarchy from the user's POV
@@ -30,12 +27,8 @@
 - Allow footprints to publish outlines
     - Make these usable in the `outlines` section through a new `what`
 - 3D orient for cases
-- Allow a generic `adjust` field for outlines that accepts an anchor
-    - This could swallow `origin` from `outline`
-- Post-process anchor for global (post-mirror!) orient/shift/rotate for everything
 - Even more extreme anchor stuff
     - Checkpoints, intersects, distances, weighted combinations?
-- Allow both object (as well as arrays) in multiple anchor refs
 - SVG input (for individual outlines, or even combinations parsed by line color, etc.)
     - And once that's done, possibly even STL or other input for cases or pcb renders
 - Support text silk output to PCBs (in configurable fonts, through SVG?)
@@ -44,7 +37,6 @@
     - Support curves (arcs as well as Béziers) in polygons
 - Add snappable line footprint
 - Figure out a manual, but still reasonably comfortable routing method directly from the config
-- Add filleting syntax with `@`?
 - Eeschema support for pcbs
 - Generate ZMK shield from config
 - Export **to** KLE?
@@ -53,11 +45,7 @@
 - Look into kicad 5 vs. 6 output format
 - Update json schema and add syntax highlight to editors
 - Support different netclasses
-- `round`, `pointy` and `beveled` symbolic constants for expand joint types
-    - Also, string shorthands like `3)`, `5>` and `10]`
 - Allow a potential filter for filleting (only on angles =90°, <45°, left turn vs. right turn when going clockwise, etc.)
-- Support cumulative handling of outline parts (i.e., add `fillet` as an generic option that applies to all the parts up to that point)
-    - Similar with adjust
 
 
 ### Patch

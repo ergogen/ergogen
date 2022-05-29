@@ -25,6 +25,7 @@ module.exports = class Point {
     }
 
     shift(s, relative=true) {
+        s[0] *= this.meta.mirrored ? -1 : 1
         if (relative) {
             s = m.point.rotate(s, this.r)
         }
@@ -34,7 +35,10 @@ module.exports = class Point {
     }
 
     rotate(angle, origin=[0, 0]) {
-        this.p = m.point.rotate(this.p, angle, origin)
+        angle *= this.meta.mirrored ? -1 : 1
+        if (origin) {
+            this.p = m.point.rotate(this.p, angle, origin)
+        }
         this.r += angle
         return this
     }
