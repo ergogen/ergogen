@@ -5,7 +5,7 @@
         "r": 0,
         "meta": {
             "stagger": 0,
-            "spread": 0,
+            "spread": 19,
             "splay": 0,
             "origin": [
                 0,
@@ -77,7 +77,7 @@
         "r": 0,
         "meta": {
             "stagger": 0,
-            "spread": 0,
+            "spread": 19,
             "splay": 0,
             "origin": [
                 0,
@@ -234,7 +234,7 @@
     },
     "matrix_right_top": {
         "x": 32.4873385,
-        "y": 25.5494106,
+        "y": 25.549410700000003,
         "r": 5,
         "meta": {
             "stagger": 5,

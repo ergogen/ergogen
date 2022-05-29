@@ -4,7 +4,7 @@ matrix:
     r: 0
     meta:
         stagger: 0
-        spread: 0
+        spread: 19
         splay: 0
         origin:
             - 0

@@ -86,7 +86,7 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key,
         const keys = []
         const default_key = {
             stagger: units.$default_stagger,
-            spread: first_col ? 0 : units.$default_spread,
+            spread: units.$default_spread,
             splay: units.$default_splay,
             origin: [0, 0],
             orient: 0,
@@ -141,7 +141,9 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key,
         }
 
         // setting up column-level anchor
-        zone_anchor.x += keys[0].spread
+        if (!first_col) {
+            zone_anchor.x += keys[0].spread
+        }
         zone_anchor.y += keys[0].stagger
         const col_anchor = zone_anchor.clone()
 
@@ -156,16 +158,17 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key,
         }
 
         // actually laying out keys
+        let running_anchor = col_anchor.clone()
+        for (const r of rotations) {
+            running_anchor.rotate(r.angle, r.origin)
+        }
 
         for (const key of keys) {
 
             // copy the current column anchor
-            let point = col_anchor.clone()
+            let point = running_anchor.clone()
 
-            // apply transformations
-            for (const r of rotations) {
-                point.rotate(r.angle, r.origin)
-            }
+            // apply per-key adjustments
             point.r += key.orient
             point.shift(key.shift)
             point.r += key.rotate
@@ -178,8 +181,9 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key,
             col_minmax[col_name].min = Math.min(col_minmax[col_name].min, point.y)
             col_minmax[col_name].max = Math.max(col_minmax[col_name].max, point.y)
 
-            // advance the column anchor to the next position
-            col_anchor.y += key.padding
+            // advance the running anchor to the next position
+            running_anchor = point.clone()
+            running_anchor.shift([0, key.padding])
         }
 
         first_col = false
