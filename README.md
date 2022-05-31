@@ -1,7 +1,11 @@
+
 # Ergogen
 
 Ergogen is a keyboard generator that aims to provide a common configuration format to describe **ergonomic** 2D layouts, and generate automatic plates, cases, and (un-routed) PCBs for them.
+
 The project grew out of (and is an integral part of) the [Absolem keyboard](https://zealot.hu/absolem), and shares its [Discord server](https://discord.gg/nbKcAZB) as well.
+
+<br>
 
 ## Getting started
 
@@ -16,7 +20,19 @@ Until there's a proper "Getting started" guide, try getting acquainted with ergo
 1. If a question persists after all of the above, feel free to ask it over on [Discord](https://discord.gg/nbKcAZB) and we'll do our best to help you out.
 
 
+<br>
+<br>
+
 ## Contributions
 
-Feature ideas, documentation improvements, examples, tests, or pull requests welcome!
-Get in touch [on Discord](https://discord.gg/nbKcAZB), and we can definitely find something you can help with, if you'd like to.
+Feature ideas, documentation improvements, <br>
+examples, tests, or pull requests welcome!
+
+*Get in touch on our **[Discord]**, and we can definitely* <br>
+*find something you can help with, if you'd like to.*
+
+<br>
+
+<!----------------------------------------------------------------------------->
+
+[Discord]: https://discord.gg/nbKcAZB
