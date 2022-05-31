@@ -7,7 +7,7 @@
 
 <img
     src = 'docs/Showcase.png'
-    width = 200
+    width = 300
     align = right
 />
 
