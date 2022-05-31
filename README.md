@@ -1,9 +1,19 @@
 
 # Ergogen    [![Badge License]][License]
 
-Ergogen is a keyboard generator that aims to provide a common configuration format to describe **ergonomic** 2D layouts, and generate automatic plates, cases, and (un-routed) PCBs for them.
+***Keyboard Generator*** *build on* ***[Absolem Keyboard]***.
 
-The project grew out of (and is an integral part of) the [Absolem keyboard](https://zealot.hu/absolem), and shares its [Discord server](https://discord.gg/nbKcAZB) as well.
+<br>
+
+<img
+    src = 'docs/Showcase.png'
+    width = 200
+    align = right
+/>
+
+The project aims to provide a common configuration format to <br>
+describe ***ergonomic*** 2D layouts and generate automatic plates, <br>
+cases, as well as un-routed PCBs for them.
 
 <br>
 
@@ -37,6 +47,7 @@ examples, tests, or pull requests welcome!
 
 [Badge License]: https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge
 
+[Absolem Keyboard]: https://zealot.hu/absolem
 [Getting Started]: docs/Getting%20Started.md
 [Documentation]: https://docs.ergogen.xyz
 [Discord]: https://discord.gg/nbKcAZB
