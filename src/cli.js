@@ -16,6 +16,11 @@ const args = yargs
         describe: 'Output folder',
         type: 'string'
     })
+    .option('footprints', {
+        alias: 'f',
+        describe: 'Additional footprints folder',
+        type: 'string',
+    })
     .option('debug', {
         alias: 'd',
         default: false,
@@ -48,6 +53,28 @@ try {
 const title_suffix = args.debug ? ' (Debug Mode)' : ''
 console.log(`Ergogen v${pkg.version} CLI${title_suffix}`)
 console.log()
+
+// load additional footprints
+
+if (args.footprints) {
+    const dirFiles = fs.readdirSync(path.resolve(args.footprints))
+
+    for (let index = 0; index < dirFiles.length; index++) {
+        const file = dirFiles[index];
+        if (file.endsWith('.js')) {
+            const name = path.basename(file, '.js')
+            const footprint = require(path.resolve(args.footprints, file))
+            if (
+                typeof footprint === 'object' &&
+                typeof footprint.nets === 'object' &&
+                typeof footprint.params === 'object' &&
+                typeof footprint.body === 'function'
+            ) {
+                ergogen.inject_footprint(name, footprint)
+            }
+        }
+    }
+}
 
 ;(async () => {
 
