@@ -202,6 +202,10 @@ const footprint = exports._footprint = (config, name, points, point, net_indexer
             net = point.meta[indirect]
             net = a.sane(net, `${name}.nets.${net_name} --> ${point.meta.name}.${indirect}`, 'string')()
         }
+        // Prevent duplicate net names between the main board and its mirror
+        if (point.meta.name.startsWith("mirror_")) {
+            net = `mirror_${net}`
+        }
         const index = net_indexer(net)
         parsed_params.net[net_name] = {
             name: net,
