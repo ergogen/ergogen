@@ -1,3 +1,4 @@
+const jsutil = require('util')
 const m = require('makerjs')
 const u = require('./utils')
 const a = require('./assert')
@@ -238,9 +239,10 @@ exports.parse = (config = {}, points = {}, units = {}) => {
             if (a.type(part)() == 'string') {
                 part = o.operation(part, {outline: Object.keys(outlines)})
             }
-            const expected = ['type', 'operation']
+            const expected = ['type', 'operation', 'color']
             part.type = a.in(part.type || 'outline', `${name}.type`, ['keys', 'rectangle', 'circle', 'polygon', 'outline'])
             part.operation = a.in(part.operation || 'add', `${name}.operation`, ['add', 'subtract', 'intersect', 'stack'])
+            part.color = a.in(part.color || 'black', `${name}.color`, ['black', 'red', 'blue', 'green', 'yellow'])
 
             let op = u.union
             if (part.operation == 'subtract') op = u.subtract
@@ -334,6 +336,7 @@ exports.parse = (config = {}, points = {}, units = {}) => {
             }
 
             result = op(result, arg)
+            result.layer = part.color
         }
 
         m.model.originate(result)
