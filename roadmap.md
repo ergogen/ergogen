@@ -46,6 +46,8 @@
 - Update json schema and add syntax highlight to editors
 - Support different netclasses
 - Allow a potential filter for filleting (only on angles =90°, <45°, left turn vs. right turn when going clockwise, etc.)
+- Add `operation: skip` to allow easily "commenting out" whole outline parts
+- Better error message for negative rectangle (it may not only be because of corner/bevel)
 
 
 ### Patch
@@ -58,6 +60,7 @@
 - Add custom fillet implementation that considers line-line connections only?
 - Add nicer filleting error messages when makerjs dies for some reason
 - Empty nets should be allowed (to mean unconnected)
+- Debug point (orient+shift) differences in circles vs. polygons (see Discord)
 
 
 ## WEBUI
