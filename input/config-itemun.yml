@@ -1,28 +1,32 @@
+#node src/cli.js input/config-itemun.yml -o output/itemun
 points:
   key:
     padding: cy
     tags: 
       1u: true
     footprints:
-          choc_hotswap:
-            type: choc
-            nets:
-              from: =column_net
-              to: GND
-            params:
-                keycaps: true
-                reverse: true
-                hotswap: true
-          choc:
-            type: choc
-            anchor:
-              rotate: 180
-            nets:
-              from: =column_net
-              to: GND
-            params:
-                keycaps: true
-                reverse: true
+
+      choc_hotswap:
+        type: choc
+        params:
+          hotswap: true
+          reverse: true
+          keycaps: true
+        nets:
+          # from: P1
+          # to: P2
+          from: =colrow
+          to: =column_net
+
+      diode:
+        type: diode
+        nets:
+          # from: P3
+          # to: P4
+          from: =colrow
+          to: =row_net
+        anchor:
+          shift: [0, -5]
 
   zones:
     board:
@@ -30,90 +34,108 @@ points:
 
       rows:
         bottom:
+          row_net: P3
         home:
+          row_net: P10
         top:
-        toptop:
+          row_net: P16
+
 
       columns:
         outouter:
           spread: cx
+          rotate: -8
+          key:
+            column_net: P4
           row_overrides:
             bottom:
               tags:
                 15u: true
                 1u: false
-              rotate: 90
-              bind: [0,47.75,1,5]
+              rotate: 93
+              bind: [2,40,4,5]
+
         outer:
-          stagger: -5
-          spread: cx
+          stagger: 2
+          spread: cx+1
+          key:
+            column_net: P14
           rows:
             bottom:
-              bind: [0,1,0,0]
+              bind: [0,1,0,1]
             home: 
-              bind: [0,1,0,0]
+              bind: [0,1,0,1]
             top:
-              bind: [18.75,1,0,0]
-            toptop.skip: true
+              bind: [11.28,0.5,0,1]
 
         pinkie:
           stagger: 2
           spread: cx
+          key:
+            column_net: P15
           rows:
             bottom:
               bind: [0,2,2,0]
             home: 
               bind: [0,2.5,0,0]
             top:
-              bind: [16.75,4,0,0]
-            toptop.skip: true
+              bind: [9.28,3.05,0,0]
 
         ring:
           stagger: 8
           spread: cx+1
           rotate: -2
+          key:
+            column_net: P18
           rows:
             bottom:
               bind: [0,3.5,9,0]
             home:  
               bind: [0,5,0,0]
             top: 
-              bind: [8.5,6,0,0]
-            toptop.skip: true
+              bind: [1,6,0,0]
 
         middle:
-          stagger: 8
-          spread: cx+2.5
+          stagger: 6
+          spread: cx+1
           rotate: -3
+          key:  
+            column_net: P19
           rows:
             bottom:
               bind: [0,4,4,0]
             home:
               bind: [0,4,0,0]
-            toptop.skip: true
-            
-          
+            top:
+              bind: [1,9,0,9]
+                   
         index:
-          stagger: -4
-          spread: cx+2
-          rotate: -2
+          stagger: -6
+          spread: cx+1
+          rotate: -3
+          key: 
+            column_net: P20
           rows:
             bottom:
               bind: [0,1,2,0]
             home:
               bind: [0,1,0,0]
             top: 
-              bind: [3.5,1,0,5]
-            toptop.skip: true
+              bind: [1,3,0,4]
+
         inner:
           stagger: -2
           spread: cx
+          key: 
+            column_net: P21
           rows:
             bottom:
-              bind: [0,0,15.55,1]
+              bind: [0,1,15.55,1]
+            home: 
+              bind: [0,1,0,0]
             top: 
-              bind: [5.5,0,0,0]
-            toptop.skip: true
+              bind: [3,1,0,1]
+
 
 
     thumb:
@@ -121,44 +143,57 @@ points:
         ref: board_ring_bottom
         shift: [0,-25]
 
+
       rows:
         first:
+          row_net: P2
         
+
       columns:
         ctrl: 
           stagger: 2.5
+          key:
+            column_net: P18
           rows: 
             first:
               tags:
                 15u: true
                 1u: false
               rotate: 90
-              bind: [0,0,0,5]
+              bind: [2,0,2,5.3]
 
         alt:
-          stagger: 13
+          stagger: 11
           rotate: -3
-          spread: cx+1.55
+          spread: cx
+          key:
+            column_net: P19
           rows: 
             first:  
-              bind: [0,3,3.7,2]
+              bind: [0,1.3,9.6,2]
 
         shift:
-          stagger: -4
-          rotate: -2
-          spread: cx+1.4
+          stagger: -6
+          rotate: -3
+          spread: cx
+          key: 
+            column_net: P20
+          rows: 
+            first:
+              bind: [0,1,4,0]
 
         e: 
           spread: cx
           stagger: -7
+          key: 
+            column_net: P21
           rows: 
             first:
               tags:
                 15u: true
                 1u: false
               rotate: 90
-              bind: [0,0,0,5]
-
+              bind: [0,0,01.2,5]
 
 outlines:
   exports:
@@ -166,18 +201,25 @@ outlines:
       - type: keys
         side: left
         size: [1cx-0.5 , 1cx-0.5]
+    polipouce:
+      - type: polygon
+        points: 
+          - ref: thumb_ctrl_first
+            shift: [-13.75,-5]
+          - ref: thumb_e_first
+            shift: [-13.6,-8.8]
+          - ref: board_inner_bottom
+            shift: [8,0]
+          - ref: board_ring_bottom 
+
     cutouta:
       - type: outline
         name: raw
         fillet: 3
     cutoutb:
       - type: outline
-        name: cutouta
-        fillet: 1
-    cutout:
-      - type: outline
-        name: cutoutb
-        fillet: 0.5
+        name: polipouce
+        fillet: 3
     keycap_outlines:
       - type: keys
         side: left
@@ -192,15 +234,66 @@ outlines:
         tags: [15u]        
     preview:
         [keycap_outlines,keycap_outlines15]
-
-
+    cutout: 
+        [cutouta,cutoutb]
         
+pcbs:
+  itemun:
+    outlines:
+      board:
+        outline: cutouta
+      keycaps:
+        outline: preview
+        layer: Eco1.User
 
+    footprints:
+      promicro:
+        type: promicro_pretty
+        anchor:
+          ref: board_outouter_bottom
+          shift: [30,0]
+          rotate: 180
 
-        
-        
+      pcm12:
+        type: pcm12
+        anchor:
+          ref: board_outer_top
+          shift: [0, 18]
+          rotate: 180
+        nets:
+          from: pos  
+          to: RAW
+        params:
+          reverse: true 
+      via3:
+        type: via
+        anchor: 
+          ref: board_outer_top
+          shift: [-7,15]
+        nets: 
+          net: pos
 
+      b3u1000p:
+        type: b3u1000p
+        nets:
+          r1: RST  
+          r2: GND
+        anchor:
+          ref: board_outer_top
+          shift: [10, 18]
+          rotate: 180
+        params:
+          reverse: true 
 
+      bat:
+        type: bat
+        nets: 
+          neg: GND
+          pos: RAW
+        anchor:
+          ref: board_outer_top
+          shift: [-7, 18]
+          rotate:  180
       
 
       

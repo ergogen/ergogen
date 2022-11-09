@@ -1,9 +1,9 @@
 points:
-  key:
-    padding: cy
-    tags: 
-      1u: true
-    footprints:
+   key:
+      padding: cy
+      tags: 
+        1u: true
+      footprints:
           choc_hotswap:
             type: choc
             nets:
@@ -23,184 +23,182 @@ points:
             params:
                 keycaps: true
                 reverse: true
-
-  zones:
+   zones:
     board:
-      rotate: 5
-
       rows:
-        bottom:
         home:
         top:
-        toptop:
-
       columns:
-        outouter:
-          spread: cx
-          row_overrides:
-            bottom:
-              tags:
+          pinkie:
+            rotate: 40
+            row_overrides: 
+             home:
+               bind: [0,5,2,5]
+               column_net: P10
+               tags: 
                 15u: true
                 1u: false
-              rotate: 90
-              bind: [0,47.75,1,5]
-        outer:
-          stagger: -5
-          spread: cx
-          rows:
-            bottom:
-              bind: [0,1,0,0]
-            home: 
-              bind: [0,1,0,0]
-            top:
-              bind: [18.75,1,0,0]
-            toptop.skip: true
-
-        pinkie:
-          stagger: 2
-          spread: cx
-          rows:
-            bottom:
-              bind: [0,2,2,0]
-            home: 
-              bind: [0,2.5,0,0]
-            top:
-              bind: [16.75,4,0,0]
-            toptop.skip: true
-
-        ring:
-          stagger: 8
-          spread: cx+1
-          rotate: -2
-          rows:
-            bottom:
-              bind: [0,3.5,9,0]
-            home:  
-              bind: [0,5,0,0]
-            top: 
-              bind: [8.5,6,0,0]
-            toptop.skip: true
-
-        middle:
-          stagger: 8
-          spread: cx+2.5
-          rotate: -3
-          rows:
-            bottom:
-              bind: [0,4,4,0]
-            home:
-              bind: [0,4,0,0]
-            toptop.skip: true
-            
-          
-        index:
-          stagger: -4
-          spread: cx+2
-          rotate: -2
-          rows:
-            bottom:
-              bind: [0,1,2,0]
-            home:
-              bind: [0,1,0,0]
-            top: 
-              bind: [3.5,1,0,5]
-            toptop.skip: true
-        inner:
-          stagger: -2
-          spread: cx
-          rows:
-            bottom:
-              bind: [0,0,15.55,1]
-            top: 
-              bind: [5.5,0,0,0]
-            toptop.skip: true
-
-
-    thumb:
+               rotate: 90
+          ring:
+            spread: cx+0.5
+            stagger: 12
+            rotate: -5
+            rows: 
+              home: 
+                bind: [0,0,3,1]
+                column_net: P9
+              top: 
+                bind: [0,0,0,1]
+                column_net: P8
+          middle: 
+            spread: cx+0.5
+            stagger: -5
+            rotate: -5
+            rows:
+              home: 
+                bind: [5,0,3,5]
+                column_net: P15
+              top:
+                column_net: P14
+                bind: [0,1,0,5]
+          index: 
+            spread: cx
+            stagger: -10
+            rotate: -5
+            rows: 
+              home: 
+                bind: [0,1,3,0]
+                column_net: P4
+              top: 
+                bind: [0,1,3,3]
+                column_net: P5
+    thumbfan:
       anchor:
-        ref: board_ring_bottom
-        shift: [0,-25]
-
+        ref: board_index_home
+        shift: [20, -18]
       rows:
-        first:
-        
+        home:
       columns:
-        ctrl: 
-          stagger: 2.5
-          rows: 
-            first:
-              tags:
-                15u: true
+        home:
+          rotate: -5
+          rows:
+            home:
+              column_net: P0
+              tags: 
                 1u: false
-              rotate: 90
-              bind: [0,0,0,5]
-
-        alt:
-          stagger: 13
-          rotate: -3
-          spread: cx+1.55
-          rows: 
-            first:  
-              bind: [0,3,3.7,2]
-
-        shift:
-          stagger: -4
-          rotate: -2
-          spread: cx+1.4
-
-        e: 
-          spread: cx
-          stagger: -7
-          rows: 
-            first:
-              tags:
                 15u: true
-                1u: false
               rotate: 90
-              bind: [0,0,0,5]
-
-
+        far:
+          spread: 17
+          stagger: -5
+          rotate: -0
+          rows:
+            home:
+              column_net: P1
+              tags: 
+                1u: false
+                15u: true
+              rotate: 90
 outlines:
   exports:
     raw: 
       - type: keys
         side: left
-        size: [1cx-0.5 , 1cx-0.5]
-    polipouce:
-      - type: polygon
-        points: 
-          - ref: thumb_ctrl_first
-            shift: [-13.75,-5]
-          - ref: thumb_e_first
-            shift: [-13.6,-8.8]
-          - ref: board_inner_bottom
-            shift: [8,0]
-          - ref: board_ring_bottom 
-
-    cutouta:
+        size: [1cx - 0.5 , 1cx -0.5]
+      - type: rectangle
+        size: [96.5, 40]
+        anchor:
+          ref: board_index_home
+          rotate: -25
+          shift: [-49.5, -12]
+    cutout:
       - type: outline
         name: raw
-        fillet: 3
-    cutoutb:
-      - type: outline
-        name: polipouce
-        fillet: 3
+        fillet: 2
     keycap_outlines:
       - type: keys
         side: left
         size: [1cx - 0.5, 1cy - 0.5] # Choc keycaps are 17.5 x 16.5
-        bound: false
-        tags: [1u]
+        bound: false    
+        tags: [1u]       
     keycap_outlines15:
       - type: keys
         side: left
         size: [1.5cx - 0.5, 1cy - 0.5] # Choc keycaps are 17.5 x 16.5
         bound: false    
-        tags: [15u]        
+        tags: [15u]       
     preview:
         [keycap_outlines,keycap_outlines15]
-    cutout: 
-        [cutouta,cutoutb]
-
-pcb: 
-  
+pcbs:
+  piano:
+    outlines:
+      board:
+        outline: cutout
+      keycaps:
+        outline: preview
+        layer: Eco1.User
+    footprints:
+      promicro:
+        type: promicro_pretty
+        anchor:
+          ref: board_pinkie_home
+          shift: [-17, -29.5]
+          rotate: 50
+      pcm12:
+        type: pcm12
+        anchor:
+          ref: thumbfan_home_home
+          shift: [-28, -13.5]
+          rotate: -110
+        nets:
+          from: pos  
+          to: RAW
+        params:
+          reverse: true 
+      via3:
+        type: via
+        anchor: 
+          ref: thumbfan_home_home
+          shift: [3,10]
+        nets: 
+          net: RAW 
+      via4:
+        type: via
+        anchor: 
+          ref: thumbfan_home_home
+          shift: [-3,10]
+        nets: 
+          net: pos 
+      via5:
+        type: via
+        anchor: 
+          ref: thumbfan_home_home
+          shift: [3,20]
+        nets: 
+          net: GND 
+      via6:
+        type: via
+        anchor: 
+          ref: thumbfan_home_home
+          shift: [-3,20]
+        nets: 
+          net: RST 
+      b3u1000p:
+        type: b3u1000p
+        nets:
+          r1: RST  
+          r2: GND
+        anchor:
+          ref: thumbfan_home_home
+          shift: [-14, 23]
+          rotate: -110
+        params:
+          reverse: true 
+      bat:
+        type: bat
+        nets: 
+          neg: GND
+        anchor:
+          ref: thumbfan_home_home
+          shift: [12.5, 57]
+          rotate: -20

@@ -1,0 +1,443 @@
+units:
+  kx: cx
+  ky: cy
+  px: 2
+  py: 2
+points:
+  key:
+    footprints:
+      choc_hotswap:
+        type: choc
+        params:
+          hotswap: true
+          reverse: true
+          keycaps: true
+        nets:
+          # from: P1
+          # to: P2
+          from: =colrow
+          to: =column_net
+      diode:
+        type: diode
+        nets:
+          # from: P3
+          # to: P4
+          from: =colrow
+          to: =row_net
+        anchor:
+          shift: [0, -5]
+  zones:
+    matrix:
+      # anchor:
+      #   rotate: 5
+      key.padding: ky
+      columns:
+        pinky:
+          stagger: 0 ky
+          spread: kx
+          key:
+            column_net: P20
+        ring:
+          stagger: 0.7 ky
+          spread: kx
+          key:
+            column_net: P19
+        middle:
+          stagger: 0.2 ky
+          spread: kx
+          key:
+            column_net: P18
+        index:
+          stagger: -0.2 ky
+          spread: kx
+          key:
+            column_net: P15
+        inner:
+          stagger: -0.1 ky
+          spread: kx
+          key:
+            column_net: P14
+      rows:
+        bottom:
+          row_net: P6
+        home:
+          row_net: P5
+        top:
+          row_net: P4
+    thumbfan:
+      anchor:
+        ref: matrix_inner_bottom
+        shift: [-1.5 kx, -1 ky]
+      columns:
+        near:
+          spread: kx
+          rotate: -15
+          origin: [-0.5 kx, -0.5 ky]
+          key:
+            column_net: P18
+        home:
+          spread: kx
+          rotate: -15
+          origin: [-0.5 kx, -0.5 ky]
+          key:
+            column_net: P15
+        far:
+          spread: kx
+          rotate: -15
+          origin: [-0.5 kx, -0.5 ky]
+          key:
+            column_net: P14
+      rows:
+        thumb:
+          row_net: P7
+outlines:
+  # board dimensions according to JLCPCB: 122.28 mm x 101.05 mm
+  exports:
+    raw:
+      - type: keys
+        side: left
+        size: [kx + px, ky + py]
+        corner: px
+    thumbfan_glue:
+      - type: polygon
+        points:
+          - ref: matrix_inner_bottom
+            shift: [0.5 kx + 0.5px, -0.5 ky + 0.5 py]
+          - ref: thumbfan_far_thumb
+            shift: [0.5 kx - 0.5px, 0.5 ky + 0.5 py]
+          - ref: thumbfan_far_thumb
+            shift: [0.5 kx - 0.5px, -0.5 ky - 0.5 py]
+          - ref: thumbfan_near_thumb
+            shift: [-0.5 kx + 0.5 px, -0.5 ky - 0.5 py]
+          - ref: matrix_pinky_bottom
+            shift: [0.5 kx - 0.5 py, -0.5 ky - 0.5 py]
+          - ref: matrix_pinky_home
+          - ref: matrix_inner_home
+    patch_outer:
+      - type: polygon
+        points:
+          - ref: matrix_ring_top
+          - ref: matrix_ring_bottom
+          - ref: matrix_pinky_bottom
+            shift: [-0.5 (kx + px), 0]
+          - ref: matrix_pinky_top
+            shift: [-0.5 (kx + px), 0]
+    patch_inner:
+      - type: polygon
+        points:
+          - ref: matrix_inner_top
+            shift: [0.5 (kx + px), 0]
+          - ref: matrix_inner_bottom
+            shift: [0.5 (kx + px), 0]
+          - ref: matrix_index_bottom
+          - ref: matrix_index_top
+    controller_area:
+      main:
+        type: rectangle
+        anchor:
+          ref:
+            - matrix_inner_top
+          shift: [0 kx, -4.05 ky]
+        size: [32, 76.5]
+        corner: px
+    switches:
+      main:
+        type: keys
+        side: left
+        size: 14
+        bound: false
+    keycaps:
+      main:
+        type: keys
+        side: left
+        size: [kx, ky]
+        bound: false
+        corner: 1
+    keywell:
+      main:
+        type: outline
+        name: raw
+      patch_inner:
+        type: outline
+        name: patch_inner
+        operation: add
+      patch_outer:
+        type: outline
+        name: patch_outer
+        operation: add
+      thumbfan_glue:
+        type: outline
+        name: thumbfan_glue
+        operation: add
+    base_outline:
+      main:
+        type: outline
+        name: keywell
+      controller:
+        type: outline
+        name: controller_area
+        operation: add
+    screw_holes:
+      top_left:
+        type: circle
+        anchor:
+          - ref: matrix_ring_home
+            shift: [-0.5 kx, 0 ky]
+        radius: 1.05
+      bottom_left:
+        type: circle
+        anchor:
+          - ref: matrix_pinky_bottom
+            shift: [0.5 kx, 0]
+        radius: 1.05
+      top_right:
+        type: circle
+        anchor:
+          - ref: matrix_inner_top
+            shift: [-0.5 kx, 0]
+        radius: 1.05
+      palm:
+        type: circle
+        anchor:
+          - ref: matrix_index_bottom
+            shift: [0, -1.06 ky]
+        radius: 1.05
+      thumb:
+        type: circle
+        anchor:
+          - ref: thumbfan_far_thumb
+            shift: [-0.55 kx, 0]
+        radius: 1.05
+    mounting_holes:
+      $extends: outlines.exports.screw_holes
+      top_left:
+        radius: 2.05
+      bottom_left:
+        radius: 2.05
+      top_right:
+        radius: 2.05
+      palm:
+        radius: 2.05
+      thumb:
+        radius: 2.05
+    bottom_outline:
+      main:
+        type: outline
+        name: base_outline
+      screw_holes:
+        type: outline
+        # TODO use footprints with pad + via reinforcement as mounting holes
+        name: screw_holes
+        operation: subtract
+    plate:
+      main:
+        type: outline
+        name: keywell
+      switches:
+        type: outline
+        name: switches
+        operation: subtract
+      mounting_holes:
+        type: outline
+        # TODO use footprints with pad + via reinforcement as mounting holes
+        name: screw_holes
+        operation: subtract
+    pcb:
+      main:
+        type: outline
+        name: base_outline
+      mounting_holes:
+        type: outline
+        # TODO use plated through hole footprints as mounting holes
+        name: mounting_holes
+        operation: subtract
+pcbs:
+  top_plate:
+    include_keys: false
+    outlines:
+      edge:
+        outline: plate
+        layer: Edge.Cuts
+    footprints:
+      jlc_order_number:
+        type: text
+        anchor:
+          ref:
+            - matrix_ring_home
+          shift: [-0.25 kx, 0.5 ky]
+        params:
+          text: "JLCJLCJLCJLC"
+          justify: left
+  bottom_plate:
+    include_keys: false
+    outlines:
+      edge:
+        outline: bottom_outline
+        layer: Edge.Cuts
+  board:
+    outlines:
+      edge:
+        outline: pcb
+        layer: Edge.Cuts
+    footprints:
+      mcu_l:
+        type: promicro
+        params:
+          orientation: up
+        anchor:
+          ref:
+            - matrix_inner_top
+          shift: [20, -11]
+          rotate: 270
+      mcu_r:
+        type: promicro
+        params:
+          orientation: down
+        anchor:
+          ref:
+            - matrix_inner_top
+          shift: [22.5, -12.25]
+          rotate: 270
+      pad_plus:
+        type: pad
+        anchor:
+          ref:
+            - matrix_inner_top
+          shift: [23, -6]
+          rotate: 0
+        params:
+          front: true
+          back: true
+          width: 1.5
+          height: 1.5
+          text: "B+"
+        nets:
+          net: Bplus
+      pad_minus:
+        type: pad
+        anchor:
+          ref:
+            - matrix_inner_top
+          shift: [23, -3]
+          rotate: 0
+        params:
+          front: true
+          back: true
+          width: 1.5
+          height: 1.5
+          text: "B-"
+        nets:
+          net: GND
+      trrs_l:
+        type: trrs
+        anchor:
+          ref:
+            - matrix_inner_bottom
+          shift: [32, -15]
+          rotate: 270
+        params:
+          reverse: false
+          symmetric: false
+        # The naming of the nets on this footprint is different from the Corne schematics.
+        nets:
+          A: ""
+          B: VCC
+          C: GND
+          D: P0
+      trrs_r:
+        type: trrs
+        anchor:
+          ref:
+            - matrix_inner_bottom
+          shift: [32, -13]
+          rotate: 270
+        params:
+          reverse: true
+          symmetric: false
+        # The naming of the nets on this footprint is different from the Corne schematics.
+        nets:
+          A: ""
+          B: VCC
+          C: GND
+          D: P0
+      jumper_l:
+        type: jumper
+        anchor:
+          ref:
+            - matrix_inner_bottom
+          shift: [23.5, 0]
+          rotate: 270
+        params:
+          side: B
+        nets:
+          from: Bplus
+          to: RAW
+      jumper_r:
+        type: jumper
+        anchor:
+          ref:
+            - matrix_inner_bottom
+          shift: [23.5, 0]
+          rotate: 270
+        params:
+          side: F
+        nets:
+          from: Bplus
+          to: RAW
+      slider_l:
+        type: slider
+        anchor:
+          ref:
+            - matrix_inner_bottom
+          shift: [30, 0]
+          rotate: 270
+        params:
+          side: F
+        nets:
+          from: RAW
+          left: Bplus
+          right: ''
+      slider_r:
+        type: slider
+        anchor:
+          ref:
+            - matrix_inner_bottom
+          shift: [30, 0]
+          rotate: 270
+        params:
+          side: B
+        nets:
+          from: RAW
+          left: ''
+          right: Bplus
+      reset:
+        type: button
+        anchor:
+          ref:
+            - matrix_inner_bottom
+          shift: [17, 0]
+          rotate: 270
+        params:
+          variant: 2_pin_th
+        nets:
+          from: GND
+          to: RST
+      info_l:
+        type: text
+        anchor:
+          ref:
+            - matrix_pinky_bottom
+          shift: [0.75 kx, 0]
+        params:
+          text: "samoklava v0.1\\nby soundmonster"
+          justify: left
+      info_r:
+        type: text
+        anchor:
+          ref:
+            - matrix_pinky_bottom
+          shift: [0.75 kx, 0]
+        params:
+          layer: B.SilkS
+          text: "samoklava v0.1\\nby soundmonster"
+          justify: right mirror

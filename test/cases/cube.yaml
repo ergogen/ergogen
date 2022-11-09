@@ -1,0 +1,10 @@
+points.zones.matrix: {}
+outlines:
+  square:
+    - what: rectangle
+      where: true
+      size: [5, 5]
+cases:
+  cube:
+    - name: square
+      extrude: 5
