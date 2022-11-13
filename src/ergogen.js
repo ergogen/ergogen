@@ -92,8 +92,22 @@ const process = async (raw, debug=false, logger=()=>{}) => {
     return results
 }
 
+const inject = (type, name, value) => {
+    if (value === undefined) {
+        value = name
+        name = type
+        type = 'footprint'
+    }
+    switch (type) {
+        case 'footprint':
+            return pcbs_lib.inject_footprint(name, value)
+        default:
+            throw new Error(`Unknown injection type "${type}" with name "${name}" and value "${value}"!`)
+    }
+}
+
 module.exports = {
     version,
     process,
-    inject_footprint: pcbs_lib.inject_footprint
+    inject
 }

@@ -1,5 +1,5 @@
 exports.inject = (ergogen) => {
-    ergogen.inject_footprint('trace_test', {
+    ergogen.inject('footprint', 'trace_test', {
         nets: {
             P1: 'P1'
         },
@@ -28,7 +28,7 @@ exports.inject = (ergogen) => {
         }
     })
 
-    ergogen.inject_footprint('zone_test', {
+    ergogen.inject('footprint', 'zone_test', {
         nets: {
             P1: 'P1'
         },
@@ -62,7 +62,7 @@ exports.inject = (ergogen) => {
         }
     })
 
-    ergogen.inject_footprint('dynamic_net_test', {
+    ergogen.inject('footprint', 'dynamic_net_test', {
         nets: {},
         params: {
             class: 'T',
@@ -90,7 +90,7 @@ exports.inject = (ergogen) => {
         }
     })
 
-    ergogen.inject_footprint('anchor_test', {
+    ergogen.inject('footprint', 'anchor_test', {
         nets: {},
         params: {
             class: 'T',
@@ -114,7 +114,7 @@ exports.inject = (ergogen) => {
         }
     })
 
-    ergogen.inject_footprint('references_test', {
+    ergogen.inject('footprint', 'references_test', {
         nets: {},
         params: {},
         body: p => {

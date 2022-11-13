@@ -1,9 +1,30 @@
 const yaml = require('js-yaml')
+const jszip = require('jszip')
 const makerjs = require('makerjs')
 
 const u = require('./utils')
 const a = require('./assert')
 const kle = require('./kle')
+
+exports.unpack = async (zip) => {
+
+    // main config text (has to be called "config.ext" where ext is one of yaml/json/js)
+    const config_text = await zip.file(/^config\.(yaml|json|js)$/).async('string')
+    const injections = []
+
+    // bundled footprints
+    const fps = zip.folder('footprints')
+    const module_prefix = 'const module = {};\n\n'
+    const module_suffix = '\n\nreturn module.exports;'
+    for (const fp in fps.file(/.*\.js$/)) {
+        const name = fp.name.split('.')[0]
+        const text = await fp.async('string')
+        const parsed = new Function(module_prefix + text + module_suffix)()
+        injections.push(['footprint', name, parsed])
+    }
+
+    return [config_text, injections]
+}
 
 exports.interpret = (raw, logger) => {
     let config = raw

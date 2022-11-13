@@ -1,1 +1,1 @@
-Could not read config file "nonexistent.yaml": Error: ENOENT: no such file or directory, open 'nonexistent.yaml'
+Could not read config file "nonexistent.yaml": File does not exist!

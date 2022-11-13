@@ -17,6 +17,7 @@
     "dependencies": {
         "fs-extra": "^10.0.1",
         "js-yaml": "^3.14.1",
+        "jszip": "^3.10.1",
         "kle-serial": "github:ergogen/kle-serial#ergogen",
         "makerjs": "github:ergogen/maker.js#ergogen",
         "mathjs": "^10.1.1",

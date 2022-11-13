@@ -1,11 +1,17 @@
 #!/usr/bin/env node
 
 const fs = require('fs-extra')
+const fsp = require('fs/promises')
 const path = require('path')
 const yaml = require('js-yaml')
 const yargs = require('yargs')
-const ergogen = require('./ergogen')
+const jszip = require('jszip')
+
+const io = require('./io')
 const pkg = require('../package.json')
+const ergogen = require('./ergogen')
+
+;(async () => {
 
 // command line args
 
@@ -29,7 +35,52 @@ const args = yargs
     })
     .argv
 
-// config reading
+// greetings
+
+const title_suffix = args.debug ? ' (Debug Mode)' : ''
+console.log(`Ergogen v${pkg.version} CLI${title_suffix}`)
+console.log()
+
+// input helpers
+
+// zip handling is baked in at the io level, so that both the cli and the webui can use it
+// if, for local development, we want to use a folder as input, we temporarily zip it in
+// memory so that it can be handled the exact same way
+// functions shamelessly repurposed from https://github.com/Stuk/jszip/issues/386
+
+// return a flat array of absolute paths of all files recursively contained in the dir
+const list_files_in_dir = async (dir) => {
+    const list = await fsp.readdir(dir)
+    const statPromises = list.map(async (file) => {
+        const fullPath = path.resolve(dir, file)
+        const stat = await fsp.stat(fullPath)
+        if (stat && stat.isDirectory()) {
+            return list_files_in_dir(fullPath)
+        }
+        return fullPath
+    })
+
+    return (await Promise.all(statPromises)).flat(Infinity)
+}
+
+// create an in-memory zip stream from a folder in the file system
+const zip_from_dir = async (dir) => {
+    const absRoot = path.resolve(dir)
+    const filePaths = await list_files_in_dir(dir)
+    return filePaths.reduce((z, filePath) => {
+        const relative = filePath.replace(absRoot, '')
+        // create folder trees manually :(
+        const zipFolder = path
+            .dirname(relative)
+            .split(path.sep)
+            .reduce((zf, dirName) => zf.folder(dirName), z)
+
+        zipFolder.file(path.basename(filePath), fs.createReadStream(filePath))
+        return z
+    }, new jszip())
+}
+
+// input reading
 
 const config_file = args._[0]
 if (!config_file) {
@@ -37,19 +88,32 @@ if (!config_file) {
     process.exit(1)
 }
 
-let config_text
+if (!fs.existsSync(config_file)) {
+    console.error(`Could not read config file "${config_file}": File does not exist!`)
+    process.exit(2)
+}
+
+let config_text = ''
+let injections = []
+
 try {
-    config_text = fs.readFileSync(config_file).toString()
+    if (config_file.endsWith('.zip') || config_file.endsWith('.ekb')) {
+        [config_text, injections] = await io.unpack(
+            (new jszip()).loadAsync(fs.readFileSync(config_file))
+        )
+    } else if (fs.statSync(config_file).isDirectory()) {
+        [config_text, injections] = await io.unpack(zip_from_dir(config_file))
+    } else {
+        config_text = fs.readFileSync(config_file).toString()
+        // no injections...
+    }
+    for (const [type, value] of injections) {
+        ergogen.inject(type, value)
+    }
 } catch (err) {
     console.error(`Could not read config file "${config_file}": ${err}`)
     process.exit(2)
 }
-
-const title_suffix = args.debug ? ' (Debug Mode)' : ''
-console.log(`Ergogen v${pkg.version} CLI${title_suffix}`)
-console.log()
-
-;(async () => {
 
 // processing
 
@@ -61,7 +125,7 @@ try {
     process.exit(3)
 }
 
-// helpers
+// output helpers
 
 const single = (data, rel) => {
     if (!data) return
@@ -89,7 +153,7 @@ const composite = (data, rel) => {
     }
 }
 
-// output
+// output generation
 
 if (args.clean) {
     console.log('Cleaning output folder...')
