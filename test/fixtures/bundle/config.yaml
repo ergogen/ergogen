@@ -1,0 +1,13 @@
+points.zones.matrix:
+outlines:
+  box:
+    - what: rectangle
+      where: true
+      size: 18
+pcbs:
+  pcb:
+    outlines.edge.outline: box
+    footprints:
+      injected:
+        type: injected
+        anchor: matrix

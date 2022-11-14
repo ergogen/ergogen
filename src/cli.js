@@ -98,20 +98,25 @@ let injections = []
 
 try {
     if (config_file.endsWith('.zip') || config_file.endsWith('.ekb')) {
+        console.log('Analyzing bundle...');
         [config_text, injections] = await io.unpack(
-            (new jszip()).loadAsync(fs.readFileSync(config_file))
+            await (new jszip()).loadAsync(fs.readFileSync(config_file))
         )
     } else if (fs.statSync(config_file).isDirectory()) {
-        [config_text, injections] = await io.unpack(zip_from_dir(config_file))
+        console.log('Analyzing folder...');
+        [config_text, injections] = await io.unpack(
+            await zip_from_dir(config_file)
+        )
     } else {
         config_text = fs.readFileSync(config_file).toString()
         // no injections...
     }
-    for (const [type, value] of injections) {
-        ergogen.inject(type, value)
+    for (const [type, name, value] of injections) {
+        ergogen.inject(type, name, value)
     }
 } catch (err) {
-    console.error(`Could not read config file "${config_file}": ${err}`)
+    console.error(`Could not read config file "${config_file}"!`)
+    console.error(err)
     process.exit(2)
 }
 

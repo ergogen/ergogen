@@ -94,8 +94,9 @@ if (what) {
 // --what is the same as above ('cli', or 'cli/prefix')
 // --dump automatically overrides the old reference
 
-const read = (d, p) => fs.readFileSync(path.join(d, p)).toString()
-const exists = (d, p) => fs.existsSync(path.join(d, p))
+const joiner = (a, b) => path.join(a, b)
+const read = (...args) => fs.readFileSync(args.reduce(joiner, '')).toString()
+const exists = (...args) => fs.existsSync(args.reduce(joiner, ''))
 const { execSync } = require('child_process')
 const dircompare = require('dir-compare')
 
@@ -114,22 +115,33 @@ for (let w of cli_what) {
                 fs.removeSync(output_path)
                 const version_regex = /\bv\d+\.\d+\.\d+(\-develop)?\b/
                 // correct execution
-                if (exists(t, 'log')) {
-                    const ref_log = read(t, 'log').replace(version_regex, '<version>')
+                if (!exists(t, 'error')) {
+                    let ref_log = ''
+                    if (exists(t, 'log')) {
+                        ref_log = read(t, 'log').replace(version_regex, '<version>')
+                    }
                     const actual_log = execSync(command).toString().replace(version_regex, '<version>')
                     if (dump) {
                         fs.writeFileSync(path.join(t, 'log'), actual_log)
                     }
-                    const comp_res = dircompare.compareSync(output_path, path.join(t, 'reference'), {
+                    let ref_path = path.join(t, 'reference')
+                    if (!exists(ref_path)) {
+                        fs.mkdirpSync(ref_path)
+                    }
+                    if (fs.statSync(ref_path).isFile()) {
+                        ref_path = path.resolve(path.join(t, read(ref_path).trim()))
+                    }
+                    const comp_res = dircompare.compareSync(output_path, ref_path, {
                         compareContent: true
                     })
                     if (dump) {
-                        fs.moveSync(output_path, path.join(t, 'reference'), {overwrite: true})
+                        fs.moveSync(output_path, ref_path, {overwrite: true})
                     } else {
                         fs.removeSync(output_path)
                     }
                     actual_log.should.equal(ref_log)
                     comp_res.same.should.be.true
+                // deliberately incorrect execution
                 } else {
                     const ref_error = read(t, 'error')
                     try {
