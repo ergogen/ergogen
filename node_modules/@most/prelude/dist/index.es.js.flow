@@ -1,0 +1,62 @@
+// @flow
+
+// array.js
+
+declare export function cons<A>(val: A, arr: Array<A>): Array<A>
+
+declare export function append<A>(val: A, arr: Array<A>): Array<A>
+
+declare export function drop<A>(val: number, arr: Array<A>): Array<A>
+
+declare export function tail<A>(arr: Array<A>): Array<A>
+
+declare export function copy<A>(arr: Array<A>): Array<A>
+
+declare export function map<A, B>(f: (val: A) => B, arr: Array<A>): Array<B>
+
+declare export function reduce<A, B>(f: (acc: A, val: B) => A, seed: A, arr: Array<B>): A
+
+declare export function replace<A>(toReplace: A, i: number, arr: Array<A>): Array<A>
+
+declare export function remove<A>(i: number, arr: Array<A>): Array<A>
+
+declare export function removeAll<A>(f: (val: A) => boolean, arr: Array<A>): Array<A>
+
+declare export function findIndex<A>(item: A, arr: Array<A>): number
+
+declare export function isArrayLike(x: any): boolean
+
+// function.js
+
+declare export function id<A>(A): A
+
+declare export function compose<A, B, C>(f: (B) => C, g: (A) => B): (A) => C
+
+declare export function apply<A, B>(f: (A) => B, A): B
+
+interface CurriedFunction2<A, B, C> {
+  (): CurriedFunction2<A, B, C>,
+  (A): (B) => C,
+  (A, B): C
+}
+
+interface CurriedFunction3<A, B, C, D> {
+  (): CurriedFunction3<A, B, C, D>,
+  (A): CurriedFunction2<B, C, D>,
+  (A, B): (C) => D,
+  (A, B, C): D
+}
+
+interface CurriedFunction4<A, B, C, D, E> {
+  (): CurriedFunction4<A, B, C, D, E>,
+  (A): CurriedFunction3<B, C, D, E>,
+  (A, B): CurriedFunction2<C, D, E>,
+  (A, B, C): (D) => E,
+  (A, B, C, D): E
+}
+
+declare export function curry2<A, B, C>(f: (A, B) => C): CurriedFunction2<A, B, C>
+
+declare export function curry3<A, B, C, D>(f: (A, B, C) => D): CurriedFunction3<A, B, C, D>
+
+declare export function curry4<A, B, C, D, E>(f: (A, B, C, D) => E): CurriedFunction4<A, B, C, D, E>

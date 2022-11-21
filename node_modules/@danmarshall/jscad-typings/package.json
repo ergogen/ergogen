@@ -1,0 +1,16 @@
+{
+  "name": "@danmarshall/jscad-typings",
+  "version": "1.0.0",
+  "description": "TypeScript typings for Jscad",
+  "types": "types/index.d.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/danmarshall/jscad-typings.git"
+  },
+  "author": "Dan Marshall",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/danmarshall/jscad-typings/issues"
+  },
+  "homepage": "https://github.com/danmarshall/jscad-typings#readme"
+}

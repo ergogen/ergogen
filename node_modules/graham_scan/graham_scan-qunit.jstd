@@ -1,0 +1,7 @@
+load:
+  - qunit-lib/equiv.js
+  - qunit-lib/QUnitAdapter.js
+  - src/graham_scan.js
+
+test:
+  - test/graham_scan.Test.js

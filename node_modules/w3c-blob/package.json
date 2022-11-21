@@ -1,0 +1,22 @@
+{
+  "name": "w3c-blob",
+  "version": "0.0.1",
+  "description": "w3c dom blob api in node and browser",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/chrisdickinson/w3c-blob.git"
+  },
+  "keywords": [
+    "blob",
+    "w3c",
+    "dom",
+    "api"
+  ],
+  "author": "Chris Dickinson <chris@neversaw.us>",
+  "browser": "./browser.js",
+  "license": "MIT"
+}

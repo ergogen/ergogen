@@ -1,0 +1,41 @@
+{
+  "name": "typed-function",
+  "version": "2.0.0",
+  "description": "Type checking for JavaScript functions",
+  "author": "Jos de Jong <wjosdejong@gmail.com> (https://github.com/josdejong)",
+  "contributors": [
+    "Luke Gumbley (https://github.com/luke-gumbley)"
+  ],
+  "homepage": "https://github.com/josdejong/typed-function",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/josdejong/typed-function.git"
+  },
+  "keywords": [
+    "typed",
+    "function",
+    "arguments",
+    "compose",
+    "types"
+  ],
+  "dependencies": {},
+  "devDependencies": {
+    "benchmark": "2.1.4",
+    "istanbul": "0.4.5",
+    "mocha": "8.0.1",
+    "pad-right": "0.2.2",
+    "uglify-js": "3.10.0",
+    "brace-expansion": "1.1.11"
+  },
+  "comment": "brace-expansion is installed because an old insecure version is used by one of the dev depencencies (under istanbul)",
+  "main": "typed-function.js",
+  "scripts": {
+    "build": "uglifyjs typed-function.js -o typed-function.min.js -c -m",
+    "test": "mocha test --recursive",
+    "coverage": "istanbul cover _mocha -- test --recursive; echo \"\nCoverage report is available at ./coverage/lcov-report/index.html\"",
+    "prepublishOnly": "npm test && npm run build"
+  },
+  "engines": {
+    "node": ">= 8"
+  }
+}

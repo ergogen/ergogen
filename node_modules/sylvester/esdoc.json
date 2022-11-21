@@ -1,0 +1,17 @@
+{
+  "source": "./src",
+  "destination": "./doc-output",
+  "test": {
+    "type": "mocha",
+    "source": "./test",
+    "includes": ["\\.test\\.js$"]
+  },
+  "plugins": [
+    { "name": "./doc/gen/index.js" }
+  ],
+  "undocumentIdentifier": false,
+  "title": "sylvester",
+  "manual": {
+    "changelog": ["./CHANGELOG.md"]
+  }
+}

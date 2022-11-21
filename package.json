@@ -16,7 +16,7 @@
     },
     "dependencies": {
         "@jscad/openjscad": "github:ergogen/oldjscad",
-        "fs-extra": "^10.0.0",
+        "fs-extra": "^10.1.0",
         "js-yaml": "^3.14.0",
         "kle-serial": "github:ergogen/kle-serial#ergogen",
         "makerjs": "github:ergogen/maker.js#ergogen",

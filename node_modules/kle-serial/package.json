@@ -1,0 +1,25 @@
+{
+  "name": "@ijprest/kle-serial",
+  "version": "0.15.1",
+  "description": "Serialization library for keyboard-layout-editor.com",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ijprest/kle-serial.git"
+  },
+  "keywords": [
+    "kle",
+    "keyboard-layout-editor",
+    "serialization",
+    "json"
+  ],
+  "author": "Ian Prest <npmjs.com@ian.prest.ca>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ijprest/kle-serial/issues"
+  },
+  "homepage": "https://github.com/ijprest/kle-serial#readme",
+  "dependencies": {
+    "json5": "^2.1.0"
+  }
+}
