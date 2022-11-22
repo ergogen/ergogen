@@ -11,19 +11,19 @@ pcbs:
         outline: edge
     footprints:
       trace:
-        type: trace_test
-        anchor:
+        what: trace_test
+        where:
           shift: [1, 1]
           rotate: 30
       zone:
-        type: zone_test
-        anchor:
+        what: zone_test
+        where:
           shift: [1, 1]
           rotate: 30
       dyn:
-        type: dynamic_net_test
+        what: dynamic_net_test
       anc:
-        type: anchor_test
+        what: anchor_test
         anchors:
           end:
             ref: matrix

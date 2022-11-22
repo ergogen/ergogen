@@ -5,7 +5,7 @@ pcbs:
   shown:
     references: true
     footprints:
-      - type: references_test
+      - what: references_test
   hidden:
     footprints:
-      - type: references_test
+      - what: references_test

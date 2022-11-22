@@ -9,5 +9,5 @@ pcbs:
     outlines.edge.outline: box
     footprints:
       injected:
-        type: injected
-        anchor: matrix
+        what: injected
+        where: matrix

@@ -2,6 +2,7 @@ const m = require('makerjs')
 const a = require('./assert')
 const prep = require('./prepare')
 const anchor_lib = require('./anchor')
+const filter = require('./filter').parse
 
 const kicad_prefix = `
 (kicad_pcb (version 20171130) (host pcbnew 5.1.6)
@@ -149,20 +150,17 @@ exports.inject_footprint = (name, fp) => {
     footprint_types[name] = fp
 }
 
-const footprint = exports._footprint = (config, name, points, point, net_indexer, component_indexer, units, extra) => {
-
-    if (config === false) return ''
+const footprint = exports._footprint = (points, net_indexer, component_indexer, units, extra) => (config, name, point) => {
 
     // config sanitization
-    a.unexpected(config, name, ['type', 'anchor', 'nets', 'anchors', 'params'])
-    const type = a.in(config.type, `${name}.type`, Object.keys(footprint_types))
-    let anchor = anchor_lib.parse(config.anchor || {}, `${name}.anchor`, points, point)(units)
+    a.unexpected(config, name, ['what', 'nets', 'anchors', 'params'])
+    const what = a.in(config.what, `${name}.what`, Object.keys(footprint_types))
     const nets = a.sane(config.nets || {}, `${name}.nets`, 'object')()
     const anchors = a.sane(config.anchors || {}, `${name}.anchors`, 'object')()
     const params = a.sane(config.params || {}, `${name}.params`, 'object')()
 
     // basic setup
-    const fp = footprint_types[type]
+    const fp = footprint_types[what]
     const parsed_params = {}
 
     // connecting other, non-net, non-anchor parameters
@@ -184,12 +182,12 @@ const footprint = exports._footprint = (config, name, points, point, net_indexer
     parsed_params.ref_hide = extra.references ? '' : 'hide'
 
     // footprint positioning
-    parsed_params.at = `(at ${anchor.x} ${-anchor.y} ${anchor.r})`
-    parsed_params.rot = anchor.r
+    parsed_params.at = `(at ${point.x} ${-point.y} ${point.r})`
+    parsed_params.rot = point.r
     parsed_params.xy = (x, y) => {
         const new_anchor = anchor_lib.parse({
             shift: [x, -y]
-        }, '_internal_footprint_xy', points, anchor)(units)
+        }, '_internal_footprint_xy', points, point)(units)
         return `${new_anchor.x} ${-new_anchor.y}`
     }
 
@@ -224,7 +222,7 @@ const footprint = exports._footprint = (config, name, points, point, net_indexer
     // parsing anchor-type parameters
     parsed_params.anchors = {}
     for (const [anchor_name, anchor_config] of Object.entries(prep.extend(fp.anchors || {}, anchors))) {
-        let parsed_anchor = anchor_lib.parse(anchor_config || {}, `${name}.anchors.${anchor_name}`, points, anchor)(units)
+        let parsed_anchor = anchor_lib.parse(anchor_config || {}, `${name}.anchors.${anchor_name}`, points, point)(units)
         parsed_anchor.y = -parsed_anchor.y
         parsed_params.anchors[anchor_name] = parsed_anchor
     }
@@ -273,21 +271,23 @@ exports.parse = (config, points, outlines, units) => {
         }
 
         const footprints = []
+        const footprint_factory = footprint(points, net_indexer, component_indexer, units, {references})
 
-        // key-level footprints
-        for (const [p_name, point] of Object.entries(points)) {
-            for (const [f_name, f] of Object.entries(point.meta.footprints || {})) {
-                footprints.push(footprint(f, `${p_name}.footprints.${f_name}`, points, point, net_indexer, component_indexer, units, {references}))
-            }
-        }
-
-        // global one-off footprints
+        // generate footprints
         if (a.type(pcb_config.footprints)() == 'array') {
             pcb_config.footprints = {...pcb_config.footprints}
         }
-        const global_footprints = a.sane(pcb_config.footprints || {}, `pcbs.${pcb_name}.footprints`, 'object')()
-        for (const [gf_name, gf] of Object.entries(global_footprints)) {
-            footprints.push(footprint(gf, `pcbs.${pcb_name}.footprints.${gf_name}`, points, undefined, net_indexer, component_indexer, units, {references}))
+        const footprints_config = a.sane(pcb_config.footprints || {}, `pcbs.${pcb_name}.footprints`, 'object')()
+        for (const [f_name, f] of Object.entries(footprints_config)) {
+            const name = `pcbs.${pcb_name}.footprints.${f_name}`
+            a.sane(f, name, 'object')()
+            const mirror = a.sane(f.mirror || false, `${name}.mirror`, 'boolean')()
+            const where = filter(f.where, `${name}.where`, points, units, mirror)
+            delete f.mirror
+            delete f.where
+            for (const w of where) {
+                footprints.push(footprint_factory(f, name, w))
+            }
         }
 
         // finalizing nets

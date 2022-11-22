@@ -72,6 +72,7 @@
 - Create browserified version of semver lib
     - Or at least a shim with a console warning
 - Visualizing multiple outlines at once, with different colors
+- Add snapping/measurement capabilities for quicker iteration
 
 ### Minor
 
