@@ -1,0 +1,269 @@
+#node src/cli.js input/item/config-itemdeux.yml -o output/itemdeux
+points:
+  key:
+    padding: cy
+    tags: 
+      1u: true
+    footprints:
+
+      choc_hotswap:
+        type: choc
+        params:
+          hotswap: true
+          reverse: true
+          keycaps: true
+        nets:
+          # from: P1
+          # to: P2
+          from: =colrow
+          to: =column_net
+
+      diode:
+        type: diode
+        nets:
+          # from: P3
+          # to: P4
+          from: =colrow
+          to: =row_net
+        anchor:
+          shift: [0, -5]
+
+  zones:
+    board:
+      rotate: 5
+      rows:
+        bottom:
+          row_net: P8
+        home:
+          row_net: P7
+        top:
+          row_net: P6
+
+      columns:
+        outer:
+          key:
+            column_net: P19
+          row_overrides:
+            home:
+            top: 
+        pinkie:
+          stagger: -12
+          spread: cx
+          key:
+            column_net: P18
+
+        ring:
+          stagger: 8
+          spread: cx+0.3
+          rotate: -3
+          key:
+            column_net: P15
+
+        middle:
+          stagger: 6
+          spread: cx+1
+          rotate: -3
+          key:  
+            column_net: P14
+                   
+        index:
+          stagger: -8
+          spread: cx+1
+          rotate: -3
+          key: 
+            column_net: P16
+
+        inner:
+          stagger: -3
+          spread: cx
+          key: 
+            column_net: P10
+
+
+
+    thumb:
+      anchor:
+        ref: board_ring_bottom
+        shift: [0,-25]
+
+      rows:
+        first:
+          row_net: P9
+        
+
+
+      columns:
+        ctrl: 
+          stagger: 2.5
+          key:
+            column_net: P15
+          rows: 
+            first:
+              tags:
+                15u: true
+                1u: false
+              rotate: 90
+
+        alt:
+          stagger: 11
+          rotate: -3
+          spread: cx
+          key:
+            column_net: P14
+          rows: 
+            first:  
+
+        shift:
+          stagger: -8
+          rotate: -3
+          spread: cx
+          key: 
+            column_net: P16
+          rows: 
+            first:
+
+        e: 
+          spread: cx
+          stagger: -8
+          key: 
+            column_net: P10
+          rows: 
+            first:
+              tags:
+                15u: true
+                1u: false
+              rotate: 90
+              
+outlines:
+  exports:
+    raw: 
+      - type: keys
+        side: left
+        size: [1cx-0.5 , 1cx-0.5]
+
+    polycutout:
+      - type: polygon
+        points: 
+          - ref: board_outer_top
+            shift: [-cx/2-1,cy/2+1]
+          - ref: board_pinkie_top
+            shift: [-cx/2,cy/2+1]
+          - ref: board_ring_top
+            shift: [-cx/2,cy/2+1]
+          - ref: board_middle_top
+            shift: [-cx/2,cy/2+1]
+          - ref: board_middle_top
+            shift: [cx/2,cy/2+1]
+          - ref: board_index_top
+            shift: [cx/2,cy/2+1]
+          - ref: board_inner_top
+            shift: [cx/2,cy/2+1]
+          - ref: board_inner_top
+            shift: [25,cy/2-1]            
+          - ref: thumb_e_first
+            shift: [-cx/2,-1.5cy/2+1] 
+          - ref: thumb_e_first
+            shift: [-cx/2,1.5cy/2+1]             
+          - ref: thumb_ctrl_first
+            shift: [-cx/2-1,-cy/2-1] 
+          - ref: thumb_ctrl_first
+            shift: [-cx/2-1,cy/2+1]
+          - ref: board_pinkie_bottom
+            shift: [-cx/2-1,-cy/2-1]
+          - ref: board_outer_home
+            shift: [-cx/2-1,-cy/2-1]
+
+
+    polybind:
+      main: 
+        type: outline
+        name: raw
+      strnst:
+        type: outline
+        name: polycutout
+        operation: add
+        
+    outline_fillet:
+      - type: outline
+        name: polybind
+        fillet: 3
+
+  
+    _keycap_outlines:
+      - type: keys
+        side: left
+        size: [1cx - 0.5, 1cy - 0.5] # Choc keycaps are 17.5 x 16.5
+        bound: false
+        tags: [1u]
+    _keycap_outlines15:
+      - type: keys
+        side: left
+        size: [1.5cx - 0.5, 1cy - 0.5] # Choc keycaps are 17.5 x 16.5
+        bound: false    
+        tags: [15u]
+
+    key:
+        [_keycap_outlines,_keycap_outlines15]   
+        
+pcbs:
+  itemdeux:
+    outlines:
+      board:
+        outline: outline_fillet
+      keycaps:
+        outline: key
+        layer: Eco1.User
+
+    footprints:
+      promicro:
+        type: promicro_pretty
+        anchor:
+          ref: board_inner_top
+          shift: [12.5,0]
+          rotate: 180
+
+      pcm12:
+        type: pcm12
+        anchor:
+          ref: board_inner_top
+          shift: [0, 0]
+          rotate: 180
+        nets:
+          from: pos  
+          to: RAW
+        params:
+          reverse: true 
+      via3:
+        type: via
+        anchor: 
+          ref: board_inner_top
+          shift: [-7,15]
+        nets: 
+          net: pos
+
+      b3u1000p:
+        type: b3u1000p
+        nets:
+          r1: RST  
+          r2: GND
+        anchor:
+          ref: board_inner_top
+          shift: [10, -18]
+          rotate: 180
+        params:
+          reverse: true 
+
+      bat:
+        type: bat
+        nets: 
+          neg: GND
+          pos: RAW
+        anchor:
+          ref: board_inner_top
+          shift: [-7, 18]
+          rotate:  180
+      
+
+      
+
+    
