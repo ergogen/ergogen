@@ -70,8 +70,8 @@ exports.trbl = (raw, name, _default=0) => units => {
 
 exports.asym = (raw, name) => {
     // allow different aliases
-    source_aliases = ['source', 'origin', 'base', 'primary', 'left']
-    clone_aliases = ['clone', 'image', 'derived', 'secondary', 'right']
+    const source_aliases = ['source', 'origin', 'base', 'primary', 'left']
+    const clone_aliases = ['clone', 'image', 'derived', 'secondary', 'right']
     _in(raw, name, ['both'].concat(source_aliases, clone_aliases))
     // return aliases to canonical names
     if (source_aliases.includes(raw)) return 'source'
