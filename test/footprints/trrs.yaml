@@ -1,0 +1,33 @@
+points.zones.matrix:
+pcbs.pcb.footprints:
+
+  # basic
+  - what: trrs
+    nets:
+      A: A
+      B: B
+      C: C
+      D: D
+
+  # reversible
+  - what: trrs
+    nets:
+      A: A
+      B: B
+      C: C
+      D: D
+    params:
+      reverse: true
+    adjust.shift: [50, 0]
+
+  # reversible + symmetric
+  - what: trrs
+    nets:
+      A: A
+      B: B
+      C: C
+      D: D
+    params:
+      reverse: true
+      symmetric: true
+    adjust.shift: [100, 0]

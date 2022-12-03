@@ -1,0 +1,11 @@
+points.zones.matrix:
+pcbs.pcb.footprints:
+  
+  # downward
+  - what: promicro
+  
+  # upward
+  - what: promicro
+    params:
+      orientation: up
+    adjust.shift: [50, 0]

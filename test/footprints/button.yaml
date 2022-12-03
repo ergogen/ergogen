@@ -1,0 +1,17 @@
+points.zones.matrix:
+pcbs.pcb.footprints:
+
+  # front
+  - what: button
+    nets:
+      from: from
+      to: to
+
+  # back
+  - what: button
+    nets:
+      from: from
+      to: to
+    params:
+      side: B
+    adjust.shift: [50, 0]
