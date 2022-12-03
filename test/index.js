@@ -55,8 +55,9 @@ const test = function(input_path) {
                 } else {
                     fs.writeJSONSync(expected_path, output_part, {spaces: 4})
                 }
+            } else {
+                output_part.should.deep.equal(expected)
             }
-            output_part.should.deep.equal(expected)
         }
     })
 }
@@ -79,7 +80,7 @@ if (what) {
         })
     }
 } else {
-    for (const part of ['points', 'outlines', 'cases', 'pcbs']) {
+    for (const part of ['points', 'outlines', 'cases', 'pcbs', 'footprints']) {
         describe(cap(part), function() {
             for (const i of glob.sync(path.join(__dirname, part, '*.yaml'))) {
                 test.call(this, i)

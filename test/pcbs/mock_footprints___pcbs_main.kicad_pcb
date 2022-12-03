@@ -1,0 +1,190 @@
+
+            
+(kicad_pcb (version 20171130) (host pcbnew 5.1.6)
+
+  (page A3)
+  (title_block
+    (title main)
+    (rev v1.0.0)
+    (company Unknown)
+  )
+
+  (general
+    (thickness 1.6)
+  )
+
+  (layers
+    (0 F.Cu signal)
+    (31 B.Cu signal)
+    (32 B.Adhes user)
+    (33 F.Adhes user)
+    (34 B.Paste user)
+    (35 F.Paste user)
+    (36 B.SilkS user)
+    (37 F.SilkS user)
+    (38 B.Mask user)
+    (39 F.Mask user)
+    (40 Dwgs.User user)
+    (41 Cmts.User user)
+    (42 Eco1.User user)
+    (43 Eco2.User user)
+    (44 Edge.Cuts user)
+    (45 Margin user)
+    (46 B.CrtYd user)
+    (47 F.CrtYd user)
+    (48 B.Fab user)
+    (49 F.Fab user)
+  )
+
+  (setup
+    (last_trace_width 0.25)
+    (trace_clearance 0.2)
+    (zone_clearance 0.508)
+    (zone_45_only no)
+    (trace_min 0.2)
+    (via_size 0.8)
+    (via_drill 0.4)
+    (via_min_size 0.4)
+    (via_min_drill 0.3)
+    (uvia_size 0.3)
+    (uvia_drill 0.1)
+    (uvias_allowed no)
+    (uvia_min_size 0.2)
+    (uvia_min_drill 0.1)
+    (edge_width 0.05)
+    (segment_width 0.2)
+    (pcb_text_width 0.3)
+    (pcb_text_size 1.5 1.5)
+    (mod_edge_width 0.12)
+    (mod_text_size 1 1)
+    (mod_text_width 0.15)
+    (pad_size 1.524 1.524)
+    (pad_drill 0.762)
+    (pad_to_mask_clearance 0.05)
+    (aux_axis_origin 0 0)
+    (visible_elements FFFFFF7F)
+    (pcbplotparams
+      (layerselection 0x010fc_ffffffff)
+      (usegerberextensions false)
+      (usegerberattributes true)
+      (usegerberadvancedattributes true)
+      (creategerberjobfile true)
+      (excludeedgelayer true)
+      (linewidth 0.100000)
+      (plotframeref false)
+      (viasonmask false)
+      (mode 1)
+      (useauxorigin false)
+      (hpglpennumber 1)
+      (hpglpenspeed 20)
+      (hpglpendiameter 15.000000)
+      (psnegative false)
+      (psa4output false)
+      (plotreference true)
+      (plotvalue true)
+      (plotinvisibletext false)
+      (padsonsilk false)
+      (subtractmaskfromsilk false)
+      (outputformat 1)
+      (mirror false)
+      (drillshape 1)
+      (scaleselection 1)
+      (outputdirectory ""))
+  )
+
+            (net 0 "")
+(net 1 "P1")
+(net 2 "T3_1")
+(net 3 "T3_2")
+(net 4 "T3_3")
+            
+  (net_class Default "This is the default net class."
+    (clearance 0.2)
+    (trace_width 0.25)
+    (via_dia 0.8)
+    (via_drill 0.4)
+    (uvia_dia 0.3)
+    (uvia_drill 0.1)
+    (add_net "")
+(add_net "P1")
+(add_net "T3_1")
+(add_net "T3_2")
+(add_net "T3_3")
+  )
+
+            
+
+                (module trace_test (layer F.Cu) (tedit 5CF31DEF)
+
+                    (at 1 -1 30)
+
+                    (pad 1 smd rect (at 0 0 30) (size 1 1) (layers F.Cu F.Paste F.Mask)
+                        (net 1 "P1") (solder_mask_margin 0.2))
+
+                    (pad 2 smd rect (at 5 5 30) (size 1 1) (layers F.Cu F.Paste F.Mask)
+                        (net 1 "P1") (solder_mask_margin 0.2))
+
+                )
+
+                (segment (start 1 -1) (end 7.830127 0.8301270000000001) (width 0.25) (layer F.Cu) (net 1))
+
+            
+
+
+                (module zone_test (layer F.Cu) (tedit 5CF31DEF)
+
+                    (at 1 -1 30)
+
+                    (pad 1 smd rect (at 0 0 30) (size 1 1) (layers F.Cu F.Paste F.Mask)
+                        (net 1 "P1") (solder_mask_margin 0.2))
+
+                    (pad 2 smd rect (at 5 5 30) (size 1 1) (layers F.Cu F.Paste F.Mask)
+                        (net 1 "P1") (solder_mask_margin 0.2))
+
+                )
+
+                (zone (net 1) (net_name P1) (layer F.Cu) (tstamp 0) (hatch full 0.508)
+                    (connect_pads (clearance 0.508))
+                    (min_thickness 0.254)
+                    (fill yes (arc_segments 32) (thermal_gap 0.508) (thermal_bridge_width 0.508))
+                    (polygon (pts (xy 7.830127 0.8301270000000001) (xy 2.830127 -7.830127) (xy -5.830127 -2.830127) (xy -0.8301270000000001 5.830127)))
+                )
+
+            
+ 
+
+                (module dynamic_net_test (layer F.Cu) (tedit 5CF31DEF)
+
+                    (at 0 0 0)
+
+                    (pad 1 smd rect (at 0 0 0) (size 1 1) (layers F.Cu F.Paste F.Mask)
+                        (net 2 "T3_1") (solder_mask_margin 0.2))
+
+                    (pad 1 smd rect (at 0 0 0) (size 1 1) (layers F.Cu F.Paste F.Mask)
+                        (net 3 "T3_2") (solder_mask_margin 0.2))
+
+                    (pad 1 smd rect (at 0 0 0) (size 1 1) (layers F.Cu F.Paste F.Mask)
+                        (net 4 "T3_3") (solder_mask_margin 0.2))
+
+                )
+
+            
+ 
+
+                (module anchor_test (layer F.Cu) (tedit 5CF31DEF)
+
+                    (at 0 0 0)
+
+                    (fp_line (start 0 0) (end 10 -10) (layer Dwgs.User) (width 0.05))
+
+                )
+
+            
+            (gr_line (start -9.5 9.5) (end 9.5 9.5) (angle 90) (layer Edge.Cuts) (width 0.15))
+(gr_line (start 9.5 9.5) (end 9.5 -9.5) (angle 90) (layer Edge.Cuts) (width 0.15))
+(gr_line (start 9.5 -9.5) (end -9.5 -9.5) (angle 90) (layer Edge.Cuts) (width 0.15))
+(gr_line (start -9.5 -9.5) (end -9.5 9.5) (angle 90) (layer Edge.Cuts) (width 0.15))
+            
+)
+
+        
