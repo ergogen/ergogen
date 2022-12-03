@@ -27,7 +27,7 @@ for (const unit of glob.sync(path.join(__dirname, 'unit', '*.js'))) {
 
 // Integration tests
 // the --what switch supports categories (like `points` and `outlines`)
-// as well as individual tests using slash-notation (like `points/000`)
+// as well as individual tests using slash-notation (like `points/default`)
 // the --dump switch can output the new results, overriding the old reference
 
 const cap = s => s.charAt(0).toUpperCase() + s.slice(1)

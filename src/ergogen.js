@@ -15,6 +15,8 @@ const process = async (raw, debug=false, logger=()=>{}) => {
     let empty = true
     let [config, format] = io.interpret(raw, logger)
     let suffix = format
+    // KLE conversion warrants automaticly engaging debug mode
+    // as, usually, we're only interested in the points anyway
     if (format == 'KLE') {
         suffix = `${format} (Auto-debug)`
         debug = true
