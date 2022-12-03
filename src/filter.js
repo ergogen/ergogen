@@ -126,7 +126,7 @@ exports.parse = (config, name, points={}, units={}, asym='source') => {
             result.push(anchor(config, name, points, undefined, true)(units))
         }
         
-        // otherwise, it is treated as a condition to filter all available points
+    // otherwise, it is treated as a condition to filter all available points
     } else {
         const source = Object.values(points).filter(complex(config, name, units))
         if (['source', 'both'].includes(asym)) {

@@ -1,7 +1,7 @@
 const m = require('makerjs')
 const a = require('./assert')
 const prep = require('./prepare')
-const anchor_lib = require('./anchor')
+const anchor = require('./anchor').parse
 const filter = require('./filter').parse
 
 const kicad_prefix = `
@@ -185,7 +185,7 @@ const footprint = exports._footprint = (points, net_indexer, component_indexer, 
     parsed_params.at = `(at ${point.x} ${-point.y} ${point.r})`
     parsed_params.rot = point.r
     parsed_params.xy = (x, y) => {
-        const new_anchor = anchor_lib.parse({
+        const new_anchor = anchor({
             shift: [x, -y]
         }, '_internal_footprint_xy', points, point)(units)
         return `${new_anchor.x} ${-new_anchor.y}`
@@ -222,7 +222,7 @@ const footprint = exports._footprint = (points, net_indexer, component_indexer, 
     // parsing anchor-type parameters
     parsed_params.anchors = {}
     for (const [anchor_name, anchor_config] of Object.entries(prep.extend(fp.anchors || {}, anchors))) {
-        let parsed_anchor = anchor_lib.parse(anchor_config || {}, `${name}.anchors.${anchor_name}`, points, point)(units)
+        let parsed_anchor = anchor(anchor_config || {}, `${name}.anchors.${anchor_name}`, points, point)(units)
         parsed_anchor.y = -parsed_anchor.y
         parsed_params.anchors[anchor_name] = parsed_anchor
     }
@@ -283,10 +283,13 @@ exports.parse = (config, points, outlines, units) => {
             a.sane(f, name, 'object')()
             const asym = a.asym(f.asym || 'source', `${name}.asym`)
             const where = filter(f.where, `${name}.where`, points, units, asym)
+            const adjust = anchor(f.adjust || {}, `${name}.adjust`, points)(units)
             delete f.asym
             delete f.where
+            delete f.adjust
             for (const w of where) {
-                footprints.push(footprint_factory(f, name, w))
+                const aw = w.clone().shift(adjust.p).rotate(adjust.r, false)
+                footprints.push(footprint_factory(f, name, aw))
             }
         }
 
