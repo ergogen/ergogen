@@ -22,4 +22,4 @@ outlines:
         ref: matrix
         shift: [-10, 10]
       radius: 5
-      mirror: true
+      asym: both

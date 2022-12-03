@@ -25,4 +25,4 @@ outlines:
         - shift: [-10, 15]
         - shift: [5, -10]
         - shift: [-10, 0]
-      mirror: true
+      asym: both

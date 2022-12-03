@@ -108,7 +108,7 @@ const contains_object = (val) => {
     return false
 }
 
-exports.parse = (config, name, points={}, units={}, include_mirrors=false) => {
+exports.parse = (config, name, points={}, units={}, asym='source') => {
     
     let result = []
 
@@ -118,18 +118,23 @@ exports.parse = (config, name, points={}, units={}, include_mirrors=false) => {
 
     // if a filter decl is an object, or an array that contains an object at any depth, it is an anchor
     } else if (contains_object(config)) {
-        result.push(anchor(config, name, points)(units))
-        if (include_mirrors) {
+        if (['source', 'both'].includes(asym)) {
+            result.push(anchor(config, name, points)(units))
+        }
+        if (['clone', 'both'].includes(asym)) {
             // this is strict: if the ref of the anchor doesn't have a mirror pair, it will error out
             result.push(anchor(config, name, points, undefined, true)(units))
         }
         
-    // otherwise, it is treated as a condition to filter all available points
+        // otherwise, it is treated as a condition to filter all available points
     } else {
-        result = Object.values(points).filter(complex(config, name, units))
-        if (include_mirrors) {
+        source = Object.values(points).filter(complex(config, name, units))
+        if (['source', 'both'].includes(asym)) {
+            result = result.concat(source)
+        }
+        if (['source', 'both'].includes(asym)) {
             // this is permissive: we only include mirrored versions if they exist, and don't fuss if they don't
-            result = result.concat(result.map(p => points[anchor_lib.mirror(p.meta.name)]).filter(p => !!p))
+            result = result.concat(source.map(p => points[anchor_lib.mirror(p.meta.name)]).filter(p => !!p))
         }
     }
 

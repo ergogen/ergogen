@@ -67,3 +67,14 @@ exports.trbl = (raw, name, _default=0) => units => {
     if (raw.length == 2) raw = [raw[1], raw[0], raw[1], raw[0]]
     return arr(raw, name, 4, 'number', _default)(units)
 }
+
+exports.asym = (raw, name) => {
+    // allow different aliases
+    source_aliases = ['source', 'origin', 'base', 'primary', 'left']
+    clone_aliases = ['clone', 'image', 'derived', 'secondary', 'right']
+    _in(raw, name, ['both'].concat(source_aliases, clone_aliases))
+    // return aliases to canonical names
+    if (source_aliases.includes(raw)) return 'source'
+    if (clone_aliases.includes(raw)) return 'clone'
+    return raw
+}

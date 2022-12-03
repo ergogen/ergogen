@@ -281,9 +281,9 @@ exports.parse = (config, points, outlines, units) => {
         for (const [f_name, f] of Object.entries(footprints_config)) {
             const name = `pcbs.${pcb_name}.footprints.${f_name}`
             a.sane(f, name, 'object')()
-            const mirror = a.sane(f.mirror || false, `${name}.mirror`, 'boolean')()
-            const where = filter(f.where, `${name}.where`, points, units, mirror)
-            delete f.mirror
+            const asym = a.asym(f.asym || 'source', `${name}.asym`)
+            const where = filter(f.where, `${name}.where`, points, units, asym)
+            delete f.asym
             delete f.where
             for (const w of where) {
                 footprints.push(footprint_factory(f, name, w))

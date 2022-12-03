@@ -35,6 +35,7 @@
     - Maybe a partial markdown preprocess to support bold and italic?
 - Look into gr_curve to possibly add beziers to the kicad conversion
     - Support curves (arcs as well as Béziers) in polygons
+    - Also, three point arcs, tangents, earier "circle tools" in general
 - Add snappable line footprint
 - Figure out a manual, but still reasonably comfortable routing method directly from the config
 - Eeschema support for pcbs

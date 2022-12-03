@@ -128,7 +128,7 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key,
             key.height = a.sane(key.height, `${key.name}.height`, 'number')(units)
             key.padding = a.sane(key.padding, `${key.name}.padding`, 'number')(units)
             key.skip = a.sane(key.skip, `${key.name}.skip`, 'boolean')()
-            key.asym = a.in(key.asym, `${key.name}.asym`, ['left', 'right', 'both'])
+            key.asym = a.asym(key.asym, `${key.name}.asym`)
 
             // templating support
             for (const [k, v] of Object.entries(key)) {
@@ -256,14 +256,14 @@ const parse_axis = exports._parse_axis = (config, name, points, units) => {
 const perform_mirror = exports._perform_mirror = (point, axis) => {
     if (axis !== undefined) {
         point.meta.mirrored = false
-        if (point.meta.asym == 'left') return ['', null]
+        if (point.meta.asym == 'source') return ['', null]
         const mp = point.clone().mirror(axis)
         const mirrored_name = `mirror_${point.meta.name}`
         mp.meta = prep.extend(mp.meta, mp.meta.mirror || {})
         mp.meta.name = mirrored_name
         mp.meta.colrow = `mirror_${mp.meta.colrow}`
         mp.meta.mirrored = true
-        if (point.meta.asym == 'right') {
+        if (point.meta.asym == 'clone') {
             point.meta.skip = true
         }
         return [mirrored_name, mp]

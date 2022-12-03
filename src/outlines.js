@@ -191,12 +191,12 @@ exports.parse = (config = {}, points = {}, units = {}) => {
             const operation = u[a.in(part.operation || 'add', `${name}.operation`, ['add', 'subtract', 'intersect', 'stack'])]
             const what = a.in(part.what || 'outline', `${name}.what`, ['rectangle', 'circle', 'polygon', 'outline'])
             const bound = !!part.bound
-            const mirror = a.sane(part.mirror || false, `${name}.mirror`, 'boolean')()
+            const asym = a.asym(part.asym || 'source', `${name}.asym`)
 
             // `where` is delayed until we have all, potentially what-dependent units
             // default where is [0, 0], as per filter parsing
             const original_where = part.where // need to save, so the delete's don't get rid of it below
-            const where = units => filter(original_where, `${name}.where`, points, units, mirror)
+            const where = units => filter(original_where, `${name}.where`, points, units, asym)
             
             const adjust = anchor(part.adjust || {}, `${name}.adjust`, points)(units)
             const fillet = a.sane(part.fillet || 0, `${name}.fillet`, 'number')(units)
@@ -209,7 +209,7 @@ exports.parse = (config = {}, points = {}, units = {}) => {
             delete part.operation
             delete part.what
             delete part.bound
-            delete part.mirror
+            delete part.asym
             delete part.where
             delete part.adjust
             delete part.fillet

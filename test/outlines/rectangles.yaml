@@ -23,4 +23,4 @@ outlines:
         ref: matrix
         shift: [-10, 10]
       size: 10
-      mirror: true
+      asym: both
