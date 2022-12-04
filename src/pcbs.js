@@ -1,4 +1,5 @@
 const m = require('makerjs')
+const u = require('./utils')
 const a = require('./assert')
 const prep = require('./prepare')
 const anchor = require('./anchor').parse
@@ -162,17 +163,41 @@ const footprint = exports._footprint = (points, net_indexer, component_indexer, 
 
     // parsing parameters
     for (const [param_name, param_def] of Object.entries(fp.params)) {
-        let value = prep.extend(param_def.value, params[param_name])
 
-        // templating support
+        // expand param definition shorthand
+        let parsed_def = param_def
+        let def_type = a.type(param_def)(units)
+        if (def_type == 'string') {
+            parsed_def = {type: 'string', value: param_def}
+        } else if (def_type == 'number') {
+            parsed_def = {type: 'number', value: a.mathnum(param_def)(units)}
+        } else if (def_type == 'boolean') {
+            parsed_def = {type: 'boolean', value: param_def}
+        } else if (def_type == 'undefined') {
+            parsed_def = {type: 'net', value: undefined}
+        }
+
+        // combine default value with potential user override
+        let value = prep.extend(parsed_def.value, params[param_name])
+        let type = parsed_def.type
+        
+        // templating support, with conversion back to raw datatypes
+        const converters = {
+            string: v => v,
+            number: v => a.sane(v, `${name}.params.${param_name}`, 'number')(units),
+            boolean: v => v === 'true',
+            net: v => v,
+            anchor: v => v
+        }
         if (a.type(value)() == 'string') {
             value = u.template(value, point.meta)
+            value = converters[type](value)
         }
 
         // type-specific processing
-        if (['string', 'number', 'boolean'].includes(param_def.type)) {
-            parsed_params[param_name] = a.sane(value, `${name}.params.${param_name}`, param_def.type)(units)
-        } else if (param_def.type == 'net') {
+        if (['string', 'number', 'boolean'].includes(type)) {
+            parsed_params[param_name] = value
+        } else if (type == 'net') {
             const net = a.sane(value, `${name}.params.${param_name}`, 'string')(units)
             const index = net_indexer(net)
             parsed_params[param_name] = {
@@ -180,7 +205,7 @@ const footprint = exports._footprint = (points, net_indexer, component_indexer, 
                 index: index,
                 str: `(net ${index} "${net}")`
             }
-        } else if (param_def.type == 'anchor') {
+        } else if (type == 'anchor') {
             let parsed_anchor = anchor(value || {}, `${name}.params.${param_name}`, points, point)(units)
             parsed_anchor.y = -parsed_anchor.y // kicad mirror, as per usual
             parsed_params[param_name] = parsed_anchor
@@ -188,7 +213,7 @@ const footprint = exports._footprint = (points, net_indexer, component_indexer, 
     }
 
     // reference
-    const component_ref = parsed_params.ref = component_indexer(parsed_params.param.class || '_')
+    const component_ref = parsed_params.ref = component_indexer(parsed_params.designator || '_')
     parsed_params.ref_hide = extra.references ? '' : 'hide'
 
     // footprint positioning

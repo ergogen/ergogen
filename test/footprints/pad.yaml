@@ -2,29 +2,26 @@ points.zones.matrix:
 pcbs.pcb.footprints:
 
   - what: pad
-    nets:
+    params:
       net: net
 
   - what: pad
-    nets:
-      net: net
     params:
+      net: net
       align: right
       text: text
     adjust.shift: [50, 0]
 
   - what: pad
-    nets:
-      net: net
     params:
+      net: net
       align: up
       front: false
     adjust.shift: [0, 50]
 
   - what: pad
-    nets:
-      net: net
     params:
+      net: net
       align: down
       mirrored: true
     adjust.shift: [50, 50]

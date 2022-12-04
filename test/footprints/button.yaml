@@ -3,15 +3,14 @@ pcbs.pcb.footprints:
 
   # front
   - what: button
-    nets:
+    params:
       from: from
       to: to
 
   # back
   - what: button
-    nets:
+    params:
       from: from
       to: to
-    params:
       side: B
     adjust.shift: [50, 0]

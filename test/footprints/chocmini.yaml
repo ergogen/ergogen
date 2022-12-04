@@ -3,24 +3,22 @@ pcbs.pcb.footprints:
   
   # base
   - what: chocmini
-    nets:
+    params:
       from: from
       to: to
   
   # keycap visualization
   - what: chocmini
-    nets:
+    params:
       from: from
       to: to
-    params:
       keycaps: true
     adjust.shift: [50, 0]
 
   # reverse
   - what: chocmini
-    nets:
+    params:
       from: from
       to: to
-    params:
       reverse: true
     adjust.shift: [100, 0]

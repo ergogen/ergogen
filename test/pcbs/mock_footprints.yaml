@@ -24,7 +24,7 @@ pcbs:
         what: dynamic_net_test
       anc:
         what: anchor_test
-        anchors:
+        params:
           end:
             ref: matrix
             shift: [10, 10]

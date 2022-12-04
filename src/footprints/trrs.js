@@ -34,16 +34,14 @@
 //      pins 1 and 2 must be identical if symmetric is true, as they will overlap
 
 module.exports = {
-  nets: {
+  params: {
+    designator: 'TRRS',
+    reverse: false,
+    symmetric: false,
     A: undefined,
     B: undefined,
     C: undefined,
     D: undefined
-  },
-  params: {
-    class: 'TRRS',
-    reverse: false,
-    symmetric: false
   },
   body: p => {
     const standard = `
@@ -73,20 +71,20 @@ module.exports = {
     }
     function pins(def_neg, def_pos) {
       return `
-        (pad 1 thru_hole oval (at ${def_neg} 11.3 ${p.rot}) (size 1.6 2.2) (drill oval 0.9 1.5) (layers *.Cu *.Mask) ${p.net.A.str})
-        (pad 2 thru_hole oval (at ${def_pos} 10.2 ${p.rot}) (size 1.6 2.2) (drill oval 0.9 1.5) (layers *.Cu *.Mask) ${p.net.B.str})
-        (pad 3 thru_hole oval (at ${def_pos} 6.2 ${p.rot}) (size 1.6 2.2) (drill oval 0.9 1.5) (layers *.Cu *.Mask) ${p.net.C.str})
-        (pad 4 thru_hole oval (at ${def_pos} 3.2 ${p.rot}) (size 1.6 2.2) (drill oval 0.9 1.5) (layers *.Cu *.Mask) ${p.net.D.str})
+        (pad 1 thru_hole oval (at ${def_neg} 11.3 ${p.rot}) (size 1.6 2.2) (drill oval 0.9 1.5) (layers *.Cu *.Mask) ${p.A.str})
+        (pad 2 thru_hole oval (at ${def_pos} 10.2 ${p.rot}) (size 1.6 2.2) (drill oval 0.9 1.5) (layers *.Cu *.Mask) ${p.B.str})
+        (pad 3 thru_hole oval (at ${def_pos} 6.2 ${p.rot}) (size 1.6 2.2) (drill oval 0.9 1.5) (layers *.Cu *.Mask) ${p.C.str})
+        (pad 4 thru_hole oval (at ${def_pos} 3.2 ${p.rot}) (size 1.6 2.2) (drill oval 0.9 1.5) (layers *.Cu *.Mask) ${p.D.str})
       `
     }
-    if(p.param.reverse & p.param.symmetric) {
+    if(p.reverse & p.symmetric) {
       return `
         ${standard}
         ${stabilizers('-2.3')}
         ${pins('0', '-4.6')}
         ${pins('-4.6', '0')})
       `
-    } else if(p.param.reverse) {
+    } else if(p.reverse) {
         return `
           ${standard}
           ${stabilizers('-2.3')}

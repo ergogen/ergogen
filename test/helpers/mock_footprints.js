@@ -1,11 +1,9 @@
 exports.inject = (ergogen) => {
     ergogen.inject('footprint', 'trace_test', {
-        nets: {
-            P1: 'P1'
-        },
         params: {
-            class: 'T',
-            side: 'F'
+            designator: 'T',
+            side: 'F',
+            P1: {type: 'net', value: 'P1'}
         },
         body: p => {
             return `
@@ -15,26 +13,24 @@ exports.inject = (ergogen) => {
                     ${p.at /* parametric position */}
 
                     (pad 1 smd rect (at 0 0 ${p.rot}) (size 1 1) (layers F.Cu F.Paste F.Mask)
-                        ${p.net.P1.str} (solder_mask_margin 0.2))
+                        ${p.P1.str} (solder_mask_margin 0.2))
 
                     (pad 2 smd rect (at 5 5 ${p.rot}) (size 1 1) (layers F.Cu F.Paste F.Mask)
-                        ${p.net.P1.str} (solder_mask_margin 0.2))
+                        ${p.P1.str} (solder_mask_margin 0.2))
 
                 )
 
-                (segment (start ${p.xy(0, 0)}) (end ${p.xy(5, 5)}) (width 0.25) (layer F.Cu) (net ${p.net.P1.index}))
+                (segment (start ${p.xy(0, 0)}) (end ${p.xy(5, 5)}) (width 0.25) (layer F.Cu) (net ${p.P1.index}))
 
             `
         }
     })
 
     ergogen.inject('footprint', 'zone_test', {
-        nets: {
-            P1: 'P1'
-        },
         params: {
-            class: 'T',
-            side: 'F'
+            designator: 'T',
+            side: 'F',
+            P1: {type: 'net', value: 'P1'}
         },
         body: p => {
             return `
@@ -44,14 +40,14 @@ exports.inject = (ergogen) => {
                     ${p.at /* parametric position */}
 
                     (pad 1 smd rect (at 0 0 ${p.rot}) (size 1 1) (layers F.Cu F.Paste F.Mask)
-                        ${p.net.P1.str} (solder_mask_margin 0.2))
+                        ${p.P1.str} (solder_mask_margin 0.2))
 
                     (pad 2 smd rect (at 5 5 ${p.rot}) (size 1 1) (layers F.Cu F.Paste F.Mask)
-                        ${p.net.P1.str} (solder_mask_margin 0.2))
+                        ${p.P1.str} (solder_mask_margin 0.2))
 
                 )
 
-                (zone (net ${p.net.P1.index}) (net_name ${p.net.P1.name}) (layer ${p.param.side}.Cu) (tstamp 0) (hatch full 0.508)
+                (zone (net ${p.P1.index}) (net_name ${p.P1.name}) (layer ${p.side}.Cu) (tstamp 0) (hatch full 0.508)
                     (connect_pads (clearance 0.508))
                     (min_thickness 0.254)
                     (fill yes (arc_segments 32) (thermal_gap 0.508) (thermal_bridge_width 0.508))
@@ -63,9 +59,8 @@ exports.inject = (ergogen) => {
     })
 
     ergogen.inject('footprint', 'dynamic_net_test', {
-        nets: {},
         params: {
-            class: 'T',
+            designator: 'T',
             side: 'F'
         },
         body: p => {
@@ -91,13 +86,10 @@ exports.inject = (ergogen) => {
     })
 
     ergogen.inject('footprint', 'anchor_test', {
-        nets: {},
         params: {
-            class: 'T',
-            side: 'F'
-        },
-        anchors: {
-            end: undefined
+            designator: 'T',
+            side: 'F',
+            end: {type: 'anchor', value: undefined}
         },
         body: p => {
             return ` 
@@ -106,7 +98,7 @@ exports.inject = (ergogen) => {
 
                     ${p.at /* parametric position */}
 
-                    (fp_line (start 0 0) (end ${p.anchors.end.x} ${p.anchors.end.y}) (layer Dwgs.User) (width 0.05))
+                    (fp_line (start 0 0) (end ${p.end.x} ${p.end.y}) (layer Dwgs.User) (width 0.05))
 
                 )
 
@@ -115,7 +107,6 @@ exports.inject = (ergogen) => {
     })
 
     ergogen.inject('footprint', 'references_test', {
-        nets: {},
         params: {},
         body: p => {
             return `references ${p.ref_hide ? 'hidden' : 'shown'}`

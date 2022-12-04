@@ -1,6 +1,6 @@
 module.exports = {
   params: {
-      class: 'I'
+      designator: 'I'
   },
   body: p => `
     (module injected_test_footprint (layer F.Cu) (tedit 5E1ADAC2)

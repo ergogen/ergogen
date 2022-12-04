@@ -1,6 +1,6 @@
 points.zones.matrix:
 pcbs.pcb.footprints:
   - what: diode
-    nets:
+    params:
       from: from
       to: to

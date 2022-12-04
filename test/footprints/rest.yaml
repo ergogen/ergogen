@@ -2,42 +2,42 @@ points.zones.matrix:
 pcbs.pcb.footprints:
 
   - what: alps
-    nets:
+    params:
       from: from
       to: to
 
   - what: jstph
-    nets:
+    params:
       pos: pos
       neg: neg 
     adjust.shift: [50, 0]
 
   - what: jumper
-    nets:
+    params:
       from: from
       to: to
     adjust.shift: [100, 0]
 
   - what: oled
-    nets:
+    params:
       SDA: SDA
       SCL: SCL 
     adjust.shift: [0, 50]
 
   - what: omron
-    nets:
+    params:
       from: from
       to: to
     adjust.shift: [50, 50]
 
   - what: rgb
-    nets:
+    params:
       din: din
       dout: dout
     adjust.shift: [100, 50]
 
   - what: rotary
-    nets:
+    params:
       from: from
       to: to
       A: A
@@ -46,7 +46,7 @@ pcbs.pcb.footprints:
     adjust.shift: [0, 100]
 
   - what: scrollwheel
-    nets:
+    params:
       from: from
       to: to
       A: A
@@ -56,12 +56,12 @@ pcbs.pcb.footprints:
     adjust.shift: [50, 100]
 
   - what: slider
-    nets:
+    params:
       from: from
       to: to
     adjust.shift: [100, 100]
 
   - what: via
-    nets:
+    params:
       net: net
     adjust.shift: [0, 150]

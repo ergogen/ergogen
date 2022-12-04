@@ -13,15 +13,13 @@
 // note: hotswap and reverse can be used simultaneously
 
 module.exports = {
-  nets: {
+  params: {
+    designator: 'S',
+    hotswap: false,
+    reverse: false,
+    keycaps: false,
     from: undefined,
     to: undefined
-  },
-  params: {
-      class: 'S',
-      hotswap: false,
-      reverse: false,
-      keycaps: false
   },
   body: p => {
     const standard = `
@@ -57,35 +55,35 @@ module.exports = {
       (fp_line (start -9.5 9.5) (end -9.5 -9.5) (layer Dwgs.User) (width 0.15))
       `
     function pins(def_neg, def_pos, def_side) {
-      if(p.param.hotswap) {
+      if(p.hotswap) {
         return `
         ${'' /* holes */}
         (pad "" np_thru_hole circle (at ${def_pos}2.54 -5.08) (size 3 3) (drill 3) (layers *.Cu *.Mask))
         (pad "" np_thru_hole circle (at ${def_neg}3.81 -2.54) (size 3 3) (drill 3) (layers *.Cu *.Mask))
         
         ${'' /* net pads */}
-        (pad 1 smd rect (at ${def_neg}7.085 -2.54 ${p.rot}) (size 2.55 2.5) (layers ${def_side}.Cu ${def_side}.Paste ${def_side}.Mask) ${p.net.from.str})
-        (pad 2 smd rect (at ${def_pos}5.842 -5.08 ${p.rot}) (size 2.55 2.5) (layers ${def_side}.Cu ${def_side}.Paste ${def_side}.Mask) ${p.net.to.str})
+        (pad 1 smd rect (at ${def_neg}7.085 -2.54 ${p.rot}) (size 2.55 2.5) (layers ${def_side}.Cu ${def_side}.Paste ${def_side}.Mask) ${p.from.str})
+        (pad 2 smd rect (at ${def_pos}5.842 -5.08 ${p.rot}) (size 2.55 2.5) (layers ${def_side}.Cu ${def_side}.Paste ${def_side}.Mask) ${p.to.str})
         `
       } else {
           return `
             ${''/* pins */}
-            (pad 1 thru_hole circle (at ${def_pos}2.54 -5.08) (size 2.286 2.286) (drill 1.4986) (layers *.Cu *.Mask) ${p.net.from.str})
-            (pad 2 thru_hole circle (at ${def_neg}3.81 -2.54) (size 2.286 2.286) (drill 1.4986) (layers *.Cu *.Mask) ${p.net.to.str})
+            (pad 1 thru_hole circle (at ${def_pos}2.54 -5.08) (size 2.286 2.286) (drill 1.4986) (layers *.Cu *.Mask) ${p.from.str})
+            (pad 2 thru_hole circle (at ${def_neg}3.81 -2.54) (size 2.286 2.286) (drill 1.4986) (layers *.Cu *.Mask) ${p.to.str})
           `
       }
     }
-    if(p.param.reverse){
+    if(p.reverse){
       return `
         ${standard}
-        ${p.param.keycaps ? keycap : ''}
+        ${p.keycaps ? keycap : ''}
         ${pins('-', '', 'B')}
         ${pins('', '-', 'F')})
         `
     } else {
       return `
         ${standard}
-        ${p.param.keycaps ? keycap : ''}
+        ${p.keycaps ? keycap : ''}
         ${pins('-', '', 'B')})
         `
     }
