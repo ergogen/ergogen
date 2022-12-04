@@ -157,11 +157,21 @@ const footprint = exports._footprint = (points, net_indexer, component_indexer, 
     a.unexpected(config, name, ['what', 'params'])
     const what = a.in(config.what, `${name}.what`, Object.keys(footprint_types))
     const fp = footprint_types[what]
-    const params = config.params || {}
-    a.unexpected(params, `${name}.params`, Object.keys(fp.params))
-    const parsed_params = {}
+    const original_params = config.params || {}
 
+    // param sanitization
+    // we unset the mirror config, as it would be an unexpected field
+    let params = u.deepcopy(original_params)
+    delete params.mirror
+    // but still override with it when applicable
+    if (point.meta.mirrored && original_params.mirror !== undefined) {
+        const mirror_overrides = a.sane(original_params.mirror, `${name}.params.mirror`, 'object')()
+        params = prep.extend(params, mirror_overrides)
+    }
+    a.unexpected(params, `${name}.params`, Object.keys(fp.params))
+    
     // parsing parameters
+    const parsed_params = {}
     for (const [param_name, param_def] of Object.entries(fp.params)) {
 
         // expand param definition shorthand
@@ -219,12 +229,19 @@ const footprint = exports._footprint = (points, net_indexer, component_indexer, 
     // footprint positioning
     parsed_params.at = `(at ${point.x} ${-point.y} ${point.r})`
     parsed_params.rot = point.r
-    parsed_params.xy = (x, y) => {
+    parsed_params.ixy = (x, y) => {
+        const sign = point.meta.mirrored ? -1 : 1
+        return `${sign * x} ${y}`
+    }
+    const xyfunc = (x, y, resist=true) => {
         const new_anchor = anchor({
-            shift: [x, -y]
+            shift: [x, -y],
+            resist: resist
         }, '_internal_footprint_xy', points, point)(units)
         return `${new_anchor.x} ${-new_anchor.y}`
     }
+    parsed_params.xy = (x, y) => xyfunc(x, y, true)
+    parsed_params.sxy = (x, y) => xyfunc(x, y, false)
 
     // allowing footprints to add dynamic nets
     parsed_params.local_net = suffix => {

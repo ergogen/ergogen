@@ -6,18 +6,11 @@
 
 ### Major
 
-- Restructure pcb point/footprint filtering
-    - Use the same `what`/`where` infrastructure as outlines
-    - Collapse params/nets/anchors into a single hierarchy from the user's POV
-    - Add per-footprint mirror support
-    - Add some way for footprints to be able to "resist" the mirroring-related special treatment of negative X shift, rotation, etc.
 - Merge, generalize, uniform-ize and externalize footprints!
     - onnx-like incremental opset versioning
     - Template for creating them, built-in variables they can use, documentation, external links, etc.
         - Add access to whole set of points + filtering logic, so they can implement their own connection logic as well maybe (see daisy chaining)
-        - footprint parameters inside the body should be `p.params.field` instead of `p.param.field` so it actually matches the options that you pass in
-    - Also considering how (or, on which layer) they define their silks, universal mirroring behaviour, etc.
-    - Rename class to designator in this context (https://en.wikipedia.org/wiki/Reference_designator#Designators)
+    - Also considering how (or, on which layer) they define their silks, universal mirroring behaviour (see ixy/xy/sxy note), etc.
 
 ### Minor
 

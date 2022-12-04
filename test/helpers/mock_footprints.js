@@ -8,19 +8,19 @@ exports.inject = (ergogen) => {
         body: p => {
             return `
 
-                (module trace_test (layer F.Cu) (tedit 5CF31DEF)
+                (module trace_test (layer ${p.side}.Cu) (tedit 5CF31DEF)
 
                     ${p.at /* parametric position */}
 
-                    (pad 1 smd rect (at 0 0 ${p.rot}) (size 1 1) (layers F.Cu F.Paste F.Mask)
+                    (pad 1 smd rect (at ${p.ixy(0, 0)} ${p.rot}) (size 1 1) (layers ${p.side}.Cu ${p.side}.Paste ${p.side}.Mask)
                         ${p.P1.str} (solder_mask_margin 0.2))
 
-                    (pad 2 smd rect (at 5 5 ${p.rot}) (size 1 1) (layers F.Cu F.Paste F.Mask)
+                    (pad 2 smd rect (at ${p.ixy(5, 5)} ${p.rot}) (size 1 1) (layers ${p.side}.Cu ${p.side}.Paste ${p.side}.Mask)
                         ${p.P1.str} (solder_mask_margin 0.2))
 
                 )
 
-                (segment (start ${p.xy(0, 0)}) (end ${p.xy(5, 5)}) (width 0.25) (layer F.Cu) (net ${p.P1.index}))
+                (segment (start ${p.sxy(0, 0)}) (end ${p.sxy(5, 5)}) (width 0.25) (layer ${p.side}.Cu) (net ${p.P1.index}))
 
             `
         }
@@ -35,14 +35,14 @@ exports.inject = (ergogen) => {
         body: p => {
             return `
 
-                (module zone_test (layer F.Cu) (tedit 5CF31DEF)
+                (module zone_test (layer ${p.side}.Cu) (tedit 5CF31DEF)
 
                     ${p.at /* parametric position */}
 
-                    (pad 1 smd rect (at 0 0 ${p.rot}) (size 1 1) (layers F.Cu F.Paste F.Mask)
+                    (pad 1 smd rect (at 0 0 ${p.rot}) (size 1 1) (layers ${p.side}.Cu ${p.side}.Paste ${p.side}.Mask)
                         ${p.P1.str} (solder_mask_margin 0.2))
 
-                    (pad 2 smd rect (at 5 5 ${p.rot}) (size 1 1) (layers F.Cu F.Paste F.Mask)
+                    (pad 2 smd rect (at 5 5 ${p.rot}) (size 1 1) (layers ${p.side}.Cu ${p.side}.Paste ${p.side}.Mask)
                         ${p.P1.str} (solder_mask_margin 0.2))
 
                 )
@@ -66,17 +66,17 @@ exports.inject = (ergogen) => {
         body: p => {
             return ` 
 
-                (module dynamic_net_test (layer F.Cu) (tedit 5CF31DEF)
+                (module dynamic_net_test (layer ${p.side}.Cu) (tedit 5CF31DEF)
 
                     ${p.at /* parametric position */}
 
-                    (pad 1 smd rect (at 0 0 ${p.rot}) (size 1 1) (layers F.Cu F.Paste F.Mask)
+                    (pad 1 smd rect (at 0 0 ${p.rot}) (size 1 1) (layers ${p.side}.Cu ${p.side}.Paste ${p.side}.Mask)
                         ${p.local_net('1').str} (solder_mask_margin 0.2))
 
-                    (pad 1 smd rect (at 0 0 ${p.rot}) (size 1 1) (layers F.Cu F.Paste F.Mask)
+                    (pad 1 smd rect (at 0 0 ${p.rot}) (size 1 1) (layers ${p.side}.Cu ${p.side}.Paste ${p.side}.Mask)
                         ${p.local_net('2').str} (solder_mask_margin 0.2))
 
-                    (pad 1 smd rect (at 0 0 ${p.rot}) (size 1 1) (layers F.Cu F.Paste F.Mask)
+                    (pad 1 smd rect (at 0 0 ${p.rot}) (size 1 1) (layers ${p.side}.Cu ${p.side}.Paste ${p.side}.Mask)
                         ${p.local_net('3').str} (solder_mask_margin 0.2))
 
                 )
@@ -94,7 +94,7 @@ exports.inject = (ergogen) => {
         body: p => {
             return ` 
 
-                (module anchor_test (layer F.Cu) (tedit 5CF31DEF)
+                (module anchor_test (layer ${p.side}.Cu) (tedit 5CF31DEF)
 
                     ${p.at /* parametric position */}
 

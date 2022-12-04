@@ -1,4 +1,5 @@
 points.zones.matrix:
+  mirror: 10
 outlines:
   edge:
     - what: rectangle
@@ -12,9 +13,14 @@ pcbs:
     footprints:
       trace:
         what: trace_test
-        where:
+        where: true
+        adjust:
           shift: [1, 1]
           rotate: 30
+        params:
+          side: F
+          mirror:
+            side: B
       zone:
         what: zone_test
         where:

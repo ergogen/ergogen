@@ -94,9 +94,9 @@
 
             (net 0 "")
 (net 1 "P1")
-(net 2 "T3_1")
-(net 3 "T3_2")
-(net 4 "T3_3")
+(net 2 "T6_1")
+(net 3 "T6_2")
+(net 4 "T6_3")
             
   (net_class Default "This is the default net class."
     (clearance 0.2)
@@ -107,12 +107,63 @@
     (uvia_drill 0.1)
     (add_net "")
 (add_net "P1")
-(add_net "T3_1")
-(add_net "T3_2")
-(add_net "T3_3")
+(add_net "T6_1")
+(add_net "T6_2")
+(add_net "T6_3")
   )
 
             
+
+                (module trace_test (layer F.Cu) (tedit 5CF31DEF)
+
+                    (at 1 -1 30)
+
+                    (pad 1 smd rect (at 0 0 30) (size 1 1) (layers F.Cu F.Paste F.Mask)
+                        (net 1 "P1") (solder_mask_margin 0.2))
+
+                    (pad 2 smd rect (at 5 5 30) (size 1 1) (layers F.Cu F.Paste F.Mask)
+                        (net 1 "P1") (solder_mask_margin 0.2))
+
+                )
+
+                (segment (start 1 -1) (end 7.830127 0.8301270000000001) (width 0.25) (layer F.Cu) (net 1))
+
+            
+
+
+                (module trace_test (layer B.Cu) (tedit 5CF31DEF)
+
+                    (at 19 -1 -30)
+
+                    (pad 1 smd rect (at 0 0 -30) (size 1 1) (layers B.Cu B.Paste B.Mask)
+                        (net 1 "P1") (solder_mask_margin 0.2))
+
+                    (pad 2 smd rect (at -5 5 -30) (size 1 1) (layers B.Cu B.Paste B.Mask)
+                        (net 1 "P1") (solder_mask_margin 0.2))
+
+                )
+
+                (segment (start 19 -1) (end 12.169872999999999 0.8301270000000001) (width 0.25) (layer B.Cu) (net 1))
+
+            
+
+
+                (module trace_test (layer B.Cu) (tedit 5CF31DEF)
+
+                    (at 19 -1 -30)
+
+                    (pad 1 smd rect (at 0 0 -30) (size 1 1) (layers B.Cu B.Paste B.Mask)
+                        (net 1 "P1") (solder_mask_margin 0.2))
+
+                    (pad 2 smd rect (at -5 5 -30) (size 1 1) (layers B.Cu B.Paste B.Mask)
+                        (net 1 "P1") (solder_mask_margin 0.2))
+
+                )
+
+                (segment (start 19 -1) (end 12.169872999999999 0.8301270000000001) (width 0.25) (layer B.Cu) (net 1))
+
+            
+
 
                 (module trace_test (layer F.Cu) (tedit 5CF31DEF)
 
@@ -158,13 +209,13 @@
                     (at 0 0 0)
 
                     (pad 1 smd rect (at 0 0 0) (size 1 1) (layers F.Cu F.Paste F.Mask)
-                        (net 2 "T3_1") (solder_mask_margin 0.2))
+                        (net 2 "T6_1") (solder_mask_margin 0.2))
 
                     (pad 1 smd rect (at 0 0 0) (size 1 1) (layers F.Cu F.Paste F.Mask)
-                        (net 3 "T3_2") (solder_mask_margin 0.2))
+                        (net 3 "T6_2") (solder_mask_margin 0.2))
 
                     (pad 1 smd rect (at 0 0 0) (size 1 1) (layers F.Cu F.Paste F.Mask)
-                        (net 4 "T3_3") (solder_mask_margin 0.2))
+                        (net 4 "T6_3") (solder_mask_margin 0.2))
 
                 )
 
@@ -184,6 +235,10 @@
 (gr_line (start 9.5 9.5) (end 9.5 -9.5) (angle 90) (layer Edge.Cuts) (width 0.15))
 (gr_line (start 9.5 -9.5) (end -9.5 -9.5) (angle 90) (layer Edge.Cuts) (width 0.15))
 (gr_line (start -9.5 -9.5) (end -9.5 9.5) (angle 90) (layer Edge.Cuts) (width 0.15))
+(gr_line (start 10.5 9.5) (end 29.5 9.5) (angle 90) (layer Edge.Cuts) (width 0.15))
+(gr_line (start 29.5 9.5) (end 29.5 -9.5) (angle 90) (layer Edge.Cuts) (width 0.15))
+(gr_line (start 29.5 -9.5) (end 10.5 -9.5) (angle 90) (layer Edge.Cuts) (width 0.15))
+(gr_line (start 10.5 -9.5) (end 10.5 9.5) (angle 90) (layer Edge.Cuts) (width 0.15))
             
 )
 
