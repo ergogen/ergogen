@@ -126,6 +126,30 @@ describe('Anchor', function() {
         )
     })
 
+    it('resist', function() {
+        const p = new Point(0, 0, 0, {mirrored: true}) // origin, but mirrored
+        
+        // resistance should be correctly propagated for shifts
+        check(
+            parse({shift: [1, 1]}, 'name', {}, p)(),
+            [-1, 1, 0, {mirrored: true}]
+        )
+        check(
+            parse({shift: [1, 1], resist: true}, 'name', {}, p)(),
+            [1, 1, 0, {mirrored: true}]
+        )
+
+        // ...and orients/rotations too
+        check(
+            parse({rotate: 10}, 'name', {}, p)(),
+            [0, 0, -10, {mirrored: true}]
+        )
+        check(
+            parse({rotate: 10, resist: true}, 'name', {}, p)(),
+            [0, 0, 10, {mirrored: true}]
+        )
+    })
+
     it('string', function() {
         // basic string form
         check(

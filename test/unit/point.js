@@ -36,7 +36,7 @@ describe('Point', function() {
 
     it('shifting', function() {
         const p = new Point(0, 0, -90) // at origin, "looking right"
-        // absolute shift up and left, should be up and left
+        // non-relative shift up and left, should be up and left
         check(p.clone().shift([-1, 1], false), [-1, 1, -90, {}])
         // relative shift up and left, should be up and right
         check(p.clone().shift([-1, 1]), [1, 1, -90, {}])
@@ -48,6 +48,19 @@ describe('Point', function() {
         check(p.clone().rotate(-90), [1, 0, -90, {}])
         // around custom origin
         check(p.clone().rotate(-90, [1, 1]), [1, 2, -90, {}])
+    })
+
+    it('resistance', function() {
+        const p = new Point(0, 0, 0, {mirrored: true}) // origin, but mirrored
+        // non-relative shift up and left, mirroring changes it to up and right
+        check(p.clone().shift([-1, 1], false), [1, 1, 0, {mirrored: true}])
+        // ...but resistance keeps it up and left
+        check(p.clone().shift([-1, 1], false, true), [-1, 1, 0, {mirrored: true}])
+        
+        // mirroring changes rotation direction, too
+        check(p.clone().rotate(-90), [0, 0, 90, {mirrored: true}])
+        // ...but not when resistance is applied
+        check(p.clone().rotate(-90, false, true), [0, 0, -90, {mirrored: true}])
     })
 
     it('mirroring', function() {

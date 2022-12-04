@@ -24,8 +24,8 @@ module.exports = class Point {
         [this.x, this.y] = val
     }
 
-    shift(s, relative=true) {
-        s[0] *= this.meta.mirrored ? -1 : 1
+    shift(s, relative=true, resist=false) {
+        s[0] *= (!resist && this.meta.mirrored) ? -1 : 1
         if (relative) {
             s = m.point.rotate(s, this.r)
         }
@@ -34,8 +34,8 @@ module.exports = class Point {
         return this
     }
 
-    rotate(angle, origin=[0, 0]) {
-        angle *= this.meta.mirrored ? -1 : 1
+    rotate(angle, origin=[0, 0], resist=false) {
+        angle *= (!resist && this.meta.mirrored) ? -1 : 1
         if (origin) {
             this.p = m.point.rotate(this.p, angle, origin)
         }

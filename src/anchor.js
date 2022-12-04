@@ -28,7 +28,7 @@ const aggregators = {
     }
 }
 
-const anchor = exports.parse = (raw, name, points={}, default_point=new Point(), mirror=false) => units => {
+const anchor = exports.parse = (raw, name, points={}, start=new Point(), mirror=false) => units => {
 
     //
     // Anchor type handling
@@ -39,8 +39,8 @@ const anchor = exports.parse = (raw, name, points={}, default_point=new Point(),
     }
 
     else if (a.type(raw)() == 'array') {
-        // recursive call with incremental default_point mods, according to `affect`s
-        let current = default_point.clone()
+        // recursive call with incremental start mods, according to `affect`s
+        let current = start.clone()
         let index = 1
         for (const step of raw) {
             current = anchor(step, `${name}[${index++}]`, points, current, mirror)(units)
@@ -48,13 +48,13 @@ const anchor = exports.parse = (raw, name, points={}, default_point=new Point(),
         return current
     }
 
-    a.unexpected(raw, name, ['ref', 'aggregate', 'orient', 'shift', 'rotate', 'affect'])
+    a.unexpected(raw, name, ['ref', 'aggregate', 'orient', 'shift', 'rotate', 'affect', 'resist'])
 
     //
     // Reference or aggregate handling
     //
     
-    let point = default_point.clone()
+    let point = start.clone()
     if (raw.ref !== undefined && raw.aggregate !== undefined) {
         throw new Error(`Fields "ref" and "aggregate" cannot appear together in anchor "${name}"!`)
     }
@@ -67,7 +67,7 @@ const anchor = exports.parse = (raw, name, points={}, default_point=new Point(),
             point = points[parsed_ref].clone()
         // recursive case
         } else {
-            point = anchor(raw.ref, `${name}.ref`, points, default_point, mirror)(units)
+            point = anchor(raw.ref, `${name}.ref`, points, start, mirror)(units)
         }
     }
 
@@ -80,7 +80,7 @@ const anchor = exports.parse = (raw, name, points={}, default_point=new Point(),
         const parts = []
         let index = 1
         for (const part of raw.aggregate.parts) {
-            parts.push(anchor(part, `${name}.aggregate.parts[${index++}]`, points, default_point, mirror)(units))
+            parts.push(anchor(part, `${name}.aggregate.parts[${index++}]`, points, start, mirror)(units))
         }
 
         point = aggregators[raw.aggregate.method](raw.aggregate, `${name}.aggregate`, parts)
@@ -90,14 +90,15 @@ const anchor = exports.parse = (raw, name, points={}, default_point=new Point(),
     // Actual orient/shift/rotate/affect handling
     //
 
+    resist = a.sane(raw.resist || false, `${name}.resist`, 'boolean')()
     const rotator = (config, name, point) => {
         // simple case: number gets added to point rotation
         if (a.type(config)(units) == 'number') {
             let angle = a.sane(config, name, 'number')(units)
-            point.rotate(angle, false)
+            point.rotate(angle, false, resist)
         // recursive case: points turns "towards" target anchor
         } else {
-            const target = anchor(config, name, points, default_point, mirror)(units)
+            const target = anchor(config, name, points, start, mirror)(units)
             point.r = point.angle(target)
         }
     }
@@ -107,14 +108,14 @@ const anchor = exports.parse = (raw, name, points={}, default_point=new Point(),
     }
     if (raw.shift !== undefined) {
         let xyval = a.wh(raw.shift, `${name}.shift`)(units)
-        point.shift(xyval)
+        point.shift(xyval, true, resist)
     }
     if (raw.rotate !== undefined) {
         rotator(raw.rotate, `${name}.rotate`, point)
     }
     if (raw.affect !== undefined) {
         const candidate = point.clone()
-        point = default_point.clone()
+        point = start.clone()
         point.meta = candidate.meta
         let affect = raw.affect
         if (a.type(affect)() == 'string') affect = affect.split('')
