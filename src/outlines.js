@@ -198,7 +198,8 @@ exports.parse = (config = {}, points = {}, units = {}) => {
             const original_where = part.where // need to save, so the delete's don't get rid of it below
             const where = units => filter(original_where, `${name}.where`, points, units, asym)
             
-            const adjust = anchor(part.adjust || {}, `${name}.adjust`, points)(units)
+            const original_adjust = part.adjust // same as above
+            const adjust = start => anchor(original_adjust || {}, `${name}.adjust`, points, start)(units)
             const fillet = a.sane(part.fillet || 0, `${name}.fillet`, 'number')(units)
             expand_shorthand(part, units)
             const expand = a.sane(part.expand || 0, `${name}.expand`, 'number')(units)
@@ -222,7 +223,7 @@ exports.parse = (config = {}, points = {}, units = {}) => {
 
             // and then the shape is repeated for all where positions
             for (const w of where(shape_units)) {
-                const point = w.clone().shift(adjust.p).rotate(adjust.r, false)
+                const point = adjust(w.clone())
                 let [shape, bbox] = shape_maker(point) // point is passed for mirroring metadata only...
                 if (bound) {
                     shape = binding(shape, bbox, point, shape_units)

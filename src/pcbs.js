@@ -283,12 +283,13 @@ exports.parse = (config, points, outlines, units) => {
             a.sane(f, name, 'object')()
             const asym = a.asym(f.asym || 'source', `${name}.asym`)
             const where = filter(f.where, `${name}.where`, points, units, asym)
-            const adjust = anchor(f.adjust || {}, `${name}.adjust`, points)(units)
+            const original_adjust = f.adjust // need to save, so the delete's don't get rid of it below
+            const adjust = start => anchor(original_adjust || {}, `${name}.adjust`, points, start)(units)
             delete f.asym
             delete f.where
             delete f.adjust
             for (const w of where) {
-                const aw = w.clone().shift(adjust.p).rotate(adjust.r, false)
+                const aw = adjust(w.clone())
                 footprints.push(footprint_factory(f, name, aw))
             }
         }
