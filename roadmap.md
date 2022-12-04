@@ -26,6 +26,8 @@
     - have a `dummy` footprint which can just be updated from schematic
 - Allow footprints to publish outlines
     - Make these usable in the `outlines` section through a new `what`
+- Add footprint sanitization to check compatibility for externally loaded ones
+    - Or to double check internal ones for compliance
 - 3D orient for cases
 - Even more extreme anchor stuff
     - Checkpoints, intersects, distances, weighted combinations?

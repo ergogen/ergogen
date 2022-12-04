@@ -153,28 +153,38 @@ exports.inject_footprint = (name, fp) => {
 const footprint = exports._footprint = (points, net_indexer, component_indexer, units, extra) => (config, name, point) => {
 
     // config sanitization
-    a.unexpected(config, name, ['what', 'nets', 'anchors', 'params'])
+    a.unexpected(config, name, ['what', 'params'])
     const what = a.in(config.what, `${name}.what`, Object.keys(footprint_types))
-    const nets = a.sane(config.nets || {}, `${name}.nets`, 'object')()
-    const anchors = a.sane(config.anchors || {}, `${name}.anchors`, 'object')()
-    const params = a.sane(config.params || {}, `${name}.params`, 'object')()
-
-    // basic setup
     const fp = footprint_types[what]
+    const params = config.params || {}
+    a.unexpected(params, `${name}.params`, Object.keys(fp.params))
     const parsed_params = {}
 
-    // connecting other, non-net, non-anchor parameters
-    parsed_params.param = {}
-    for (const [param_name, param_value] of Object.entries(prep.extend(fp.params || {}, params))) {
-        let value = param_value
-        if (a.type(value)() == 'string' && value.startsWith('=') && point) {
-            const indirect = value.substring(1)
-            value = point.meta[indirect]
-            // if (value === undefined) {
-            //     throw new Error(`Indirection "${name}.params.${param_name}" --> "${point.meta.name}.${indirect}" to undefined value!`)
-            // }
+    // parsing parameters
+    for (const [param_name, param_def] of Object.entries(fp.params)) {
+        let value = prep.extend(param_def.value, params[param_name])
+
+        // templating support
+        if (a.type(value)() == 'string') {
+            value = u.template(value, point.meta)
         }
-        parsed_params.param[param_name] = value
+
+        // type-specific processing
+        if (['string', 'number', 'boolean'].includes(param_def.type)) {
+            parsed_params[param_name] = a.sane(value, `${name}.params.${param_name}`, param_def.type)(units)
+        } else if (param_def.type == 'net') {
+            const net = a.sane(value, `${name}.params.${param_name}`, 'string')(units)
+            const index = net_indexer(net)
+            parsed_params[param_name] = {
+                name: net,
+                index: index,
+                str: `(net ${index} "${net}")`
+            }
+        } else if (param_def.type == 'anchor') {
+            let parsed_anchor = anchor(value || {}, `${name}.params.${param_name}`, points, point)(units)
+            parsed_anchor.y = -parsed_anchor.y // kicad mirror, as per usual
+            parsed_params[param_name] = parsed_anchor
+        }
     }
 
     // reference
@@ -191,23 +201,6 @@ const footprint = exports._footprint = (points, net_indexer, component_indexer, 
         return `${new_anchor.x} ${-new_anchor.y}`
     }
 
-    // connecting nets
-    parsed_params.net = {}
-    for (const [net_name, net_value] of Object.entries(prep.extend(fp.nets || {}, nets))) {
-        let net = a.sane(net_value, `${name}.nets.${net_name}`, 'string')()
-        if (net.startsWith('=') && point) {
-            const indirect = net.substring(1)
-            net = point.meta[indirect]
-            net = a.sane(net, `${name}.nets.${net_name} --> ${point.meta.name}.${indirect}`, 'string')()
-        }
-        const index = net_indexer(net)
-        parsed_params.net[net_name] = {
-            name: net,
-            index: index,
-            str: `(net ${index} "${net}")`
-        }
-    }
-
     // allowing footprints to add dynamic nets
     parsed_params.local_net = suffix => {
         const net = `${component_ref}_${suffix}`
@@ -217,14 +210,6 @@ const footprint = exports._footprint = (points, net_indexer, component_indexer, 
             index: index,
             str: `(net ${index} "${net}")`
         }
-    }
-
-    // parsing anchor-type parameters
-    parsed_params.anchors = {}
-    for (const [anchor_name, anchor_config] of Object.entries(prep.extend(fp.anchors || {}, anchors))) {
-        let parsed_anchor = anchor(anchor_config || {}, `${name}.anchors.${anchor_name}`, points, point)(units)
-        parsed_anchor.y = -parsed_anchor.y
-        parsed_params.anchors[anchor_name] = parsed_anchor
     }
 
     return fp.body(parsed_params)
