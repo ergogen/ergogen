@@ -1,0 +1,67 @@
+points.zones.matrix:
+pcbs.pcb.footprints:
+
+  - what: alps
+    nets:
+      from: from
+      to: to
+
+  - what: jstph
+    nets:
+      pos: pos
+      neg: neg 
+    adjust.shift: [50, 0]
+
+  - what: jumper
+    nets:
+      from: from
+      to: to
+    adjust.shift: [100, 0]
+
+  - what: oled
+    nets:
+      SDA: SDA
+      SCL: SCL 
+    adjust.shift: [0, 50]
+
+  - what: omron
+    nets:
+      from: from
+      to: to
+    adjust.shift: [50, 50]
+
+  - what: rgb
+    nets:
+      din: din
+      dout: dout
+    adjust.shift: [100, 50]
+
+  - what: rotary
+    nets:
+      from: from
+      to: to
+      A: A
+      B: B
+      C: C
+    adjust.shift: [0, 100]
+
+  - what: scrollwheel
+    nets:
+      from: from
+      to: to
+      A: A
+      B: B
+      C: C
+      D: D
+    adjust.shift: [50, 100]
+
+  - what: slider
+    nets:
+      from: from
+      to: to
+    adjust.shift: [100, 100]
+
+  - what: via
+    nets:
+      net: net
+    adjust.shift: [0, 150]

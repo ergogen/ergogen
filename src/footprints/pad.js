@@ -28,7 +28,10 @@ module.exports = {
             if (align == 'right') x += p.param.width / 2 + plus
             if (align == 'up') y += p.param.height / 2 + plus
             if (align == 'down') y -= p.param.height / 2 + plus
-            const text = `(fp_text user ${p.param.text} (at ${x} ${y} ${p.rot}) (layer ${side}.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15)) ${mirror}))`
+            let text = ''
+            if (p.param.text.length) {
+                text = `(fp_text user ${p.param.text} (at ${x} ${y} ${p.rot}) (layer ${side}.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15)) ${mirror}))`
+            }
             return `(pad 1 smd rect (at 0 0 ${p.rot}) (size ${p.param.width} ${p.param.height}) (layers ${side}.Cu ${side}.Paste ${side}.Mask) ${p.net.net.str})\n${text}`
         }
 

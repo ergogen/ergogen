@@ -170,9 +170,9 @@ const footprint = exports._footprint = (points, net_indexer, component_indexer, 
         if (a.type(value)() == 'string' && value.startsWith('=') && point) {
             const indirect = value.substring(1)
             value = point.meta[indirect]
-            if (value === undefined) {
-                throw new Error(`Indirection "${name}.params.${param}" --> "${point.meta.name}.${indirect}" to undefined value!`)
-            }
+            // if (value === undefined) {
+            //     throw new Error(`Indirection "${name}.params.${param_name}" --> "${point.meta.name}.${indirect}" to undefined value!`)
+            // }
         }
         parsed_params.param[param_name] = value
     }

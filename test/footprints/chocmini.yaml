@@ -1,0 +1,26 @@
+points.zones.matrix:
+pcbs.pcb.footprints:
+  
+  # base
+  - what: chocmini
+    nets:
+      from: from
+      to: to
+  
+  # keycap visualization
+  - what: chocmini
+    nets:
+      from: from
+      to: to
+    params:
+      keycaps: true
+    adjust.shift: [50, 0]
+
+  # reverse
+  - what: chocmini
+    nets:
+      from: from
+      to: to
+    params:
+      reverse: true
+    adjust.shift: [100, 0]
