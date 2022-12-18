@@ -9,19 +9,16 @@ points:
         rotate: 5
       columns:
         pinky:
-        ring:
-          rotate: -5
+        ring.key:
+          splay: -5
           # hinge at the bottom right corner
           # of the bottom pinky's 14x14 hole
           # for historical reasons...
           origin: [-12, -19]
           stagger: 12
-        middle:
-          stagger: 5
-        index:
-          stagger: -6
-        inner:
-          stagger: -2
+        middle.key.stagger: 5
+        index.key.stagger: -6
+        inner.key.stagger: -2
       rows:
         bottom:
         home:
@@ -32,13 +29,13 @@ points:
         shift: [-7, -19]
       columns:
         near:
-        home:
+        home.key:
           spread: 21.25
-          rotate: -28
+          splay: -28
           origin: [-11.75, -9]
-        far:
+        far.key:
           spread: 21.25
-          rotate: -28
+          splay: -28
           origin: [-9.5, -9]
       rows:
         thumb:
@@ -69,18 +66,16 @@ points:
     matrix:
       columns:
         pinky:
-        ring:
-          stagger: 3
-        middle:
-          stagger: 5
-        index:
-          stagger: -5
-        inner:
-          stagger: -6
+        ring.key.stagger: 3
+        middle.key.stagger: 5
+        index.key.stagger: -5
+        inner.key.stagger: -6
         thumb:
-          stagger: 10
-          row_overrides:
-            home:
+          key.stagger: 10
+          rows:
+            bottom: $unset
+            top: $unset
+            num: $unset
       rows:
         bottom:
         home:
@@ -91,6 +86,44 @@ points:
     ref: matrix_thumb_home
     distance: 22
       
+        `,
+        CasePcbTest: `
+        
+points.zones.matrix:
+  columns:
+    c1:
+    c2:
+  rows:
+    r1:
+    r2:
+  key.bind: 1
+outlines:
+  holes:
+    - where: true
+      what: rectangle
+      size: 18
+  edge:
+    - where: true
+      what: rectangle
+      size: 18
+      bound: true
+  plate:
+    - edge
+    - -holes
+cases.test:
+  - what: outline
+    name: plate
+    extrude: 5
+pcbs.test:
+  outlines:
+    - outline: edge
+  footprints:
+    - what: mx
+      where: true
+      params:
+        from: '{{name}}_from'
+        to: '{{name}}_to'
+        
         `
     }
 }
