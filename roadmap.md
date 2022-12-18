@@ -24,6 +24,7 @@
 - 3D orient for cases
 - Even more extreme anchor stuff
     - Checkpoints, intersects, distances, weighted combinations?
+    - Extend the "turning towards" capabilities of `orient` and `rotate` to `shift` as well (to move as much as it would take the current anchor location to get there)
 - SVG input (for individual outlines, or even combinations parsed by line color, etc.)
     - And once that's done, possibly even STL or other input for cases or pcb renders
 - Support text silk output to PCBs (in configurable fonts, through SVG?)
