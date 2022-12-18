@@ -90,7 +90,7 @@ const anchor = exports.parse = (raw, name, points={}, start=new Point(), mirror=
     // Actual orient/shift/rotate/affect handling
     //
 
-    resist = a.sane(raw.resist || false, `${name}.resist`, 'boolean')()
+    const resist = a.sane(raw.resist || false, `${name}.resist`, 'boolean')()
     const rotator = (config, name, point) => {
         // simple case: number gets added to point rotation
         if (a.type(config)(units) == 'number') {
@@ -107,7 +107,7 @@ const anchor = exports.parse = (raw, name, points={}, start=new Point(), mirror=
         rotator(raw.orient, `${name}.orient`, point)
     }
     if (raw.shift !== undefined) {
-        let xyval = a.wh(raw.shift, `${name}.shift`)(units)
+        const xyval = a.wh(raw.shift, `${name}.shift`)(units)
         point.shift(xyval, true, resist)
     }
     if (raw.rotate !== undefined) {
