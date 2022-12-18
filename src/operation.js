@@ -17,7 +17,7 @@ exports.operation = (str, choices={}, order=Object.keys(choices)) => {
     let res = op_prefix(str)
     for (const key of order) {
         if (choices[key].includes(res.name)) {
-            res.type = key
+            res.what = key
             break
         }
     }

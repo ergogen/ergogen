@@ -57,15 +57,15 @@ exports.parse = (config, outlines, units) => {
             }
             const part_qname = `cases.${case_name}.${part_name}`
             const part_var = `${case_name}__part_${part_name}`
-            a.unexpected(part, part_qname, ['type', 'name', 'extrude', 'shift', 'rotate', 'operation'])
-            const type = a.in(part.type || 'outline', `${part_qname}.type`, ['outline', 'case'])
+            a.unexpected(part, part_qname, ['what', 'name', 'extrude', 'shift', 'rotate', 'operation'])
+            const what = a.in(part.what || 'outline', `${part_qname}.what`, ['outline', 'case'])
             const name = a.sane(part.name, `${part_qname}.name`, 'string')()
             const shift = a.numarr(part.shift || [0, 0, 0], `${part_qname}.shift`, 3)(units)
             const rotate = a.numarr(part.rotate || [0, 0, 0], `${part_qname}.rotate`, 3)(units)
             const operation = a.in(part.operation || 'add', `${part_qname}.operation`, ['add', 'subtract', 'intersect'])
 
             let base
-            if (type == 'outline') {
+            if (what == 'outline') {
                 const extrude = a.sane(part.extrude || 1, `${part_qname}.extrude`, 'number')(units)
                 const outline = outlines[name]
                 a.assert(outline, `Field "${part_qname}.name" does not name a valid outline!`)
@@ -79,7 +79,7 @@ exports.parse = (config, outlines, units) => {
                 outline_dependencies.push(name)
                 base = `${name}_outline_fn()`
             } else {
-                a.assert(part.extrude === undefined, `Field "${part_qname}.extrude" should not be used when type=case!`)
+                a.assert(part.extrude === undefined, `Field "${part_qname}.extrude" should not be used when what=case!`)
                 a.in(name, `${part_qname}.name`, Object.keys(cases))
                 case_dependencies.push(name)
                 base = `${name}_case_fn()`
