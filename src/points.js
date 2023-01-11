@@ -117,7 +117,7 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key,
             key.col.name = col_name
             key.row = row
 
-            key.stagger = a.sane(key.stagger, `${key.name}.shift`, 'number')(units)
+            key.stagger = a.sane(key.stagger, `${key.name}.stagger`, 'number')(units)
             key.spread = a.sane(key.spread, `${key.name}.spread`, 'number')(units)
             key.splay = a.sane(key.splay, `${key.name}.splay`, 'number')(units)
             key.origin = a.xy(key.origin, `${key.name}.origin`)(units)
