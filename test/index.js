@@ -133,14 +133,19 @@ for (let w of cli_what) {
                         ref_path = path.resolve(path.join(t, read(ref_path).trim()))
                     }
                     const comp_res = dircompare.compareSync(output_path, ref_path, {
-                        compareContent: true
+                        compareContent: true,
+                        compareFileSync: dircompare.fileCompareHandlers.lineBasedFileCompare.compareSync,
+                        compareFileAsync: dircompare.fileCompareHandlers.lineBasedFileCompare.compareAsync,
+                        ignoreLineEnding: true
                     })
                     if (dump) {
                         fs.moveSync(output_path, ref_path, {overwrite: true})
                     } else {
                         fs.removeSync(output_path)
                     }
-                    actual_log.should.equal(ref_log)
+                    const parse_act_log = actual_log.replace(/(?:\r\n|\r|\n)/g,"\n")
+                    const parse_ref_log = ref_log.replace(/(?:\r\n|\r|\n)/g,"\n")
+                    parse_act_log.should.equal(parse_ref_log)
                     comp_res.same.should.be.true
                 // deliberately incorrect execution
                 } else {
