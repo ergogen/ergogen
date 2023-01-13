@@ -56,7 +56,13 @@ const test = function(input_path) {
                     fs.writeJSONSync(expected_path, output_part, {spaces: 4})
                 }
             } else {
-                output_part.should.deep.equal(expected)
+                if (a.type(output_part)() == 'string') {
+                  const parse_out = output_part.replace(/(?:\r\n|\r|\n)/g,"\n")
+                  const parse_exp = expected.replace(/(?:\r\n|\r|\n)/g,"\n")
+                  parse_out.should.deep.equal(parse_exp)
+                } else {
+                  output_part.should.deep.equal(expected)
+                }
             }
         }
     })
