@@ -65,3 +65,21 @@ pcbs.pcb.footprints:
     params:
       net: net
     adjust.shift: [0, 150]
+
+  - what: scrollwheel
+    params:
+      from: from
+      to: to
+      A: A
+      B: B
+      C: C
+      D: D
+      reverse: true
+    adjust.shift: [50, 150]
+
+  - what: slider
+    params:
+      from: from
+      to: to
+      side: B
+    adjust.shift: [100, 150]
