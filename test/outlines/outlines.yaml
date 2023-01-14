@@ -24,3 +24,7 @@ outlines:
     - what: outline
       name: fillet
       scale: 0.5
+  combination:
+    - "base"
+    - "-scale"
+    - "~fillet"
