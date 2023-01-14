@@ -22,3 +22,12 @@ pcbs.pcb.footprints:
       to: to
       reverse: true
     adjust.shift: [100, 0]
+
+  # reverse with keycap visualization
+  - what: chocmini
+    params:
+      from: from
+      to: to
+      keycaps: true
+      reverse: true
+    adjust.shift: [150, 0]
