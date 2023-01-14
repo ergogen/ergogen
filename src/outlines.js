@@ -140,7 +140,7 @@ const expand_shorthand = (config, units) => {
     if (a.type(config.expand)(units) == 'string') {
         const prefix = config.expand.slice(0, -1)
         const suffix = config.expand.slice(-1)
-        let expand = suffix
+        let expand = prefix
         let joints = 0
         
         if (suffix == ')') ; // noop
