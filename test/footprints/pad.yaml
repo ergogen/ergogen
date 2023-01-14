@@ -25,3 +25,17 @@ pcbs.pcb.footprints:
       align: down
       mirrored: true
     adjust.shift: [50, 50]
+
+  - what: pad
+    params:
+      net: net
+      align: right
+      mirrored: true
+    adjust.shift: [100, 0]
+
+  - what: pad
+    params:
+      net: net
+      align: left
+      mirrored: true
+    adjust.shift: [100, 50]
