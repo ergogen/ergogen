@@ -56,6 +56,21 @@ describe('Anchor', function() {
             }, 'name', points)(),
             [5, 5, -45, {}]
         )
+        // empty parts
+        check(
+            parse({
+                aggregate: {
+                }
+            }, 'name', points)(),
+            [0, 0, 0, {}]
+        )
+        // can't have aggregate and ref together
+        parse({
+          aggregate: {
+            parts: ['o', 'ten']
+          },
+          ref : 'ten'
+        }, 'name', points).should.throw()
     })
 
     it('shift', function() {
