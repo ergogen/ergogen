@@ -126,7 +126,7 @@
 
                 )
 
-                (segment (start 1 -1) (end 7.830127 0.8301270000000001) (width 0.25) (layer F.Cu) (net 1))
+                (segment (start 1 -1) (end 7.830127 0.8301270000000001) (width 0.475) (layer F.Cu) (net 1))
 
             
 
@@ -143,7 +143,7 @@
 
                 )
 
-                (segment (start 19 -1) (end 12.169872999999999 0.8301270000000001) (width 0.25) (layer B.Cu) (net 1))
+                (segment (start 19 -1) (end 12.169872999999999 0.8301270000000001) (width 0.475) (layer B.Cu) (net 1))
 
             
 
@@ -160,7 +160,7 @@
 
                 )
 
-                (segment (start 19 -1) (end 12.169872999999999 0.8301270000000001) (width 0.25) (layer B.Cu) (net 1))
+                (segment (start 19 -1) (end 12.169872999999999 0.8301270000000001) (width 0.475) (layer B.Cu) (net 1))
 
             
 
@@ -177,7 +177,7 @@
 
                 )
 
-                (segment (start 1 -1) (end 7.830127 0.8301270000000001) (width 0.25) (layer F.Cu) (net 1))
+                (segment (start 1 -1) (end 7.830127 0.8301270000000001) (width 0.475) (layer F.Cu) (net 1))
 
             
 
@@ -227,6 +227,17 @@
                     (at 0 0 0)
 
                     (fp_line (start 0 0) (end 10 -10) (layer Dwgs.User) (width 0.05))
+
+                )
+
+            
+ 
+
+                (module anchor_test (layer F.Cu) (tedit 5CF31DEF)
+
+                    (at 0 0 0)
+
+                    (fp_line (start 0 0) (end 0 0) (layer Dwgs.User) (width 0.05))
 
                 )
 

@@ -3,6 +3,7 @@ exports.inject = (ergogen) => {
         params: {
             designator: 'T',
             side: 'F',
+            width: 0.25,
             P1: {type: 'net', value: 'P1'}
         },
         body: p => {
@@ -20,7 +21,7 @@ exports.inject = (ergogen) => {
 
                 )
 
-                (segment (start ${p.sxy(0, 0)}) (end ${p.sxy(5, 5)}) (width 0.25) (layer ${p.side}.Cu) (net ${p.P1.index}))
+                (segment (start ${p.sxy(0, 0)}) (end ${p.sxy(5, 5)}) (width ${p.width}) (layer ${p.side}.Cu) (net ${p.P1.index}))
 
             `
         }
