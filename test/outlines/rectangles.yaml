@@ -17,6 +17,7 @@ outlines:
           - mirror_matrix
         shift: [0, sy/2]
       size: [20, 40]
+      corner: 5
     outside_rects:
       what: rectangle
       where:

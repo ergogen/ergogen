@@ -1,0 +1,18 @@
+points:
+  zones:
+    matrix:
+      mirror:
+        ref: matrix_only_first
+        distance: 30
+      columns:
+        only.rows:
+          first.bind: 0
+          second.bind: [0,10,0,10]
+          third.bind: [10,0,10,0]
+          fourth.bind: [u, u/2, u/3, u/4]
+outlines:
+  bound:
+    - what: rectangle
+      where: true
+      size: 20
+      bound: true
