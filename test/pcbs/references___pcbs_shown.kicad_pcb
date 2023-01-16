@@ -8,9 +8,9 @@
 
   (paper "A3")
   (title_block
-    (title shown)
-    (rev v1.0.0)
-    (company Unknown)
+    (title "shown")
+    (rev "v1.0.0")
+    (company "Unknown")
   )
 
   (layers

@@ -14,9 +14,9 @@ const kicad_prefix = `
 
   (paper "A3")
   (title_block
-    (title KEYBOARD_NAME_HERE)
-    (rev VERSION_HERE)
-    (company YOUR_NAME_HERE)
+    (title "KEYBOARD_NAME_HERE")
+    (rev "VERSION_HERE")
+    (company "YOUR_NAME_HERE")
   )
 
   (layers
