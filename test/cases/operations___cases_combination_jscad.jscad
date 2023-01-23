@@ -1,12 +1,18 @@
-function _square_outline_fn(){
+function _square_extrude_8_outline_fn(){
     return new CSG.Path2D([[-4,-4],[4,-4]]).appendPoint([4,4]).appendPoint([-4,4]).appendPoint([-4,-4]).close().innerToCAG()
 .extrude({ offset: [0, 0, 8] });
 }
 
 
-function _circle_outline_fn(){
+function _circle_extrude_8_outline_fn(){
     return CAG.circle({"center":[0,0],"radius":3})
 .extrude({ offset: [0, 0, 8] });
+}
+
+
+function _square_extrude_1_outline_fn(){
+    return new CSG.Path2D([[-4,-4],[4,-4]]).appendPoint([4,4]).appendPoint([-4,4]).appendPoint([-4,-4]).close().innerToCAG()
+.extrude({ offset: [0, 0, 1] });
 }
 
 
@@ -55,7 +61,7 @@ function _circle_outline_fn(){
                     
 
                 // creating part 0 of case _cube
-                let _cube__part_0 = _square_outline_fn();
+                let _cube__part_0 = _square_extrude_8_outline_fn();
 
                 // make sure that rotations are relative
                 let _cube__part_0_bounds = _cube__part_0.getBounds();
@@ -78,7 +84,7 @@ function _circle_outline_fn(){
                     
 
                 // creating part 0 of case _cylinder_one
-                let _cylinder_one__part_0 = _circle_outline_fn();
+                let _cylinder_one__part_0 = _circle_extrude_8_outline_fn();
 
                 // make sure that rotations are relative
                 let _cylinder_one__part_0_bounds = _cylinder_one__part_0.getBounds();
@@ -101,7 +107,7 @@ function _circle_outline_fn(){
                     
 
                 // creating part 0 of case _cylinder_two
-                let _cylinder_two__part_0 = _circle_outline_fn();
+                let _cylinder_two__part_0 = _circle_extrude_8_outline_fn();
 
                 // make sure that rotations are relative
                 let _cylinder_two__part_0_bounds = _cylinder_two__part_0.getBounds();
@@ -124,7 +130,7 @@ function _circle_outline_fn(){
                     
 
                 // creating part 0 of case _flat_square
-                let _flat_square__part_0 = _square_outline_fn();
+                let _flat_square__part_0 = _square_extrude_1_outline_fn();
 
                 // make sure that rotations are relative
                 let _flat_square__part_0_bounds = _flat_square__part_0.getBounds();

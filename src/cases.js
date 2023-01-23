@@ -69,15 +69,19 @@ exports.parse = (config, outlines, units) => {
                 const extrude = a.sane(part.extrude || 1, `${part_qname}.extrude`, 'number')(units)
                 const outline = outlines[name]
                 a.assert(outline, `Field "${part_qname}.name" does not name a valid outline!`)
-                if (!scripts[name]) {
-                    scripts[name] = m.exporter.toJscadScript(outline, {
-                        functionName: `${name}_outline_fn`,
+                // This is a hack to separate multiple calls to the same outline with different extrude values
+                // I know it needlessly duplicates a lot of code, but it's the quickest fix in the short term
+                // And on the long run, we'll probably be moving to CADQuery anyway...
+                const extruded_name = `${name}_extrude_` + ('' + extrude).replace(/\D/g, '_')
+                if (!scripts[extruded_name]) {
+                    scripts[extruded_name] = m.exporter.toJscadScript(outline, {
+                        functionName: `${extruded_name}_outline_fn`,
                         extrude: extrude,
                         indent: 4
                     })
                 }
-                outline_dependencies.push(name)
-                base = `${name}_outline_fn()`
+                outline_dependencies.push(extruded_name)
+                base = `${extruded_name}_outline_fn()`
             } else {
                 a.assert(part.extrude === undefined, `Field "${part_qname}.extrude" should not be used when what=case!`)
                 a.in(name, `${part_qname}.name`, Object.keys(cases))

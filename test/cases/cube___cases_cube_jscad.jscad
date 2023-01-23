@@ -1,4 +1,4 @@
-function square_outline_fn(){
+function square_extrude_5_outline_fn(){
     return new CSG.Path2D([[-2.5,-2.5],[2.5,-2.5]]).appendPoint([2.5,2.5]).appendPoint([-2.5,2.5]).appendPoint([-2.5,-2.5]).close().innerToCAG()
 .extrude({ offset: [0, 0, 5] });
 }
@@ -10,7 +10,7 @@ function square_outline_fn(){
                     
 
                 // creating part 0 of case cube
-                let cube__part_0 = square_outline_fn();
+                let cube__part_0 = square_extrude_5_outline_fn();
 
                 // make sure that rotations are relative
                 let cube__part_0_bounds = cube__part_0.getBounds();

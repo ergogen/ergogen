@@ -1,4 +1,4 @@
-function export_outline_fn(){
+function export_extrude_1_outline_fn(){
     return new CSG.Path2D([[-9,-9],[9,-9]]).appendPoint([9,9]).appendPoint([-9,9]).appendPoint([-9,-9]).close().innerToCAG()
 .extrude({ offset: [0, 0, 1] });
 }
@@ -10,7 +10,7 @@ function export_outline_fn(){
                     
 
                 // creating part 0 of case _export
-                let _export__part_0 = export_outline_fn();
+                let _export__part_0 = export_extrude_1_outline_fn();
 
                 // make sure that rotations are relative
                 let _export__part_0_bounds = _export__part_0.getBounds();
