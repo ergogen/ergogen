@@ -14,6 +14,7 @@
 
 ### Minor
 
+- Add full anchor support to individual points (via `adjust`, probably)
 - Include raw kicad footprint integrations
     - pull torik's script to be able to convert raw kicad footprints into positionable ergogen ones
     - have a `dummy` footprint which can just be updated from schematic
