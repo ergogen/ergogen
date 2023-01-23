@@ -115,7 +115,7 @@ const kicad_netclass = `
   )
 `
 
-const makerjs2kicad = exports._makerjs2kicad = (model, layer='Edge.Cuts') => {
+const makerjs2kicad = exports._makerjs2kicad = (model, layer) => {
     const grs = []
     const xy = val => `${val[0]} ${-val[1]}`
     m.model.walk(model, {
@@ -185,30 +185,40 @@ const footprint = exports._footprint = (points, net_indexer, component_indexer, 
             parsed_def = {type: 'boolean', value: param_def}
         } else if (def_type == 'array') {
             parsed_def = {type: 'array', value: param_def}
-        } else if (def_type == 'undefined') {
+        } else if (def_type == 'object') {
+            // parsed param definitions also expand to an object
+            // so to detect whether this is an arbitrary object,
+            // we first have to make sure it's not an expanded param def
+            // (this has to be a heuristic, but should be pretty reliable)
+            const defarr = Object.keys(param_def)
+            const already_expanded = defarr.length == 2 && defarr.includes('type') && defarr.includes('value')
+            if (!already_expanded) {
+                parsed_def = {type: 'object', value: param_def}
+            }
+        } else {
             parsed_def = {type: 'net', value: undefined}
         }
 
         // combine default value with potential user override
-        let value = prep.extend(parsed_def.value, params[param_name])
-        let type = parsed_def.type
+        let value = params[param_name] !== undefined ? params[param_name] : parsed_def.value
+        const type = parsed_def.type
+        a.in(type, `${name}.params.${param_name}.type`, [
+            'string', 'number', 'boolean', 'array', 'object', 'net', 'anchor'
+        ])
 
         // templating support, with conversion back to raw datatypes
         const converters = {
             string: v => v,
             number: v => a.sane(v, `${name}.params.${param_name}`, 'number')(units),
-            boolean: v => v === 'true',
-            net: v => v,
-            anchor: v => v,
-            array: v => v
+            boolean: v => v === 'true'
         }
-        if (a.type(value)() == 'string') {
+        if (a.type(value)() == 'string' && Object.keys(converters).includes(type)) {
             value = u.template(value, point.meta)
             value = converters[type](value)
         }
 
         // type-specific processing
-        if (['string', 'number', 'boolean', 'array'].includes(type)) {
+        if (['string', 'number', 'boolean', 'array', 'object'].includes(type)) {
             parsed_params[param_name] = value
         } else if (type == 'net') {
             const net = a.sane(value, `${name}.params.${param_name}`, 'string')(units)
@@ -218,8 +228,8 @@ const footprint = exports._footprint = (points, net_indexer, component_indexer, 
                 index: index,
                 str: `(net ${index} "${net}")`
             }
-        } else if (type == 'anchor') {
-            let parsed_anchor = anchor(value || {}, `${name}.params.${param_name}`, points, point)(units)
+        } else { // anchor
+            let parsed_anchor = anchor(value, `${name}.params.${param_name}`, points, point)(units)
             parsed_anchor.y = -parsed_anchor.y // kicad mirror, as per usual
             parsed_params[param_name] = parsed_anchor
         }
@@ -236,7 +246,7 @@ const footprint = exports._footprint = (points, net_indexer, component_indexer, 
         const sign = point.meta.mirrored ? -1 : 1
         return `${sign * x} ${y}`
     }
-    const xyfunc = (x, y, resist=true) => {
+    const xyfunc = (x, y, resist) => {
         const new_anchor = anchor({
             shift: [x, -y],
             resist: resist

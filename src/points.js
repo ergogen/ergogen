@@ -244,7 +244,7 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key,
 
 const parse_axis = exports._parse_axis = (config, name, points, units) => {
     if (!['number', 'undefined'].includes(a.type(config)(units))) {
-        const mirror_obj = a.sane(config || {}, name, 'object')()
+        const mirror_obj = a.sane(config, name, 'object')()
         const distance = a.sane(mirror_obj.distance || 0, `${name}.distance`, 'number')(units)
         delete mirror_obj.distance
         let axis = anchor_lib.parse(mirror_obj, name, points)(units).x
@@ -254,21 +254,18 @@ const parse_axis = exports._parse_axis = (config, name, points, units) => {
 }
 
 const perform_mirror = exports._perform_mirror = (point, axis) => {
-    if (axis !== undefined) {
-        point.meta.mirrored = false
-        if (point.meta.asym == 'source') return ['', null]
-        const mp = point.clone().mirror(axis)
-        const mirrored_name = `mirror_${point.meta.name}`
-        mp.meta = prep.extend(mp.meta, mp.meta.mirror || {})
-        mp.meta.name = mirrored_name
-        mp.meta.colrow = `mirror_${mp.meta.colrow}`
-        mp.meta.mirrored = true
-        if (point.meta.asym == 'clone') {
-            point.meta.skip = true
-        }
-        return [mirrored_name, mp]
+    point.meta.mirrored = false
+    if (point.meta.asym == 'source') return ['', null]
+    const mp = point.clone().mirror(axis)
+    const mirrored_name = `mirror_${point.meta.name}`
+    mp.meta = prep.extend(mp.meta, mp.meta.mirror || {})
+    mp.meta.name = mirrored_name
+    mp.meta.colrow = `mirror_${mp.meta.colrow}`
+    mp.meta.mirrored = true
+    if (point.meta.asym == 'clone') {
+        point.meta.skip = true
     }
-    return ['', null]
+    return [mirrored_name, mp]
 }
 
 exports.parse = (config, units) => {
@@ -300,13 +297,11 @@ exports.parse = (config, units) => {
 
         // simplifying the names in individual point "zones" and single-key columns
         while (Object.keys(new_points).some(k => k.endsWith('_default'))) {
-            for (const key of Object.keys(new_points)) {
-                if (key.endsWith('_default')) {
-                    const new_key = key.slice(0, -8)
-                    new_points[new_key] = new_points[key]
-                    new_points[new_key].meta.name = new_key
-                    delete new_points[key]
-                }
+            for (const key of Object.keys(new_points).filter(k => k.endsWith('_default'))) {
+                const new_key = key.slice(0, -8)
+                new_points[new_key] = new_points[key]
+                new_points[new_key].meta.name = new_key
+                delete new_points[key]
             }
         }
 
@@ -352,7 +347,7 @@ exports.parse = (config, units) => {
     const global_axis = parse_axis(global_mirror, `points.mirror`, points, units)
     const global_mirrored_points = {}
     for (const point of Object.values(points)) {
-        if (global_axis !== undefined && point.mirrored === undefined) {
+        if (global_axis !== undefined && point.meta.mirrored === undefined) {
             const [mname, mp] = perform_mirror(point, global_axis)
             if (mp) {
                 global_mirrored_points[mname] = mp

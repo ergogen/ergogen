@@ -107,6 +107,32 @@ exports.inject = (ergogen) => {
         }
     })
 
+    ergogen.inject('footprint', 'arrobj_test', {
+        params: {
+            designator: 'T',
+            side: 'F',
+            start: {x: 0, y: 0},
+            end: [[1, 0], [0, 1]]
+        },
+        body: p => {
+            lines = ''
+            for (const item of p.end) {
+                lines += `(fp_line (start ${p.start.x} ${p.start.y}) (end ${item[0]} ${item[1]}) (layer Dwgs.User) (width 0.05))\n`
+            }
+            return ` 
+
+                (module arrobj_test (layer ${p.side}.Cu) (tedit 5CF31DEF)
+
+                    ${p.at /* parametric position */}
+
+                    ${lines}
+
+                )
+
+            `
+        }
+    })
+
     ergogen.inject('references_test', {
         params: {},
         body: p => {

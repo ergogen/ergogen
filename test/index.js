@@ -9,6 +9,7 @@ require('./helpers/mock_footprints').inject(ergogen)
 
 let what = process.env.npm_config_what
 const dump = process.env.npm_config_dump
+const lineends = /(?:\r\n|\r|\n)/g
 
 
 
@@ -30,6 +31,19 @@ for (const unit of glob.sync(path.join(__dirname, 'unit', '*.js'))) {
 // as well as individual tests using slash-notation (like `points/default`)
 // the --dump switch can output the new results, overriding the old reference
 
+const dump_structure = (obj, depth=-1, prefix='', breadcrumbs=[]) => {
+    if (a.type(obj)() != 'object') {
+        console.log(prefix + breadcrumbs.join('_'))
+        return
+    }
+    if (depth == 0) return
+    for (const [key, val] of Object.entries(obj)) {
+        breadcrumbs.push(key)
+        dump_structure(val, depth-1, prefix, breadcrumbs)
+        breadcrumbs.pop()
+    }
+}
+
 const cap = s => s.charAt(0).toUpperCase() + s.slice(1)
 
 const test = function(input_path) {
@@ -37,33 +51,52 @@ const test = function(input_path) {
     this.slow(120000)
     title = path.basename(input_path, '.yaml').split('_').join(' ')
     it(title, async function() {
+        
         const input = yaml.load(fs.readFileSync(input_path).toString())
+        const base = path.join(path.dirname(input_path), path.basename(input_path, '.yaml'))
+        const references = glob.sync(base + '___*')
+        
+        // handle deliberately wrong inputs
+        const exception = base + '___EXCEPTION.txt'
+        if (fs.existsSync(exception)) {
+            const exception_snippet = fs.readFileSync(exception).toString()
+            return await ergogen.process(input, true).should.be.rejectedWith(exception_snippet)
+        }
+
         const output = await ergogen.process(input, true)
 
         // compare output vs. reference
-        const base = path.join(path.dirname(input_path), path.basename(input_path, '.yaml'))
-        for (const expected_path of glob.sync(base + '___*')) {
-            let expected = fs.readFileSync(expected_path).toString()
-            if (expected_path.endsWith('.json')) {
-                expected = JSON.parse(expected)
-            }
-            const comp_path = expected_path.split('___')[1].split('.')[0].split('_').join('.')
-            const output_part = u.deep(output, comp_path)
-            if (dump) {
-                if (a.type(output_part)() == 'string') {
-                    fs.writeFileSync(expected_path, output_part)
-                } else {
-                    fs.writeJSONSync(expected_path, output_part, {spaces: 4})
+        if (references.length) {
+            for (const expected_path of references) {
+                let expected = fs.readFileSync(expected_path).toString()
+                if (expected_path.endsWith('.json')) {
+                    expected = JSON.parse(expected)
                 }
-            } else {
-                if (a.type(output_part)() == 'string') {
-                  const parse_out = output_part.replace(/(?:\r\n|\r|\n)/g,"\n")
-                  const parse_exp = expected.replace(/(?:\r\n|\r|\n)/g,"\n")
-                  parse_out.should.deep.equal(parse_exp)
+                const comp_path = expected_path.split('___')[1].split('.')[0].split('_').join('.')
+                const output_part = u.deep(output, comp_path)
+                if (dump) {
+                    if (a.type(output_part)() == 'string') {
+                        fs.writeFileSync(expected_path, output_part)
+                    } else {
+                        fs.writeJSONSync(expected_path, output_part, {spaces: 4})
+                    }
                 } else {
-                  output_part.should.deep.equal(expected)
+                    if (a.type(output_part)() == 'string') {
+                        const parse_out = output_part.replace(lineends, '\n')
+                        const parse_exp = expected.replace(lineends, '\n')
+                        parse_out.should.deep.equal(parse_exp)
+                    } else {
+                        // JSON can hide negative zeroes, for example, so we canonical-ize first
+                        const canonical_part = JSON.parse(JSON.stringify(output_part))
+                        canonical_part.should.deep.equal(expected)
+                    }
                 }
             }
+
+        // explicit dump-ing above only works, if there are already files with the right name
+        // if there aren't, dump now outputs a list of candidates that could be referenced
+        } else if (dump) {
+            dump_structure(output, 3, base + '___')
         }
     })
 }
@@ -140,17 +173,17 @@ for (let w of cli_what) {
                     }
                     const comp_res = dircompare.compareSync(output_path, ref_path, {
                         compareContent: true,
+                        ignoreLineEnding: true,
                         compareFileSync: dircompare.fileCompareHandlers.lineBasedFileCompare.compareSync,
-                        compareFileAsync: dircompare.fileCompareHandlers.lineBasedFileCompare.compareAsync,
-                        ignoreLineEnding: true
+                        compareFileAsync: dircompare.fileCompareHandlers.lineBasedFileCompare.compareAsync
                     })
                     if (dump) {
                         fs.moveSync(output_path, ref_path, {overwrite: true})
                     } else {
                         fs.removeSync(output_path)
                     }
-                    const parse_act_log = actual_log.replace(/(?:\r\n|\r|\n)/g,"\n")
-                    const parse_ref_log = ref_log.replace(/(?:\r\n|\r|\n)/g,"\n")
+                    const parse_act_log = actual_log.replace(lineends, '\n')
+                    const parse_ref_log = ref_log.replace(lineends, '\n')
                     parse_act_log.should.equal(parse_ref_log)
                     comp_res.same.should.be.true
                 // deliberately incorrect execution

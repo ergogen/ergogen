@@ -13,3 +13,18 @@ points:
       rows:
         bottom:
         top:
+    other:
+      anchor:
+        ref: matrix_right_top
+        shift: [100, 100]
+      # default mirror object, ref = [0, 0], distance = 0
+      mirror: {}
+      columns:
+        left:
+          rows:
+            bottom.asym: source
+            top.asym: clone
+        right:
+      rows:
+        bottom:
+        top:

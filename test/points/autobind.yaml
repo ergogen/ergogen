@@ -1,0 +1,24 @@
+points.zones:
+  none:
+    key:
+      autobind: 0
+    columns:
+      a:
+      b:
+  some:
+    key:
+      autobind: 1
+    columns:
+      a:
+      b:
+outlines:
+  none:
+    - what: rectangle
+      where: /none_.*/
+      size: 5
+      bound: true
+  some:
+    - what: rectangle
+      where: /some_.*/
+      size: 5
+      bound: true

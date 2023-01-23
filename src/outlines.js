@@ -136,20 +136,15 @@ const whats = {
     outline
 }
 
-const expand_shorthand = (config, units) => {
+const expand_shorthand = (config, name, units) => {
     if (a.type(config.expand)(units) == 'string') {
         const prefix = config.expand.slice(0, -1)
         const suffix = config.expand.slice(-1)
-        let expand = prefix
-        let joints = 0
-        
-        if (suffix == ')') ; // noop
-        else if (suffix == '>') joints = 1
-        else if (suffix == ']') joints = 2
-        else expand = config.expand
-        
-        config.expand = parseFloat(expand)
-        config.joints = config.joints || joints
+        const valid_suffixes = [')', '>', ']']
+        a.assert(valid_suffixes.includes(suffix), `If field "${name}" is a string, ` +
+            `it should end with one of [${valid_suffixes.map(s => `'${s}'`).join(', ')}]!`)
+        config.expand = prefix
+        config.joints = config.joints || valid_suffixes.indexOf(suffix)
     }
     
     if (a.type(config.joints)(units) == 'string') {
@@ -159,7 +154,7 @@ const expand_shorthand = (config, units) => {
     }
 }
 
-exports.parse = (config = {}, points = {}, units = {}) => {
+exports.parse = (config, points, units) => {
 
     // output outlines will be collected here
     const outlines = {}
@@ -201,7 +196,7 @@ exports.parse = (config = {}, points = {}, units = {}) => {
             const original_adjust = part.adjust // same as above
             const adjust = start => anchor(original_adjust || {}, `${name}.adjust`, points, start)(units)
             const fillet = a.sane(part.fillet || 0, `${name}.fillet`, 'number')(units)
-            expand_shorthand(part, units)
+            expand_shorthand(part, `${name}.expand`, units)
             const expand = a.sane(part.expand || 0, `${name}.expand`, 'number')(units)
             const joints = a.in(a.sane(part.joints || 0, `${name}.joints`, 'number')(units), `${name}.joints`, [0, 1, 2])
             const scale = a.sane(part.scale || 1, `${name}.scale`, 'number')(units)

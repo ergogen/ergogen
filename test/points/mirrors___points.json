@@ -1,0 +1,786 @@
+{
+    "matrix_left_bottom": {
+        "x": 0,
+        "y": 0,
+        "r": 0,
+        "meta": {
+            "stagger": 0,
+            "spread": 19,
+            "splay": 0,
+            "origin": [
+                0,
+                0
+            ],
+            "orient": 0,
+            "shift": [
+                0,
+                0
+            ],
+            "rotate": 0,
+            "width": 18,
+            "height": 18,
+            "padding": 19,
+            "autobind": 10,
+            "skip": false,
+            "asym": "source",
+            "colrow": "left_bottom",
+            "name": "matrix_left_bottom",
+            "zone": {
+                "columns": {
+                    "left": {
+                        "rows": {
+                            "bottom": {
+                                "asym": "source"
+                            },
+                            "top": {
+                                "asym": "clone"
+                            }
+                        },
+                        "key": {},
+                        "name": "left"
+                    },
+                    "right": null
+                },
+                "rows": {
+                    "bottom": {},
+                    "top": {}
+                },
+                "name": "matrix"
+            },
+            "col": {
+                "rows": {
+                    "bottom": {
+                        "asym": "source"
+                    },
+                    "top": {
+                        "asym": "clone"
+                    }
+                },
+                "key": {},
+                "name": "left"
+            },
+            "row": "bottom",
+            "bind": [
+                10,
+                10,
+                0,
+                0
+            ],
+            "mirrored": false
+        }
+    },
+    "matrix_right_bottom": {
+        "x": 19,
+        "y": 0,
+        "r": 0,
+        "meta": {
+            "stagger": 0,
+            "spread": 19,
+            "splay": 0,
+            "origin": [
+                0,
+                0
+            ],
+            "orient": 0,
+            "shift": [
+                0,
+                0
+            ],
+            "rotate": 0,
+            "width": 18,
+            "height": 18,
+            "padding": 19,
+            "autobind": 10,
+            "skip": false,
+            "asym": "both",
+            "colrow": "right_bottom",
+            "name": "matrix_right_bottom",
+            "zone": {
+                "columns": {
+                    "left": {
+                        "rows": {
+                            "bottom": {
+                                "asym": "source"
+                            },
+                            "top": {
+                                "asym": "clone"
+                            }
+                        },
+                        "key": {},
+                        "name": "left"
+                    },
+                    "right": null
+                },
+                "rows": {
+                    "bottom": {},
+                    "top": {}
+                },
+                "name": "matrix"
+            },
+            "col": {
+                "rows": {},
+                "key": {},
+                "name": "right"
+            },
+            "row": "bottom",
+            "bind": [
+                10,
+                0,
+                0,
+                10
+            ],
+            "mirrored": false
+        }
+    },
+    "matrix_right_top": {
+        "x": 19,
+        "y": 19,
+        "r": 0,
+        "meta": {
+            "stagger": 0,
+            "spread": 19,
+            "splay": 0,
+            "origin": [
+                0,
+                0
+            ],
+            "orient": 0,
+            "shift": [
+                0,
+                0
+            ],
+            "rotate": 0,
+            "width": 18,
+            "height": 18,
+            "padding": 19,
+            "autobind": 10,
+            "skip": false,
+            "asym": "both",
+            "colrow": "right_top",
+            "name": "matrix_right_top",
+            "zone": {
+                "columns": {
+                    "left": {
+                        "rows": {
+                            "bottom": {
+                                "asym": "source"
+                            },
+                            "top": {
+                                "asym": "clone"
+                            }
+                        },
+                        "key": {},
+                        "name": "left"
+                    },
+                    "right": null
+                },
+                "rows": {
+                    "bottom": {},
+                    "top": {}
+                },
+                "name": "matrix"
+            },
+            "col": {
+                "rows": {},
+                "key": {},
+                "name": "right"
+            },
+            "row": "top",
+            "bind": [
+                0,
+                0,
+                10,
+                10
+            ],
+            "mirrored": false
+        }
+    },
+    "other_left_bottom": {
+        "x": 119,
+        "y": 119,
+        "r": 0,
+        "meta": {
+            "stagger": 0,
+            "spread": 19,
+            "splay": 0,
+            "origin": [
+                0,
+                0
+            ],
+            "orient": 0,
+            "shift": [
+                0,
+                0
+            ],
+            "rotate": 0,
+            "width": 18,
+            "height": 18,
+            "padding": 19,
+            "autobind": 10,
+            "skip": false,
+            "asym": "source",
+            "colrow": "left_bottom",
+            "name": "other_left_bottom",
+            "zone": {
+                "columns": {
+                    "left": {
+                        "rows": {
+                            "bottom": {
+                                "asym": "source"
+                            },
+                            "top": {
+                                "asym": "clone"
+                            }
+                        },
+                        "key": {},
+                        "name": "left"
+                    },
+                    "right": null
+                },
+                "rows": {
+                    "bottom": {},
+                    "top": {}
+                },
+                "name": "other"
+            },
+            "col": {
+                "rows": {
+                    "bottom": {
+                        "asym": "source"
+                    },
+                    "top": {
+                        "asym": "clone"
+                    }
+                },
+                "key": {},
+                "name": "left"
+            },
+            "row": "bottom",
+            "bind": [
+                10,
+                10,
+                0,
+                0
+            ],
+            "mirrored": false
+        }
+    },
+    "other_right_bottom": {
+        "x": 138,
+        "y": 119,
+        "r": 0,
+        "meta": {
+            "stagger": 0,
+            "spread": 19,
+            "splay": 0,
+            "origin": [
+                0,
+                0
+            ],
+            "orient": 0,
+            "shift": [
+                0,
+                0
+            ],
+            "rotate": 0,
+            "width": 18,
+            "height": 18,
+            "padding": 19,
+            "autobind": 10,
+            "skip": false,
+            "asym": "both",
+            "colrow": "right_bottom",
+            "name": "other_right_bottom",
+            "zone": {
+                "columns": {
+                    "left": {
+                        "rows": {
+                            "bottom": {
+                                "asym": "source"
+                            },
+                            "top": {
+                                "asym": "clone"
+                            }
+                        },
+                        "key": {},
+                        "name": "left"
+                    },
+                    "right": null
+                },
+                "rows": {
+                    "bottom": {},
+                    "top": {}
+                },
+                "name": "other"
+            },
+            "col": {
+                "rows": {},
+                "key": {},
+                "name": "right"
+            },
+            "row": "bottom",
+            "bind": [
+                10,
+                0,
+                0,
+                10
+            ],
+            "mirrored": false
+        }
+    },
+    "other_right_top": {
+        "x": 138,
+        "y": 138,
+        "r": 0,
+        "meta": {
+            "stagger": 0,
+            "spread": 19,
+            "splay": 0,
+            "origin": [
+                0,
+                0
+            ],
+            "orient": 0,
+            "shift": [
+                0,
+                0
+            ],
+            "rotate": 0,
+            "width": 18,
+            "height": 18,
+            "padding": 19,
+            "autobind": 10,
+            "skip": false,
+            "asym": "both",
+            "colrow": "right_top",
+            "name": "other_right_top",
+            "zone": {
+                "columns": {
+                    "left": {
+                        "rows": {
+                            "bottom": {
+                                "asym": "source"
+                            },
+                            "top": {
+                                "asym": "clone"
+                            }
+                        },
+                        "key": {},
+                        "name": "left"
+                    },
+                    "right": null
+                },
+                "rows": {
+                    "bottom": {},
+                    "top": {}
+                },
+                "name": "other"
+            },
+            "col": {
+                "rows": {},
+                "key": {},
+                "name": "right"
+            },
+            "row": "top",
+            "bind": [
+                0,
+                0,
+                10,
+                10
+            ],
+            "mirrored": false
+        }
+    },
+    "mirror_other_left_top": {
+        "x": -119,
+        "y": 138,
+        "r": 0,
+        "meta": {
+            "stagger": 0,
+            "spread": 19,
+            "splay": 0,
+            "origin": [
+                0,
+                0
+            ],
+            "orient": 0,
+            "shift": [
+                0,
+                0
+            ],
+            "rotate": 0,
+            "width": 18,
+            "height": 18,
+            "padding": 19,
+            "autobind": 10,
+            "skip": false,
+            "asym": "clone",
+            "colrow": "mirror_left_top",
+            "name": "mirror_other_left_top",
+            "zone": {
+                "columns": {
+                    "left": {
+                        "rows": {
+                            "bottom": {
+                                "asym": "source"
+                            },
+                            "top": {
+                                "asym": "clone"
+                            }
+                        },
+                        "key": {},
+                        "name": "left"
+                    },
+                    "right": null
+                },
+                "rows": {
+                    "bottom": {},
+                    "top": {}
+                },
+                "name": "other"
+            },
+            "col": {
+                "rows": {
+                    "bottom": {
+                        "asym": "source"
+                    },
+                    "top": {
+                        "asym": "clone"
+                    }
+                },
+                "key": {},
+                "name": "left"
+            },
+            "row": "top",
+            "bind": [
+                0,
+                10,
+                10,
+                0
+            ],
+            "mirrored": true
+        }
+    },
+    "mirror_other_right_bottom": {
+        "x": -138,
+        "y": 119,
+        "r": 0,
+        "meta": {
+            "stagger": 0,
+            "spread": 19,
+            "splay": 0,
+            "origin": [
+                0,
+                0
+            ],
+            "orient": 0,
+            "shift": [
+                0,
+                0
+            ],
+            "rotate": 0,
+            "width": 18,
+            "height": 18,
+            "padding": 19,
+            "autobind": 10,
+            "skip": false,
+            "asym": "both",
+            "colrow": "mirror_right_bottom",
+            "name": "mirror_other_right_bottom",
+            "zone": {
+                "columns": {
+                    "left": {
+                        "rows": {
+                            "bottom": {
+                                "asym": "source"
+                            },
+                            "top": {
+                                "asym": "clone"
+                            }
+                        },
+                        "key": {},
+                        "name": "left"
+                    },
+                    "right": null
+                },
+                "rows": {
+                    "bottom": {},
+                    "top": {}
+                },
+                "name": "other"
+            },
+            "col": {
+                "rows": {},
+                "key": {},
+                "name": "right"
+            },
+            "row": "bottom",
+            "bind": [
+                10,
+                0,
+                0,
+                10
+            ],
+            "mirrored": true
+        }
+    },
+    "mirror_other_right_top": {
+        "x": -138,
+        "y": 138,
+        "r": 0,
+        "meta": {
+            "stagger": 0,
+            "spread": 19,
+            "splay": 0,
+            "origin": [
+                0,
+                0
+            ],
+            "orient": 0,
+            "shift": [
+                0,
+                0
+            ],
+            "rotate": 0,
+            "width": 18,
+            "height": 18,
+            "padding": 19,
+            "autobind": 10,
+            "skip": false,
+            "asym": "both",
+            "colrow": "mirror_right_top",
+            "name": "mirror_other_right_top",
+            "zone": {
+                "columns": {
+                    "left": {
+                        "rows": {
+                            "bottom": {
+                                "asym": "source"
+                            },
+                            "top": {
+                                "asym": "clone"
+                            }
+                        },
+                        "key": {},
+                        "name": "left"
+                    },
+                    "right": null
+                },
+                "rows": {
+                    "bottom": {},
+                    "top": {}
+                },
+                "name": "other"
+            },
+            "col": {
+                "rows": {},
+                "key": {},
+                "name": "right"
+            },
+            "row": "top",
+            "bind": [
+                0,
+                0,
+                10,
+                10
+            ],
+            "mirrored": true
+        }
+    },
+    "mirror_matrix_left_top": {
+        "x": 57.05,
+        "y": 19,
+        "r": 0,
+        "meta": {
+            "stagger": 0,
+            "spread": 19,
+            "splay": 0,
+            "origin": [
+                0,
+                0
+            ],
+            "orient": 0,
+            "shift": [
+                0,
+                0
+            ],
+            "rotate": 0,
+            "width": 18,
+            "height": 18,
+            "padding": 19,
+            "autobind": 10,
+            "skip": false,
+            "asym": "clone",
+            "colrow": "mirror_left_top",
+            "name": "mirror_matrix_left_top",
+            "zone": {
+                "columns": {
+                    "left": {
+                        "rows": {
+                            "bottom": {
+                                "asym": "source"
+                            },
+                            "top": {
+                                "asym": "clone"
+                            }
+                        },
+                        "key": {},
+                        "name": "left"
+                    },
+                    "right": null
+                },
+                "rows": {
+                    "bottom": {},
+                    "top": {}
+                },
+                "name": "matrix"
+            },
+            "col": {
+                "rows": {
+                    "bottom": {
+                        "asym": "source"
+                    },
+                    "top": {
+                        "asym": "clone"
+                    }
+                },
+                "key": {},
+                "name": "left"
+            },
+            "row": "top",
+            "bind": [
+                0,
+                10,
+                10,
+                0
+            ],
+            "mirrored": true
+        }
+    },
+    "mirror_matrix_right_bottom": {
+        "x": 38.05,
+        "y": 0,
+        "r": 0,
+        "meta": {
+            "stagger": 0,
+            "spread": 19,
+            "splay": 0,
+            "origin": [
+                0,
+                0
+            ],
+            "orient": 0,
+            "shift": [
+                0,
+                0
+            ],
+            "rotate": 0,
+            "width": 18,
+            "height": 18,
+            "padding": 19,
+            "autobind": 10,
+            "skip": false,
+            "asym": "both",
+            "colrow": "mirror_right_bottom",
+            "name": "mirror_matrix_right_bottom",
+            "zone": {
+                "columns": {
+                    "left": {
+                        "rows": {
+                            "bottom": {
+                                "asym": "source"
+                            },
+                            "top": {
+                                "asym": "clone"
+                            }
+                        },
+                        "key": {},
+                        "name": "left"
+                    },
+                    "right": null
+                },
+                "rows": {
+                    "bottom": {},
+                    "top": {}
+                },
+                "name": "matrix"
+            },
+            "col": {
+                "rows": {},
+                "key": {},
+                "name": "right"
+            },
+            "row": "bottom",
+            "bind": [
+                10,
+                0,
+                0,
+                10
+            ],
+            "mirrored": true
+        }
+    },
+    "mirror_matrix_right_top": {
+        "x": 38.05,
+        "y": 19,
+        "r": 0,
+        "meta": {
+            "stagger": 0,
+            "spread": 19,
+            "splay": 0,
+            "origin": [
+                0,
+                0
+            ],
+            "orient": 0,
+            "shift": [
+                0,
+                0
+            ],
+            "rotate": 0,
+            "width": 18,
+            "height": 18,
+            "padding": 19,
+            "autobind": 10,
+            "skip": false,
+            "asym": "both",
+            "colrow": "mirror_right_top",
+            "name": "mirror_matrix_right_top",
+            "zone": {
+                "columns": {
+                    "left": {
+                        "rows": {
+                            "bottom": {
+                                "asym": "source"
+                            },
+                            "top": {
+                                "asym": "clone"
+                            }
+                        },
+                        "key": {},
+                        "name": "left"
+                    },
+                    "right": null
+                },
+                "rows": {
+                    "bottom": {},
+                    "top": {}
+                },
+                "name": "matrix"
+            },
+            "col": {
+                "rows": {},
+                "key": {},
+                "name": "right"
+            },
+            "row": "top",
+            "bind": [
+                0,
+                0,
+                10,
+                10
+            ],
+            "mirrored": true
+        }
+    }
+}
