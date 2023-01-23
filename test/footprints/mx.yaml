@@ -39,3 +39,13 @@ pcbs.pcb.footprints:
       reverse: true
       hotswap: true
     adjust.shift: [200, 0]
+
+  # all of keycaps, reverse and hotswap
+  - what: mx
+    params:
+      from: from
+      to: to
+      keycaps: true
+      reverse: true
+      hotswap: true
+    adjust.shift: [250, 0]

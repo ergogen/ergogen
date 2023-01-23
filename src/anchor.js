@@ -17,8 +17,11 @@ const aggregator_common = ['parts', 'method']
 const aggregators = {
     average: (config, name, parts) => {
         a.unexpected(config, name, aggregator_common)
-        let x = 0, y = 0, r = 0
         const len = parts.length
+        if (len == 0) {
+          return new Point()
+        }
+        let x = 0, y = 0, r = 0
         for (const part of parts) {
             x += part.x
             y += part.y

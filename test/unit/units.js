@@ -5,12 +5,19 @@ describe('Units', function() {
 
     it('defaults', function() {
         // check that an empty config has the default units (and nothing more)
-        const def = u.parse({})
-        Object.keys(def).filter(public).length.should.equal(4)
-        def.U.should.equal(19.05)
-        def.u.should.equal(19)
-        def.cx.should.equal(18)
-        def.cy.should.equal(17)
+        const def1 = u.parse({})
+        Object.keys(def1).filter(public).length.should.equal(4)
+        def1.U.should.equal(19.05)
+        def1.u.should.equal(19)
+        def1.cx.should.equal(18)
+        def1.cy.should.equal(17)
+        // check that an empty config has the default units (and nothing more)
+        const def2 = u.parse()
+        Object.keys(def2).filter(public).length.should.equal(4)
+        def2.U.should.equal(19.05)
+        def2.u.should.equal(19)
+        def2.cx.should.equal(18)
+        def2.cy.should.equal(17)
     })
 
     it('units', function() {

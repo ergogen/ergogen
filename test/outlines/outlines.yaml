@@ -17,10 +17,15 @@ outlines:
       size: cy
       bound: true
   fillet:
-    - what: outline
-      name: base
+    - name: base
       fillet: 2
   scale:
-    - what: outline
-      name: fillet
+    - name: fillet
       scale: 0.5
+  combination:
+    - "base"
+    - "-scale"
+    - "~fillet"
+  expand:
+    - name: combination
+      expand: 1

@@ -18,6 +18,7 @@ pcbs:
           shift: [1, 1]
           rotate: 30
         params:
+          width: u/40
           side: F
           mirror:
             side: B
@@ -28,9 +29,13 @@ pcbs:
           rotate: 30
       dyn:
         what: dynamic_net_test
-      anc:
+      anc1:
         what: anchor_test
         params:
           end:
             ref: matrix
             shift: [10, 10]
+      anc2:
+        what: anchor_test
+        params:
+          end: matrix

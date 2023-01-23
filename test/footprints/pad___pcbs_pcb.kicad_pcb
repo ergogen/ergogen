@@ -181,6 +181,44 @@
         )
     
         
+
+    
+        (module SMDPad (layer F.Cu) (tedit 5B24D78E)
+
+            (at 100 0 0)
+
+            
+            (fp_text reference "PAD5" (at 0 0) (layer F.SilkS) hide (effects (font (size 1.27 1.27) (thickness 0.15))))
+            (fp_text value "" (at 0 0) (layer F.SilkS) hide (effects (font (size 1.27 1.27) (thickness 0.15))))
+            
+            
+            (pad 1 smd rect (at 0 0 0) (size 1 1) (layers F.Cu F.Paste F.Mask) (net 1 "net"))
+
+            (pad 1 smd rect (at 0 0 0) (size 1 1) (layers B.Cu B.Paste B.Mask) (net 1 "net"))
+
+            
+        )
+    
+        
+
+    
+        (module SMDPad (layer F.Cu) (tedit 5B24D78E)
+
+            (at 100 -50 0)
+
+            
+            (fp_text reference "PAD6" (at 0 0) (layer F.SilkS) hide (effects (font (size 1.27 1.27) (thickness 0.15))))
+            (fp_text value "" (at 0 0) (layer F.SilkS) hide (effects (font (size 1.27 1.27) (thickness 0.15))))
+            
+            
+            (pad 1 smd rect (at 0 0 0) (size 1 1) (layers F.Cu F.Paste F.Mask) (net 1 "net"))
+
+            (pad 1 smd rect (at 0 0 0) (size 1 1) (layers B.Cu B.Paste B.Mask) (net 1 "net"))
+
+            
+        )
+    
+        
             
             
 )

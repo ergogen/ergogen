@@ -1,0 +1,15 @@
+points:
+  mirror:
+    ref: matrix_right_top
+    distance: U
+  zones:
+    matrix:
+      columns:
+        left:
+          rows:
+            bottom.asym: source
+            top.asym: clone
+        right:
+      rows:
+        bottom:
+        top:

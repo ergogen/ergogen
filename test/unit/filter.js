@@ -4,6 +4,12 @@ const Point = require('../../src/point')
 
 describe('Filter', function() {
 
+    it('empty', function() {
+      filter(undefined, '').should.deep.equal([new Point()])
+      filter(true, '').should.deep.equal([])
+      filter(false, '').should.deep.equal([])
+    })
+
     const points = {
         one: new Point(0, 1, 0, {name: 'one', tags: ['odd']}),
         two: new Point(0, 2, 0, {name: 'two', tags: ['even', 'prime']}),
@@ -18,8 +24,15 @@ describe('Filter', function() {
         // true shouldn't filter anything, while false should filter everything
         filter(true, '', points).should.deep.equal(Object.values(points))
         filter(false, '', points).should.deep.equal([])
+        // points should only be returned on their respective halves
+        filter(true, '', points, undefined, 'source').should.deep.equal(Object.values(points))
+        filter(true, '', points, undefined, 'clone').should.deep.equal([])
+        filter(true, '', points, undefined, 'both').should.deep.equal(Object.values(points))
         // objects just propagate to anchor (and then wrap in array for consistency)
         filter({}, '', points).should.deep.equal([anchor({}, '', points)()])
+        filter({}, '', points, undefined, 'source').should.deep.equal([anchor({}, '', points)()])
+        filter({}, '', points, undefined, 'clone').should.deep.equal([anchor({}, '', points)()])
+        filter({}, '', points, undefined, 'both').should.deep.equal([anchor({}, '', points)(), anchor({}, '', points)()])
         // simple name string
         names(filter('one', '', points)).should.deep.equal(['one'])
         // simple name regex

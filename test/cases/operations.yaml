@@ -1,0 +1,36 @@
+points.zones.matrix: {}
+outlines:
+  _square:
+    - what: rectangle
+      where: true
+      size: [8, 8]
+  _circle:
+    - what: circle
+      where: true
+      radius: 3
+cases:
+  _cube:
+    - name: _square
+      extrude: 8
+  _cylinder_one:
+    - name: _circle
+      extrude: 8
+  _subtract:
+    target:
+      name: _cube
+      what: case
+    tool:
+      name: _cylinder_one
+      what: case
+      operation: subtract
+  _cylinder_two:
+    - name: _circle
+      extrude: 8
+      shift: [0,4,4]
+      rotate: [90,0,0]
+  _flat_square:
+    - "_square"
+  combination:
+    - "_subtract"
+    - "~_cylinder_two"
+    - "+_flat_square"

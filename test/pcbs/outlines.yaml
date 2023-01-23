@@ -1,0 +1,34 @@
+points.zones.matrix:
+  columns:
+    left:
+    right:
+  rows.only:
+outlines:
+  left:
+    out:
+      what: rectangle
+      where: matrix_left_only
+      size: u
+      fillet: u/5
+    in:
+      what: circle
+      where: matrix_left_only
+      radius: u/4
+      operation: subtract
+  right:
+    out:
+      what: rectangle
+      where: matrix_right_only
+      size: u
+      bevel: u/5
+    in:
+      what: rectangle
+      where: matrix_right_only
+      size: u/2
+      bevel: u/4
+      operation: subtract
+pcbs:
+  main:
+    outlines:
+      - outline: 'left'
+      - outline: 'right'

@@ -1,0 +1,16 @@
+points:
+  rotate: 22.5
+  zones:
+    matrix:
+      rotate: 22.5
+      key:
+        origin: [-u/2, -u/2]
+      columns:
+        left:
+        right.key:
+          rotate: -45
+          padding: (1+sqrt(2))/2 * u
+          spread: (1+sqrt(2))/2 * u
+      rows:
+        bottom:
+        top:

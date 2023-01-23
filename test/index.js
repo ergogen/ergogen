@@ -56,7 +56,13 @@ const test = function(input_path) {
                     fs.writeJSONSync(expected_path, output_part, {spaces: 4})
                 }
             } else {
-                output_part.should.deep.equal(expected)
+                if (a.type(output_part)() == 'string') {
+                  const parse_out = output_part.replace(/(?:\r\n|\r|\n)/g,"\n")
+                  const parse_exp = expected.replace(/(?:\r\n|\r|\n)/g,"\n")
+                  parse_out.should.deep.equal(parse_exp)
+                } else {
+                  output_part.should.deep.equal(expected)
+                }
             }
         }
     })
@@ -133,14 +139,19 @@ for (let w of cli_what) {
                         ref_path = path.resolve(path.join(t, read(ref_path).trim()))
                     }
                     const comp_res = dircompare.compareSync(output_path, ref_path, {
-                        compareContent: true
+                        compareContent: true,
+                        compareFileSync: dircompare.fileCompareHandlers.lineBasedFileCompare.compareSync,
+                        compareFileAsync: dircompare.fileCompareHandlers.lineBasedFileCompare.compareAsync,
+                        ignoreLineEnding: true
                     })
                     if (dump) {
                         fs.moveSync(output_path, ref_path, {overwrite: true})
                     } else {
                         fs.removeSync(output_path)
                     }
-                    actual_log.should.equal(ref_log)
+                    const parse_act_log = actual_log.replace(/(?:\r\n|\r|\n)/g,"\n")
+                    const parse_ref_log = ref_log.replace(/(?:\r\n|\r|\n)/g,"\n")
+                    parse_act_log.should.equal(parse_ref_log)
                     comp_res.same.should.be.true
                 // deliberately incorrect execution
                 } else {
