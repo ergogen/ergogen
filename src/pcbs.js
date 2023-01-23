@@ -169,7 +169,7 @@ const footprint = exports._footprint = (points, net_indexer, component_indexer, 
         params = prep.extend(params, mirror_overrides)
     }
     a.unexpected(params, `${name}.params`, Object.keys(fp.params))
-    
+
     // parsing parameters
     const parsed_params = {}
     for (const [param_name, param_def] of Object.entries(fp.params)) {
@@ -183,6 +183,8 @@ const footprint = exports._footprint = (points, net_indexer, component_indexer, 
             parsed_def = {type: 'number', value: a.mathnum(param_def)(units)}
         } else if (def_type == 'boolean') {
             parsed_def = {type: 'boolean', value: param_def}
+        } else if (def_type == 'array') {
+            parsed_def = {type: 'array', value: param_def}
         } else if (def_type == 'undefined') {
             parsed_def = {type: 'net', value: undefined}
         }
@@ -190,14 +192,15 @@ const footprint = exports._footprint = (points, net_indexer, component_indexer, 
         // combine default value with potential user override
         let value = prep.extend(parsed_def.value, params[param_name])
         let type = parsed_def.type
-        
+
         // templating support, with conversion back to raw datatypes
         const converters = {
             string: v => v,
             number: v => a.sane(v, `${name}.params.${param_name}`, 'number')(units),
             boolean: v => v === 'true',
             net: v => v,
-            anchor: v => v
+            anchor: v => v,
+            array: v => v
         }
         if (a.type(value)() == 'string') {
             value = u.template(value, point.meta)
@@ -205,7 +208,7 @@ const footprint = exports._footprint = (points, net_indexer, component_indexer, 
         }
 
         // type-specific processing
-        if (['string', 'number', 'boolean'].includes(type)) {
+        if (['string', 'number', 'boolean', 'array'].includes(type)) {
             parsed_params[param_name] = value
         } else if (type == 'net') {
             const net = a.sane(value, `${name}.params.${param_name}`, 'string')(units)
