@@ -6,40 +6,40 @@ const anchor = require('./anchor').parse
 const filter = require('./filter').parse
 
 const kicad_prefix = `
-(kicad_pcb (version 20171130) (host pcbnew 5.1.6)
-
-  (page A3)
-  (title_block
-    (title KEYBOARD_NAME_HERE)
-    (rev VERSION_HERE)
-    (company YOUR_NAME_HERE)
-  )
+(kicad_pcb (version 20211014) (generator pcbnew)
 
   (general
     (thickness 1.6)
   )
 
+  (paper "A3")
+  (title_block
+    (title "KEYBOARD_NAME_HERE")
+    (rev "VERSION_HERE")
+    (company "YOUR_NAME_HERE")
+  )
+
   (layers
-    (0 F.Cu signal)
-    (31 B.Cu signal)
-    (32 B.Adhes user)
-    (33 F.Adhes user)
-    (34 B.Paste user)
-    (35 F.Paste user)
-    (36 B.SilkS user)
-    (37 F.SilkS user)
-    (38 B.Mask user)
-    (39 F.Mask user)
-    (40 Dwgs.User user)
-    (41 Cmts.User user)
-    (42 Eco1.User user)
-    (43 Eco2.User user)
-    (44 Edge.Cuts user)
-    (45 Margin user)
-    (46 B.CrtYd user)
-    (47 F.CrtYd user)
-    (48 B.Fab user)
-    (49 F.Fab user)
+    (0 "F.Cu" signal)
+    (31 "B.Cu" signal)
+    (32 "B.Adhes" user "B.Adhesive")
+    (33 "F.Adhes" user "F.Adhesive")
+    (34 "B.Paste" user)
+    (35 "F.Paste" user)
+    (36 "B.SilkS" user "B.Silkscreen")
+    (37 "F.SilkS" user "F.Silkscreen")
+    (38 "B.Mask" user)
+    (39 "F.Mask" user)
+    (40 "Dwgs.User" user "User.Drawings")
+    (41 "Cmts.User" user "User.Comments")
+    (42 "Eco1.User" user "User.Eco1")
+    (43 "Eco2.User" user "User.Eco2")
+    (44 "Edge.Cuts" user)
+    (45 "Margin" user)
+    (46 "B.CrtYd" user "B.Courtyard")
+    (47 "F.CrtYd" user "F.Courtyard")
+    (48 "B.Fab" user)
+    (49 "F.Fab" user)
   )
 
   (setup
@@ -70,13 +70,15 @@ const kicad_prefix = `
     (aux_axis_origin 0 0)
     (visible_elements FFFFFF7F)
     (pcbplotparams
-      (layerselection 0x010fc_ffffffff)
+      (layerselection 0x00010fc_ffffffff)
+      (disableapertmacros false)
       (usegerberextensions false)
       (usegerberattributes true)
       (usegerberadvancedattributes true)
       (creategerberjobfile true)
+      (svguseinch false)
+      (svgprecision 6)
       (excludeedgelayer true)
-      (linewidth 0.100000)
       (plotframeref false)
       (viasonmask false)
       (mode 1)
@@ -84,18 +86,22 @@ const kicad_prefix = `
       (hpglpennumber 1)
       (hpglpenspeed 20)
       (hpglpendiameter 15.000000)
+      (dxfpolygonmode true)
+      (dxfimperialunits true)
+      (dxfusepcbnewfont true)
       (psnegative false)
       (psa4output false)
       (plotreference true)
       (plotvalue true)
       (plotinvisibletext false)
-      (padsonsilk false)
+      (sketchpadsonfab false)
       (subtractmaskfromsilk false)
       (outputformat 1)
       (mirror false)
       (drillshape 1)
       (scaleselection 1)
-      (outputdirectory ""))
+      (outputdirectory "")
+    )
   )
 `
 
@@ -123,19 +129,26 @@ const makerjs2kicad = exports._makerjs2kicad = (model, layer='Edge.Cuts') => {
             const p = wp.pathContext
             switch (p.type) {
                 case 'line':
-                    grs.push(`(gr_line (start ${xy(p.origin)}) (end ${xy(p.end)}) (angle 90) (layer ${layer}) (width 0.15))`)
+                    grs.push(`(gr_line (start ${xy(p.origin)}) (end ${xy(p.end)}) (layer "${layer}") (width 0.15))`)
                     break
                 case 'arc':
-                    const arc_center = p.origin
-                    const angle_start = p.startAngle > p.endAngle ? p.startAngle - 360 : p.startAngle
-                    const angle_diff = Math.abs(p.endAngle - angle_start)
-                    const arc_end = m.point.rotate(m.point.add(arc_center, [p.radius, 0]), angle_start, arc_center)
-                    grs.push(`(gr_arc (start ${xy(arc_center)}) (end ${xy(arc_end)}) (angle ${-angle_diff}) (layer ${layer}) (width 0.15))`)
+                    // Normalize angles to the range [0, 360]
+                    let startAngle = ((p.startAngle % 360) + 360) % 360;
+                    let endAngle = ((p.endAngle % 360) + 360) % 360;
+
+                    // check the case when end angle is smaller than start angle
+                    if (endAngle < startAngle) {
+                        endAngle += 360;
+                    }
+                    const start = [p.origin[0] + p.radius * Math.cos(startAngle * (Math.PI / 180)), p.origin[1] + p.radius * Math.sin(startAngle * (Math.PI / 180))]
+                    const mid = [p.origin[0] + p.radius * Math.cos(((startAngle + endAngle) * (Math.PI / 180)) / 2), p.origin[1] + p.radius * Math.sin(((startAngle + endAngle) * (Math.PI / 180)) / 2)]
+                    const end = [p.origin[0] + p.radius * Math.cos(endAngle * (Math.PI / 180)), p.origin[1] + p.radius * Math.sin(endAngle * (Math.PI / 180))]
+                    grs.push(`(gr_arc (start ${xy(start)}) (mid ${xy(mid)}) (end ${xy(end)}) (layer "${layer}") (width 0.15))`)
                     break
                 case 'circle':
                     const circle_center = p.origin
                     const circle_end = m.point.add(circle_center, [p.radius, 0])
-                    grs.push(`(gr_circle (center ${xy(circle_center)}) (end ${xy(circle_end)}) (layer ${layer}) (width 0.15))`)
+                    grs.push(`(gr_circle (center ${xy(circle_center)}) (end ${xy(circle_end)}) (layer "${layer}") (width 0.15))`)
                     break
                 default:
                     throw new Error(`Can't convert path type "${p.type}" to kicad!`)
@@ -169,7 +182,6 @@ const footprint = exports._footprint = (points, net_indexer, component_indexer, 
         params = prep.extend(params, mirror_overrides)
     }
     a.unexpected(params, `${name}.params`, Object.keys(fp.params))
-    
     // parsing parameters
     const parsed_params = {}
     for (const [param_name, param_def] of Object.entries(fp.params)) {
@@ -190,7 +202,7 @@ const footprint = exports._footprint = (points, net_indexer, component_indexer, 
         // combine default value with potential user override
         let value = prep.extend(parsed_def.value, params[param_name])
         let type = parsed_def.type
-        
+
         // templating support, with conversion back to raw datatypes
         const converters = {
             string: v => v,
