@@ -1,0 +1,46 @@
+points:
+  zones:
+    matrix: {}
+outlines:
+  base:
+    - what: rectangle
+      where: true
+      size: 20
+      bound: false
+  sh_beveled:
+    - what: outline
+      name: base
+      expand: "5]"
+  sh_round:
+    - what: outline
+      name: base
+      expand: "6)"
+  sh_pointy:
+    - what: outline
+      name: base
+      expand: "7>"
+  shorthand-combo:
+    - "sh_pointy"
+    - "-sh_round"
+    - "+sh_beveled"
+    - "-base"
+  jnt_beveled:
+    - what: outline
+      name: base
+      expand: 8
+      joints: beveled
+  jnt_round:
+    - what: outline
+      name: base
+      expand: 9
+      joints: round
+  jnt_pointy:
+    - what: outline
+      name: base
+      expand: 10
+      joints: pointy
+  joint-name-combo:
+    - "jnt_pointy"
+    - "-jnt_round"
+    - "+jnt_beveled"
+    - "-base"
