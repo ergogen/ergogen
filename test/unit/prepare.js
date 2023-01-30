@@ -24,6 +24,7 @@ describe('Prepare', function() {
     })
 
     it('inherit', function() {
+        // normal case
         p.inherit({
             a: {
                 x: 1,
@@ -42,6 +43,23 @@ describe('Prepare', function() {
             y: 2,
             z: 3,
             w: 4
+        })
+        // should apply to objects within arrays as well!
+        p.inherit({
+            a: {
+                x: 1,
+                y: 2
+            },
+            b: [
+                {
+                    $extends: 'a',
+                    z: 3
+                }
+            ]
+        }).b[0].should.deep.equal({
+            x: 1,
+            y: 2,
+            z: 3
         })
     })
 

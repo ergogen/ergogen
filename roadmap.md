@@ -14,7 +14,9 @@
 
 ### Minor
 
+- Support "direct" anchors, as in, recognize num arrays and parse them as x/y/r
 - Add full anchor support to individual points (via `adjust`, probably)
+- Handle unnecessary (but seemingly consistent, so easy to confuse) `key` subfield of row-level overrides
 - Allow footprints to access raw array/object fields from points with templating
 - Include raw kicad footprint integrations
     - pull torik's script to be able to convert raw kicad footprints into positionable ergogen ones
