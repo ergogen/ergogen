@@ -11,6 +11,13 @@ let what = process.env.npm_config_what
 const dump = process.env.npm_config_dump
 const lineends = /(?:\r\n|\r|\n)/g
 
+const handle_slash = (() => {
+  if (path.sep == '\\') {
+    return str => str.replace(/\\/g,'/')
+  } else {
+    return str => str
+  }
+})()
 
 
 // Unit tests
@@ -18,7 +25,7 @@ const lineends = /(?:\r\n|\r|\n)/g
 // the --dump switch does nothing here
 
 what = what ? what.split(',') : false
-for (const unit of glob.sync(path.join(__dirname, 'unit', '*.js'))) {
+for (const unit of glob.sync(handle_slash(path.join(__dirname, 'unit', '*.js')))) {
     const base = path.basename(unit, '.js')
     if (what && !what.includes(base)) continue
     require(`./unit/${base}.js`)
@@ -54,7 +61,7 @@ const test = function(input_path) {
         
         const input = yaml.load(fs.readFileSync(input_path).toString())
         const base = path.join(path.dirname(input_path), path.basename(input_path, '.yaml'))
-        const references = glob.sync(base + '___*')
+        const references = glob.sync(handle_slash(base) + '___*')
         
         // handle deliberately wrong inputs
         const exception = base + '___EXCEPTION.txt'
@@ -113,7 +120,7 @@ if (what) {
             regex = path.join(__dirname, w, '*.yaml')
         }
         describe(title, function() {
-            for (const i of glob.sync(regex)) {
+            for (const i of glob.sync(handle_slash(regex))) {
                 test.call(this, i)
             }
         })
@@ -121,7 +128,7 @@ if (what) {
 } else {
     for (const part of ['points', 'outlines', 'cases', 'pcbs', 'footprints']) {
         describe(cap(part), function() {
-            for (const i of glob.sync(path.join(__dirname, part, '*.yaml'))) {
+            for (const i of glob.sync(handle_slash(path.join(__dirname, part, '*.yaml')))) {
                 test.call(this, i)
             }
         })
@@ -148,7 +155,7 @@ for (let w of cli_what) {
     describe('CLI', function() {
         this.timeout(120000)
         this.slow(120000)
-        for (const t of glob.sync(path.join(__dirname, w))) {
+        for (const t of glob.sync(handle_slash(path.join(__dirname, w)))) {
             it(path.basename(t).split('_').join(' '), function() {
                 const command = read(t, 'command')
                 const output_path = exists(t, 'path') ? read(t, 'path') : 'output'
