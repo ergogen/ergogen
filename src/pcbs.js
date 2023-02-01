@@ -210,7 +210,8 @@ const footprint = exports._footprint = (points, net_indexer, component_indexer, 
         const converters = {
             string: v => v,
             number: v => a.sane(v, `${name}.params.${param_name}`, 'number')(units),
-            boolean: v => v === 'true'
+            boolean: v => v === 'true',
+            net: v => v
         }
         if (a.type(value)() == 'string' && Object.keys(converters).includes(type)) {
             value = u.template(value, point.meta)
