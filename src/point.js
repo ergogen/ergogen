@@ -76,4 +76,11 @@ module.exports = class Point {
         const dy = other.y - this.y
         return -Math.atan2(dx, dy) * (180 / Math.PI)
     }
+
+    equals(other) {
+        return this.x === other.x
+            && this.y === other.y
+            && this.r === other.r
+            && JSON.stringify(this.meta) === JSON.stringify(other.meta)
+    }
 }

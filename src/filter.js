@@ -123,7 +123,11 @@ exports.parse = (config, name, points={}, units={}, asym='source') => {
         }
         if (['clone', 'both'].includes(asym)) {
             // this is strict: if the ref of the anchor doesn't have a mirror pair, it will error out
-            result.push(anchor(config, name, points, undefined, true)(units))
+            // also, we check for duplicates as ref-less anchors mirror to themselves
+            const clone = anchor(config, name, points, undefined, true)(units)
+            if (result.every(p => !p.equals(clone))) {
+                result.push(clone)
+            }
         }
         
     // otherwise, it is treated as a condition to filter all available points
@@ -132,9 +136,15 @@ exports.parse = (config, name, points={}, units={}, asym='source') => {
         if (['source', 'both'].includes(asym)) {
             result = result.concat(source)
         }
-        if (['source', 'both'].includes(asym)) {
+        if (['clone', 'both'].includes(asym)) {
             // this is permissive: we only include mirrored versions if they exist, and don't fuss if they don't
-            result = result.concat(source.map(p => points[anchor_lib.mirror(p.meta.name)]).filter(p => !!p))
+            // also, we check for duplicates as clones can potentially refer back to their sources, too
+            const pool = result.map(p => p.meta.name)
+            result = result.concat(
+                source.map(p => points[anchor_lib.mirror(p.meta.name)])
+                .filter(p => !!p)
+                .filter(p => !pool.includes(p.meta.name))
+            )
         }
     }
 
