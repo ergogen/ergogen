@@ -58,10 +58,11 @@ exports.twodee = (model, debug) => {
 
     const result = {
         dxf: makerjs.exporter.toDXF(assembly),
+        svg: makerjs.exporter.toSVG(assembly)
     }
     if (debug) {
         result.yaml = assembly
-        result.svg = makerjs.exporter.toSVG(assembly)
+        //result.svg = makerjs.exporter.toSVG(assembly)
     }
     return result
 }
