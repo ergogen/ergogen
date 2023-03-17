@@ -221,6 +221,19 @@
                 )
 
             
+ 
+
+                (module arrobj_test (layer F.Cu) (tedit 5CF31DEF)
+
+                    (at 0 0 0)
+
+                    (fp_line (start 5 5) (end 6 6) (layer Dwgs.User) (width 0.05))
+(fp_line (start 5 5) (end 7 5) (layer Dwgs.User) (width 0.05))
+
+
+                )
+
+            
             (gr_line (start -9.5 9.5) (end 9.5 9.5) (angle 90) (layer Edge.Cuts) (width 0.15))
 (gr_line (start 9.5 9.5) (end 9.5 -9.5) (angle 90) (layer Edge.Cuts) (width 0.15))
 (gr_line (start 9.5 -9.5) (end -9.5 -9.5) (angle 90) (layer Edge.Cuts) (width 0.15))

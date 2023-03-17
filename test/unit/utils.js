@@ -33,6 +33,7 @@ describe('Utils', function() {
             {longlonglong: 'long', short: 'shortshortshort'}
         ).should.equal('long_shortshortshort')
         u.template('{{a.b.c}}', {a: {b: {c: 'deep'}}}).should.equal('deep')
+        u.template('{x: {{number}}, y: {{number}}}', {number: 5}).should.equal('{x: 5, y: 5}')
     })
 
     it('eq', function() {

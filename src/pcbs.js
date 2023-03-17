@@ -1,4 +1,6 @@
 const m = require('makerjs')
+const yaml = require('js-yaml')
+
 const u = require('./utils')
 const a = require('./assert')
 const prep = require('./prepare')
@@ -202,22 +204,24 @@ const footprint = exports._footprint = (points, net_indexer, component_indexer, 
         // combine default value with potential user override
         let value = params[param_name] !== undefined ? params[param_name] : parsed_def.value
         const type = parsed_def.type
-        a.in(type, `${name}.params.${param_name}.type`, [
-            'string', 'number', 'boolean', 'array', 'object', 'net', 'anchor'
-        ])
 
         // templating support, with conversion back to raw datatypes
         const converters = {
             string: v => v,
             number: v => a.sane(v, `${name}.params.${param_name}`, 'number')(units),
-            boolean: v => v === 'true'
+            boolean: v => v === 'true',
+            array: v => yaml.load(v),
+            object: v => yaml.load(v),
+            net: v => v,
+            anchor: v => yaml.load(v)
         }
-        if (a.type(value)() == 'string' && Object.keys(converters).includes(type)) {
+        a.in(type, `${name}.params.${param_name}.type`, Object.keys(converters))
+        if (a.type(value)() == 'string') {
             value = u.template(value, point.meta)
             value = converters[type](value)
         }
 
-        // type-specific processing
+        // type-specific postprocessing
         if (['string', 'number', 'boolean', 'array', 'object'].includes(type)) {
             parsed_params[param_name] = value
         } else if (type == 'net') {

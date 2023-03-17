@@ -1,5 +1,7 @@
 points.zones.matrix:
   mirror: 10
+  key:
+    magic_value: 5
 outlines:
   edge:
     - what: rectangle
@@ -44,3 +46,10 @@ pcbs:
         params:
           start: {x: 5, y: 5}
           end: [[6, 6], [7, 7]]
+      arrobj_templated:
+        what: arrobj_test
+        where:
+          ref: matrix
+        params:
+          start: '{x: {{magic_value}}, y: {{magic_value}}}'
+          end: '[[6, 6], [7, {{magic_value}}]]'
