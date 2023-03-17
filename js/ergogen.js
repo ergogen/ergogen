@@ -1,5 +1,5 @@
 /*!
- * Ergogen v4.0.0
+ * Ergogen v4.0.1
  * https://ergogen.xyz
  */
 
@@ -9,16 +9,9 @@
     (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.ergogen = factory(global.makerjs, global.jsyaml, global.jszip, global.math, global.kle));
 })(this, (function (require$$0, require$$2, require$$1$1, require$$3, require$$1) { 'use strict';
 
-    function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
-
-    var require$$0__default = /*#__PURE__*/_interopDefaultLegacy(require$$0);
-    var require$$2__default = /*#__PURE__*/_interopDefaultLegacy(require$$2);
-    var require$$3__default = /*#__PURE__*/_interopDefaultLegacy(require$$3);
-    var require$$1__default = /*#__PURE__*/_interopDefaultLegacy(require$$1);
-
     var utils = {};
 
-    const m$5 = require$$0__default["default"];
+    const m$5 = require$$0;
 
     utils.deepcopy = value => {
         if (value === undefined) return undefined
@@ -43,7 +36,7 @@
         let res = str;
         let shift = 0;
         for (const match of str.matchAll(regex)) {
-            const replacement = deep(vals, match[1]) || '';
+            const replacement = (deep(vals, match[1]) || '') + '';
             res = res.substring(0, match.index + shift)
                 + replacement
                 + res.substring(match.index + shift + match[0].length);
@@ -159,7 +152,7 @@
 
     var assert$1 = {};
 
-    const m$4 = require$$0__default["default"];
+    const m$4 = require$$0;
     const u$8 = utils;
 
     var point = class Point {
@@ -237,9 +230,16 @@
             const dy = other.y - this.y;
             return -Math.atan2(dx, dy) * (180 / Math.PI)
         }
+
+        equals(other) {
+            return this.x === other.x
+                && this.y === other.y
+                && this.r === other.r
+                && JSON.stringify(this.meta) === JSON.stringify(other.meta)
+        }
     };
 
-    const mathjs = require$$3__default["default"];
+    const mathjs = require$$3;
 
     const mathnum = assert$1.mathnum = raw => units => {
         return mathjs.evaluate(`${raw}`, units || {})
@@ -320,8 +320,8 @@
     var kle$2 = {};
 
     const u$7 = utils;
-    const kle$1 = require$$1__default["default"];
-    const yaml$1 = require$$2__default["default"];
+    const kle$1 = require$$1;
+    const yaml$2 = require$$2;
 
     kle$2.convert = (config, logger) => {
         const keyboard = kle$1.Serial.deserialize(config);
@@ -330,7 +330,7 @@
         // if the keyboard notes are valid YAML/JSON, they get added to each key as metadata
         let meta;
         try {
-            meta = yaml$1.load(keyboard.meta.notes);
+            meta = yaml$2.load(keyboard.meta.notes);
         } catch (ex) {
             // notes were not valid YAML/JSON, oh well...
         }
@@ -393,8 +393,8 @@
         return result
     };
 
-    const yaml = require$$2__default["default"];
-    const makerjs = require$$0__default["default"];
+    const yaml$1 = require$$2;
+    const makerjs = require$$0;
 
     const u$6 = utils;
     const a$8 = assert$1;
@@ -430,7 +430,7 @@
         let format = 'OBJ';
         if (a$8.type(raw)() == 'string') {
             try {
-                config = yaml.safeLoad(raw);
+                config = yaml$1.safeLoad(raw);
                 format = 'YAML';
             } catch (yamlex) {
                 try {
@@ -531,11 +531,14 @@
             }
             return result
         } else if (a$7.type(config)() == 'array') {
+            // needed so that arrays can set output the same way as objects within ops
+            const dummy = {};
             const result = [];
             let index = 0;
             for (const val of config) {
                 breadcrumbs.push(`[${index}]`);
-                result[index] = traverse(val, root, breadcrumbs, op);
+                op(dummy, 'dummykey', traverse(val, root, breadcrumbs, op), root, breadcrumbs);
+                result[index] = dummy.dummykey;
                 breadcrumbs.pop();
                 index++;
             }
@@ -671,8 +674,11 @@
     const aggregators = {
         average: (config, name, parts) => {
             a$5.unexpected(config, name, aggregator_common);
-            let x = 0, y = 0, r = 0;
             const len = parts.length;
+            if (len == 0) {
+              return new Point$2()
+            }
+            let x = 0, y = 0, r = 0;
             for (const part of parts) {
                 x += part.x;
                 y += part.y;
@@ -784,7 +790,7 @@
         return point
     };
 
-    const m$3 = require$$0__default["default"];
+    const m$3 = require$$0;
     const u$4 = utils;
     const a$4 = assert$1;
     const prep$2 = prepare$1;
@@ -903,7 +909,7 @@
                 key.col.name = col_name;
                 key.row = row;
 
-                key.stagger = a$4.sane(key.stagger, `${key.name}.shift`, 'number')(units);
+                key.stagger = a$4.sane(key.stagger, `${key.name}.stagger`, 'number')(units);
                 key.spread = a$4.sane(key.spread, `${key.name}.spread`, 'number')(units);
                 key.splay = a$4.sane(key.splay, `${key.name}.splay`, 'number')(units);
                 key.origin = a$4.xy(key.origin, `${key.name}.origin`)(units);
@@ -1030,7 +1036,7 @@
 
     const parse_axis = points._parse_axis = (config, name, points, units) => {
         if (!['number', 'undefined'].includes(a$4.type(config)(units))) {
-            const mirror_obj = a$4.sane(config || {}, name, 'object')();
+            const mirror_obj = a$4.sane(config, name, 'object')();
             const distance = a$4.sane(mirror_obj.distance || 0, `${name}.distance`, 'number')(units);
             delete mirror_obj.distance;
             let axis = anchor_lib$1.parse(mirror_obj, name, points)(units).x;
@@ -1040,21 +1046,18 @@
     };
 
     const perform_mirror = points._perform_mirror = (point, axis) => {
-        if (axis !== undefined) {
-            point.meta.mirrored = false;
-            if (point.meta.asym == 'source') return ['', null]
-            const mp = point.clone().mirror(axis);
-            const mirrored_name = `mirror_${point.meta.name}`;
-            mp.meta = prep$2.extend(mp.meta, mp.meta.mirror || {});
-            mp.meta.name = mirrored_name;
-            mp.meta.colrow = `mirror_${mp.meta.colrow}`;
-            mp.meta.mirrored = true;
-            if (point.meta.asym == 'clone') {
-                point.meta.skip = true;
-            }
-            return [mirrored_name, mp]
+        point.meta.mirrored = false;
+        if (point.meta.asym == 'source') return ['', null]
+        const mp = point.clone().mirror(axis);
+        const mirrored_name = `mirror_${point.meta.name}`;
+        mp.meta = prep$2.extend(mp.meta, mp.meta.mirror || {});
+        mp.meta.name = mirrored_name;
+        mp.meta.colrow = `mirror_${mp.meta.colrow}`;
+        mp.meta.mirrored = true;
+        if (point.meta.asym == 'clone') {
+            point.meta.skip = true;
         }
-        return ['', null]
+        return [mirrored_name, mp]
     };
 
     points.parse = (config, units) => {
@@ -1086,13 +1089,11 @@
 
             // simplifying the names in individual point "zones" and single-key columns
             while (Object.keys(new_points).some(k => k.endsWith('_default'))) {
-                for (const key of Object.keys(new_points)) {
-                    if (key.endsWith('_default')) {
-                        const new_key = key.slice(0, -8);
-                        new_points[new_key] = new_points[key];
-                        new_points[new_key].meta.name = new_key;
-                        delete new_points[key];
-                    }
+                for (const key of Object.keys(new_points).filter(k => k.endsWith('_default'))) {
+                    const new_key = key.slice(0, -8);
+                    new_points[new_key] = new_points[key];
+                    new_points[new_key].meta.name = new_key;
+                    delete new_points[key];
                 }
             }
 
@@ -1138,7 +1139,7 @@
         const global_axis = parse_axis(global_mirror, `points.mirror`, points, units);
         const global_mirrored_points = {};
         for (const point of Object.values(points)) {
-            if (global_axis !== undefined && point.mirrored === undefined) {
+            if (global_axis !== undefined && point.meta.mirrored === undefined) {
                 const [mname, mp] = perform_mirror(point, global_axis);
                 if (mp) {
                     global_mirrored_points[mname] = mp;
@@ -1326,7 +1327,11 @@
             }
             if (['clone', 'both'].includes(asym)) {
                 // this is strict: if the ref of the anchor doesn't have a mirror pair, it will error out
-                result.push(anchor$2(config, name, points, undefined, true)(units));
+                // also, we check for duplicates as ref-less anchors mirror to themselves
+                const clone = anchor$2(config, name, points, undefined, true)(units);
+                if (result.every(p => !p.equals(clone))) {
+                    result.push(clone);
+                }
             }
             
         // otherwise, it is treated as a condition to filter all available points
@@ -1335,16 +1340,22 @@
             if (['source', 'both'].includes(asym)) {
                 result = result.concat(source);
             }
-            if (['source', 'both'].includes(asym)) {
+            if (['clone', 'both'].includes(asym)) {
                 // this is permissive: we only include mirrored versions if they exist, and don't fuss if they don't
-                result = result.concat(source.map(p => points[anchor_lib.mirror(p.meta.name)]).filter(p => !!p));
+                // also, we check for duplicates as clones can potentially refer back to their sources, too
+                const pool = result.map(p => p.meta.name);
+                result = result.concat(
+                    source.map(p => points[anchor_lib.mirror(p.meta.name)])
+                    .filter(p => !!p)
+                    .filter(p => !pool.includes(p.meta.name))
+                );
             }
         }
 
         return result
     };
 
-    const m$2 = require$$0__default["default"];
+    const m$2 = require$$0;
     const u$2 = utils;
     const a$2 = assert$1;
     const o$1 = operation;
@@ -1482,20 +1493,15 @@
         outline
     };
 
-    const expand_shorthand = (config, units) => {
+    const expand_shorthand = (config, name, units) => {
         if (a$2.type(config.expand)(units) == 'string') {
-            config.expand.slice(0, -1);
+            const prefix = config.expand.slice(0, -1);
             const suffix = config.expand.slice(-1);
-            let expand = suffix;
-            let joints = 0;
-            
-            if (suffix == ')') ; // noop
-            else if (suffix == '>') joints = 1;
-            else if (suffix == ']') joints = 2;
-            else expand = config.expand;
-            
-            config.expand = parseFloat(expand);
-            config.joints = config.joints || joints;
+            const valid_suffixes = [')', '>', ']'];
+            a$2.assert(valid_suffixes.includes(suffix), `If field "${name}" is a string, ` +
+                `it should end with one of [${valid_suffixes.map(s => `'${s}'`).join(', ')}]!`);
+            config.expand = prefix;
+            config.joints = config.joints || valid_suffixes.indexOf(suffix);
         }
         
         if (a$2.type(config.joints)(units) == 'string') {
@@ -1505,7 +1511,7 @@
         }
     };
 
-    outlines.parse = (config = {}, points = {}, units = {}) => {
+    outlines.parse = (config, points, units) => {
 
         // output outlines will be collected here
         const outlines = {};
@@ -1547,7 +1553,7 @@
                 const original_adjust = part.adjust; // same as above
                 const adjust = start => anchor$1(original_adjust || {}, `${name}.adjust`, points, start)(units);
                 const fillet = a$2.sane(part.fillet || 0, `${name}.fillet`, 'number')(units);
-                expand_shorthand(part, units);
+                expand_shorthand(part, `${name}.expand`, units);
                 const expand = a$2.sane(part.expand || 0, `${name}.expand`, 'number')(units);
                 const joints = a$2.in(a$2.sane(part.joints || 0, `${name}.joints`, 'number')(units), `${name}.joints`, [0, 1, 2]);
                 const scale = a$2.sane(part.scale || 1, `${name}.scale`, 'number')(units);
@@ -1606,7 +1612,7 @@
 
     var cases = {};
 
-    const m$1 = require$$0__default["default"];
+    const m$1 = require$$0;
     const a$1 = assert$1;
     const o = operation;
 
@@ -1677,15 +1683,19 @@
                     const extrude = a$1.sane(part.extrude || 1, `${part_qname}.extrude`, 'number')(units);
                     const outline = outlines[name];
                     a$1.assert(outline, `Field "${part_qname}.name" does not name a valid outline!`);
-                    if (!scripts[name]) {
-                        scripts[name] = m$1.exporter.toJscadScript(outline, {
-                            functionName: `${name}_outline_fn`,
+                    // This is a hack to separate multiple calls to the same outline with different extrude values
+                    // I know it needlessly duplicates a lot of code, but it's the quickest fix in the short term
+                    // And on the long run, we'll probably be moving to CADQuery anyway...
+                    const extruded_name = `${name}_extrude_` + ('' + extrude).replace(/\D/g, '_');
+                    if (!scripts[extruded_name]) {
+                        scripts[extruded_name] = m$1.exporter.toJscadScript(outline, {
+                            functionName: `${extruded_name}_outline_fn`,
                             extrude: extrude,
                             indent: 4
                         });
                     }
-                    outline_dependencies.push(name);
-                    base = `${name}_outline_fn()`;
+                    outline_dependencies.push(extruded_name);
+                    base = `${extruded_name}_outline_fn()`;
                 } else {
                     a$1.assert(part.extrude === undefined, `Field "${part_qname}.extrude" should not be used when what=case!`);
                     a$1.in(name, `${part_qname}.name`, Object.keys(cases));
@@ -1743,13 +1753,19 @@
 
     var pcbs = {};
 
-    var alps = {
-        params: {
-            designator: 'S',
-            from: undefined,
-            to: undefined
-        },
-        body: p => `
+    var alps;
+    var hasRequiredAlps;
+
+    function requireAlps () {
+    	if (hasRequiredAlps) return alps;
+    	hasRequiredAlps = 1;
+    	alps = {
+    	    params: {
+    	        designator: 'S',
+    	        from: undefined,
+    	        to: undefined
+    	    },
+    	    body: p => `
 
     (module ALPS (layer F.Cu) (tedit 5CF31DEF)
 
@@ -1775,16 +1791,24 @@
     )
 
     `
-    };
+    	};
+    	return alps;
+    }
 
-    var button = {
-        params: {
-            designator: 'B', // for Button
-            side: 'F',
-            from: undefined,
-            to: undefined
-        },
-        body: p => `
+    var button;
+    var hasRequiredButton;
+
+    function requireButton () {
+    	if (hasRequiredButton) return button;
+    	hasRequiredButton = 1;
+    	button = {
+    	    params: {
+    	        designator: 'B', // for Button
+    	        side: 'F',
+    	        from: undefined,
+    	        to: undefined
+    	    },
+    	    body: p => `
     
     (module E73:SW_TACT_ALPS_SKQGABE010 (layer F.Cu) (tstamp 5BF2CC94)
 
@@ -1814,33 +1838,41 @@
     )
     
     `
-    };
+    	};
+    	return button;
+    }
 
-    // Kailh Choc PG1350
-    // Nets
-    //    from: corresponds to pin 1
-    //    to: corresponds to pin 2
-    // Params
-    //    hotswap: default is false
-    //      if true, will include holes and pads for Kailh choc hotswap sockets
-    //    reverse: default is false
-    //      if true, will flip the footprint such that the pcb can be reversible
-    //    keycaps: default is false
-    //      if true, will add choc sized keycap box around the footprint
-    // 
-    // note: hotswap and reverse can be used simultaneously
+    var choc;
+    var hasRequiredChoc;
 
-    var choc = {
-      params: {
-        designator: 'S',
-        hotswap: false,
-        reverse: false,
-        keycaps: false,
-        from: undefined,
-        to: undefined
-      },
-      body: p => {
-        const standard = `
+    function requireChoc () {
+    	if (hasRequiredChoc) return choc;
+    	hasRequiredChoc = 1;
+    	// Kailh Choc PG1350
+    	// Nets
+    	//    from: corresponds to pin 1
+    	//    to: corresponds to pin 2
+    	// Params
+    	//    hotswap: default is false
+    	//      if true, will include holes and pads for Kailh choc hotswap sockets
+    	//    reverse: default is false
+    	//      if true, will flip the footprint such that the pcb can be reversible
+    	//    keycaps: default is false
+    	//      if true, will add choc sized keycap box around the footprint
+    	// 
+    	// note: hotswap and reverse can be used simultaneously
+
+    	choc = {
+    	  params: {
+    	    designator: 'S',
+    	    hotswap: false,
+    	    reverse: false,
+    	    keycaps: false,
+    	    from: undefined,
+    	    to: undefined
+    	  },
+    	  body: p => {
+    	    const standard = `
       (module PG1350 (layer F.Cu) (tedit 5DD50112)
       ${p.at /* parametric position */}
 
@@ -1865,16 +1897,16 @@
       (pad "" np_thru_hole circle (at 5.5 0) (size 1.7018 1.7018) (drill 1.7018) (layers *.Cu *.Mask))
       (pad "" np_thru_hole circle (at -5.5 0) (size 1.7018 1.7018) (drill 1.7018) (layers *.Cu *.Mask))
       `;
-        const keycap = `
+    	    const keycap = `
       ${'' /* keycap marks */}
       (fp_line (start -9 -8.5) (end 9 -8.5) (layer Dwgs.User) (width 0.15))
       (fp_line (start 9 -8.5) (end 9 8.5) (layer Dwgs.User) (width 0.15))
       (fp_line (start 9 8.5) (end -9 8.5) (layer Dwgs.User) (width 0.15))
       (fp_line (start -9 8.5) (end -9 -8.5) (layer Dwgs.User) (width 0.15))
       `;
-        function pins(def_neg, def_pos, def_side) {
-          if(p.hotswap) {
-            return `
+    	    function pins(def_neg, def_pos, def_side) {
+    	      if(p.hotswap) {
+    	        return `
           ${'' /* holes */}
           (pad "" np_thru_hole circle (at ${def_pos}5 -3.75) (size 3 3) (drill 3) (layers *.Cu *.Mask))
           (pad "" np_thru_hole circle (at 0 -5.95) (size 3 3) (drill 3) (layers *.Cu *.Mask))
@@ -1883,52 +1915,60 @@
           (pad 1 smd rect (at ${def_neg}3.275 -5.95 ${p.rot}) (size 2.6 2.6) (layers ${def_side}.Cu ${def_side}.Paste ${def_side}.Mask)  ${p.from.str})
           (pad 2 smd rect (at ${def_pos}8.275 -3.75 ${p.rot}) (size 2.6 2.6) (layers ${def_side}.Cu ${def_side}.Paste ${def_side}.Mask)  ${p.to.str})
         `
-          } else {
-              return `
+    	      } else {
+    	          return `
             ${''/* pins */}
             (pad 1 thru_hole circle (at ${def_pos}5 -3.8) (size 2.032 2.032) (drill 1.27) (layers *.Cu *.Mask) ${p.from.str})
             (pad 2 thru_hole circle (at ${def_pos}0 -5.9) (size 2.032 2.032) (drill 1.27) (layers *.Cu *.Mask) ${p.to.str})
           `
-          }
-        }
-        if(p.reverse) {
-          return `
+    	      }
+    	    }
+    	    if(p.reverse) {
+    	      return `
         ${standard}
         ${p.keycaps ? keycap : ''}
         ${pins('-', '', 'B')}
         ${pins('', '-', 'F')})
         `
-        } else {
-          return `
+    	    } else {
+    	      return `
         ${standard}
         ${p.keycaps ? keycap : ''}
         ${pins('-', '', 'B')})
         `
-        }
-      }
-    };
+    	    }
+    	  }
+    	};
+    	return choc;
+    }
 
-    // Kailh Choc PG1232
-    // Nets
-    //    from: corresponds to pin 1
-    //    to: corresponds to pin 2
-    // Params
-    //    reverse: default is false
-    //      if true, will flip the footprint such that the pcb can be reversible 
-    //    keycaps: default is false
-    //      if true, will add choc sized keycap box around the footprint
+    var chocmini;
+    var hasRequiredChocmini;
 
-    var chocmini = {
-        params: {
-          designator: 'S',
-    		  side: 'F',
-    		  reverse: false,
-          keycaps: false,
-          from: undefined,
-          to: undefined
-        },
-        body: p => {
-    	    const standard = `
+    function requireChocmini () {
+    	if (hasRequiredChocmini) return chocmini;
+    	hasRequiredChocmini = 1;
+    	// Kailh Choc PG1232
+    	// Nets
+    	//    from: corresponds to pin 1
+    	//    to: corresponds to pin 2
+    	// Params
+    	//    reverse: default is false
+    	//      if true, will flip the footprint such that the pcb can be reversible 
+    	//    keycaps: default is false
+    	//      if true, will add choc sized keycap box around the footprint
+
+    	chocmini = {
+    	    params: {
+    	      designator: 'S',
+    			  side: 'F',
+    			  reverse: false,
+    	      keycaps: false,
+    	      from: undefined,
+    	      to: undefined
+    	    },
+    	    body: p => {
+    		    const standard = `
         (module lib:Kailh_PG1232 (layer F.Cu) (tedit 5E1ADAC2)
         ${p.at /* parametric position */} 
 
@@ -1969,45 +2009,53 @@
         (pad 3 thru_hole circle (at 5.3 -4.75) (size 1.6 1.6) (drill 1.1) (layers *.Cu *.Mask) (clearance 0.2))
         (pad 4 thru_hole circle (at -5.3 -4.75) (size 1.6 1.6) (drill 1.1) (layers *.Cu *.Mask) (clearance 0.2))
       `;
-          const keycap = `
+    	      const keycap = `
         ${'' /* keycap marks */}
         (fp_line (start -9 -8.5) (end 9 -8.5) (layer Dwgs.User) (width 0.15))
         (fp_line (start 9 -8.5) (end 9 8.5) (layer Dwgs.User) (width 0.15))
         (fp_line (start 9 8.5) (end -9 8.5) (layer Dwgs.User) (width 0.15))
         (fp_line (start -9 8.5) (end -9 -8.5) (layer Dwgs.User) (width 0.15))
         `;
-          function pins(def_neg, def_pos) {
-            return `
+    	      function pins(def_neg, def_pos) {
+    	        return `
         ${''/* pins */}
         (pad 1 thru_hole circle (at ${def_neg}4.58 5.1) (size 1.6 1.6) (drill 1.1) (layers *.Cu *.Mask) ${p.from.str} (clearance 0.2))
         (pad 2 thru_hole circle (at ${def_pos}2 5.4) (size 1.6 1.6) (drill 1.1) (layers *.Cu *.Mask) ${p.to.str} (clearance 0.2))
 			  `
-          }
-          if(p.reverse){
-            return `
+    	      }
+    	      if(p.reverse){
+    	        return `
           ${standard}
           ${p.keycaps ? keycap : ''}
           ${pins('-', '')}
           ${pins('', '-')})
 
           `
-          } else {
-            return `
+    	      } else {
+    	        return `
           ${standard}
           ${p.keycaps ? keycap : ''}
           ${pins('-', '')})
           `
-          }
-        }
-      };
+    	      }
+    	    }
+    	  };
+    	return chocmini;
+    }
 
-    var diode = {
-        params: {
-            designator: 'D',
-            from: undefined,
-            to: undefined
-        },
-        body: p => `
+    var diode;
+    var hasRequiredDiode;
+
+    function requireDiode () {
+    	if (hasRequiredDiode) return diode;
+    	hasRequiredDiode = 1;
+    	diode = {
+    	    params: {
+    	        designator: 'D',
+    	        from: undefined,
+    	        to: undefined
+    	    },
+    	    body: p => `
   
     (module ComboDiode (layer F.Cu) (tedit 5B24D78E)
 
@@ -2046,16 +2094,24 @@
     )
   
     `
-    };
+    	};
+    	return diode;
+    }
 
-    var jstph = {
-        params: {
-            designator: 'JST',
-            side: 'F',
-            pos: undefined,
-            neg: undefined
-        },
-        body: p => `
+    var jstph;
+    var hasRequiredJstph;
+
+    function requireJstph () {
+    	if (hasRequiredJstph) return jstph;
+    	hasRequiredJstph = 1;
+    	jstph = {
+    	    params: {
+    	        designator: 'JST',
+    	        side: 'F',
+    	        pos: undefined,
+    	        neg: undefined
+    	    },
+    	    body: p => `
     
     (module JST_PH_S2B-PH-K_02x2.00mm_Angled (layer F.Cu) (tedit 58D3FE32)
 
@@ -2086,16 +2142,24 @@
     )
     
     `
-    };
+    	};
+    	return jstph;
+    }
 
-    var jumper = {
-        params: {
-            designator: 'J',
-            side: 'F',
-            from: undefined,
-            to: undefined
-        },
-        body: p => `
+    var jumper;
+    var hasRequiredJumper;
+
+    function requireJumper () {
+    	if (hasRequiredJumper) return jumper;
+    	hasRequiredJumper = 1;
+    	jumper = {
+    	    params: {
+    	        designator: 'J',
+    	        side: 'F',
+    	        from: undefined,
+    	        to: undefined
+    	    },
+    	    body: p => `
         (module lib:Jumper (layer F.Cu) (tedit 5E1ADAC2)
         ${p.at /* parametric position */} 
 
@@ -2109,33 +2173,41 @@
         (pad 2 smd rect (at 0.50038 0 ${p.rot}) (size 0.635 1.143) (layers ${p.side}.Cu ${p.side}.Paste ${p.side}.Mask)
         (clearance 0.1905) ${p.to.str}))
     `
-    };
+    	};
+    	return jumper;
+    }
 
-    // Any MX switch
-    // Nets
-    //    from: corresponds to pin 1
-    //    to: corresponds to pin 2
-    // Params
-    //    hotswap: default is false
-    //      if true, will include holes and pads for Kailh MX hotswap sockets
-    //    reverse: default is false
-    //      if true, will flip the footprint such that the pcb can be reversible 
-    //    keycaps: default is false
-    //      if true, will add choc sized keycap box around the footprint
-    //
-    // note: hotswap and reverse can be used simultaneously
+    var mx;
+    var hasRequiredMx;
 
-    var mx = {
-      params: {
-        designator: 'S',
-        hotswap: false,
-        reverse: false,
-        keycaps: false,
-        from: undefined,
-        to: undefined
-      },
-      body: p => {
-        const standard = `
+    function requireMx () {
+    	if (hasRequiredMx) return mx;
+    	hasRequiredMx = 1;
+    	// Any MX switch
+    	// Nets
+    	//    from: corresponds to pin 1
+    	//    to: corresponds to pin 2
+    	// Params
+    	//    hotswap: default is false
+    	//      if true, will include holes and pads for Kailh MX hotswap sockets
+    	//    reverse: default is false
+    	//      if true, will flip the footprint such that the pcb can be reversible 
+    	//    keycaps: default is false
+    	//      if true, will add choc sized keycap box around the footprint
+    	//
+    	// note: hotswap and reverse can be used simultaneously
+
+    	mx = {
+    	  params: {
+    	    designator: 'S',
+    	    hotswap: false,
+    	    reverse: false,
+    	    keycaps: false,
+    	    from: undefined,
+    	    to: undefined
+    	  },
+    	  body: p => {
+    	    const standard = `
       (module MX (layer F.Cu) (tedit 5DD4F656)
       ${p.at /* parametric position */}
 
@@ -2160,16 +2232,16 @@
       (pad "" np_thru_hole circle (at 5.08 0) (size 1.7018 1.7018) (drill 1.7018) (layers *.Cu *.Mask))
       (pad "" np_thru_hole circle (at -5.08 0) (size 1.7018 1.7018) (drill 1.7018) (layers *.Cu *.Mask))
       `;
-        const keycap = `
+    	    const keycap = `
       ${'' /* keycap marks */}
       (fp_line (start -9.5 -9.5) (end 9.5 -9.5) (layer Dwgs.User) (width 0.15))
       (fp_line (start 9.5 -9.5) (end 9.5 9.5) (layer Dwgs.User) (width 0.15))
       (fp_line (start 9.5 9.5) (end -9.5 9.5) (layer Dwgs.User) (width 0.15))
       (fp_line (start -9.5 9.5) (end -9.5 -9.5) (layer Dwgs.User) (width 0.15))
       `;
-        function pins(def_neg, def_pos, def_side) {
-          if(p.hotswap) {
-            return `
+    	    function pins(def_neg, def_pos, def_side) {
+    	      if(p.hotswap) {
+    	        return `
         ${'' /* holes */}
         (pad "" np_thru_hole circle (at ${def_pos}2.54 -5.08) (size 3 3) (drill 3) (layers *.Cu *.Mask))
         (pad "" np_thru_hole circle (at ${def_neg}3.81 -2.54) (size 3 3) (drill 3) (layers *.Cu *.Mask))
@@ -2178,41 +2250,49 @@
         (pad 1 smd rect (at ${def_neg}7.085 -2.54 ${p.rot}) (size 2.55 2.5) (layers ${def_side}.Cu ${def_side}.Paste ${def_side}.Mask) ${p.from.str})
         (pad 2 smd rect (at ${def_pos}5.842 -5.08 ${p.rot}) (size 2.55 2.5) (layers ${def_side}.Cu ${def_side}.Paste ${def_side}.Mask) ${p.to.str})
         `
-          } else {
-              return `
+    	      } else {
+    	          return `
             ${''/* pins */}
             (pad 1 thru_hole circle (at ${def_pos}2.54 -5.08) (size 2.286 2.286) (drill 1.4986) (layers *.Cu *.Mask) ${p.from.str})
             (pad 2 thru_hole circle (at ${def_neg}3.81 -2.54) (size 2.286 2.286) (drill 1.4986) (layers *.Cu *.Mask) ${p.to.str})
           `
-          }
-        }
-        if(p.reverse){
-          return `
+    	      }
+    	    }
+    	    if(p.reverse){
+    	      return `
         ${standard}
         ${p.keycaps ? keycap : ''}
         ${pins('-', '', 'B')}
         ${pins('', '-', 'F')})
         `
-        } else {
-          return `
+    	    } else {
+    	      return `
         ${standard}
         ${p.keycaps ? keycap : ''}
         ${pins('-', '', 'B')})
         `
-        }
-      }
-    };
+    	    }
+    	  }
+    	};
+    	return mx;
+    }
 
-    var oled = {
-        params: {
-            designator: 'OLED',
-            side: 'F',
-            VCC: {type: 'net', value: 'VCC'},
-            GND: {type: 'net', value: 'GND'},
-            SDA: undefined,
-            SCL: undefined
-        },
-        body: p => `
+    var oled;
+    var hasRequiredOled;
+
+    function requireOled () {
+    	if (hasRequiredOled) return oled;
+    	hasRequiredOled = 1;
+    	oled = {
+    	    params: {
+    	        designator: 'OLED',
+    	        side: 'F',
+    	        VCC: {type: 'net', value: 'VCC'},
+    	        GND: {type: 'net', value: 'GND'},
+    	        SDA: undefined,
+    	        SCL: undefined
+    	    },
+    	    body: p => `
         (module lib:OLED_headers (layer F.Cu) (tedit 5E1ADAC2)
         ${p.at /* parametric position */} 
 
@@ -2231,15 +2311,23 @@
         ${p.GND.str})
         )
         `
-    };
+    	};
+    	return oled;
+    }
 
-    var omron = {
-        params: {
-            designator: 'S',
-            from: undefined,
-            to: undefined
-        },
-        body: p => `
+    var omron;
+    var hasRequiredOmron;
+
+    function requireOmron () {
+    	if (hasRequiredOmron) return omron;
+    	hasRequiredOmron = 1;
+    	omron = {
+    	    params: {
+    	        designator: 'S',
+    	        from: undefined,
+    	        to: undefined
+    	    },
+    	    body: p => `
     
     (module OMRON_B3F-4055 (layer F.Cu) (tstamp 5BF2CC94)
 
@@ -2266,44 +2354,52 @@
     )
     
     `
-    };
+    	};
+    	return omron;
+    }
 
-    var pad = {
-        params: {
-            designator: 'PAD',
-            width: 1,
-            height: 1,
-            front: true,
-            back: true,
-            text: '',
-            align: 'left',
-            mirrored: {type: 'boolean', value: '{{mirrored}}'},
-            net: undefined
-        },
-        body: p => {
+    var pad;
+    var hasRequiredPad;
 
-            const layout = (toggle, side) => {
-                if (!toggle) return ''
-                let x = 0, y = 0;
-                const mirror = side == 'B' ? '(justify mirror)' : '';
-                const plus = (p.text.length + 1) * 0.5;
-                let align = p.align;
-                if (p.mirrored === true) {
-                    if (align == 'left') align = 'right';
-                    else if (align == 'right') align = 'left';
-                }
-                if (align == 'left') x -= p.width / 2 + plus;
-                if (align == 'right') x += p.width / 2 + plus;
-                if (align == 'up') y += p.height / 2 + plus;
-                if (align == 'down') y -= p.height / 2 + plus;
-                let text = '';
-                if (p.text.length) {
-                    text = `(fp_text user ${p.text} (at ${x} ${y} ${p.rot}) (layer ${side}.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15)) ${mirror}))`;
-                }
-                return `(pad 1 smd rect (at 0 0 ${p.rot}) (size ${p.width} ${p.height}) (layers ${side}.Cu ${side}.Paste ${side}.Mask) ${p.net.str})\n${text}`
-            };
+    function requirePad () {
+    	if (hasRequiredPad) return pad;
+    	hasRequiredPad = 1;
+    	pad = {
+    	    params: {
+    	        designator: 'PAD',
+    	        width: 1,
+    	        height: 1,
+    	        front: true,
+    	        back: true,
+    	        text: '',
+    	        align: 'left',
+    	        mirrored: {type: 'boolean', value: '{{mirrored}}'},
+    	        net: undefined
+    	    },
+    	    body: p => {
 
-            return `
+    	        const layout = (toggle, side) => {
+    	            if (!toggle) return ''
+    	            let x = 0, y = 0;
+    	            const mirror = side == 'B' ? '(justify mirror)' : '';
+    	            const plus = (p.text.length + 1) * 0.5;
+    	            let align = p.align;
+    	            if (p.mirrored === true) {
+    	                if (align == 'left') align = 'right';
+    	                else if (align == 'right') align = 'left';
+    	            }
+    	            if (align == 'left') x -= p.width / 2 + plus;
+    	            if (align == 'right') x += p.width / 2 + plus;
+    	            if (align == 'up') y += p.height / 2 + plus;
+    	            if (align == 'down') y -= p.height / 2 + plus;
+    	            let text = '';
+    	            if (p.text.length) {
+    	                text = `(fp_text user ${p.text} (at ${x} ${y} ${p.rot}) (layer ${side}.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15)) ${mirror}))`;
+    	            }
+    	            return `(pad 1 smd rect (at 0 0 ${p.rot}) (size ${p.width} ${p.height}) (layers ${side}.Cu ${side}.Paste ${side}.Mask) ${p.net.str})\n${text}`
+    	        };
+
+    	        return `
     
         (module SMDPad (layer F.Cu) (tedit 5B24D78E)
 
@@ -2320,44 +2416,52 @@
         )
     
         `
-        }
-    };
+    	    }
+    	};
+    	return pad;
+    }
 
-    // Arduino ProMicro atmega32u4au
-    // Params
-    //  orientation: default is down
-    //    if down, power led will face the pcb
-    //    if up, power led will face away from pcb
+    var promicro;
+    var hasRequiredPromicro;
 
-    var promicro = {
-      params: {
-        designator: 'MCU',
-        orientation: 'down',
-        RAW: {type: 'net', value: 'RAW'},
-        GND: {type: 'net', value: 'GND'},
-        RST: {type: 'net', value: 'RST'},
-        VCC: {type: 'net', value: 'VCC'},
-        P21: {type: 'net', value: 'P21'},
-        P20: {type: 'net', value: 'P20'},
-        P19: {type: 'net', value: 'P19'},
-        P18: {type: 'net', value: 'P18'},
-        P15: {type: 'net', value: 'P15'},
-        P14: {type: 'net', value: 'P14'},
-        P16: {type: 'net', value: 'P16'},
-        P10: {type: 'net', value: 'P10'},
-        P1: {type: 'net', value: 'P1'},
-        P0: {type: 'net', value: 'P0'},
-        P2: {type: 'net', value: 'P2'},
-        P3: {type: 'net', value: 'P3'},
-        P4: {type: 'net', value: 'P4'},
-        P5: {type: 'net', value: 'P5'},
-        P6: {type: 'net', value: 'P6'},
-        P7: {type: 'net', value: 'P7'},
-        P8: {type: 'net', value: 'P8'},
-        P9: {type: 'net', value: 'P9'}
-      },
-      body: p => {
-        const standard = `
+    function requirePromicro () {
+    	if (hasRequiredPromicro) return promicro;
+    	hasRequiredPromicro = 1;
+    	// Arduino ProMicro atmega32u4au
+    	// Params
+    	//  orientation: default is down
+    	//    if down, power led will face the pcb
+    	//    if up, power led will face away from pcb
+
+    	promicro = {
+    	  params: {
+    	    designator: 'MCU',
+    	    orientation: 'down',
+    	    RAW: {type: 'net', value: 'RAW'},
+    	    GND: {type: 'net', value: 'GND'},
+    	    RST: {type: 'net', value: 'RST'},
+    	    VCC: {type: 'net', value: 'VCC'},
+    	    P21: {type: 'net', value: 'P21'},
+    	    P20: {type: 'net', value: 'P20'},
+    	    P19: {type: 'net', value: 'P19'},
+    	    P18: {type: 'net', value: 'P18'},
+    	    P15: {type: 'net', value: 'P15'},
+    	    P14: {type: 'net', value: 'P14'},
+    	    P16: {type: 'net', value: 'P16'},
+    	    P10: {type: 'net', value: 'P10'},
+    	    P1: {type: 'net', value: 'P1'},
+    	    P0: {type: 'net', value: 'P0'},
+    	    P2: {type: 'net', value: 'P2'},
+    	    P3: {type: 'net', value: 'P3'},
+    	    P4: {type: 'net', value: 'P4'},
+    	    P5: {type: 'net', value: 'P5'},
+    	    P6: {type: 'net', value: 'P6'},
+    	    P7: {type: 'net', value: 'P7'},
+    	    P8: {type: 'net', value: 'P8'},
+    	    P9: {type: 'net', value: 'P9'}
+    	  },
+    	  body: p => {
+    	    const standard = `
       (module ProMicro (layer F.Cu) (tedit 5B307E4C)
       ${p.at /* parametric position */}
 
@@ -2377,8 +2481,8 @@
       (fp_line (start 15.24 -8.89) (end -17.78 -8.89) (layer F.SilkS) (width 0.15))
       (fp_line (start -17.78 -8.89) (end -17.78 8.89) (layer F.SilkS) (width 0.15))
       `;
-        function pins(def_neg, def_pos) {
-          return `
+    	    function pins(def_neg, def_pos) {
+    	      return `
         ${''/* extra border around "RAW", in case the rectangular shape is not distinctive enough */}
         (fp_line (start -15.24 ${def_pos}6.35) (end -12.7 ${def_pos}6.35) (layer F.SilkS) (width 0.15))
         (fp_line (start -15.24 ${def_pos}6.35) (end -15.24 ${def_pos}8.89) (layer F.SilkS) (width 0.15))
@@ -2438,31 +2542,39 @@
         (pad 23 thru_hole circle (at 11.43 ${def_neg}7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.P8.str})
         (pad 24 thru_hole circle (at 13.97 ${def_neg}7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) ${p.P9.str})
       `
-        }
-        if(p.orientation == 'down') {
-          return `
+    	    }
+    	    if(p.orientation == 'down') {
+    	      return `
         ${standard}
         ${pins('-', '')})
         `
-        } else {
-          return `
+    	    } else {
+    	      return `
         ${standard}
         ${pins('', '-')})
         `
-        }
-      }
-    };
+    	    }
+    	  }
+    	};
+    	return promicro;
+    }
 
-    var rgb = {
-        params: {
-            designator: 'LED',
-            side: 'F',
-            din: undefined,
-            dout: undefined,
-            VCC: {type: 'net', value: 'VCC'},
-            GND: {type: 'net', value: 'GND'}
-        },
-        body: p => `
+    var rgb;
+    var hasRequiredRgb;
+
+    function requireRgb () {
+    	if (hasRequiredRgb) return rgb;
+    	hasRequiredRgb = 1;
+    	rgb = {
+    	    params: {
+    	        designator: 'LED',
+    	        side: 'F',
+    	        din: undefined,
+    	        dout: undefined,
+    	        VCC: {type: 'net', value: 'VCC'},
+    	        GND: {type: 'net', value: 'GND'}
+    	    },
+    	    body: p => `
     
         (module WS2812B (layer F.Cu) (tedit 53BEE615)
 
@@ -2497,27 +2609,35 @@
         )
     
     `
-    };
+    	};
+    	return rgb;
+    }
 
-    // EC11 rotary encoder
-    //
-    // Nets
-    //    from: corresponds to switch pin 1 (for button presses)
-    //    to: corresponds to switch pin 2 (for button presses)
-    //    A: corresponds to pin 1 (for rotary)
-    //    B: corresponds to pin 2 (for rotary, should be GND)
-    //    C: corresponds to pin 3 (for rotary)
+    var rotary;
+    var hasRequiredRotary;
 
-    var rotary = {
-        params: {
-            designator: 'ROT',
-            from: undefined,
-            to: undefined,
-            A: undefined,
-            B: undefined,
-            C: undefined
-        },
-        body: p => `
+    function requireRotary () {
+    	if (hasRequiredRotary) return rotary;
+    	hasRequiredRotary = 1;
+    	// EC11 rotary encoder
+    	//
+    	// Nets
+    	//    from: corresponds to switch pin 1 (for button presses)
+    	//    to: corresponds to switch pin 2 (for button presses)
+    	//    A: corresponds to pin 1 (for rotary)
+    	//    B: corresponds to pin 2 (for rotary, should be GND)
+    	//    C: corresponds to pin 3 (for rotary)
+
+    	rotary = {
+    	    params: {
+    	        designator: 'ROT',
+    	        from: undefined,
+    	        to: undefined,
+    	        A: undefined,
+    	        B: undefined,
+    	        C: undefined
+    	    },
+    	    body: p => `
         (module rotary_encoder (layer F.Cu) (tedit 603326DE)
 
             ${p.at /* parametric position */}
@@ -2568,43 +2688,51 @@
             (pad "" thru_hole rect (at -0.12 5.56 ${p.rot})  (size 3.2 2) (drill oval 2.8 1.5) (layers *.Cu *.Mask))
         )
     `
-    };
+    	};
+    	return rotary;
+    }
 
-    // Panasonic EVQWGD001 horizontal rotary encoder
-    //
-    //   __________________
-    //  (f) (t)         | |
-    //  | (1)           | |
-    //  | (2)           | |
-    //  | (3)           | |
-    //  | (4)           | |
-    //  |_( )___________|_|
-    //
-    // Nets
-    //    from: corresponds to switch pin 1 (for button presses)
-    //    to: corresponds to switch pin 2 (for button presses)
-    //    A: corresponds to pin 1 (for rotary)
-    //    B: corresponds to pin 2 (for rotary, should be GND)
-    //    C: corresponds to pin 3 (for rotary)
-    //    D: corresponds to pin 4 (for rotary, unused)
-    // Params
-    //    reverse: default is false
-    //      if true, will flip the footprint such that the pcb can be reversible
+    var scrollwheel;
+    var hasRequiredScrollwheel;
+
+    function requireScrollwheel () {
+    	if (hasRequiredScrollwheel) return scrollwheel;
+    	hasRequiredScrollwheel = 1;
+    	// Panasonic EVQWGD001 horizontal rotary encoder
+    	//
+    	//   __________________
+    	//  (f) (t)         | |
+    	//  | (1)           | |
+    	//  | (2)           | |
+    	//  | (3)           | |
+    	//  | (4)           | |
+    	//  |_( )___________|_|
+    	//
+    	// Nets
+    	//    from: corresponds to switch pin 1 (for button presses)
+    	//    to: corresponds to switch pin 2 (for button presses)
+    	//    A: corresponds to pin 1 (for rotary)
+    	//    B: corresponds to pin 2 (for rotary, should be GND)
+    	//    C: corresponds to pin 3 (for rotary)
+    	//    D: corresponds to pin 4 (for rotary, unused)
+    	// Params
+    	//    reverse: default is false
+    	//      if true, will flip the footprint such that the pcb can be reversible
 
 
-    var scrollwheel = {
-        params: {
-          designator: 'S',
-    		  reverse: false,
-          from: undefined,
-          to: undefined,
-          A: undefined,
-          B: undefined,
-          C: undefined,
-          D: undefined
-        },
-        body: p => {
-          const standard = `
+    	scrollwheel = {
+    	    params: {
+    	      designator: 'S',
+    			  reverse: false,
+    	      from: undefined,
+    	      to: undefined,
+    	      A: undefined,
+    	      B: undefined,
+    	      C: undefined,
+    	      D: undefined
+    	    },
+    	    body: p => {
+    	      const standard = `
         (module RollerEncoder_Panasonic_EVQWGD001 (layer F.Cu) (tedit 6040A10C)
         ${p.at /* parametric position */}   
         (fp_text reference REF** (at 0 0 ${p.rot}) (layer F.Fab) (effects (font (size 1 1) (thickness 0.15))))
@@ -2616,8 +2744,8 @@
         (fp_line (start 8.4 7.4) (end -8.4 7.4) (layer Dwgs.User) (width 0.12))
         (fp_line (start -8.4 7.4) (end -8.4 -6.4) (layer Dwgs.User) (width 0.12))
       `;
-          function pins(def_neg, def_pos) {
-            return `
+    	      function pins(def_neg, def_pos) {
+    	        return `
           ${'' /* edge cuts */}
           (fp_line (start ${def_pos}9.8 7.3) (end ${def_pos}9.8 -6.3) (layer Edge.Cuts) (width 0.15))
           (fp_line (start ${def_pos}7.4 -6.3) (end ${def_pos}7.4 7.3) (layer Edge.Cuts) (width 0.15))
@@ -2639,35 +2767,43 @@
           ${'' /* stabilizer */}
           (pad "" np_thru_hole circle (at ${def_neg}5.625 6.3 ${p.rot}) (size 1.5 1.5) (drill 1.5) (layers *.Cu *.Mask))
         `
-        }
-        if(p.reverse) {
-          return `
+    	    }
+    	    if(p.reverse) {
+    	      return `
         ${standard}
         ${pins('-', '')}
         ${pins('', '-')})
         `
-        } else {
-          return `
+    	    } else {
+    	      return `
         ${standard}
         ${pins('-', '')})
         `
-        }
-      }
-    };
+    	    }
+    	  }
+    	};
+    	return scrollwheel;
+    }
 
-    var slider = {
-        params: {
-            designator: 'T', // for Toggle
-            side: 'F',
-            from: undefined,
-            to: undefined
-        },
-        body: p => {
+    var slider;
+    var hasRequiredSlider;
 
-            const left = p.side == 'F' ? '-' : '';
-            const right = p.side == 'F' ? '' : '-';
+    function requireSlider () {
+    	if (hasRequiredSlider) return slider;
+    	hasRequiredSlider = 1;
+    	slider = {
+    	    params: {
+    	        designator: 'T', // for Toggle
+    	        side: 'F',
+    	        from: undefined,
+    	        to: undefined
+    	    },
+    	    body: p => {
 
-            return `
+    	        const left = p.side == 'F' ? '-' : '';
+    	        const right = p.side == 'F' ? '' : '-';
+
+    	        return `
         
         (module E73:SPDT_C128955 (layer F.Cu) (tstamp 5BF2CC3C)
 
@@ -2707,56 +2843,64 @@
         )
         
         `
-        }
-    };
+    	    }
+    	};
+    	return slider;
+    }
 
-    // TRRS-PJ-320A-dual
-    //
-    // Normal footprint:
-    //     _________________
-    //    |   (2)   (3) (4)|
-    //    |                |
-    //    | (1)            |
-    //    |________________|
-    // 
-    // Reverse footprint:
-    //     _________________
-    //    |   (2)   (3) (4)|
-    //    | (1)            |
-    //    | (1)            |
-    //    |___(2)___(3)_(4)|
-    //
-    // Reverse & symmetric footprint:
-    //     _________________
-    //    | (1|2)   (3) (4)|
-    //    |                |
-    //    |_(1|2)___(3)_(4)|
-    //
-    // Nets
-    //    A: corresponds to pin 1
-    //    B: corresponds to pin 2
-    //    C: corresponds to pin 3
-    //    D: corresponds to pin 4
-    // Params
-    //    reverse: default is false
-    //      if true, will flip the footprint such that the pcb can be reversible
-    //    symmetric: default is false
-    //      if true, will only work if reverse is also true
-    //      this will cause the footprint to be symmetrical on each half
-    //      pins 1 and 2 must be identical if symmetric is true, as they will overlap
+    var trrs;
+    var hasRequiredTrrs;
 
-    var trrs = {
-      params: {
-        designator: 'TRRS',
-        reverse: false,
-        symmetric: false,
-        A: undefined,
-        B: undefined,
-        C: undefined,
-        D: undefined
-      },
-      body: p => {
-        const standard = `
+    function requireTrrs () {
+    	if (hasRequiredTrrs) return trrs;
+    	hasRequiredTrrs = 1;
+    	// TRRS-PJ-320A-dual
+    	//
+    	// Normal footprint:
+    	//     _________________
+    	//    |   (2)   (3) (4)|
+    	//    |                |
+    	//    | (1)            |
+    	//    |________________|
+    	// 
+    	// Reverse footprint:
+    	//     _________________
+    	//    |   (2)   (3) (4)|
+    	//    | (1)            |
+    	//    | (1)            |
+    	//    |___(2)___(3)_(4)|
+    	//
+    	// Reverse & symmetric footprint:
+    	//     _________________
+    	//    | (1|2)   (3) (4)|
+    	//    |                |
+    	//    |_(1|2)___(3)_(4)|
+    	//
+    	// Nets
+    	//    A: corresponds to pin 1
+    	//    B: corresponds to pin 2
+    	//    C: corresponds to pin 3
+    	//    D: corresponds to pin 4
+    	// Params
+    	//    reverse: default is false
+    	//      if true, will flip the footprint such that the pcb can be reversible
+    	//    symmetric: default is false
+    	//      if true, will only work if reverse is also true
+    	//      this will cause the footprint to be symmetrical on each half
+    	//      pins 1 and 2 must be identical if symmetric is true, as they will overlap
+
+    	trrs = {
+    	  params: {
+    	    designator: 'TRRS',
+    	    reverse: false,
+    	    symmetric: false,
+    	    A: undefined,
+    	    B: undefined,
+    	    C: undefined,
+    	    D: undefined
+    	  },
+    	  body: p => {
+    	    const standard = `
       (module TRRS-PJ-320A-dual (layer F.Cu) (tedit 5970F8E5)
 
       ${p.at /* parametric position */}   
@@ -2775,54 +2919,62 @@
       (fp_line (start 0.75 0) (end -5.35 0) (layer Dwgs.User) (width 0.15))
 
       `;
-        function stabilizers(def_pos) {
-          return `
+    	    function stabilizers(def_pos) {
+    	      return `
         (pad "" np_thru_hole circle (at ${def_pos} 8.6) (size 1.5 1.5) (drill 1.5) (layers *.Cu *.Mask))
         (pad "" np_thru_hole circle (at ${def_pos} 1.6) (size 1.5 1.5) (drill 1.5) (layers *.Cu *.Mask))
       `
-        }
-        function pins(def_neg, def_pos) {
-          return `
+    	    }
+    	    function pins(def_neg, def_pos) {
+    	      return `
         (pad 1 thru_hole oval (at ${def_neg} 11.3 ${p.rot}) (size 1.6 2.2) (drill oval 0.9 1.5) (layers *.Cu *.Mask) ${p.A.str})
         (pad 2 thru_hole oval (at ${def_pos} 10.2 ${p.rot}) (size 1.6 2.2) (drill oval 0.9 1.5) (layers *.Cu *.Mask) ${p.B.str})
         (pad 3 thru_hole oval (at ${def_pos} 6.2 ${p.rot}) (size 1.6 2.2) (drill oval 0.9 1.5) (layers *.Cu *.Mask) ${p.C.str})
         (pad 4 thru_hole oval (at ${def_pos} 3.2 ${p.rot}) (size 1.6 2.2) (drill oval 0.9 1.5) (layers *.Cu *.Mask) ${p.D.str})
       `
-        }
-        if(p.reverse & p.symmetric) {
-          return `
+    	    }
+    	    if(p.reverse & p.symmetric) {
+    	      return `
         ${standard}
         ${stabilizers('-2.3')}
         ${pins('0', '-4.6')}
         ${pins('-4.6', '0')})
       `
-        } else if(p.reverse) {
-            return `
+    	    } else if(p.reverse) {
+    	        return `
           ${standard}
           ${stabilizers('-2.3')}
           ${stabilizers('0')}
           ${pins('-2.3', '2.3')}
           ${pins('0', '-4.6')})
         `
-        } else {
-          return `
+    	    } else {
+    	      return `
         ${standard}
         ${stabilizers('-2.3')}
         ${pins('-4.6', '0')})
       `
-        }
-      }
-    };
+    	    }
+    	  }
+    	};
+    	return trrs;
+    }
 
-    // Via
-    // Nets
-    //		net: the net this via should be connected to
+    var via;
+    var hasRequiredVia;
 
-    var via = {
-        params: {
-          net: undefined
-        },
-        body: p => `
+    function requireVia () {
+    	if (hasRequiredVia) return via;
+    	hasRequiredVia = 1;
+    	// Via
+    	// Nets
+    	//		net: the net this via should be connected to
+
+    	via = {
+    	    params: {
+    	      net: undefined
+    	    },
+    	    body: p => `
       (module VIA-0.6mm (layer F.Cu) (tedit 591DBFB0)
       ${p.at /* parametric position */}   
       ${'' /* footprint reference */}
@@ -2833,30 +2985,42 @@
       (pad 1 thru_hole circle (at 0 0) (size 0.6 0.6) (drill 0.3) (layers *.Cu) (zone_connect 2) ${p.net.str})
       )
     `
-    };
+    	};
+    	return via;
+    }
 
-    var footprints = {
-        alps: alps,
-        button: button,
-        choc: choc,
-        chocmini: chocmini,
-        diode: diode,
-        jstph: jstph,
-        jumper: jumper,
-        mx: mx,
-        oled: oled,
-        omron: omron,
-        pad: pad,
-        promicro: promicro,
-        rgb: rgb,
-        rotary: rotary,
-        scrollwheel: scrollwheel,
-        slider: slider,
-        trrs: trrs,
-        via: via,
-    };
+    var footprints;
+    var hasRequiredFootprints;
 
-    const m = require$$0__default["default"];
+    function requireFootprints () {
+    	if (hasRequiredFootprints) return footprints;
+    	hasRequiredFootprints = 1;
+    	footprints = {
+    	    alps: requireAlps(),
+    	    button: requireButton(),
+    	    choc: requireChoc(),
+    	    chocmini: requireChocmini(),
+    	    diode: requireDiode(),
+    	    jstph: requireJstph(),
+    	    jumper: requireJumper(),
+    	    mx: requireMx(),
+    	    oled: requireOled(),
+    	    omron: requireOmron(),
+    	    pad: requirePad(),
+    	    promicro: requirePromicro(),
+    	    rgb: requireRgb(),
+    	    rotary: requireRotary(),
+    	    scrollwheel: requireScrollwheel(),
+    	    slider: requireSlider(),
+    	    trrs: requireTrrs(),
+    	    via: requireVia(),
+    	};
+    	return footprints;
+    }
+
+    const m = require$$0;
+    const yaml = require$$2;
+
     const u$1 = utils;
     const a = assert$1;
     const prep = prepare$1;
@@ -2973,7 +3137,7 @@
   )
 `;
 
-    const makerjs2kicad = pcbs._makerjs2kicad = (model, layer='Edge.Cuts') => {
+    const makerjs2kicad = pcbs._makerjs2kicad = (model, layer) => {
         const grs = [];
         const xy = val => `${val[0]} ${-val[1]}`;
         m.model.walk(model, {
@@ -3003,7 +3167,7 @@
         return grs.join('\n')
     };
 
-    const footprint_types = footprints;
+    const footprint_types = requireFootprints();
 
     pcbs.inject_footprint = (name, fp) => {
         footprint_types[name] = fp;
@@ -3027,7 +3191,7 @@
             params = prep.extend(params, mirror_overrides);
         }
         a.unexpected(params, `${name}.params`, Object.keys(fp.params));
-        
+
         // parsing parameters
         const parsed_params = {};
         for (const [param_name, param_def] of Object.entries(fp.params)) {
@@ -3041,29 +3205,44 @@
                 parsed_def = {type: 'number', value: a.mathnum(param_def)(units)};
             } else if (def_type == 'boolean') {
                 parsed_def = {type: 'boolean', value: param_def};
-            } else if (def_type == 'undefined') {
+            } else if (def_type == 'array') {
+                parsed_def = {type: 'array', value: param_def};
+            } else if (def_type == 'object') {
+                // parsed param definitions also expand to an object
+                // so to detect whether this is an arbitrary object,
+                // we first have to make sure it's not an expanded param def
+                // (this has to be a heuristic, but should be pretty reliable)
+                const defarr = Object.keys(param_def);
+                const already_expanded = defarr.length == 2 && defarr.includes('type') && defarr.includes('value');
+                if (!already_expanded) {
+                    parsed_def = {type: 'object', value: param_def};
+                }
+            } else {
                 parsed_def = {type: 'net', value: undefined};
             }
 
             // combine default value with potential user override
-            let value = prep.extend(parsed_def.value, params[param_name]);
-            let type = parsed_def.type;
-            
+            let value = params[param_name] !== undefined ? params[param_name] : parsed_def.value;
+            const type = parsed_def.type;
+
             // templating support, with conversion back to raw datatypes
             const converters = {
                 string: v => v,
                 number: v => a.sane(v, `${name}.params.${param_name}`, 'number')(units),
                 boolean: v => v === 'true',
+                array: v => yaml.load(v),
+                object: v => yaml.load(v),
                 net: v => v,
-                anchor: v => v
+                anchor: v => yaml.load(v)
             };
+            a.in(type, `${name}.params.${param_name}.type`, Object.keys(converters));
             if (a.type(value)() == 'string') {
                 value = u$1.template(value, point.meta);
                 value = converters[type](value);
             }
 
-            // type-specific processing
-            if (['string', 'number', 'boolean'].includes(type)) {
+            // type-specific postprocessing
+            if (['string', 'number', 'boolean', 'array', 'object'].includes(type)) {
                 parsed_params[param_name] = value;
             } else if (type == 'net') {
                 const net = a.sane(value, `${name}.params.${param_name}`, 'string')(units);
@@ -3073,8 +3252,8 @@
                     index: index,
                     str: `(net ${index} "${net}")`
                 };
-            } else if (type == 'anchor') {
-                let parsed_anchor = anchor(value || {}, `${name}.params.${param_name}`, points, point)(units);
+            } else { // anchor
+                let parsed_anchor = anchor(value, `${name}.params.${param_name}`, points, point)(units);
                 parsed_anchor.y = -parsed_anchor.y; // kicad mirror, as per usual
                 parsed_params[param_name] = parsed_anchor;
             }
@@ -3091,7 +3270,7 @@
             const sign = point.meta.mirrored ? -1 : 1;
             return `${sign * x} ${y}`
         };
-        const xyfunc = (x, y, resist=true) => {
+        const xyfunc = (x, y, resist) => {
             const new_anchor = anchor({
                 shift: [x, -y],
                 resist: resist
@@ -3209,7 +3388,7 @@
     };
 
     var name = "ergogen";
-    var version$1 = "4.0.0";
+    var version$1 = "4.0.1";
     var description = "Ergonomic keyboard layout generator";
     var author = "Bán Dénes <mr@zealot.hu>";
     var license = "MIT";
@@ -3224,24 +3403,25 @@
     	coverage: "nyc --reporter=html --reporter=text npm test"
     };
     var dependencies = {
-    	"fs-extra": "^10.0.1",
+    	"fs-extra": "^11.1.0",
     	"js-yaml": "^3.14.1",
     	jszip: "^3.10.1",
     	"kle-serial": "github:ergogen/kle-serial#ergogen",
     	makerjs: "github:ergogen/maker.js#ergogen",
-    	mathjs: "^10.1.1",
-    	yargs: "^17.3.1"
+    	mathjs: "^11.5.0",
+    	yargs: "^17.6.2"
     };
     var devDependencies = {
-    	"@rollup/plugin-commonjs": "^21.0.2",
-    	"@rollup/plugin-json": "^4.1.0",
-    	chai: "^4.3.6",
+    	"@rollup/plugin-commonjs": "^24.0.1",
+    	"@rollup/plugin-json": "^6.0.0",
+    	chai: "^4.3.7",
     	"chai-as-promised": "^7.1.1",
     	"dir-compare": "^4.0.0",
-    	glob: "^7.2.0",
-    	mocha: "^9.2.1",
+    	glob: "^8.1.0",
+    	mocha: "^10.2.0",
     	nyc: "^15.1.0",
-    	rollup: "^2.68.0"
+    	rollup: "^3.10.1",
+    	sinon: "^15.0.1"
     };
     var nyc = {
     	all: true,

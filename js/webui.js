@@ -1,4 +1,4 @@
-const webui_version = '1.4.0'
+const webui_version = '1.4.1'
 
 //
 // ZIP helper
