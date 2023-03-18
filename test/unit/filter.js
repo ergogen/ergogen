@@ -49,17 +49,21 @@ describe('Filter', function() {
         names(filter('/^o/', '', points)).should.deep.equal(['one', 'three', 'mirror_one'])
         // middle spec, should be the same as above, only explicit
         names(filter('~ /^o/', '', points)).should.deep.equal(['one', 'three', 'mirror_one'])
-        // full spec (n would normally match both one and even, but on the tags level, it's just even)
+        // full spec (/n/ would normally match both "one" and "even", but on the tags level, it's just even)
         names(filter('meta.tags ~ /n/', '', points)).should.deep.equal(['two'])
+        names(filter('meta.name,meta.tags ~ /n/', '', points)).should.deep.equal(['one', 'two', 'mirror_one'])
         // negation
         names(filter('meta.tags ~ -/n/', '', points)).should.deep.equal(['one', 'three', 'mirror_one'])
+        names(filter('meta.name,meta.tags ~ -/n/', '', points)).should.deep.equal(['three'])
         // arrays OR by default at odd levels (including top level)...
         names(filter(['one', 'two'], '', points)).should.deep.equal(['one', 'two'])
         // ...and AND at even levels
         names(filter([['even', 'prime']], '', points)).should.deep.equal(['two'])
         // arbitrary nesting should be possible
         names(filter([[['even', 'odd'], 'prime']], '', points)).should.deep.equal(['two', 'three'])
-        // anything other than string/array/object/undefined is an error
+        // invalid regexes should throw meaningful errors
+        filter.bind(this, '/\\/', '', points).should.throw('Invalid regex')
+        // anything other than string/array/object/undefined is also an error
         filter.bind(this, 28, '', points).should.throw('Unexpected type')
     })
 
