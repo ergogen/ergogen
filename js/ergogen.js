@@ -1,5 +1,5 @@
 /*!
- * Ergogen v4.0.1
+ * Ergogen v4.0.2
  * https://ergogen.xyz
  */
 
@@ -1213,9 +1213,8 @@
     const _and = arr => p => arr.map(e => e(p)).reduce((a, b) => a && b);
     const _or = arr => p => arr.map(e => e(p)).reduce((a, b) => a || b);
 
-    const similar = (key, reference, name, units) => {
+    const similar = (keys, reference, name, units) => {
         let neg = false;
-
         if (reference.startsWith('-')) {
             neg = true;
             reference = reference.slice(1);
@@ -1224,15 +1223,19 @@
         // support both string or regex as reference
         let internal_tester = val => (''+val) == reference;
         if (reference.startsWith('/')) {
-            const regex_parts = reference.split('/');
-            regex_parts.shift(); // remove starting slash
-            const flags = regex_parts.pop();
-            const regex = new RegExp(regex_parts.join('/'), flags);
-            internal_tester = val => regex.test(''+val);
+            try {
+                const regex_parts = reference.split('/');
+                regex_parts.shift(); // remove starting slash
+                const flags = regex_parts.pop();
+                const regex = new RegExp(regex_parts.join('/'), flags);
+                internal_tester = val => regex.test(''+val);
+            } catch (ex) {
+                throw new Error(`Invalid regex "${reference}" found at filter "${name}"!`)
+            }
         }
 
         // support strings, arrays, or objects as key
-        const external_tester = point => {
+        const external_tester = (point, key) => {
             const value = u$3.deep(point, key);
             if (a$3.type(value)() == 'array') {
                 return value.some(subkey => internal_tester(subkey))
@@ -1243,11 +1246,12 @@
             }
         };
 
-        // negation happens at the end
+        // consider negation
         if (neg) {
-            return point => !external_tester(point)
+            return point => keys.every(key => !external_tester(point, key))
+        } else {
+            return point => keys.some(key => external_tester(point, key))
         }
-        return external_tester
     };
 
     const comparators = {
@@ -1279,7 +1283,7 @@
             value = exp;
         }
 
-        return point => keys.some(key => comparators[op](key, value, name, units)(point))
+        return point => comparators[op](keys, value, name, units)(point)
     };
 
     const complex = (config, name, units, aggregator=_or) => {
@@ -1313,7 +1317,7 @@
     };
 
     filter$2.parse = (config, name, points={}, units={}, asym='source') => {
-        
+
         let result = [];
 
         // if a filter decl is undefined, it's just the default point at [0, 0]
@@ -3388,7 +3392,7 @@
     };
 
     var name = "ergogen";
-    var version$1 = "4.0.1";
+    var version$1 = "4.0.2";
     var description = "Ergonomic keyboard layout generator";
     var author = "Bán Dénes <mr@zealot.hu>";
     var license = "MIT";
