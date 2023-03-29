@@ -41,7 +41,7 @@ Until there's a proper "Getting started" guide, try getting acquainted with **Er
 
 <br>
 
-1. Read the **[Documentation]**.
+1. Read the **[Documentation]**. (But see note above!)
     
     D'uuh.
     They're not complete by any measure, but should give you a fairly good idea what you're dealing with here.
