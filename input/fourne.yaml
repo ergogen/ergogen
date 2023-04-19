@@ -1,0 +1,182 @@
+points:
+  key:
+    bind: 1
+  zones:
+    matrix:
+      columns:
+        outer:
+          key:
+            column_net: P10
+        pinky:
+          key:
+            column_net: P16
+            stagger: .25cy
+        ring:
+          key:
+            column_net: P14
+            stagger: .66cy
+        middle:
+          key:
+            column_net: P15
+            stagger: .2cy
+        index:
+          key:
+            column_net: P18
+            stagger: -.25cy
+        inner:
+          key:
+            column_net: P19
+            stagger: -.2cy
+      rows:
+        bottom:
+          padding: cy+.5
+          row_net: P20
+        middle:
+          padding: cy+.5
+          row_net: P21
+        top:
+          row_net: P4
+    thumb:
+      key:
+      anchor:
+        ref: matrix_index_bottom
+        shift: [-.4cx, -1.2cy]
+      columns:
+        a:
+          key:
+            splay: -10
+            column_net: P14
+        b:
+          key:
+            splay: -10
+            stagger: -.1cy
+            spread: 1.15cx
+            column_net: P15
+        c:
+          key:
+            bind: [4, 1]
+            splay: -10
+            stagger: -.1cy
+            spread: 1.15cx
+            column_net: P18
+        d:
+          key:
+            splay: -10
+            stagger: -.1cy
+            spread: 1.15cx
+            column_net: P19
+      rows:
+        only:
+          row_net: P9
+
+outlines:
+  keys:
+    - what: rectangle
+      where: true
+      size: [cx, cy]
+  raw:
+    - what: rectangle
+      where: true
+      size: [cx, cy]
+      bound: true
+  _triangle:
+    - what: polygon
+      operation: add
+      points:
+        - ref: matrix_outer_top
+          shift: [.5cx, 0]
+        - ref: matrix_outer_bottom
+          shift: [.5cx, -.5cy - 1]
+        - ref: thumb_d_only
+          shift: [.5cx + 1, .5cy + 1]
+        - ref: matrix_inner_middle
+          shift: [1.75u, .1u]
+        - ref: matrix_inner_top
+          shift: [.5cx + 1, .5cy + 1]
+  wtriangle:
+    - what: outline
+      name: raw
+    - what: outline
+      name: _triangle
+  smooth1:
+    - what: outline
+      name: wtriangle
+      fillet: 1.5
+  _micro:
+    - what: rectangle
+      where:
+        ref: matrix_inner_middle
+        shift: [1.2cx, -.9u]
+      size: [cx, 2u]
+  pcb:
+    - what: outline
+      name: smooth1
+    - what: outline
+      name: keys
+      operation: subtract
+    - what: outline
+      name: _micro
+      operation: subtract
+pcbs:
+  fourne:
+    outlines:
+      main:
+        outline: smooth1
+    footprints:
+      mcu:
+        what: promicro
+        where:
+          ref: matrix_inner_middle
+          shift: [1.2cx, -.9u]
+          rotate: 270
+      keys:
+        what: choc
+        where: true
+        params:
+          from: "{{colrow}}"
+          to: "{{column_net}}"
+          keycaps: true
+          hotswap: true
+          reverse: true
+      diodes:
+        what: diode
+        where: true
+        adjust:
+          shift: [0, -5]
+        params:
+          from: "{{colrow}}"
+          to: "{{row_net}}"
+      reset:
+        what: button
+        where:
+          ref: matrix_inner_top
+          shift: [.9cx, -.5cy]
+        params:
+          from: RST
+          to: GND
+      oled:
+        what: oled
+        where:
+          ref: matrix_inner_middle
+          shift: [1.2cx - 6, -.9u - 19]
+          rotate: 90
+        params:
+          side: "F"
+          SDA: P2
+          SCL: P3
+      slider:
+        what: slider
+        where:
+          ref: thumb_d_only
+          shift: [-.2cx, 1u]
+          rotate: -40.5
+        params:
+          from: pos
+          to: RAW
+      vias:
+        what: via
+        where: true
+        adjust:
+          shift: [2.5, 2.5]
+        params:
+          net: "{{column_net}}"
