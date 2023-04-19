@@ -189,6 +189,8 @@ module.exports = {
   }) (size 1.7 1.7) (drill 1) (layers *.Cu *.Mask) (roundrect_rratio 0.5)
     (chamfer_ratio 0) (chamfer top_left bottom_left) (tstamp 71f03194-0fff-4226-9b3c-f18abc0fcf3c))
 )
+`;
+/*
 (footprint "MountingHole:MountingHole_2.2mm_M2_DIN965_Pad" (layer "F.Cu")
     (tedit 56D1B4CB) (tstamp 0fef5383-a446-41c8-8c18-9f022c3b3404)
     (at 106.5 -2.6)
@@ -226,5 +228,6 @@ module.exports = {
     (pad "" thru_hole circle (at 0 0) (size 4 4) (drill 2.4) (layers F&B.Cu *.Mask) (tstamp 71f4066b-ac54-4429-9d94-7d1eafa4d009))
   )
     `;
+*/
   },
 };

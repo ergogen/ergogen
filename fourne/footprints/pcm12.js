@@ -1,9 +1,9 @@
 module.exports = {
   params: {
     designator: 'T', // for Toggle
-    reverse: false,
-    from: 'from',
-    to: 'to'
+    reverse: true,
+    from: {type: 'net', value: 'pos'},
+    to: {type: 'net', value: 'RAW'},
   },
   body: p => {
     const standard = `
@@ -38,8 +38,8 @@ module.exports = {
             ${''/* pins */}
   (pad "" np_thru_hole circle (at -1.5 0.33) (size 0.9 0.9) (drill 0.9) (layers *.Cu *.Mask))
   (pad "" np_thru_hole circle (at 1.5 0.33) (size 0.9 0.9) (drill 0.9) (layers *.Cu *.Mask))
-  (pad 1 smd rect (at ${def_neg}2.25 -1.43) (size 0.7 1.5) (layers ${def_side}.Cu ${def_side}.Paste ${def_side}.Mask) ${p.net.from.str})
-  (pad 2 smd rect (at ${def_pos}0.75 -1.43) (size 0.7 1.5) (layers ${def_side}.Cu ${def_side}.Paste ${def_side}.Mask) ${p.net.to.str})
+  (pad 1 smd rect (at ${def_neg}2.25 -1.43) (size 0.7 1.5) (layers ${def_side}.Cu ${def_side}.Paste ${def_side}.Mask) ${p.from.str})
+  (pad 2 smd rect (at ${def_pos}0.75 -1.43) (size 0.7 1.5) (layers ${def_side}.Cu ${def_side}.Paste ${def_side}.Mask) ${p.to.str})
   (pad 3 smd rect (at ${def_pos}2.25 -1.43) (size 0.7 1.5) (layers ${def_side}.Cu ${def_side}.Paste ${def_side}.Mask))
   (pad "" smd rect (at ${def_neg}3.65 1.43) (size 1 0.8) (layers ${def_side}.Cu ${def_side}.Paste ${def_side}.Mask))
   (pad "" smd rect (at ${def_pos}3.65 1.43) (size 1 0.8) (layers ${def_side}.Cu ${def_side}.Paste ${def_side}.Mask))
@@ -47,7 +47,7 @@ module.exports = {
   (pad "" smd rect (at ${def_neg}3.65 -0.78) (size 1 0.8) (layers ${def_side}.Cu ${def_side}.Paste ${def_side}.Mask))
           `
     }
-    if(p.param.reverse) {
+    if(p.reverse) {
       return `
         ${standard}
         ${pins('-', '', 'F')}

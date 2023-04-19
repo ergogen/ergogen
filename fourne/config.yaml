@@ -1,6 +1,8 @@
+units:
+  pad: 1
 points:
   key:
-    bind: 1
+    bind: pad
   zones:
     matrix:
       columns:
@@ -54,7 +56,7 @@ points:
             column_net: P15
         c:
           key:
-            bind: [4, 1]
+            bind: [2, pad]
             splay: -10
             stagger: -.1cy
             spread: 1.15cx
@@ -86,13 +88,17 @@ outlines:
         - ref: matrix_outer_top
           shift: [.5cx, 0]
         - ref: matrix_outer_bottom
-          shift: [.5cx, -.5cy - 1]
+          shift: [.5cx + pad, -.5cy - pad]
+        - ref: thumb_a_only
+          shift: [-.5cx - pad, -.5cy - pad]
+        - ref: thumb_a_only
+          shift: [.5cx, -.5cy - pad]
         - ref: thumb_d_only
-          shift: [.5cx + 1, .5cy + 1]
+          shift: [.5cx + pad, .5cy + pad]
         - ref: matrix_inner_middle
           shift: [1.75u, .1u]
         - ref: matrix_inner_top
-          shift: [.5cx + 1, .5cy + 1]
+          shift: [.5cx + pad, .5cy + pad]
   wtriangle:
     - what: outline
       name: raw
@@ -108,6 +114,19 @@ outlines:
         ref: matrix_inner_middle
         shift: [1.2cx, -.9u]
       size: [cx, 2u]
+  _cutoutpoly:
+    - what: polygon
+      points:
+        - ref: matrix_inner_top
+          shift: [.5cx + pad, + 4u]
+        - ref: matrix_inner_bottom
+          shift: [.5cx + pad, -.5cy - 5]
+        - ref: thumb_c_only
+          shift: [.5cx + pad, .5cy + pad]
+        - ref: thumb_d_only
+          shift: [cx, .5cy + pad]
+        - ref: matrix_inner_top
+          shift: [4u, + 4u]
   pcb:
     - what: outline
       name: smooth1
@@ -117,6 +136,35 @@ outlines:
     - what: outline
       name: _micro
       operation: subtract
+  sp:
+    - what: outline
+      name: raw
+    - what: outline
+      name: _triangle
+    - what: outline
+      name: _cutoutpoly
+      operation: subtract
+      fillet: 1.5
+    - what: outline
+      name: keys
+      operation: subtract
+  sp_large:
+    - what: polygon
+      points:
+        - ref: matrix_outer_top
+          shift: [-.5cx - pad, pad + 1.61cy]
+        - ref: matrix_inner_top
+          shift: [.5cx + pad, pad + .95cy]
+        - ref: thumb_d_only
+          shift: [.5cx + pad, pad + .5cy]
+        - ref: thumb_d_only
+          shift: [.5cx + pad, -pad - .5cy]
+        - ref: matrix_outer_bottom
+          shift: [-.5cx - pad, -.5cy - pad]
+      fillet: 6
+    - what: outline
+      name: keys
+      operation: subtract
 pcbs:
   fourne:
     outlines:
@@ -124,11 +172,11 @@ pcbs:
         outline: smooth1
     footprints:
       mcu:
-        what: promicro
+        what: promicro_pretty
         where:
           ref: matrix_inner_middle
           shift: [1.2cx, -.9u]
-          rotate: 270
+          rotate: -90
       keys:
         what: choc
         where: true
@@ -147,15 +195,15 @@ pcbs:
           from: "{{colrow}}"
           to: "{{row_net}}"
       reset:
-        what: button
+        what: b3u1000p
         where:
           ref: matrix_inner_top
           shift: [.9cx, -.5cy]
         params:
-          from: RST
-          to: GND
-      oled:
-        what: oled
+          r1: RST
+          r2: GND
+      niceview:
+        what: oled-reversible
         where:
           ref: matrix_inner_middle
           shift: [1.2cx - 6, -.9u - 19]
@@ -164,19 +212,33 @@ pcbs:
           side: "F"
           SDA: P2
           SCL: P3
+          VCC: VCC
+          GND: GND
       slider:
-        what: slider
+        what: pcm12
         where:
           ref: thumb_d_only
           shift: [-.2cx, 1u]
-          rotate: -40.5
+          rotate: 139.5
         params:
-          from: pos
-          to: RAW
+          from: "pos"
+          to: "RAW"
+      bat:
+        what: bat
+        where:
+          ref: matrix_inner_bottom
+          shift: [1.75cx, -1.2cy]
+          rotate: 180
+        params:
+          neg: GND
       vias:
         what: via
         where: true
         adjust:
-          shift: [2.5, 2.5]
+          shift: [2, 2.5]
         params:
           net: "{{column_net}}"
+cases:
+  bottom:
+    - name: smooth1
+      extrude: 1
