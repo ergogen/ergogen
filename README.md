@@ -24,6 +24,7 @@ The project aims to provide a common configuration format to describe ***ergonom
 [![Button WebUI]][WebUI]
 [![Button Documentation]][Documentation]
 [![Button Discord]][Discord]
+[![Button Donate]][Donate]
 
 ---
 
@@ -87,6 +88,7 @@ Get in touch on our **[Discord]**, and we can definitely find something you can 
 [WebUI]: https://ergogen.xyz
 [Unofficial]: https://ergogen.cache.works/
 [Topic]: https://github.com/topics/ergogen
+[Donate]: https://github.com/sponsors/mrzealot
 
 <!--------------------------------{ Buttons }---------------------------------->
 
@@ -95,3 +97,4 @@ Get in touch on our **[Discord]**, and we can definitely find something you can 
 [Button Official]: https://img.shields.io/badge/Official-37a779?style=for-the-badge
 [Button Documentation]: https://img.shields.io/badge/Documentation-1793D1?style=for-the-badge&logoColor=white&logo=GitBook
 [Button Discord]: https://img.shields.io/badge/Discord-5865F2?style=for-the-badge&logoColor=white&logo=Discord
+[Button Donate]: https://img.shields.io/badge/Donate-EA4AAA?style=for-the-badge&logoColor=white&logo=githubsponsors
