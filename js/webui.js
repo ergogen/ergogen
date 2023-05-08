@@ -218,6 +218,12 @@ $(function() {
         $('#intro').removeClass('d-none')
         $('#back-link').removeClass('d-none')
     })
+
+    $('#sponsor-link').click(function() {
+        $('div.swap').addClass('d-none')
+        $('#sponsor').removeClass('d-none')
+        $('#back-link').removeClass('d-none')
+    })
     
     // Back to tool
     $('#back-link').click(function() {

@@ -11,7 +11,7 @@ a:hover {
 
 #intro a,
 footer a {
-    color: #28a745;
+  color: #28a745;
 }
 
 /* Custom default button */
@@ -117,11 +117,38 @@ body {
     display: flex;
 }
 
-#intro > div {
+#intro > div, #sponsor > div {
     display: flex;
     justify-content: center;
     flex-direction: column;
     max-width: 45rem;
+}
+
+#sponsor-link {
+  color: #db61a2;
+}
+
+#sponsor {
+  overflow: auto;
+}
+
+#sponsor a {
+  color: #db61a2;
+}
+
+#sponsor code {
+  background-color: rgba(0, 0, 0, .5);
+  font-family: monospace;
+  color: white;
+  padding: 2px;
+  border-radius: 2px;
+}
+
+#sponsor img.sponsor {
+  width: 64px;
+  height: 64px;
+  border-radius: 32px;
+  margin: 0 10px;
 }
 
 textarea {
