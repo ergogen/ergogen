@@ -80,6 +80,16 @@ Get in touch on our **[Discord]**, and we can definitely find something you can 
 
 <br>
 
+## Sponsors
+
+Huge thanks go to everyone who chooses to support my work!
+But even huger thanks are due to the following, *distinguished* sponsors:
+
+- [Perce](https://madebyperce.com/)
+- [Neil Gilmour](https://github.com/neilgilmour)
+- [ochief](https://github.com/ochief)
+- [Alyx Brett](https://github.com/alyx-brett)
+
 <!----------------------------------------------------------------------------->
 
 [Absolem keyboard]: https://zealot.hu/absolem
