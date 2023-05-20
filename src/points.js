@@ -92,6 +92,7 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key,
             orient: 0,
             shift: [0, 0],
             rotate: 0,
+            adjust: {},
             width: units.$default_width,
             height: units.$default_height,
             padding: units.$default_padding,
@@ -168,10 +169,16 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key,
             // copy the current column anchor
             let point = running_anchor.clone()
 
-            // apply per-key adjustments
+            // apply cumulative per-key adjustments
             point.r += key.orient
             point.shift(key.shift)
             point.r += key.rotate
+
+            // commit running anchor
+            running_anchor = point.clone()
+
+            // apply independent adjustments
+            point = anchor_lib.parse(key.adjust, `${key.name}.adjust`, {}, point)(units)
 
             // save new key
             point.meta = key
@@ -182,7 +189,6 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key,
             col_minmax[col_name].max = Math.max(col_minmax[col_name].max, point.y)
 
             // advance the running anchor to the next position
-            running_anchor = point.clone()
             running_anchor.shift([0, key.padding])
         }
 

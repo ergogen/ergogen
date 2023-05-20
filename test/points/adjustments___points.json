@@ -17,6 +17,7 @@
                 0
             ],
             "rotate": 0,
+            "adjust": {},
             "width": 18,
             "height": 18,
             "padding": 19,
@@ -28,18 +29,33 @@
             "zone": {
                 "columns": {
                     "left": null,
+                    "middle": {
+                        "rows": {
+                            "home": {
+                                "adjust": {
+                                    "shift": [
+                                        "-2u",
+                                        0
+                                    ],
+                                    "rotate": 45
+                                }
+                            }
+                        },
+                        "key": {},
+                        "name": "middle"
+                    },
                     "right": {
                         "key": {
                             "stagger": 5,
                             "spread": 25,
-                            "splay": 5,
+                            "splay": -5,
                             "origin": [
                                 -9,
                                 -9
                             ]
                         },
                         "rows": {
-                            "top": {
+                            "home": {
                                 "orient": -90,
                                 "shift": [
                                     0,
@@ -53,6 +69,7 @@
                 },
                 "rows": {
                     "bottom": {},
+                    "home": {},
                     "top": {}
                 },
                 "name": "matrix"
@@ -65,13 +82,13 @@
             "row": "bottom",
             "bind": [
                 10,
-                0,
+                10,
                 0,
                 0
             ]
         }
     },
-    "matrix_left_top": {
+    "matrix_left_home": {
         "x": 0,
         "y": 19,
         "r": 0,
@@ -89,29 +106,45 @@
                 0
             ],
             "rotate": 0,
+            "adjust": {},
             "width": 18,
             "height": 18,
             "padding": 19,
             "autobind": 10,
             "skip": false,
             "asym": "both",
-            "colrow": "left_top",
-            "name": "matrix_left_top",
+            "colrow": "left_home",
+            "name": "matrix_left_home",
             "zone": {
                 "columns": {
                     "left": null,
+                    "middle": {
+                        "rows": {
+                            "home": {
+                                "adjust": {
+                                    "shift": [
+                                        "-2u",
+                                        0
+                                    ],
+                                    "rotate": 45
+                                }
+                            }
+                        },
+                        "key": {},
+                        "name": "middle"
+                    },
                     "right": {
                         "key": {
                             "stagger": 5,
                             "spread": 25,
-                            "splay": 5,
+                            "splay": -5,
                             "origin": [
                                 -9,
                                 -9
                             ]
                         },
                         "rows": {
-                            "top": {
+                            "home": {
                                 "orient": -90,
                                 "shift": [
                                     0,
@@ -125,6 +158,96 @@
                 },
                 "rows": {
                     "bottom": {},
+                    "home": {},
+                    "top": {}
+                },
+                "name": "matrix"
+            },
+            "col": {
+                "rows": {},
+                "key": {},
+                "name": "left"
+            },
+            "row": "home",
+            "bind": [
+                10,
+                10,
+                10,
+                0
+            ]
+        }
+    },
+    "matrix_left_top": {
+        "x": 0,
+        "y": 38,
+        "r": 0,
+        "meta": {
+            "stagger": 0,
+            "spread": 19,
+            "splay": 0,
+            "origin": [
+                0,
+                0
+            ],
+            "orient": 0,
+            "shift": [
+                0,
+                0
+            ],
+            "rotate": 0,
+            "adjust": {},
+            "width": 18,
+            "height": 18,
+            "padding": 19,
+            "autobind": 10,
+            "skip": false,
+            "asym": "both",
+            "colrow": "left_top",
+            "name": "matrix_left_top",
+            "zone": {
+                "columns": {
+                    "left": null,
+                    "middle": {
+                        "rows": {
+                            "home": {
+                                "adjust": {
+                                    "shift": [
+                                        "-2u",
+                                        0
+                                    ],
+                                    "rotate": 45
+                                }
+                            }
+                        },
+                        "key": {},
+                        "name": "middle"
+                    },
+                    "right": {
+                        "key": {
+                            "stagger": 5,
+                            "spread": 25,
+                            "splay": -5,
+                            "origin": [
+                                -9,
+                                -9
+                            ]
+                        },
+                        "rows": {
+                            "home": {
+                                "orient": -90,
+                                "shift": [
+                                    0,
+                                    10
+                                ],
+                                "rotate": 90
+                            }
+                        },
+                        "name": "right"
+                    }
+                },
+                "rows": {
+                    "bottom": {},
+                    "home": {},
                     "top": {}
                 },
                 "name": "matrix"
@@ -143,17 +266,17 @@
             ]
         }
     },
-    "matrix_right_bottom": {
-        "x": 24.181350600000002,
-        "y": 5.750154,
-        "r": 5,
+    "matrix_middle_bottom": {
+        "x": 19,
+        "y": 0,
+        "r": 0,
         "meta": {
-            "stagger": 5,
-            "spread": 25,
-            "splay": 5,
+            "stagger": 0,
+            "spread": 19,
+            "splay": 0,
             "origin": [
-                -9,
-                -9
+                0,
+                0
             ],
             "orient": 0,
             "shift": [
@@ -161,29 +284,45 @@
                 0
             ],
             "rotate": 0,
+            "adjust": {},
             "width": 18,
             "height": 18,
             "padding": 19,
             "autobind": 10,
             "skip": false,
             "asym": "both",
-            "colrow": "right_bottom",
-            "name": "matrix_right_bottom",
+            "colrow": "middle_bottom",
+            "name": "matrix_middle_bottom",
             "zone": {
                 "columns": {
                     "left": null,
+                    "middle": {
+                        "rows": {
+                            "home": {
+                                "adjust": {
+                                    "shift": [
+                                        "-2u",
+                                        0
+                                    ],
+                                    "rotate": 45
+                                }
+                            }
+                        },
+                        "key": {},
+                        "name": "middle"
+                    },
                     "right": {
                         "key": {
                             "stagger": 5,
                             "spread": 25,
-                            "splay": 5,
+                            "splay": -5,
                             "origin": [
                                 -9,
                                 -9
                             ]
                         },
                         "rows": {
-                            "top": {
+                            "home": {
                                 "orient": -90,
                                 "shift": [
                                     0,
@@ -197,6 +336,310 @@
                 },
                 "rows": {
                     "bottom": {},
+                    "home": {},
+                    "top": {}
+                },
+                "name": "matrix"
+            },
+            "col": {
+                "rows": {
+                    "home": {
+                        "adjust": {
+                            "shift": [
+                                "-2u",
+                                0
+                            ],
+                            "rotate": 45
+                        }
+                    }
+                },
+                "key": {},
+                "name": "middle"
+            },
+            "row": "bottom",
+            "bind": [
+                10,
+                0,
+                0,
+                10
+            ]
+        }
+    },
+    "matrix_middle_home": {
+        "x": -19,
+        "y": 19,
+        "r": 45,
+        "meta": {
+            "stagger": 0,
+            "spread": 19,
+            "splay": 0,
+            "origin": [
+                0,
+                0
+            ],
+            "orient": 0,
+            "shift": [
+                0,
+                0
+            ],
+            "rotate": 0,
+            "adjust": {
+                "shift": [
+                    "-2u",
+                    0
+                ],
+                "rotate": 45
+            },
+            "width": 18,
+            "height": 18,
+            "padding": 19,
+            "autobind": 10,
+            "skip": false,
+            "asym": "both",
+            "colrow": "middle_home",
+            "name": "matrix_middle_home",
+            "zone": {
+                "columns": {
+                    "left": null,
+                    "middle": {
+                        "rows": {
+                            "home": {
+                                "adjust": {
+                                    "shift": [
+                                        "-2u",
+                                        0
+                                    ],
+                                    "rotate": 45
+                                }
+                            }
+                        },
+                        "key": {},
+                        "name": "middle"
+                    },
+                    "right": {
+                        "key": {
+                            "stagger": 5,
+                            "spread": 25,
+                            "splay": -5,
+                            "origin": [
+                                -9,
+                                -9
+                            ]
+                        },
+                        "rows": {
+                            "home": {
+                                "orient": -90,
+                                "shift": [
+                                    0,
+                                    10
+                                ],
+                                "rotate": 90
+                            }
+                        },
+                        "name": "right"
+                    }
+                },
+                "rows": {
+                    "bottom": {},
+                    "home": {},
+                    "top": {}
+                },
+                "name": "matrix"
+            },
+            "col": {
+                "rows": {
+                    "home": {
+                        "adjust": {
+                            "shift": [
+                                "-2u",
+                                0
+                            ],
+                            "rotate": 45
+                        }
+                    }
+                },
+                "key": {},
+                "name": "middle"
+            },
+            "row": "home",
+            "bind": [
+                10,
+                10,
+                10,
+                10
+            ]
+        }
+    },
+    "matrix_middle_top": {
+        "x": 19,
+        "y": 38,
+        "r": 0,
+        "meta": {
+            "stagger": 0,
+            "spread": 19,
+            "splay": 0,
+            "origin": [
+                0,
+                0
+            ],
+            "orient": 0,
+            "shift": [
+                0,
+                0
+            ],
+            "rotate": 0,
+            "adjust": {},
+            "width": 18,
+            "height": 18,
+            "padding": 19,
+            "autobind": 10,
+            "skip": false,
+            "asym": "both",
+            "colrow": "middle_top",
+            "name": "matrix_middle_top",
+            "zone": {
+                "columns": {
+                    "left": null,
+                    "middle": {
+                        "rows": {
+                            "home": {
+                                "adjust": {
+                                    "shift": [
+                                        "-2u",
+                                        0
+                                    ],
+                                    "rotate": 45
+                                }
+                            }
+                        },
+                        "key": {},
+                        "name": "middle"
+                    },
+                    "right": {
+                        "key": {
+                            "stagger": 5,
+                            "spread": 25,
+                            "splay": -5,
+                            "origin": [
+                                -9,
+                                -9
+                            ]
+                        },
+                        "rows": {
+                            "home": {
+                                "orient": -90,
+                                "shift": [
+                                    0,
+                                    10
+                                ],
+                                "rotate": 90
+                            }
+                        },
+                        "name": "right"
+                    }
+                },
+                "rows": {
+                    "bottom": {},
+                    "home": {},
+                    "top": {}
+                },
+                "name": "matrix"
+            },
+            "col": {
+                "rows": {
+                    "home": {
+                        "adjust": {
+                            "shift": [
+                                "-2u",
+                                0
+                            ],
+                            "rotate": 45
+                        }
+                    }
+                },
+                "key": {},
+                "name": "middle"
+            },
+            "row": "top",
+            "bind": [
+                0,
+                10,
+                10,
+                10
+            ]
+        }
+    },
+    "matrix_right_bottom": {
+        "x": 44.750154,
+        "y": 4.1813506,
+        "r": -5,
+        "meta": {
+            "stagger": 5,
+            "spread": 25,
+            "splay": -5,
+            "origin": [
+                -9,
+                -9
+            ],
+            "orient": 0,
+            "shift": [
+                0,
+                0
+            ],
+            "rotate": 0,
+            "adjust": {},
+            "width": 18,
+            "height": 18,
+            "padding": 19,
+            "autobind": 10,
+            "skip": false,
+            "asym": "both",
+            "colrow": "right_bottom",
+            "name": "matrix_right_bottom",
+            "zone": {
+                "columns": {
+                    "left": null,
+                    "middle": {
+                        "rows": {
+                            "home": {
+                                "adjust": {
+                                    "shift": [
+                                        "-2u",
+                                        0
+                                    ],
+                                    "rotate": 45
+                                }
+                            }
+                        },
+                        "key": {},
+                        "name": "middle"
+                    },
+                    "right": {
+                        "key": {
+                            "stagger": 5,
+                            "spread": 25,
+                            "splay": -5,
+                            "origin": [
+                                -9,
+                                -9
+                            ]
+                        },
+                        "rows": {
+                            "home": {
+                                "orient": -90,
+                                "shift": [
+                                    0,
+                                    10
+                                ],
+                                "rotate": 90
+                            }
+                        },
+                        "name": "right"
+                    }
+                },
+                "rows": {
+                    "bottom": {},
+                    "home": {},
                     "top": {}
                 },
                 "name": "matrix"
@@ -205,14 +648,14 @@
                 "key": {
                     "stagger": 5,
                     "spread": 25,
-                    "splay": 5,
+                    "splay": -5,
                     "origin": [
                         -9,
                         -9
                     ]
                 },
                 "rows": {
-                    "top": {
+                    "home": {
                         "orient": -90,
                         "shift": [
                             0,
@@ -232,14 +675,14 @@
             ]
         }
     },
-    "matrix_right_top": {
-        "x": 32.4873385,
-        "y": 25.549410700000003,
-        "r": 5,
+    "matrix_right_home": {
+        "x": 56.3680601,
+        "y": 22.237492500000002,
+        "r": -5,
         "meta": {
             "stagger": 5,
             "spread": 25,
-            "splay": 5,
+            "splay": -5,
             "origin": [
                 -9,
                 -9
@@ -250,29 +693,45 @@
                 10
             ],
             "rotate": 90,
+            "adjust": {},
             "width": 18,
             "height": 18,
             "padding": 19,
             "autobind": 10,
             "skip": false,
             "asym": "both",
-            "colrow": "right_top",
-            "name": "matrix_right_top",
+            "colrow": "right_home",
+            "name": "matrix_right_home",
             "zone": {
                 "columns": {
                     "left": null,
+                    "middle": {
+                        "rows": {
+                            "home": {
+                                "adjust": {
+                                    "shift": [
+                                        "-2u",
+                                        0
+                                    ],
+                                    "rotate": 45
+                                }
+                            }
+                        },
+                        "key": {},
+                        "name": "middle"
+                    },
                     "right": {
                         "key": {
                             "stagger": 5,
                             "spread": 25,
-                            "splay": 5,
+                            "splay": -5,
                             "origin": [
                                 -9,
                                 -9
                             ]
                         },
                         "rows": {
-                            "top": {
+                            "home": {
                                 "orient": -90,
                                 "shift": [
                                     0,
@@ -286,6 +745,7 @@
                 },
                 "rows": {
                     "bottom": {},
+                    "home": {},
                     "top": {}
                 },
                 "name": "matrix"
@@ -294,14 +754,120 @@
                 "key": {
                     "stagger": 5,
                     "spread": 25,
-                    "splay": 5,
+                    "splay": -5,
                     "origin": [
                         -9,
                         -9
                     ]
                 },
                 "rows": {
-                    "top": {
+                    "home": {
+                        "orient": -90,
+                        "shift": [
+                            0,
+                            10
+                        ],
+                        "rotate": 90
+                    }
+                },
+                "name": "right"
+            },
+            "row": "home",
+            "bind": [
+                10,
+                0,
+                10,
+                10
+            ]
+        }
+    },
+    "matrix_right_top": {
+        "x": 58.0240192,
+        "y": 41.1651918,
+        "r": -5,
+        "meta": {
+            "stagger": 5,
+            "spread": 25,
+            "splay": -5,
+            "origin": [
+                -9,
+                -9
+            ],
+            "orient": 0,
+            "shift": [
+                0,
+                0
+            ],
+            "rotate": 0,
+            "adjust": {},
+            "width": 18,
+            "height": 18,
+            "padding": 19,
+            "autobind": 10,
+            "skip": false,
+            "asym": "both",
+            "colrow": "right_top",
+            "name": "matrix_right_top",
+            "zone": {
+                "columns": {
+                    "left": null,
+                    "middle": {
+                        "rows": {
+                            "home": {
+                                "adjust": {
+                                    "shift": [
+                                        "-2u",
+                                        0
+                                    ],
+                                    "rotate": 45
+                                }
+                            }
+                        },
+                        "key": {},
+                        "name": "middle"
+                    },
+                    "right": {
+                        "key": {
+                            "stagger": 5,
+                            "spread": 25,
+                            "splay": -5,
+                            "origin": [
+                                -9,
+                                -9
+                            ]
+                        },
+                        "rows": {
+                            "home": {
+                                "orient": -90,
+                                "shift": [
+                                    0,
+                                    10
+                                ],
+                                "rotate": 90
+                            }
+                        },
+                        "name": "right"
+                    }
+                },
+                "rows": {
+                    "bottom": {},
+                    "home": {},
+                    "top": {}
+                },
+                "name": "matrix"
+            },
+            "col": {
+                "key": {
+                    "stagger": 5,
+                    "spread": 25,
+                    "splay": -5,
+                    "origin": [
+                        -9,
+                        -9
+                    ]
+                },
+                "rows": {
+                    "home": {
                         "orient": -90,
                         "shift": [
                             0,
