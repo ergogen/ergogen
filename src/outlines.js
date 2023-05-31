@@ -194,7 +194,6 @@ exports.parse = (config, points, units) => {
             const where = units => filter(original_where, `${name}.where`, points, units, asym)
             
             const original_adjust = part.adjust // same as above
-            const adjust = start => anchor(original_adjust || {}, `${name}.adjust`, points, start)(units)
             const fillet = a.sane(part.fillet || 0, `${name}.fillet`, 'number')(units)
             expand_shorthand(part, `${name}.expand`, units)
             const expand = a.sane(part.expand || 0, `${name}.expand`, 'number')(units)
@@ -215,6 +214,7 @@ exports.parse = (config, points, units) => {
 
             // a prototype "shape" maker (and its units) are computed
             const [shape_maker, shape_units] = whats[what](part, name, points, outlines, units)
+            const adjust = start => anchor(original_adjust || {}, `${name}.adjust`, points, start)(shape_units)
 
             // and then the shape is repeated for all where positions
             for (const w of where(shape_units)) {
