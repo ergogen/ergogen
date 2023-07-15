@@ -1,6 +1,7 @@
 const u = require('./utils')
 const a = require('./assert')
 const Point = require('./point')
+const m = require('makerjs')
 
 const mirror_ref = exports.mirror = (ref, mirror=true) => {
     if (mirror) {
@@ -28,7 +29,43 @@ const aggregators = {
             r += part.r
         }
         return new Point(x / len, y / len, r / len)
-    }
+    },
+    intersect: (config, name, parts) => {
+        const get_line_from_point = (point, axis, offset=1000) => {
+            let p1 = [point.x - offset, point.y]
+            let p2 = [point.x + offset, point.y]
+            if(axis == 'y') {
+                p1 = [point.x, point.y - offset]
+                p2 = [point.x, point.y + offset]
+            }
+
+            let line = new m.paths.Line(p1, p2)
+            line = m.path.rotate(line, point.r, point.p)
+
+            return line
+        };
+
+        a.unexpected(
+            config, name,
+            [...aggregator_common, ...['axis1', 'axis2']]
+        )
+        a.in(config.axis1, 'axis1', ['x', 'y'])
+        a.in(config.axis2, 'axis2', ['x', 'y'])
+        a.arr(parts, 'parts', 2, 'Point')
+
+        const line1 = get_line_from_point(parts[0], config.axis1)
+        const line2 = get_line_from_point(parts[1], config.axis2)
+        var intersection = m.path.intersection(line1, line2);
+
+        a.assert(intersection != null, `There is no intersection for ${name}`)
+
+        const intersection_point_arr = intersection.intersectionPoints[0]
+        const intersection_point = new Point(
+            intersection_point_arr[0], intersection_point_arr[1]
+        )
+
+        return intersection_point
+    },
 }
 
 const anchor = exports.parse = (raw, name, points={}, start=new Point(), mirror=false) => units => {
@@ -56,7 +93,7 @@ const anchor = exports.parse = (raw, name, points={}, start=new Point(), mirror=
     //
     // Reference or aggregate handling
     //
-    
+
     let point = start.clone()
     if (raw.ref !== undefined && raw.aggregate !== undefined) {
         throw new Error(`Fields "ref" and "aggregate" cannot appear together in anchor "${name}"!`)
