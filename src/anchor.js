@@ -43,7 +43,7 @@ const aggregators = {
             line = m.path.rotate(line, point.r, point.p)
 
             return line
-        };
+        }
 
         a.unexpected(
             config, name,
@@ -51,13 +51,13 @@ const aggregators = {
         )
         a.in(config.axis1, 'axis1', ['x', 'y'])
         a.in(config.axis2, 'axis2', ['x', 'y'])
-        a.arr(parts, 'parts', 2, 'Point')
+        a.arr(parts, `${name}.parts`, 2, 'Point', '')
 
         const line1 = get_line_from_point(parts[0], config.axis1)
         const line2 = get_line_from_point(parts[1], config.axis2)
-        var intersection = m.path.intersection(line1, line2);
+        const intersection = m.path.intersection(line1, line2)
 
-        a.assert(intersection != null, `There is no intersection for ${name}`)
+        a.assert(intersection, `The points under "${name}.parts" do not intersect!`)
 
         const intersection_point_arr = intersection.intersectionPoints[0]
         const intersection_point = new Point(
