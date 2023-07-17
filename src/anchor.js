@@ -61,7 +61,7 @@ const aggregators = {
 
         const intersection_point_arr = intersection.intersectionPoints[0]
         const intersection_point = new Point(
-            intersection_point_arr[0], intersection_point_arr[1], parts[1].r
+            intersection_point_arr[0], intersection_point_arr[1]
         )
 
         return intersection_point
