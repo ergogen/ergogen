@@ -31,37 +31,27 @@ const aggregators = {
         return new Point(x / len, y / len, r / len)
     },
     intersect: (config, name, parts) => {
-        const get_line_from_point = (point, axis, offset=1000) => {
-            let p1 = [point.x - offset, point.y]
-            let p2 = [point.x + offset, point.y]
-            if(axis == 'y') {
-                p1 = [point.x, point.y - offset]
-                p2 = [point.x, point.y + offset]
-            }
+        const get_line_from_point = (point, offset=1000) => {
+            const p1 = [point.x, point.y]
+            const p2 = [point.x, point.y + offset]
 
             let line = new m.paths.Line(p1, p2)
-            line = m.path.rotate(line, point.r, point.p)
+            line = m.path.rotate(line, point.r, p1)
 
             return line
         }
 
-        a.unexpected(
-            config, name,
-            [...aggregator_common, ...['axis1', 'axis2']]
-        )
-        a.in(config.axis1, 'axis1', ['x', 'y'])
-        a.in(config.axis2, 'axis2', ['x', 'y'])
-        a.arr(parts, `${name}.parts`, 2, 'Point', '')
+        a.unexpected(config, name, aggregator_common)
 
-        const line1 = get_line_from_point(parts[0], config.axis1)
-        const line2 = get_line_from_point(parts[1], config.axis2)
+        const line1 = get_line_from_point(parts[0])
+        const line2 = get_line_from_point(parts[1])
         const intersection = m.path.intersection(line1, line2)
 
         a.assert(intersection, `The points under "${name}.parts" do not intersect!`)
 
         const intersection_point_arr = intersection.intersectionPoints[0]
         const intersection_point = new Point(
-            intersection_point_arr[0], intersection_point_arr[1]
+            intersection_point_arr[0], intersection_point_arr[1], 0
         )
 
         return intersection_point
