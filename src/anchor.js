@@ -42,6 +42,7 @@ const aggregators = {
         }
 
         a.unexpected(config, name, aggregator_common)
+        a.assert(parts.length==2, `Intersect expects exactly two parts, but it got ` + parts.length + `!`)
 
         const line1 = get_line_from_point(parts[0])
         const line2 = get_line_from_point(parts[1])
