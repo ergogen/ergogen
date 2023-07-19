@@ -8,6 +8,7 @@ describe('Anchor', function() {
         o: new Point(0, 0, 0, {label: 'o'}),
         rotated_o: new Point(0, 0, 90, {label: 'rotated_o'}),
         o_five: new Point(0, 5, 0, {label: 'o_five'}),
+        five_o: new Point(5, 0, 0, {label: 'five_o'}),
         five: new Point(5, 5, 90, {label: 'five'}),
         ten: new Point(10, 10, -90, {label: 'ten'}),
         mirror_ten: new Point(-10, 10, 90, {mirrored: true})
@@ -76,15 +77,26 @@ describe('Anchor', function() {
         }, 'name', points).should.throw()
     })
     it('intersect', function() {
-        // points are facing (i.e. their rotated Y axis) in non-intersecting directions
+        // points that intersect on a negative Y axis
+        check(
+            parse({
+                aggregate: {
+                    parts: ['o','ten'],
+                    method: 'intersect'
+                }
+            }, 'name', points)(),
+            [0,10,0,{}]
+        )
+
+        // points that have parallel Y axis, i.e. never intersect
         parse({
             aggregate: {
-                parts: ['o','ten'],
+                parts: ['o','five_o'],
                 method: 'intersect'
             }
         }, 'name', points).should.throw(`The points under "name.aggregate.parts" do not intersect!`)
 
-        // points intersect
+        // points intersect on their positive Y axis
         check(
             parse({
                 aggregate: {
@@ -106,7 +118,7 @@ describe('Anchor', function() {
             [0, 0, 0, {}]
         )
         
-        // points with overlapping directions
+        // points with overlapping Y axis
         parse({
             aggregate: {
                 parts: ['o','o_five'],
@@ -136,7 +148,6 @@ describe('Anchor', function() {
                 method: 'intersect'
             }
         }, 'name', points).should.throw(`Intersect expects exactly two parts, but it got 0!`)
-
     })
 
     it('shift', function() {

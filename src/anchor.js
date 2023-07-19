@@ -31,12 +31,19 @@ const aggregators = {
         return new Point(x / len, y / len, r / len)
     },
     intersect: (config, name, parts) => {
+        // a line is generated from a point by taking their
+        // (rotated) Y axis. The line is not extended to
+        // +/- Infinity as that doesn't work with makerjs.
+        // An arbitrary offset of 1 meter is considered
+        // sufficient for practical purposes, and the point
+        // coordinates are used as pivot point for the rotation.
         const get_line_from_point = (point, offset=1000) => {
-            const p1 = [point.x, point.y]
+            const origin = [point.x, point.y]
+            const p1 = [point.x, point.y - offset]
             const p2 = [point.x, point.y + offset]
 
             let line = new m.paths.Line(p1, p2)
-            line = m.path.rotate(line, point.r, p1)
+            line = m.path.rotate(line, point.r, origin)
 
             return line
         }
