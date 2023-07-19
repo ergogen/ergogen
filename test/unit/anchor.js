@@ -75,7 +75,7 @@ describe('Anchor', function() {
           ref : 'ten'
         }, 'name', points).should.throw()
     })
-    it('aggregate_intersect', function() {
+    it('intersect', function() {
         // points are facing (i.e. their rotated Y axis) in non-intersecting directions
         parse({
             aggregate: {
