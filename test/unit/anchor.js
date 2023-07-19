@@ -6,6 +6,10 @@ describe('Anchor', function() {
 
     const points = {
         o: new Point(0, 0, 0, {label: 'o'}),
+        rotated_o: new Point(0, 0, 90, {label: 'rotated_o'}),
+        o_five: new Point(0, 5, 0, {label: 'o_five'}),
+        five_o: new Point(5, 0, 0, {label: 'five_o'}),
+        five: new Point(5, 5, 90, {label: 'five'}),
         ten: new Point(10, 10, -90, {label: 'ten'}),
         mirror_ten: new Point(-10, 10, 90, {mirrored: true})
     }
@@ -71,6 +75,79 @@ describe('Anchor', function() {
           },
           ref : 'ten'
         }, 'name', points).should.throw()
+    })
+    it('intersect', function() {
+        // points that intersect on a negative Y axis
+        check(
+            parse({
+                aggregate: {
+                    parts: ['o','ten'],
+                    method: 'intersect'
+                }
+            }, 'name', points)(),
+            [0,10,0,{}]
+        )
+
+        // points that have parallel Y axis, i.e. never intersect
+        parse({
+            aggregate: {
+                parts: ['o','five_o'],
+                method: 'intersect'
+            }
+        }, 'name', points).should.throw(`The points under "name.aggregate.parts" do not intersect!`)
+
+        // points intersect on their positive Y axis
+        check(
+            parse({
+                aggregate: {
+                    parts: ['o','five'],
+                    method: 'intersect'
+                }
+            }, 'name', points)(),
+            [0, 5, 0, {}]
+        )
+
+        // intersecting points with the same coordinates, but different rotations
+        check(
+            parse({
+                aggregate: {
+                    parts: ['o','rotated_o'],
+                    method: 'intersect'
+                }
+            }, 'name', points)(),
+            [0, 0, 0, {}]
+        )
+        
+        // points with overlapping Y axis
+        parse({
+            aggregate: {
+                parts: ['o','o_five'],
+                method: 'intersect'
+            }
+        }, 'name', points).should.throw(`The points under "name.aggregate.parts" do not intersect!`)
+
+        // more than two parts
+        parse({
+            aggregate: {
+                parts: ['o', `five`, `ten`],
+                method: 'intersect'
+            }
+        }, 'name', points).should.throw(`Intersect expects exactly two parts, but it got 3!`)
+
+        // only one part
+        parse({
+            aggregate: {
+                parts: ['o'],
+                method: 'intersect'
+            }
+        }, 'name', points).should.throw(`Intersect expects exactly two parts, but it got 1!`)
+
+        // no parts
+        parse({
+            aggregate: {
+                method: 'intersect'
+            }
+        }, 'name', points).should.throw(`Intersect expects exactly two parts, but it got 0!`)
     })
 
     it('shift', function() {
