@@ -13,6 +13,7 @@ module.exports = {
     promicro: require('./promicro'),
     rgb: require('./rgb'),
     rotary: require('./rotary'),
+    pi_pico: require('./pi_pico'),
     scrollwheel: require('./scrollwheel'),
     slider: require('./slider'),
     trrs: require('./trrs'),
