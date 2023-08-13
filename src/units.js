@@ -6,15 +6,18 @@ const default_units = {
     u: 19,
     cx: 18,
     cy: 17,
+    mm: 1,
+    mil: 0.0254,
     $default_stagger: 0,
     $default_spread: 'u',
     $default_splay: 0,
     $default_height: 'u-1',
     $default_width: 'u-1',
     $default_padding: 'u',
-    $default_autobind: 10
+    $default_autobind: 10,
 }
 
+exports.units = default_units
 exports.parse = (config = {}) => {
     const raw_units = prep.extend(
         default_units,

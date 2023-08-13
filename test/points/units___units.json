@@ -3,6 +3,8 @@
     "u": 19,
     "cx": 18,
     "cy": 17,
+    "mm": 1,
+    "mil": 0.0254,
     "$default_stagger": 0,
     "$default_spread": 19,
     "$default_splay": 0,

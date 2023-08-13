@@ -261,8 +261,9 @@ const footprint = exports._footprint = (points, net_indexer, component_indexer, 
     parsed_params.sxy = (x, y) => xyfunc(x, y, false)
 
     // allowing footprints to add dynamic nets
-    parsed_params.local_net = suffix => {
-        const net = `${component_ref}_${suffix}`
+    parsed_params.local_net = (suffix, prefix) => {
+        const pre = typeof prefix !== "undefined" ? prefix : `${component_ref}_`
+        const net = `${pre}${suffix}`
         const index = net_indexer(net)
         return {
             name: net,

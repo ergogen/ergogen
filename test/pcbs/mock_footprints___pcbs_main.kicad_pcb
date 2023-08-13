@@ -97,6 +97,8 @@
 (net 2 "T4_1")
 (net 3 "T4_2")
 (net 4 "T4_3")
+(net 5 "aP2")
+(net 6 "3_P3")
             
   (net_class Default "This is the default net class."
     (clearance 0.2)
@@ -110,6 +112,8 @@
 (add_net "T4_1")
 (add_net "T4_2")
 (add_net "T4_3")
+(add_net "aP2")
+(add_net "3_P3")
   )
 
             
@@ -182,6 +186,24 @@
 
                     (pad 1 smd rect (at 0 0 0) (size 1 1) (layers F.Cu F.Paste F.Mask)
                         (net 4 "T4_3") (solder_mask_margin 0.2))
+
+                )
+
+            
+ 
+
+                (module dynamic_net_with_prefix_test (layer F.Cu) (tedit 5CF31DEF)
+
+                    (at 0 0 0)
+
+                    (pad 1 smd rect (at 0 0 0) (size 1 1) (layers F.Cu F.Paste F.Mask)
+                        (net 1 "P1") (solder_mask_margin 0.2))
+
+                    (pad 1 smd rect (at 0 0 0) (size 1 1) (layers F.Cu F.Paste F.Mask)
+                        (net 5 "aP2") (solder_mask_margin 0.2))
+
+                    (pad 1 smd rect (at 0 0 0) (size 1 1) (layers F.Cu F.Paste F.Mask)
+                        (net 6 "3_P3") (solder_mask_margin 0.2))
 
                 )
 
