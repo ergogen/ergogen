@@ -86,6 +86,33 @@ exports.inject = (ergogen) => {
         }
     })
 
+    ergogen.inject('footprint', 'dynamic_net_with_prefix_test', {
+        params: {
+            designator: 'T',
+            side: 'F'
+        },
+        body: p => {
+            return ` 
+
+                (module dynamic_net_with_prefix_test (layer ${p.side}.Cu) (tedit 5CF31DEF)
+
+                    ${p.at /* parametric position */}
+
+                    (pad 1 smd rect (at 0 0 ${p.rot}) (size 1 1) (layers ${p.side}.Cu ${p.side}.Paste ${p.side}.Mask)
+                        ${p.local_net('P1', '').str} (solder_mask_margin 0.2))
+
+                    (pad 1 smd rect (at 0 0 ${p.rot}) (size 1 1) (layers ${p.side}.Cu ${p.side}.Paste ${p.side}.Mask)
+                        ${p.local_net('P2', 'a').str} (solder_mask_margin 0.2))
+
+                    (pad 1 smd rect (at 0 0 ${p.rot}) (size 1 1) (layers ${p.side}.Cu ${p.side}.Paste ${p.side}.Mask)
+                        ${p.local_net('P3', '3_').str} (solder_mask_margin 0.2))
+
+                )
+
+            `
+        }
+    })
+
     ergogen.inject('footprint', 'anchor_test', {
         params: {
             designator: 'T',

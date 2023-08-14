@@ -31,6 +31,8 @@ pcbs:
           rotate: 30
       dyn:
         what: dynamic_net_test
+      dyn_prefix:
+        what: dynamic_net_with_prefix_test
       anc1:
         what: anchor_test
         params:
