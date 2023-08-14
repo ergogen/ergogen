@@ -28,9 +28,9 @@ module.exports = {
             if (align == 'down') y -= p.height / 2 + plus
             let text = ''
             if (p.text.length) {
-                text = `(fp_text user ${p.text} (at ${x} ${y} ${p.rot}) (layer ${side}.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15)) ${mirror}))`
+                text = `(fp_text user ${p.text} (at ${x} ${y} ${p.r}) (layer ${side}.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15)) ${mirror}))`
             }
-            return `(pad 1 smd rect (at 0 0 ${p.rot}) (size ${p.width} ${p.height}) (layers ${side}.Cu ${side}.Paste ${side}.Mask) ${p.net.str})\n${text}`
+            return `(pad 1 smd rect (at 0 0 ${p.r}) (size ${p.width} ${p.height}) (layers ${side}.Cu ${side}.Paste ${side}.Mask) ${p.net})\n${text}`
         }
 
         return `

@@ -153,6 +153,24 @@ exports.inject_footprint = (name, fp) => {
     footprint_types[name] = fp
 }
 
+const xy_obj = (x, y) => {
+    return {
+        x,
+        y,
+        str: `${x} ${y}`,
+        toString: function() { return this.str }
+    }
+}
+
+const net_obj = (name, index) => {
+    return {
+        name,
+        index,
+        str: `(net ${index} "${name}")`,
+        toString: function() { return this.str }
+    }
+}
+
 const footprint = exports._footprint = (points, net_indexer, component_indexer, units, extra) => (config, name, point) => {
 
     // config sanitization
@@ -227,11 +245,7 @@ const footprint = exports._footprint = (points, net_indexer, component_indexer, 
         } else if (type == 'net') {
             const net = a.sane(value, `${name}.params.${param_name}`, 'string')(units)
             const index = net_indexer(net)
-            parsed_params[param_name] = {
-                name: net,
-                index: index,
-                str: `(net ${index} "${net}")`
-            }
+            parsed_params[param_name] = net_obj(net, index)
         } else { // anchor
             let parsed_anchor = anchor(value, `${name}.params.${param_name}`, points, point)(units)
             parsed_anchor.y = -parsed_anchor.y // kicad mirror, as per usual
@@ -244,31 +258,35 @@ const footprint = exports._footprint = (points, net_indexer, component_indexer, 
     parsed_params.ref_hide = extra.references ? '' : 'hide'
 
     // footprint positioning
+    parsed_params.x = point.x
+    parsed_params.y = -point.y
+    parsed_params.r = point.r
+    parsed_params.rot = point.r // to be deprecated
+    parsed_params.xy = `${point.x} ${-point.y}`
     parsed_params.at = `(at ${point.x} ${-point.y} ${point.r})`
-    parsed_params.rot = point.r
-    parsed_params.ixy = (x, y) => {
-        const sign = point.meta.mirrored ? -1 : 1
-        return `${sign * x} ${y}`
+
+    const internal_xyfunc = (x, y, resist) => {
+        const sign = resist ? 1 : (point.meta.mirrored ? -1 : 1)
+        return xy_obj(sign * x, y)
     }
-    const xyfunc = (x, y, resist) => {
+    parsed_params.isxy = (x, y) => internal_xyfunc(x, y, false)
+    parsed_params.iaxy = (x, y) => internal_xyfunc(x, y, true)
+
+    const external_xyfunc = (x, y, resist) => {
         const new_anchor = anchor({
             shift: [x, -y],
             resist: resist
         }, '_internal_footprint_xy', points, point)(units)
-        return `${new_anchor.x} ${-new_anchor.y}`
+        return xy_obj(new_anchor.x, -new_anchor.y)
     }
-    parsed_params.xy = (x, y) => xyfunc(x, y, true)
-    parsed_params.sxy = (x, y) => xyfunc(x, y, false)
+    parsed_params.esxy = (x, y) => external_xyfunc(x, y, false)
+    parsed_params.eaxy = (x, y) => external_xyfunc(x, y, true)
 
     // allowing footprints to add dynamic nets
     parsed_params.local_net = suffix => {
         const net = `${component_ref}_${suffix}`
         const index = net_indexer(net)
-        return {
-            name: net,
-            index: index,
-            str: `(net ${index} "${net}")`
-        }
+        return net_obj(net, index)
     }
 
     return fp.body(parsed_params)
