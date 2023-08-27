@@ -227,7 +227,7 @@ const footprint = exports._footprint = (points, net_indexer, component_indexer, 
         const converters = {
             string: v => v,
             number: v => a.sane(v, `${name}.params.${param_name}`, 'number')(units),
-            boolean: v => v === 'true',
+            boolean: v => v === 'true' || a.mathnum(v)(units) === 1,
             array: v => yaml.load(v),
             object: v => yaml.load(v),
             net: v => v,
