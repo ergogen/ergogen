@@ -238,6 +238,14 @@ const footprint = exports._footprint = (points, net_indexer, component_indexer, 
             value = u.template(value, point.meta)
             value = converters[type](value)
         }
+        if (a.type(value)() == 'array') {
+            value = value.map(item_value => {
+                if (a.type(item_value)() =='string') {
+                    item_value = u.template(item_value, point.meta)
+                }
+                return item_value
+            })
+        }
 
         // type-specific postprocessing
         if (['string', 'number', 'boolean', 'array', 'object'].includes(type)) {
