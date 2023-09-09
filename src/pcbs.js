@@ -244,7 +244,7 @@ const footprint = exports._footprint = (points, net_indexer, component_indexer, 
             parsed_params[param_name] = value
         } else if (type == 'net') {
             const net = a.sane(value, `${name}.params.${param_name}`, 'string')(units)
-            const index = net_indexer(net)
+            const index = net_indexer(net, true)
             parsed_params[param_name] = net_obj(net, index)
         } else { // anchor
             let parsed_anchor = anchor(value, `${name}.params.${param_name}`, points, point)(units)
@@ -285,7 +285,16 @@ const footprint = exports._footprint = (points, net_indexer, component_indexer, 
     // allowing footprints to add dynamic nets
     parsed_params.local_net = suffix => {
         const net = `${component_ref}_${suffix}`
-        const index = net_indexer(net)
+        const index = net_indexer(net, true)
+        return net_obj(net, index)
+    }
+
+    parsed_params.global_net = (net, add_if_missing) => {
+        const index = net_indexer(net, add_if_missing) 
+        if (index === undefined) {
+            console.log("should be an exception")
+            throw new Error(`Net ${net} not available, referenced in footprint ${name} w/o specifying to add!`)
+        }
         return net_obj(net, index)
     }
 
@@ -317,10 +326,14 @@ exports.parse = (config, points, outlines, units) => {
 
         // making a global net index registry
         const nets = {"": 0}
-        const net_indexer = net => {
+        const net_indexer = (net, add_if_missing) => {
             if (nets[net] !== undefined) return nets[net]
-            const index = Object.keys(nets).length
-            return nets[net] = index
+            if (add_if_missing) {
+                const index = Object.keys(nets).length
+                return nets[net] = index
+            } else {
+                return undefined
+            } 
         }
         // and a component indexer
         const component_registry = {}
