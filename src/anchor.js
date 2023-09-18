@@ -2,6 +2,7 @@ const u = require('./utils')
 const a = require('./assert')
 const Point = require('./point')
 const m = require('makerjs')
+const mathjs = require('mathjs')
 
 const mirror_ref = exports.mirror = (ref, mirror=true) => {
     if (mirror) {
@@ -63,6 +64,27 @@ const aggregators = {
         )
 
         return intersection_point
+    },
+    midpoint: (config, name, parts) => {
+        a.unexpected(config, name, aggregator_common)
+        a.assert(parts.length==3, `Midpoint expects exactly three parts, but it got ${parts.length}!`)
+
+        const p0dot = mathjs.dot(parts[0].p, parts[0].p)
+        const p1dot = mathjs.dot(parts[1].p, parts[1].p)
+        const p2dot = mathjs.dot(parts[2].p, parts[2].p)
+
+        const p01 = mathjs.subtract(parts[0].p, parts[1].p)
+        const p02 = mathjs.subtract(parts[0].p, parts[2].p)
+
+        const A = [p01, p02]
+        const B = [p0dot - p1dot, p0dot - p2dot]
+
+        // should get div by 0 or some such if point are colinear
+        const midpoint = mathjs.multiply(0.5, mathjs.multiply(mathjs.inv(A), B))
+
+        return new Point(
+            midpoint[0], midpoint[1], 0
+        )
     },
 }
 
