@@ -80,7 +80,12 @@ const aggregators = {
         const B = [p0dot - p1dot, p0dot - p2dot]
 
         // should get div by 0 or some such if point are colinear
-        const midpoint = mathjs.multiply(0.5, mathjs.multiply(mathjs.inv(A), B))
+        let midpoint;
+        try {
+            midpoint = mathjs.multiply(0.5, mathjs.multiply(mathjs.inv(A), B))
+        } catch (e) {
+            a.assert(false, `Midpoint failed to compute, points are likely co-linear`)
+        }
 
         return new Point(
             midpoint[0], midpoint[1], 0
