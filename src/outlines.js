@@ -7,6 +7,12 @@ const prep = require('./prepare')
 const anchor = require('./anchor').parse
 const filter = require('./filter').parse
 
+const svgs = {};
+
+exports.inject_svg = (name, data) => {
+    svgs[name] = m.importer.fromSVGPathData(data)
+}
+
 const binding = (base, bbox, point, units) => {
 
     let bind = a.trbl(point.meta.bind || 0, `${point.meta.name}.bind`)(units)
@@ -250,5 +256,8 @@ exports.parse = (config, points, units) => {
 
     }
 
-    return outlines
+    return {
+        ...outlines,
+        ...svgs,
+    }
 }   

@@ -1,4 +1,5 @@
 const yaml = require('js-yaml')
+const jsdom = require('jsdom')
 const jszip = require('jszip')
 const makerjs = require('makerjs')
 
@@ -26,6 +27,15 @@ exports.unpack = async (zip) => {
         const parsed = new Function(module_prefix + text + module_suffix)()
         // TODO: some sort of footprint validation?
         injections.push(['footprint', name, parsed])
+    }
+
+    // bundled svgs
+    const svgs = zip.folder('svgs')
+    for (const svg_file of svgs.file(/.*\.svg$/)) {
+        const name = svg_file.name.split('/').at(-1).split('.')[0]
+        const dom = new jsdom.JSDOM(await svg_file.async('string'))
+        data = dom.window.document.body.querySelector('path').getAttribute('d')
+        injections.push(['svg', name, data])
     }
 
     return [config_text, injections]
