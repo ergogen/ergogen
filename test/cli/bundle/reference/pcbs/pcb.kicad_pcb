@@ -116,6 +116,10 @@
 (gr_line (start 9 9) (end 9 -9) (angle 90) (layer Edge.Cuts) (width 0.15))
 (gr_line (start 9 -9) (end -9 -9) (angle 90) (layer Edge.Cuts) (width 0.15))
 (gr_line (start -9 -9) (end -9 9) (angle 90) (layer Edge.Cuts) (width 0.15))
+(gr_line (start 10 9) (end 28 9) (angle 90) (layer Edge.Cuts) (width 0.15))
+(gr_line (start 28 9) (end 28 -9) (angle 90) (layer Edge.Cuts) (width 0.15))
+(gr_line (start 28 -9) (end 10 -9) (angle 90) (layer Edge.Cuts) (width 0.15))
+(gr_line (start 10 -9) (end 10 9) (angle 90) (layer Edge.Cuts) (width 0.15))
             
 )
 
