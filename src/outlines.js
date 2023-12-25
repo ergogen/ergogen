@@ -7,6 +7,12 @@ const prep = require('./prepare')
 const anchor = require('./anchor').parse
 const filter = require('./filter').parse
 
+const svgs = {};
+
+exports.inject_svg = (name, data) => {
+    svgs[name] = m.importer.fromSVGPathData(data)
+}
+
 const binding = (base, bbox, point, units) => {
 
     let bind = a.trbl(point.meta.bind || 0, `${point.meta.name}.bind`)(units)
@@ -156,8 +162,8 @@ const expand_shorthand = (config, name, units) => {
 
 exports.parse = (config, points, units) => {
 
-    // output outlines will be collected here
-    const outlines = {}
+    // output outlines will be collected here. seed with injected svgs
+    const outlines = { ...svgs }
 
     // the config must be an actual object so that the exports have names
     config = a.sane(config, 'outlines', 'object')()
@@ -250,5 +256,7 @@ exports.parse = (config, points, units) => {
 
     }
 
-    return outlines
+    return {
+        ...outlines,
+    }
 }   

@@ -4,9 +4,16 @@ outlines:
     - what: rectangle
       where: true
       size: 18
+  injected_offset:
+    - what:
+      name: injected
+      origin:
+        shift: [-10, -9]
 pcbs:
   pcb:
-    outlines.edge.outline: box
+    outlines:
+      edge.outline: box
+      injected.outline: injected_offset
     footprints:
       injected:
         what: injected
