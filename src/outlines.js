@@ -162,8 +162,8 @@ const expand_shorthand = (config, name, units) => {
 
 exports.parse = (config, points, units) => {
 
-    // output outlines will be collected here
-    const outlines = {}
+    // output outlines will be collected here. seed with injected svgs
+    const outlines = { ...svgs }
 
     // the config must be an actual object so that the exports have names
     config = a.sane(config, 'outlines', 'object')()
@@ -258,6 +258,5 @@ exports.parse = (config, points, units) => {
 
     return {
         ...outlines,
-        ...svgs,
     }
 }   
