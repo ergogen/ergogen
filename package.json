@@ -17,6 +17,7 @@
     "dependencies": {
         "fs-extra": "^11.1.0",
         "js-yaml": "^3.14.1",
+        "jsdom": "^23.0.1",
         "jszip": "^3.10.1",
         "kle-serial": "github:ergogen/kle-serial#ergogen",
         "makerjs": "github:ergogen/maker.js#ergogen",
