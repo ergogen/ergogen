@@ -7,12 +7,12 @@
     "homepage": "https://ergogen.xyz",
     "repository": "github:ergogen/ergogen",
     "bugs": "https://github.com/ergogen/ergogen/issues",
-    "main": "./src/ergogen.js",
-    "bin": "./src/cli.js",
+    "main": "./build/ergogen.js",
+    "bin": "./build/cli.js",
     "scripts": {
-        "build": "rollup -c",
-        "test": "mocha -r test/helpers/register test/index.js",
-        "coverage": "nyc --reporter=html --reporter=text npm test"
+        "build": "tsc && rollup -c",
+        "test": "tsc && mocha -r test/helpers/register test/index.js",
+        "coverage": "tsc && nyc --reporter=html --reporter=text npm test"
     },
     "dependencies": {
         "fs-extra": "^11.1.0",
@@ -21,6 +21,7 @@
         "kle-serial": "github:ergogen/kle-serial#ergogen",
         "makerjs": "github:ergogen/maker.js#ergogen",
         "mathjs": "^11.5.0",
+        "typescript": "^5.3.3",
         "yargs": "^17.6.2"
     },
     "devDependencies": {
