@@ -1,3 +1,5 @@
+type Config = import('./config').Config
+
 const a = require('./assert')
 const prep = require('./prepare')
 
@@ -13,9 +15,9 @@ const default_units = {
     $default_width: 'u-1',
     $default_padding: 'u',
     $default_autobind: 10
-}
+} as const;
 
-exports.parse = (config = {}) => {
+exports.parse = (config: Pick<Config, "units" | "variables"> = {}) => {
     const raw_units = prep.extend(
         default_units,
         a.sane(config.units || {}, 'units', 'object')(),
