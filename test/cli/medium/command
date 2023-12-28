@@ -1,1 +1,1 @@
-node src/cli.js test/fixtures/medium.yaml
+node build/cli.js test/fixtures/medium.yaml

@@ -1,1 +1,1 @@
-node src/cli.js nonexistent.yaml
+node build/cli.js nonexistent.yaml

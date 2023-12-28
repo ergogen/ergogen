@@ -1,5 +1,5 @@
-const {parse} = require('../../src/anchor')
-const Point = require('../../src/point')
+const {parse} = require('../../build/anchor')
+const Point = require('../../build/point')
 const {check} = require('../helpers/point')
 
 describe('Anchor', function() {

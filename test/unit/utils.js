@@ -1,5 +1,5 @@
 const m = require('makerjs')
-const u = require('../../src/utils')
+const u = require('../../build/utils')
 
 describe('Utils', function() {
 

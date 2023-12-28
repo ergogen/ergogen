@@ -1,6 +1,6 @@
-const filter = require('../../src/filter').parse
-const anchor = require('../../src/anchor').parse
-const Point = require('../../src/point')
+const filter = require('../../build/filter').parse
+const anchor = require('../../build/anchor').parse
+const Point = require('../../build/point')
 
 describe('Filter', function() {
 

@@ -1,4 +1,4 @@
-const u = require('../../src/units')
+const u = require('../../build/units')
 const public = key => !key.startsWith('$')
 
 describe('Units', function() {

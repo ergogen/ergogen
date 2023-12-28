@@ -1,6 +1,6 @@
 const m = require('makerjs')
-const pcb_lib = require('../../src/pcbs')
-const ergogen = require('../../src/ergogen')
+const pcb_lib = require('../../build/pcbs')
+const ergogen = require('../../build/ergogen')
 
 describe('Internals', function() {
 

@@ -1,7 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 const yaml = require('js-yaml')
-const ergogen = require('../../src/ergogen')
+const ergogen = require('../../build/ergogen')
 const version = require('../../package.json').version
 
 // fixtures

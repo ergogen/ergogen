@@ -1,1 +1,1 @@
-node src/cli.js test/fixtures/big.yaml --debug --clean
+node build/cli.js test/fixtures/big.yaml --debug --clean

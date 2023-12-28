@@ -1,5 +1,5 @@
 const m = require('makerjs')
-const Point = require('../../src/point')
+const Point = require('../../build/point')
 const {check} = require('../helpers/point')
 
 describe('Point', function() {

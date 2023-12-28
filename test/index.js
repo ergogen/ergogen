@@ -2,9 +2,9 @@ const fs = require('fs-extra')
 const path = require('path')
 const yaml = require('js-yaml')
 const glob = require('glob')
-const u = require('../src/utils')
-const a = require('../src/assert')
-const ergogen = require('../src/ergogen')
+const u = require('../build/utils')
+const a = require('../build/assert')
+const ergogen = require('../build/ergogen')
 require('./helpers/mock_footprints').inject(ergogen)
 
 let what = process.env.npm_config_what
