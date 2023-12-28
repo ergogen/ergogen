@@ -1,7 +1,31 @@
 const m = require('makerjs')
 const u = require('./utils')
+type IModel = import('makerjs').IModel
+type IPoint = import('makerjs').IPoint
+type Column = import('./column').Column
+type Row = import('./row').Row
+
+type PointMetadata = {
+    name?: string
+    width?: number
+    height?: number
+    col?: Column
+    row?: Row
+    colrow?: string
+    bind?: unknown
+    autobind?: boolean
+    skip?: boolean
+    mirrored?: boolean
+    asym?: unknown
+}
 
 module.exports = class Point {
+    x: number
+    y: number
+    r: number
+
+    meta: PointMetadata
+
     constructor(x=0, y=0, r=0, meta={}) {
         if (Array.isArray(x)) {
             this.x = x[0]
@@ -16,15 +40,15 @@ module.exports = class Point {
         }
     }
 
-    get p() {
+    get p(): [number, number] {
         return [this.x, this.y]
     }
 
-    set p(val) {
-        [this.x, this.y] = val
+    set p(val: IPoint) {
+        [this.x, this.y] = val as [number, number]
     }
 
-    shift(s, relative=true, resist=false) {
+    shift(s: IPoint, relative=true, resist=false): Point {
         s[0] *= (!resist && this.meta.mirrored) ? -1 : 1
         if (relative) {
             s = m.point.rotate(s, this.r)
@@ -34,7 +58,7 @@ module.exports = class Point {
         return this
     }
 
-    rotate(angle, origin=[0, 0], resist=false) {
+    rotate(angle: number, origin=[0, 0], resist=false): Point {
         angle *= (!resist && this.meta.mirrored) ? -1 : 1
         if (origin) {
             this.p = m.point.rotate(this.p, angle, origin)
@@ -43,13 +67,13 @@ module.exports = class Point {
         return this
     }
 
-    mirror(x) {
+    mirror(x: number): Point {
         this.x = 2 * x - this.x
         this.r = -this.r
         return this
     }
 
-    clone() {
+    clone(): Point {
         return new Point(
             this.x,
             this.y,
@@ -58,26 +82,26 @@ module.exports = class Point {
         )
     }
 
-    position(model) {
+    position(model: IModel): IModel {
         return m.model.moveRelative(m.model.rotate(model, this.r), this.p)
     }
 
-    unposition(model) {
+    unposition(model: IModel): IModel {
         return m.model.rotate(m.model.moveRelative(model, [-this.x, -this.y]), -this.r)
     }
 
-    rect(size=14) {
+    rect(size=14): IModel {
         let rect = u.rect(size, size, [-size/2, -size/2])
         return this.position(rect)
     }
 
-    angle(other) {
+    angle(other: Point): number {
         const dx = other.x - this.x
         const dy = other.y - this.y
         return -Math.atan2(dx, dy) * (180 / Math.PI)
     }
 
-    equals(other) {
+    equals(other: Point): boolean {
         return this.x === other.x
             && this.y === other.y
             && this.r === other.r
