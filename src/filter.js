@@ -1,8 +1,7 @@
-const u = require('./utils')
-const a = require('./assert')
-const anchor_lib = require('./anchor')
-const Point = require('./point')
-const anchor = anchor_lib.parse
+import * as u from './utils.js'
+import * as a from './assert.js'
+import * as anchor_lib from './anchor.js'
+import Point from './point.js'
 
 const _true = () => true
 const _false = () => false
@@ -112,7 +111,7 @@ const contains_object = (val) => {
     return false
 }
 
-exports.parse = (config, name, points={}, units={}, asym='source') => {
+export const parse = (config, name, points={}, units={}, asym='source') => {
 
     let result = []
 
@@ -123,12 +122,12 @@ exports.parse = (config, name, points={}, units={}, asym='source') => {
     // if a filter decl is an object, or an array that contains an object at any depth, it is an anchor
     } else if (contains_object(config)) {
         if (['source', 'both'].includes(asym)) {
-            result.push(anchor(config, name, points)(units))
+            result.push(anchor_lib.parse(config, name, points)(units))
         }
         if (['clone', 'both'].includes(asym)) {
             // this is strict: if the ref of the anchor doesn't have a mirror pair, it will error out
             // also, we check for duplicates as ref-less anchors mirror to themselves
-            const clone = anchor(config, name, points, undefined, true)(units)
+            const clone = anchor_lib.parse(config, name, points, undefined, true)(units)
             if (result.every(p => !p.equals(clone))) {
                 result.push(clone)
             }

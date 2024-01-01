@@ -9,7 +9,7 @@ describe('Internals', function() {
         sinon.stub(m.model, 'walk').callsFake(function(model, config) {
             config.onPath({pathContext: {type: 'nonexistent'}})
         })
-        pcb_lib._makerjs2kicad.bind(this).should.throw("Can't convert path type")
+        pcb_lib.makerjs2kicad.bind(this).should.throw("Can't convert path type")
     })
 
     it('injection', function() {

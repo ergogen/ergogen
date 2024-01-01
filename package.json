@@ -7,7 +7,7 @@
     "homepage": "https://ergogen.xyz",
     "repository": "github:ergogen/ergogen",
     "bugs": "https://github.com/ergogen/ergogen/issues",
-    "type": "commonjs",
+    "type": "module",
     "main": "./build/ergogen.js",
     "bin": "./build/cli.js",
     "scripts": {

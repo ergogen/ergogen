@@ -2,7 +2,7 @@
 // Nets
 //		net: the net this via should be connected to
 
-module.exports = {
+const via = {
     params: {
       net: undefined
     },
@@ -18,3 +18,5 @@ module.exports = {
       )
     `
 }
+
+export default via

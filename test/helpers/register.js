@@ -1,11 +1,13 @@
-global.chai = require('chai')
-global.chai.use(require('chai-as-promised'))
-global.expect = global.chai.expect
-global.should = global.chai.should()
-global.sinon = require('sinon')
+import chai from 'chai'
+import chaiAsPromised from 'chai-as-promised'
+
+chai.use(chaiAsPromised)
+export const expect = chai.expect
+export const should = chai.should()
+import sinon from 'sinon'
 
 // Restore the default sandbox after every test
-exports.mochaHooks = {
+export const mochaHooks = {
     afterEach() {
         sinon.restore()
     }

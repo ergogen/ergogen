@@ -1,11 +1,11 @@
-const m = require('makerjs')
-const u = require('./utils')
-const a = require('./assert')
-const o = require('./operation')
-const Point = require('./point')
-const prep = require('./prepare')
-const anchor = require('./anchor').parse
-const filter = require('./filter').parse
+import m from 'makerjs'
+import * as u from './utils.js'
+import * as a from './assert.js'
+import * as o from './operation.js'
+import Point from './point.js'
+import * as prep from './prepare.js'
+import { parse as anchor } from './anchor.js'
+import { parse as filter } from './filter.js'
 
 const binding = (base, bbox, point, units) => {
 
@@ -154,7 +154,7 @@ const expand_shorthand = (config, name, units) => {
     }
 }
 
-exports.parse = (config, points, units) => {
+export const parse = (config, points, units) => {
 
     // output outlines will be collected here
     const outlines = {}

@@ -1,4 +1,4 @@
-module.exports = {
+const diode = {
     params: {
         designator: 'D',
         from: undefined,
@@ -44,3 +44,5 @@ module.exports = {
   
     `
 }
+
+export default diode

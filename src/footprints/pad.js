@@ -1,4 +1,4 @@
-module.exports = {
+const pad = {
     params: {
         designator: 'PAD',
         width: 1,
@@ -52,3 +52,5 @@ module.exports = {
         `
     }
 }
+
+export default pad

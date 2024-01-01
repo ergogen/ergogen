@@ -1,9 +1,7 @@
-const m = require('makerjs')
-const u = require('./utils')
-type IModel = import('makerjs').IModel
-type IPoint = import('makerjs').IPoint
-type Column = import('./column').Column
-type Row = import('./row').Row
+import m, { IModel, IPoint } from 'makerjs'
+import * as u from './utils.js'
+import { Column } from './column.js'
+import { Row } from './row.js'
 
 type PointMetadata = {
     name?: string
@@ -19,7 +17,7 @@ type PointMetadata = {
     asym?: unknown
 }
 
-module.exports = class Point {
+export default class Point {
     x: number
     y: number
     r: number

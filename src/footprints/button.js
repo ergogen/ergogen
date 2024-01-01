@@ -1,4 +1,4 @@
-module.exports = {
+const button = {
     params: {
         designator: 'B', // for Button
         side: 'F',
@@ -36,3 +36,5 @@ module.exports = {
     
     `
 }
+
+export default button

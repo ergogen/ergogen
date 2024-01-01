@@ -1,4 +1,4 @@
-module.exports = {
+const alps = {
     params: {
         designator: 'S',
         from: undefined,
@@ -31,3 +31,5 @@ module.exports = {
 
     `
 }
+
+export default alps

@@ -1,21 +1,21 @@
 #!/usr/bin/env node
 
-const fs = require('fs-extra')
-const fsp = require('fs/promises')
-const path = require('path')
-const yaml = require('js-yaml')
-const yargs = require('yargs')
-const jszip = require('jszip')
+import fs from 'fs-extra'
+import fsp from 'fs/promises'
+import path from 'path'
+import yaml from 'js-yaml'
+import yargs from 'yargs'
+import jszip from 'jszip'
 
-const io = require('./io')
-const pkg = require('../package.json')
-const ergogen = require('./ergogen')
+import * as io from './io.js'
+import * as ergogen from './ergogen.js'
+import pkg from '../package.json' with { type: "json" }
 
 ;(async () => {
 
 // command line args
 
-const args = yargs
+const args = yargs(process.argv.slice(2))
     .option('output', {
         alias: 'o',
         default: path.resolve('output'),

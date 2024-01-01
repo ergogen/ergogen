@@ -1,11 +1,11 @@
-const m = require('makerjs')
+import m from 'makerjs'
 
-exports.deepcopy = value => {
+export const deepcopy = value => {
     if (value === undefined) return undefined
     return JSON.parse(JSON.stringify(value))
 }
 
-const deep = exports.deep = (obj, key, val) => {
+export const deep = (obj, key, val) => {
     const levels = key.split('.')
     const last = levels.pop()
     let step = obj
@@ -18,7 +18,7 @@ const deep = exports.deep = (obj, key, val) => {
     return obj
 }
 
-exports.template = (str, vals={}) => {
+export const template = (str, vals={}) => {
     const regex = /\{\{([^}]*)\}\}/g
     let res = str
     let shift = 0
@@ -32,19 +32,19 @@ exports.template = (str, vals={}) => {
     return res
 }
 
-const eq = exports.eq = (a=[], b=[]) => {
+export const eq = (a=[], b=[]) => {
     return a[0] === b[0] && a[1] === b[1]
 }
 
-const line = exports.line = (a, b) => {
+export const line = (a, b) => {
     return new m.paths.Line(a, b)
 }
 
-exports.circle = (p, r) => {
+export const circle = (p, r) => {
     return {paths: {circle: new m.paths.Circle(p, r)}}
 }
 
-exports.rect = (w, h, o=[0, 0]) => {
+export const rect = (w, h, o=[0, 0]) => {
     const res = {
         top:    line([0, h], [w, h]),
         right:  line([w, h], [w, 0]),
@@ -54,7 +54,7 @@ exports.rect = (w, h, o=[0, 0]) => {
     return m.model.move({paths: res}, o)
 }
 
-exports.poly = (arr) => {
+export const poly = (arr) => {
     let counter = 0
     let prev = arr[arr.length - 1]
     const res = {
@@ -68,7 +68,7 @@ exports.poly = (arr) => {
     return res
 }
 
-exports.bbox = (arr) => {
+export const bbox = (arr) => {
     let minx = Infinity
     let miny = Infinity
     let maxx = -Infinity
@@ -82,27 +82,28 @@ exports.bbox = (arr) => {
     return {low: [minx, miny], high: [maxx, maxy]}
 }
 
-const farPoint = exports.farPoint = [1234.1234, 2143.56789]
+export const farPoint = [1234.1234, 2143.56789]
 
-exports.union = exports.add = (a, b) => {
+export const union = (a, b) => {
     return m.model.combine(a, b, false, true, false, true, {
         farPoint
     })
 }
+export { union as add }
 
-exports.subtract = (a, b) => {
+export const subtract = (a, b) => {
     return m.model.combine(a, b, false, true, true, false, {
         farPoint
     })
 }
 
-exports.intersect = (a, b) => {
+export const intersect = (a, b) => {
     return m.model.combine(a, b, true, false, true, false, {
         farPoint
     })
 }
 
-exports.stack = (a, b) => {
+export const stack = (a, b) => {
     return {
         models: {
             a, b
@@ -110,7 +111,7 @@ exports.stack = (a, b) => {
     }
 }
 
-const semver = exports.semver = (str, name='') => {
+export const semver = (str, name='') => {
     let main = str.split('-')[0]
     if (main.startsWith('v')) {
         main = main.substring(1)
@@ -124,7 +125,7 @@ const semver = exports.semver = (str, name='') => {
     } else throw new Error(`Invalid semver "${str}" at ${name}!`)
 }
 
-const satisfies = exports.satisfies = (current, expected) => {
+export const satisfies = (current, expected) => {
     if (current.major === undefined) current = semver(current)
     if (expected.major === undefined) expected = semver(expected)
     return current.major === expected.major && (

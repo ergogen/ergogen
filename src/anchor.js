@@ -1,9 +1,9 @@
-const u = require('./utils')
-const a = require('./assert')
-const Point = require('./point')
-const m = require('makerjs')
+import m from 'makerjs'
+import * as u from './utils.js'
+import * as a from './assert.js'
+import Point from './point.js'
 
-const mirror_ref = exports.mirror = (ref, mirror=true) => {
+const mirror_ref = (ref, mirror=true) => {
     if (mirror) {
         if (ref.startsWith('mirror_')) {
             return ref.substring(7)
@@ -66,7 +66,7 @@ const aggregators = {
     },
 }
 
-const anchor = exports.parse = (raw, name, points={}, start=new Point(), mirror=false) => units => {
+const anchor = (raw, name, points={}, start=new Point(), mirror=false) => units => {
 
     //
     // Anchor type handling
@@ -166,4 +166,9 @@ const anchor = exports.parse = (raw, name, points={}, start=new Point(), mirror=
     }
 
     return point
+}
+
+export {
+    mirror_ref as mirror,
+    anchor as parse,
 }

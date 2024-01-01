@@ -1,4 +1,4 @@
-module.exports = {
+const jstph = {
     params: {
         designator: 'JST',
         side: 'F',
@@ -37,3 +37,5 @@ module.exports = {
     
     `
 }
+
+export default jstph

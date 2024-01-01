@@ -1,15 +1,17 @@
-const u = require('./utils')
-const io = require('./io')
-const prepare = require('./prepare')
-const units_lib = require('./units')
-const points_lib = require('./points')
-const outlines_lib = require('./outlines')
-const cases_lib = require('./cases')
-const pcbs_lib = require('./pcbs')
+import * as u from './utils.js'
+import * as io from './io.js'
+import * as prepare from './prepare.js'
+import * as units_lib from './units.js'
+import * as points_lib from './points.js'
+import * as outlines_lib from './outlines.js'
+import * as cases_lib from './cases.js'
+import * as pcbs_lib from './pcbs.js'
 
-const version = require('../package.json').version
+import pkg from '../package.json' with { type: "json" }
 
-const process = async (raw, debug=false, logger=()=>{}) => {
+export const version = pkg.version
+
+export const process = async (raw, debug=false, logger=()=>{}) => {
 
     const prefix = 'Interpreting format: '
     let empty = true
@@ -94,7 +96,7 @@ const process = async (raw, debug=false, logger=()=>{}) => {
     return results
 }
 
-const inject = (type, name, value) => {
+export const inject = (type, name, value) => {
     if (value === undefined) {
         value = name
         name = type
@@ -106,10 +108,4 @@ const inject = (type, name, value) => {
         default:
             throw new Error(`Unknown injection type "${type}" with name "${name}" and value "${value}"!`)
     }
-}
-
-module.exports = {
-    version,
-    process,
-    inject
 }

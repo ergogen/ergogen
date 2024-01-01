@@ -7,7 +7,7 @@
 //    B: corresponds to pin 2 (for rotary, should be GND)
 //    C: corresponds to pin 3 (for rotary)
 
-module.exports = {
+const rotary = {
     params: {
         designator: 'ROT',
         from: undefined,
@@ -68,3 +68,5 @@ module.exports = {
         )
     `
 }
+
+export default rotary

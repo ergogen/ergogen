@@ -1,8 +1,8 @@
-const m = require('makerjs')
-const a = require('./assert')
-const o = require('./operation')
+import m from 'makerjs'
+import * as a from './assert.js'
+import * as o from './operation.js'
 
-exports.parse = (config, outlines, units) => {
+export const parse = (config, outlines, units) => {
 
     const cases_config = a.sane(config, 'cases', 'object')()
 

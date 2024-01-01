@@ -1,12 +1,12 @@
-const yaml = require('js-yaml')
-const jszip = require('jszip')
-const makerjs = require('makerjs')
+import yaml from 'js-yaml'
+import jszip from 'jszip'
+import makerjs from 'makerjs'
 
-const u = require('./utils')
-const a = require('./assert')
-const kle = require('./kle')
+import * as u from './utils.js'
+import * as a from './assert.js'
+import * as kle from './kle.js'
 
-exports.unpack = async (zip) => {
+export const unpack = async (zip) => {
 
     // main config text (has to be called "config.ext" where ext is one of yaml/json/js)
     const candidates = zip.file(/^config\.(yaml|json|js)$/)
@@ -31,7 +31,7 @@ exports.unpack = async (zip) => {
     return [config_text, injections]
 }
 
-exports.interpret = (raw, logger) => {
+export const interpret = (raw, logger) => {
     let config = raw
     let format = 'OBJ'
     if (a.type(raw)() == 'string') {
@@ -73,7 +73,7 @@ exports.interpret = (raw, logger) => {
     return [config, format]
 }
 
-exports.twodee = (model, debug) => {
+export const twodee = (model, debug) => {
     const assembly = makerjs.model.originate({
         models: {
             export: u.deepcopy(model)

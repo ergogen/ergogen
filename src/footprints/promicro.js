@@ -4,7 +4,7 @@
 //    if down, power led will face the pcb
 //    if up, power led will face away from pcb
 
-module.exports = {
+const promicro = {
   params: {
     designator: 'MCU',
     orientation: 'down',
@@ -127,3 +127,5 @@ module.exports = {
     }
   }
 }
+
+export default promicro
