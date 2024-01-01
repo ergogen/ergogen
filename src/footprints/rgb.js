@@ -1,4 +1,4 @@
-module.exports = {
+const rgb = {
     params: {
         designator: 'LED',
         side: 'F',
@@ -43,3 +43,5 @@ module.exports = {
     
     `
 }
+
+export default rgb

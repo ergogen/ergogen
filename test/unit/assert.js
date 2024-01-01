@@ -1,4 +1,4 @@
-const a = require('../../src/assert')
+const a = require('../../build/assert')
 
 describe('Assert', function() {
 

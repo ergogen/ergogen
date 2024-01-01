@@ -1,5 +1,7 @@
-const a = require('./assert')
-const prep = require('./prepare')
+import { Config } from './config.js'
+
+import * as a from './assert.js'
+import * as prep from './prepare.js'
 
 const default_units = {
     U: 19.05,
@@ -13,9 +15,9 @@ const default_units = {
     $default_width: 'u-1',
     $default_padding: 'u',
     $default_autobind: 10
-}
+} as const;
 
-exports.parse = (config = {}) => {
+export const parse = (config: Pick<Config, "units" | "variables"> = {}) => {
     const raw_units = prep.extend(
         default_units,
         a.sane(config.units || {}, 'units', 'object')(),

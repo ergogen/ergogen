@@ -1,8 +1,9 @@
-const u = require('./utils')
-const kle = require('kle-serial')
-const yaml = require('js-yaml')
+import kle from 'kle-serial'
+import yaml from 'js-yaml'
 
-exports.convert = (config, logger) => {
+import * as u from './utils.js'
+
+export const convert = (config, logger) => {
     const keyboard = kle.Serial.deserialize(config)
     const result = {points: {zones: {}}, pcbs: {main: {}}}
 

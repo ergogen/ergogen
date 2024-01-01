@@ -8,7 +8,7 @@
 //    keycaps: default is false
 //      if true, will add choc sized keycap box around the footprint
 
-module.exports = {
+const chocmini = {
     params: {
       designator: 'S',
 		  side: 'F',
@@ -90,3 +90,5 @@ module.exports = {
       }
     }
   }
+
+export default chocmini

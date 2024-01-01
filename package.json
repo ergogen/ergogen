@@ -7,25 +7,36 @@
     "homepage": "https://ergogen.xyz",
     "repository": "github:ergogen/ergogen",
     "bugs": "https://github.com/ergogen/ergogen/issues",
-    "main": "./src/ergogen.js",
-    "bin": "./src/cli.js",
+    "type": "module",
+    "main": "./build/ergogen.js",
+    "bin": "./build/cli.js",
     "scripts": {
-        "build": "rollup -c",
-        "test": "mocha -r test/helpers/register test/index.js",
-        "coverage": "nyc --reporter=html --reporter=text npm test"
+        "build": "tsc && rollup -c",
+        "test": "tsc && mocha -r test/helpers/register.js test/index.js",
+        "coverage": "tsc && nyc --reporter=html --reporter=text npm test"
     },
     "dependencies": {
+        "@types/glob": "^8.1.0",
         "fs-extra": "^11.1.0",
         "js-yaml": "^3.14.1",
         "jszip": "^3.10.1",
         "kle-serial": "github:ergogen/kle-serial#ergogen",
         "makerjs": "github:ergogen/maker.js#ergogen",
-        "mathjs": "^11.5.0",
+        "mathjs": "^12.0.0",
+        "typescript": "^5.3.3",
         "yargs": "^17.6.2"
     },
     "devDependencies": {
         "@rollup/plugin-commonjs": "^24.0.1",
         "@rollup/plugin-json": "^6.0.0",
+        "@types/chai": "^4.3.11",
+        "@types/fs-extra": "^11.0.4",
+        "@types/js-yaml": "^4.0.9",
+        "@types/jszip": "^3.4.1",
+        "@types/mocha": "^10.0.6",
+        "@types/node": "^20.10.5",
+        "@types/sinon": "^17.0.2",
+        "@types/yargs": "^17.0.32",
         "chai": "^4.3.7",
         "chai-as-promised": "^7.1.1",
         "dir-compare": "^4.0.0",
@@ -35,6 +46,7 @@
         "rollup": "^3.10.1",
         "sinon": "^15.0.1"
     },
+    "mocha": {},
     "nyc": {
         "all": true,
         "include": [

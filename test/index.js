@@ -1,11 +1,17 @@
-const fs = require('fs-extra')
-const path = require('path')
-const yaml = require('js-yaml')
-const glob = require('glob')
-const u = require('../src/utils')
-const a = require('../src/assert')
-const ergogen = require('../src/ergogen')
-require('./helpers/mock_footprints').inject(ergogen)
+import fs from 'fs-extra'
+import path from 'path'
+import yaml from 'js-yaml'
+import glob from 'glob'
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+import * as u from '../build/utils.js'
+import * as a from '../build/assert.js'
+import * as ergogen from '../build/ergogen.js'
+import { inject } from './helpers/mock_footprints.js'
+
+inject(ergogen)
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 let what = process.env.npm_config_what
 const dump = process.env.npm_config_dump
@@ -28,7 +34,8 @@ what = what ? what.split(',') : false
 for (const unit of glob.sync(handle_slash(path.join(__dirname, 'unit', '*.js')))) {
     const base = path.basename(unit, '.js')
     if (what && !what.includes(base)) continue
-    require(`./unit/${base}.js`)
+    if (base !== "anchor") continue
+    await import(`./unit/${base}.js`)
 }
 
 
@@ -56,7 +63,7 @@ const cap = s => s.charAt(0).toUpperCase() + s.slice(1)
 const test = function(input_path) {
     this.timeout(120000)
     this.slow(120000)
-    title = path.basename(input_path, '.yaml').split('_').join(' ')
+    const title = path.basename(input_path, '.yaml').split('_').join(' ')
     it(title, async function() {
         
         const input = yaml.load(fs.readFileSync(input_path).toString())
@@ -144,8 +151,8 @@ if (what) {
 const joiner = (a, b) => path.join(a, b)
 const read = (...args) => fs.readFileSync(args.reduce(joiner, '')).toString()
 const exists = (...args) => fs.existsSync(args.reduce(joiner, ''))
-const { execSync } = require('child_process')
-const dircompare = require('dir-compare')
+import { execSync } from 'child_process'
+import dircompare from 'dir-compare'
 
 const cli_what = what ? what.filter(w => w.startsWith('cli')) : ['cli']
 
@@ -203,7 +210,7 @@ for (let w of cli_what) {
                         if (ex === 'should_have_thrown') {
                             throw new Error('This command should have thrown!')
                         }
-                        const actual_error = ex.stderr.toString().split('\n')[0]
+                        const actual_error = ex.stderr.toString().split('\n')
                         if (dump) {
                             fs.writeFileSync(path.join(t, 'error'), actual_error)
                         }

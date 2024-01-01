@@ -1,4 +1,4 @@
-exports.inject = (ergogen) => {
+export const inject = (ergogen) => {
     ergogen.inject('footprint', 'trace_test', {
         params: {
             designator: 'T',
@@ -115,7 +115,7 @@ exports.inject = (ergogen) => {
             end: [[1, 0], [0, 1]]
         },
         body: p => {
-            lines = ''
+            let lines = ''
             for (const item of p.end) {
                 lines += `(fp_line (start ${p.start.x} ${p.start.y}) (end ${item[0]} ${item[1]}) (layer Dwgs.User) (width 0.05))\n`
             }

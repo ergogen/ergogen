@@ -1,11 +1,14 @@
-const m = require('makerjs')
-const yaml = require('js-yaml')
+import m from 'makerjs'
+import yaml from 'js-yaml'
 
-const u = require('./utils')
-const a = require('./assert')
-const prep = require('./prepare')
-const anchor = require('./anchor').parse
-const filter = require('./filter').parse
+import * as u from './utils.js'
+import * as a from './assert.js'
+import * as prep from './prepare.js'
+import { parse as anchor } from './anchor.js'
+import { parse as filter } from './filter.js'
+import * as default_footprints from './footprints/index.js'
+
+const footprint_types = { ...default_footprints }
 
 const kicad_prefix = `
 (kicad_pcb (version 20171130) (host pcbnew 5.1.6)
@@ -117,7 +120,7 @@ const kicad_netclass = `
   )
 `
 
-const makerjs2kicad = exports._makerjs2kicad = (model, layer) => {
+export const makerjs2kicad = (model, layer) => {
     const grs = []
     const xy = val => `${val[0]} ${-val[1]}`
     m.model.walk(model, {
@@ -147,9 +150,7 @@ const makerjs2kicad = exports._makerjs2kicad = (model, layer) => {
     return grs.join('\n')
 }
 
-const footprint_types = require('./footprints')
-
-exports.inject_footprint = (name, fp) => {
+export const inject_footprint = (name, fp) => {
     footprint_types[name] = fp
 }
 
@@ -171,7 +172,7 @@ const net_obj = (name, index) => {
     }
 }
 
-const footprint = exports._footprint = (points, net_indexer, component_indexer, units, extra) => (config, name, point) => {
+const footprint = (points, net_indexer, component_indexer, units, extra) => (config, name, point) => {
 
     // config sanitization
     a.unexpected(config, name, ['what', 'params'])
@@ -291,8 +292,9 @@ const footprint = exports._footprint = (points, net_indexer, component_indexer, 
 
     return fp.body(parsed_params)
 }
+export { footprint as _footprint }
 
-exports.parse = (config, points, outlines, units) => {
+export const parse = (config, points, outlines, units) => {
 
     const pcbs = a.sane(config.pcbs || {}, 'pcbs', 'object')()
     const results = {}

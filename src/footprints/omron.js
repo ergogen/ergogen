@@ -1,4 +1,4 @@
-module.exports = {
+const omron = {
     params: {
         designator: 'S',
         from: undefined,
@@ -32,3 +32,5 @@ module.exports = {
     
     `
 }
+
+export default omron

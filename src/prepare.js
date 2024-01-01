@@ -1,7 +1,7 @@
-const u = require('./utils')
-const a = require('./assert')
+import * as u from './utils.js'
+import * as a from './assert.js'
 
-const _extend = exports._extend = (to, from) => {
+export const _extend = (to, from) => {
     const to_type = a.type(to)()
     const from_type = a.type(from)()
     if (from === undefined || from === null) return to
@@ -23,7 +23,7 @@ const _extend = exports._extend = (to, from) => {
     } else return from
 }
 
-const extend = exports.extend = (...args) => {
+export const extend = (...args) => {
     let res = args[0]
     for (const arg of args) {
         if (res == arg) continue
@@ -32,7 +32,7 @@ const extend = exports.extend = (...args) => {
     return res
 }
 
-const traverse = exports.traverse = (config, root, breadcrumbs, op) => {
+export const traverse = (config, root, breadcrumbs, op) => {
     if (a.type(config)() == 'object') {
         const result = {}
         for (const [key, val] of Object.entries(config)) {
@@ -58,11 +58,11 @@ const traverse = exports.traverse = (config, root, breadcrumbs, op) => {
     return config
 }
 
-exports.unnest = config => traverse(config, config, [], (target, key, val) => {
+export const unnest = config => traverse(config, config, [], (target, key, val) => {
     u.deep(target, key, val)
 })
 
-exports.inherit = config => traverse(config, config, [], (target, key, val, root, breadcrumbs) => {
+export const inherit = config => traverse(config, config, [], (target, key, val, root, breadcrumbs) => {
     if (val && val.$extends !== undefined) {
         let candidates = u.deepcopy(val.$extends)
         if (a.type(candidates)() !== 'array') candidates = [candidates]
@@ -82,7 +82,7 @@ exports.inherit = config => traverse(config, config, [], (target, key, val, root
     target[key] = val
 })
 
-exports.parameterize = config => traverse(config, config, [], (target, key, val, root, breadcrumbs) => {
+export const parameterize = config => traverse(config, config, [], (target, key, val, root, breadcrumbs) => {
 
     // we only care about objects
     if (a.type(val)() !== 'object') {

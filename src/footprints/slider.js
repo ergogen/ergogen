@@ -1,4 +1,4 @@
-module.exports = {
+const slider = {
     params: {
         designator: 'T', // for Toggle
         side: 'F',
@@ -52,3 +52,5 @@ module.exports = {
         `
     }
 }
+
+export default slider

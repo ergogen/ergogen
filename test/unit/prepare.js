@@ -1,4 +1,4 @@
-const p = require('../../src/prepare')
+const p = require('../../build/prepare')
 
 describe('Prepare', function() {
     it('unnest', function() {

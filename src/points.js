@@ -1,10 +1,10 @@
-const m = require('makerjs')
-const u = require('./utils')
-const a = require('./assert')
-const prep = require('./prepare')
-const anchor_lib = require('./anchor')
+import m from 'makerjs'
+import * as u from './utils.js'
+import * as a from './assert.js'
+import * as prep from './prepare.js'
+import * as anchor_lib from './anchor.js'
 
-const push_rotation = exports._push_rotation = (list, angle, origin) => {
+export const push_rotation = (list, angle, origin) => {
     let candidate = origin
     for (const r of list) {
         candidate = m.point.rotate(candidate, r.angle, r.origin)
@@ -15,7 +15,7 @@ const push_rotation = exports._push_rotation = (list, angle, origin) => {
     })
 }
 
-const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key, units) => {
+export const render_zone = (zone_name, zone, anchor, global_key, units) => {
 
     // zone-wide sanitization
 
@@ -248,7 +248,7 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key,
     return points
 }
 
-const parse_axis = exports._parse_axis = (config, name, points, units) => {
+export const parse_axis = (config, name, points, units) => {
     if (!['number', 'undefined'].includes(a.type(config)(units))) {
         const mirror_obj = a.sane(config, name, 'object')()
         const distance = a.sane(mirror_obj.distance || 0, `${name}.distance`, 'number')(units)
@@ -259,7 +259,7 @@ const parse_axis = exports._parse_axis = (config, name, points, units) => {
     } else return config
 }
 
-const perform_mirror = exports._perform_mirror = (point, axis) => {
+export const perform_mirror = (point, axis) => {
     point.meta.mirrored = false
     if (point.meta.asym == 'source') return ['', null]
     const mp = point.clone().mirror(axis)
@@ -274,7 +274,7 @@ const perform_mirror = exports._perform_mirror = (point, axis) => {
     return [mirrored_name, mp]
 }
 
-exports.parse = (config, units) => {
+export const parse = (config, units) => {
 
     // config sanitization
     a.unexpected(config, 'points', ['zones', 'key', 'rotate', 'mirror'])
@@ -373,7 +373,7 @@ exports.parse = (config, units) => {
     return filtered
 }
 
-exports.visualize = (points, units) => {
+export const visualize = (points, units) => {
     const models = {}
     for (const [pname, p] of Object.entries(points)) {
         const w = p.meta.width

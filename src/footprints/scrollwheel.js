@@ -20,7 +20,7 @@
 //      if true, will flip the footprint such that the pcb can be reversible
 
 
-module.exports = {
+const scrollwheel = {
     params: {
       designator: 'S',
 		  reverse: false,
@@ -82,3 +82,5 @@ module.exports = {
     }
   }
 }
+
+export default scrollwheel

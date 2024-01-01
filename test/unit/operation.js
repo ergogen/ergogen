@@ -1,4 +1,4 @@
-const o = require('../../src/operation')
+const o = require('../../build/operation')
 
 describe('Operation', function() {
 

@@ -116,5 +116,6 @@ dist
 .pnp.*
 
 # Project specific
+build
 output
 temp*

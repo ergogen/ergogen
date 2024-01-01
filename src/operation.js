@@ -1,4 +1,4 @@
-const op_prefix = exports.op_prefix = str => {
+export const op_prefix = str => {
 
     const prefix = str[0]
     const suffix = str.slice(1)
@@ -13,7 +13,7 @@ const op_prefix = exports.op_prefix = str => {
     return result
 }
 
-exports.operation = (str, choices={}, order=Object.keys(choices)) => {
+export const operation = (str, choices={}, order=Object.keys(choices)) => {
     let res = op_prefix(str)
     for (const key of order) {
         if (choices[key].includes(res.name)) {

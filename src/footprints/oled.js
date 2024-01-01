@@ -1,4 +1,4 @@
-module.exports = {
+const oled = {
     params: {
         designator: 'OLED',
         side: 'F',
@@ -27,3 +27,5 @@ module.exports = {
         )
         `
 }
+
+export default oled

@@ -1,6 +1,6 @@
 const m = require('makerjs')
-const pcb_lib = require('../../src/pcbs')
-const ergogen = require('../../src/ergogen')
+const pcb_lib = require('../../build/pcbs')
+const ergogen = require('../../build/ergogen')
 
 describe('Internals', function() {
 
@@ -9,7 +9,7 @@ describe('Internals', function() {
         sinon.stub(m.model, 'walk').callsFake(function(model, config) {
             config.onPath({pathContext: {type: 'nonexistent'}})
         })
-        pcb_lib._makerjs2kicad.bind(this).should.throw("Can't convert path type")
+        pcb_lib.makerjs2kicad.bind(this).should.throw("Can't convert path type")
     })
 
     it('injection', function() {

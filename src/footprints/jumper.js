@@ -1,4 +1,4 @@
-module.exports = {
+const jumper = {
     params: {
         designator: 'J',
         side: 'F',
@@ -20,3 +20,5 @@ module.exports = {
         (clearance 0.1905) ${p.to}))
     `
 }
+
+export default jumper
