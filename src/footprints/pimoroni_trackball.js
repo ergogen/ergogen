@@ -3,7 +3,7 @@ module.exports = {
     VCC: {type:'net', value: 'VCC'},
     SDA: {type:'net', value: 'P2' },
     SCL: {type:'net', value: 'P3' },
-    //INT: {type:'net', value: undefined } // this pin is not needed for normal use, and can be unhelpful
+    INT: {type:'net', value: 'INT' }, // usually best not to connect this pin
     GND: {type:'net', value: 'GND'},
   },
   body: p => {
@@ -12,9 +12,6 @@ module.exports = {
       ${p.at /* parametric position */}
         (descr "Pimoroni I2C trackball breakout")
         (tags "Through hole pin header THT 1x05 2.54mm single row")
-        (fp_text value pimoroni_trackball (at 0 12.49) (layer F.Fab)
-          (effects (font (size 1 1) (thickness 0.15)))
-        )
 
         ${''/* pins outline */}
         (fp_line (start -0.635 -1.27) (end 1.27 -1.27) (layer F.Fab) (width 0.1))
@@ -49,17 +46,18 @@ module.exports = {
         (pad 4 np_thru_hole circle (at 7.05 -4.9) (size 2.5 2.5) (drill 2.5) (layers *.Cu *.Mask))
 
         ${''/* pins */}
-        (pad 1 thru_hole rect (at 0 0) (size 1.7 1.7) (drill 1) (layers *.Cu *.Mask) ${p.VCC})
+        (pad 1 thru_hole rect (at 0 0 ${p.r}) (size 1.7 1.7) (drill 1) (layers *.Cu *.Mask) ${p.VCC})
         (pad 2 thru_hole oval (at 0 2.54) (size 1.7 1.7) (drill 1) (layers *.Cu *.Mask) ${p.SDA})
         (pad 3 thru_hole oval (at 0 5.08) (size 1.7 1.7) (drill 1) (layers *.Cu *.Mask) ${p.SCL})
-        ${''/*(pad 4 thru_hole oval (at 0 7.62) (size 1.7 1.7) (drill 1) (layers *.Cu *.Mask) ${p.INT})*/ }
+        (pad 4 thru_hole oval (at 0 7.62) (size 1.7 1.7) (drill 1) (layers *.Cu *.Mask) ${p.INT}) 
         (pad 5 thru_hole oval (at 0 10.16) (size 1.7 1.7) (drill 1) (layers *.Cu *.Mask) ${p.GND})
 
         ${''/* pin name text */}
-        (fp_text user VCC (at 3 0 ) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-        (fp_text user SDA (at 3 2.54 ) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-        (fp_text user SCL (at 3 5.08 ) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
-        (fp_text user GND (at 3 10.16 ) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+        (fp_text user VCC (at 3 0 ${p.r} ) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+        (fp_text user SDA (at 3 2.54 ${p.r} ) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+        (fp_text user SCL (at 3 5.08 ${p.r} ) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+        (fp_text user INT (at 3 7.62 ${p.r} ) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
+        (fp_text user GND (at 3 10.16 ${p.r} ) (layer F.SilkS) (effects (font (size 0.8 0.8) (thickness 0.15))))
       )
     `
   }
