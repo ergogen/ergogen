@@ -25,14 +25,17 @@ matrix_col_row:
         name: matrix_col_row
         zone:
             columns:
-                col: &ref_0
+                col:
                     rows: {}
                     key: {}
                     name: col
             rows:
                 row: {}
             name: matrix
-        col: *ref_0
+        col:
+            rows: {}
+            key: {}
+            name: col
         row: row
         bind:
             - 0

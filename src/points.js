@@ -21,7 +21,7 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key,
 
     a.unexpected(zone, `points.zones.${zone_name}`, ['columns', 'rows', 'key'])
     // the anchor comes from "above", because it needs other zones too (for references)
-    const cols = a.sane(zone.columns || {}, `points.zones.${zone_name}.columns`, 'object')()
+    const cols = zone.columns = a.sane(zone.columns || {}, `points.zones.${zone_name}.columns`, 'object')()
     const zone_wide_rows = a.sane(zone.rows || {}, `points.zones.${zone_name}.rows`, 'object')()
     for (const [key, val] of Object.entries(zone_wide_rows)) {
         zone_wide_rows[key] = val || {} // no check yet, as it will be extended later
@@ -43,7 +43,6 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key,
 
     // column layout
 
-    const col_minmax = {}
     if (!Object.keys(cols).length) {
         cols.default = {}
     }
@@ -53,7 +52,6 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key,
         // column-level sanitization
 
         col = col || {}
-        col_minmax[col_name] = {min: Infinity, max: -Infinity}
 
         a.unexpected(
             col,
@@ -184,65 +182,11 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key,
             point.meta = key
             points[key.name] = point
 
-            // collect minmax stats for autobind
-            col_minmax[col_name].min = Math.min(col_minmax[col_name].min, point.y)
-            col_minmax[col_name].max = Math.max(col_minmax[col_name].max, point.y)
-
             // advance the running anchor to the next position
             running_anchor.shift([0, key.padding])
         }
 
         first_col = false
-    }
-
-    // autobind
-
-    let col_names = Object.keys(col_minmax)
-    let col_index = 0
-    for (const [col_name, bounds] of Object.entries(col_minmax)) {
-        for (const point of Object.values(points)) {
-            if (point.meta.col.name != col_name) continue
-            if (!point.meta.autobind) continue
-            const autobind = a.sane(point.meta.autobind, `${point.meta.name}.autobind`, 'number')(units)
-            // specify default as -1, so we can recognize where it was left undefined even after number-ification
-            const bind = point.meta.bind = a.trbl(point.meta.bind, `${point.meta.name}.bind`, -1)(units)
-
-            // up
-            if (bind[0] == -1) {
-                if (point.y < bounds.max) bind[0] = autobind
-                else bind[0] = 0
-                
-            }
-
-            // right
-            if (bind[1] == -1) {
-                bind[1] = 0
-                if (col_index < col_names.length - 1) {
-                    const right = col_minmax[col_names[col_index + 1]]
-                    if (point.y >= right.min && point.y <= right.max) {
-                        bind[1] = autobind
-                    }
-                }
-            }
-
-            // down
-            if (bind[2] == -1) {
-                if (point.y > bounds.min) bind[2] = autobind
-                else bind[2] = 0
-            }
-
-            // left
-            if (bind[3] == -1) {
-                bind[3] = 0
-                if (col_index > 0) {
-                    const left = col_minmax[col_names[col_index - 1]]
-                    if (point.y >= left.min && point.y <= left.max) {
-                        bind[3] = autobind
-                    }
-                }
-            }
-        }
-        col_index++
     }
 
     return points
@@ -272,6 +216,79 @@ const perform_mirror = exports._perform_mirror = (point, axis) => {
         point.meta.skip = true
     }
     return [mirrored_name, mp]
+}
+
+const perform_autobind = exports._perform_autobind = (points, units) => {
+
+    const bounds = {}
+    const col_lists = {}
+    const mirrorzone = p => (p.meta.mirrored ? 'mirror_' : '') + p.meta.zone.name
+
+    // round one: get column upper/lower bounds and per-zone column lists
+    for (const p of Object.values(points)) {
+
+        const zone = mirrorzone(p)
+        const col = p.meta.col.name
+
+        if (!bounds[zone]) bounds[zone] = {}
+        if (!bounds[zone][col]) bounds[zone][col] = {min: Infinity, max: -Infinity}
+        if (!col_lists[zone]) col_lists[zone] = Object.keys(p.meta.zone.columns)
+
+        bounds[zone][col].min = Math.min(bounds[zone][col].min, p.y)
+        bounds[zone][col].max = Math.max(bounds[zone][col].max, p.y)
+    }
+
+    // round two: apply autobind as appropriate
+    for (const p of Object.values(points)) {
+
+        const autobind = a.sane(p.meta.autobind, `${p.meta.name}.autobind`, 'number')(units)
+        if (!autobind) continue
+
+        const zone = mirrorzone(p)
+        const col = p.meta.col.name
+        const col_list = col_lists[zone]
+        const col_bounds = bounds[zone][col]
+
+        
+        // specify default as -1, so we can recognize where it was left undefined even after number-ification
+        const bind = p.meta.bind = a.trbl(p.meta.bind, `${p.meta.name}.bind`, -1)(units)
+
+        // up
+        if (bind[0] == -1) {
+            if (p.y < col_bounds.max) bind[0] = autobind
+            else bind[0] = 0
+        }
+
+        // down
+        if (bind[2] == -1) {
+            if (p.y > col_bounds.min) bind[2] = autobind
+            else bind[2] = 0
+        }
+
+        // left
+        if (bind[3] == -1) {
+            bind[3] = 0
+            const col_index = col_list.indexOf(col)
+            if (col_index > 0) {
+                const left = bounds[zone][col_list[col_index - 1]]
+                if (left && p.y >= left.min && p.y <= left.max) {
+                    bind[3] = autobind
+                }
+            }
+        }
+
+        // right
+        if (bind[1] == -1) {
+            bind[1] = 0
+            const col_index = col_list.indexOf(col)
+            if (col_index < col_list.length - 1) {
+                const right = bounds[zone][col_list[col_index + 1]]
+                if (right && p.y >= right.min && p.y <= right.max) {
+                    bind[1] = autobind
+                }
+            }
+        }
+    }
 }
 
 exports.parse = (config, units) => {
@@ -368,6 +385,9 @@ exports.parse = (config, units) => {
         if (p.meta.skip) continue
         filtered[k] = p
     }
+
+    // apply autobind
+    perform_autobind(filtered, units)
 
     // done
     return filtered

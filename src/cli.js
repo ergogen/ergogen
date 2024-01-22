@@ -132,12 +132,14 @@ try {
 
 // output helpers
 
+const yamldump = data => yaml.dump(data, {indent: 4, noRefs: true})
+
 const single = (data, rel) => {
     if (!data) return
     const abs = path.join(args.o, rel)
     fs.mkdirpSync(path.dirname(abs))
     if (abs.endsWith('.yaml')) {
-        fs.writeFileSync(abs, yaml.dump(data, {indent: 4}))
+        fs.writeFileSync(abs, yamldump(data))
     } else {
         fs.writeFileSync(abs, data)
     }
@@ -148,7 +150,7 @@ const composite = (data, rel) => {
     const abs = path.join(args.o, rel)
     if (data.yaml) {
         fs.mkdirpSync(path.dirname(abs))
-        fs.writeFileSync(abs + '.yaml', yaml.dump(data.yaml, {indent: 4}))
+        fs.writeFileSync(abs + '.yaml', yamldump(data.yaml))
     }
     for (const format of ['svg', 'dxf', 'jscad']) {
         if (data[format]) {

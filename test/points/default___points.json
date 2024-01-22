@@ -27,6 +27,13 @@
             "colrow": "default_default",
             "name": "matrix",
             "zone": {
+                "columns": {
+                    "default": {
+                        "rows": {},
+                        "key": {},
+                        "name": "default"
+                    }
+                },
                 "name": "matrix"
             },
             "col": {
