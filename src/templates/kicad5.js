@@ -1,12 +1,19 @@
+module.exports = params => {
 
+    const net_text = params.nets.join('\n')
+    const netclass_text = params.nets.map(net => `(add_net "${net.name}")`).join('\n')
+    const footprint_text = params.footprints.join('\n')
+    const outline_text = Object.values(params.outlines).join('\n')
+    
+    return `
 
 (kicad_pcb (version 20171130) (host pcbnew 5.1.6)
 
   (page A3)
   (title_block
-    (title export)
-    (rev v3.14)
-    (company MrZealot)
+    (title ${params.name})
+    (rev ${params.version})
+    (company ${params.author})
   )
 
   (general
@@ -92,7 +99,7 @@
       (outputdirectory ""))
   )
 
-  (net 0 "")
+  ${net_text}
 
   (net_class Default "This is the default net class."
     (clearance 0.2)
@@ -101,11 +108,14 @@
     (via_drill 0.4)
     (uvia_dia 0.3)
     (uvia_drill 0.1)
-    (add_net "")
+    ${netclass_text}
   )
 
-  
-  
+  ${footprint_text}
+  ${outline_text}
 
 )
 
+`
+
+}

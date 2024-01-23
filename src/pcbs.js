@@ -7,116 +7,6 @@ const prep = require('./prepare')
 const anchor = require('./anchor').parse
 const filter = require('./filter').parse
 
-const kicad_prefix = `
-(kicad_pcb (version 20171130) (host pcbnew 5.1.6)
-
-  (page A3)
-  (title_block
-    (title KEYBOARD_NAME_HERE)
-    (rev VERSION_HERE)
-    (company YOUR_NAME_HERE)
-  )
-
-  (general
-    (thickness 1.6)
-  )
-
-  (layers
-    (0 F.Cu signal)
-    (31 B.Cu signal)
-    (32 B.Adhes user)
-    (33 F.Adhes user)
-    (34 B.Paste user)
-    (35 F.Paste user)
-    (36 B.SilkS user)
-    (37 F.SilkS user)
-    (38 B.Mask user)
-    (39 F.Mask user)
-    (40 Dwgs.User user)
-    (41 Cmts.User user)
-    (42 Eco1.User user)
-    (43 Eco2.User user)
-    (44 Edge.Cuts user)
-    (45 Margin user)
-    (46 B.CrtYd user)
-    (47 F.CrtYd user)
-    (48 B.Fab user)
-    (49 F.Fab user)
-  )
-
-  (setup
-    (last_trace_width 0.25)
-    (trace_clearance 0.2)
-    (zone_clearance 0.508)
-    (zone_45_only no)
-    (trace_min 0.2)
-    (via_size 0.8)
-    (via_drill 0.4)
-    (via_min_size 0.4)
-    (via_min_drill 0.3)
-    (uvia_size 0.3)
-    (uvia_drill 0.1)
-    (uvias_allowed no)
-    (uvia_min_size 0.2)
-    (uvia_min_drill 0.1)
-    (edge_width 0.05)
-    (segment_width 0.2)
-    (pcb_text_width 0.3)
-    (pcb_text_size 1.5 1.5)
-    (mod_edge_width 0.12)
-    (mod_text_size 1 1)
-    (mod_text_width 0.15)
-    (pad_size 1.524 1.524)
-    (pad_drill 0.762)
-    (pad_to_mask_clearance 0.05)
-    (aux_axis_origin 0 0)
-    (visible_elements FFFFFF7F)
-    (pcbplotparams
-      (layerselection 0x010fc_ffffffff)
-      (usegerberextensions false)
-      (usegerberattributes true)
-      (usegerberadvancedattributes true)
-      (creategerberjobfile true)
-      (excludeedgelayer true)
-      (linewidth 0.100000)
-      (plotframeref false)
-      (viasonmask false)
-      (mode 1)
-      (useauxorigin false)
-      (hpglpennumber 1)
-      (hpglpenspeed 20)
-      (hpglpendiameter 15.000000)
-      (psnegative false)
-      (psa4output false)
-      (plotreference true)
-      (plotvalue true)
-      (plotinvisibletext false)
-      (padsonsilk false)
-      (subtractmaskfromsilk false)
-      (outputformat 1)
-      (mirror false)
-      (drillshape 1)
-      (scaleselection 1)
-      (outputdirectory ""))
-  )
-`
-
-const kicad_suffix = `
-)
-`
-
-const kicad_netclass = `
-  (net_class Default "This is the default net class."
-    (clearance 0.2)
-    (trace_width 0.25)
-    (via_dia 0.8)
-    (via_drill 0.4)
-    (uvia_dia 0.3)
-    (uvia_drill 0.1)
-    __ADD_NET
-  )
-`
-
 const makerjs2kicad = exports._makerjs2kicad = (model, layer) => {
     const grs = []
     const xy = val => `${val[0]} ${-val[1]}`
@@ -148,9 +38,14 @@ const makerjs2kicad = exports._makerjs2kicad = (model, layer) => {
 }
 
 const footprint_types = require('./footprints')
+const template_types = require('./templates')
 
 exports.inject_footprint = (name, fp) => {
     footprint_types[name] = fp
+}
+
+exports.inject_template = (name, t) => {
+    template_types[name] = t
 }
 
 const xy_obj = (x, y) => {
@@ -300,8 +195,9 @@ exports.parse = (config, points, outlines, units) => {
     for (const [pcb_name, pcb_config] of Object.entries(pcbs)) {
 
         // config sanitization
-        a.unexpected(pcb_config, `pcbs.${pcb_name}`, ['outlines', 'footprints', 'references'])
+        a.unexpected(pcb_config, `pcbs.${pcb_name}`, ['outlines', 'footprints', 'references', 'template', 'params'])
         const references = a.sane(pcb_config.references || false, `pcbs.${pcb_name}.references`, 'boolean')()
+        const template = template_types[a.in(pcb_config.template || 'kicad5', `pcbs.${pcb_name}.template`, Object.keys(template_types))]
 
         // outline conversion
         if (a.type(pcb_config.outlines)() == 'array') {
@@ -358,28 +254,19 @@ exports.parse = (config, points, outlines, units) => {
 
         // finalizing nets
         const nets_arr = []
-        const add_nets_arr = []
         for (const [net, index] of Object.entries(nets)) {
-            nets_arr.push(`(net ${index} "${net}")`)
-            add_nets_arr.push(`(add_net "${net}")`)
+            nets_arr.push(net_obj(net, index))
         }
 
-        const netclass = kicad_netclass.replace('__ADD_NET', add_nets_arr.join('\n'))
-        const nets_text = nets_arr.join('\n')
-        const footprint_text = footprints.join('\n')
-        const outline_text = Object.values(kicad_outlines).join('\n')
-        const personalized_prefix = kicad_prefix
-            .replace('KEYBOARD_NAME_HERE', pcb_name)
-            .replace('VERSION_HERE', config.meta && config.meta.version || 'v1.0.0')
-            .replace('YOUR_NAME_HERE', config.meta && config.meta.author || 'Unknown')
-        results[pcb_name] = `
-            ${personalized_prefix}
-            ${nets_text}
-            ${netclass}
-            ${footprint_text}
-            ${outline_text}
-            ${kicad_suffix}
-        `
+        results[pcb_name] = template({
+            name: pcb_name,
+            version: config.meta && config.meta.version || 'v1.0.0',
+            author: config.meta && config.meta.author || 'Unknown',
+            nets: nets_arr,
+            footprints: footprints,
+            outlines: kicad_outlines,
+            custom: pcb_config.params
+        })
     }
 
     return results

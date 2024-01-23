@@ -28,6 +28,16 @@ exports.unpack = async (zip) => {
         injections.push(['footprint', name, parsed])
     }
 
+    // bundled pcb templates
+    const tpls = zip.folder('templates')
+    for (const tpl of tpls.file(/.*\.js$/)) {
+        const name = tpl.name.slice('templates/'.length).split('.')[0]
+        const text = await tpl.async('string')
+        const parsed = new Function(module_prefix + text + module_suffix)()
+        // TODO: some sort of template validation?
+        injections.push(['template', name, parsed])
+    }
+
     return [config_text, injections]
 }
 

@@ -139,4 +139,8 @@ exports.inject = (ergogen) => {
             return `references ${p.ref_hide ? 'hidden' : 'shown'}`
         }
     })
+
+    ergogen.inject('template', 'template_test', params => {
+        return `Custom template override. The secret is ${params.custom.secret}.`
+    })
 }

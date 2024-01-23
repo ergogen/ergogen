@@ -103,6 +103,8 @@ const inject = (type, name, value) => {
     switch (type) {
         case 'footprint':
             return pcbs_lib.inject_footprint(name, value)
+        case 'template':
+            return pcbs_lib.inject_template(name, value)
         default:
             throw new Error(`Unknown injection type "${type}" with name "${name}" and value "${value}"!`)
     }
