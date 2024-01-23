@@ -6,6 +6,7 @@ const Point = require('./point')
 const prep = require('./prepare')
 const anchor = require('./anchor').parse
 const filter = require('./filter').parse
+const mathjs = require('mathjs')
 
 const binding = (base, bbox, point, units) => {
 
@@ -76,15 +77,25 @@ const circle = (config, name, points, outlines, units) => {
 
     // prepare params
     a.unexpected(config, `${name}`, ['radius'])
-    const radius = a.sane(config.radius, `${name}.radius`, 'number')(units)
+    const get_radius_from_point = a.type(config.radius)(units) != 'number';
+    let radius, get_radius;
+    if (get_radius_from_point) {
+        radius = 1; // not sure what to do with units here...
+        const target = anchor(config.radius, `${name}.radius`, points)(units)
+        get_radius = point => { return mathjs.distance(point.p, target.p) }
+    } else {
+        radius = a.sane(config.radius, `${name}.radius`, 'number')(units)
+        get_radius = () => { return radius }
+    }
     const circ_units = prep.extend({
         r: radius
     }, units)
 
     // return shape function and its units
-    return [() => {
-        let circle = u.circle([0, 0], radius)
-        const bbox = {high: [radius, radius], low: [-radius, -radius]}
+    return [point => {
+        const r = get_radius(point)
+        let circle = u.circle([0, 0], r)
+        const bbox = {high: [r, r], low: [-r, -r]}
         return [circle, bbox]
     }, circ_units]
 }
