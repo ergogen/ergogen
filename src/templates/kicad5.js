@@ -4,7 +4,7 @@ module.exports = params => {
     const netclass_text = params.nets.map(net => `(add_net "${net.name}")`).join('\n')
     const footprint_text = params.footprints.join('\n')
     const outline_text = Object.values(params.outlines).join('\n')
-    
+
     return `
 
 (kicad_pcb (version 20171130) (host pcbnew 5.1.6)
@@ -13,7 +13,7 @@ module.exports = params => {
   (title_block
     (title ${params.name})
     (rev ${params.version})
-    (company ${params.author})
+    (company "${params.author}")
   )
 
   (general
@@ -114,8 +114,5 @@ module.exports = params => {
   ${footprint_text}
   ${outline_text}
 
-)
-
-`
-
+)`
 }
