@@ -7,36 +7,6 @@ const prep = require('./prepare')
 const anchor = require('./anchor').parse
 const filter = require('./filter').parse
 
-const makerjs2kicad = exports._makerjs2kicad = (model, layer) => {
-    const grs = []
-    const xy = val => `${val[0]} ${-val[1]}`
-    m.model.walk(model, {
-        onPath: wp => {
-            const p = wp.pathContext
-            switch (p.type) {
-                case 'line':
-                    grs.push(`(gr_line (start ${xy(p.origin)}) (end ${xy(p.end)}) (angle 90) (layer ${layer}) (width 0.15))`)
-                    break
-                case 'arc':
-                    const arc_center = p.origin
-                    const angle_start = p.startAngle > p.endAngle ? p.startAngle - 360 : p.startAngle
-                    const angle_diff = Math.abs(p.endAngle - angle_start)
-                    const arc_end = m.point.rotate(m.point.add(arc_center, [p.radius, 0]), angle_start, arc_center)
-                    grs.push(`(gr_arc (start ${xy(arc_center)}) (end ${xy(arc_end)}) (angle ${-angle_diff}) (layer ${layer}) (width 0.15))`)
-                    break
-                case 'circle':
-                    const circle_center = p.origin
-                    const circle_end = m.point.add(circle_center, [p.radius, 0])
-                    grs.push(`(gr_circle (center ${xy(circle_center)}) (end ${xy(circle_end)}) (layer ${layer}) (width 0.15))`)
-                    break
-                default:
-                    throw new Error(`Can't convert path type "${p.type}" to kicad!`)
-            }
-        }
-    })
-    return grs.join('\n')
-}
-
 const footprint_types = require('./footprints')
 const template_types = require('./templates')
 
@@ -208,7 +178,7 @@ exports.parse = (config, points, outlines, units) => {
         for (const [outline_name, outline] of Object.entries(config_outlines)) {
             const ref = a.in(outline.outline, `pcbs.${pcb_name}.outlines.${outline_name}.outline`, Object.keys(outlines))
             const layer = a.sane(outline.layer || 'Edge.Cuts', `pcbs.${pcb_name}.outlines.${outline_name}.outline`, 'string')()
-            kicad_outlines[outline_name] = makerjs2kicad(outlines[ref], layer)
+            kicad_outlines[outline_name] = template.convert_outline(outlines[ref], layer)
         }
 
         // making a global net index registry
@@ -258,7 +228,7 @@ exports.parse = (config, points, outlines, units) => {
             nets_arr.push(net_obj(net, index))
         }
 
-        results[pcb_name] = template({
+        results[pcb_name] = template.body({
             name: pcb_name,
             version: config.meta && config.meta.version || 'v1.0.0',
             author: config.meta && config.meta.author || 'Unknown',
