@@ -45,9 +45,9 @@ module.exports = {
 
   (page A3)
   (title_block
-    (title ${params.name})
-    (rev ${params.version})
-    (company ${params.author})
+    (title "${params.name}")
+    (rev "${params.version}")
+    (company "${params.author}")
   )
 
   (general

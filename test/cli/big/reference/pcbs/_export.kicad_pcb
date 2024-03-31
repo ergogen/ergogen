@@ -4,9 +4,9 @@
 
   (page A3)
   (title_block
-    (title _export)
-    (rev v3.14)
-    (company MrZealot)
+    (title "_export")
+    (rev "v3.14")
+    (company "MrZealot")
   )
 
   (general
