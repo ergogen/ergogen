@@ -1,4 +1,5 @@
 const m = require('makerjs')
+const version = require('../../package.json').version
 
 module.exports = {
 
@@ -45,7 +46,7 @@ module.exports = {
 (kicad_pcb
   (version 20240108)
   (generator "ergogen")
-  (generator_version "4.0.5")
+  (generator_version "${version}")
   (general
     (thickness 1.6)
     (legacy_teardrops no)

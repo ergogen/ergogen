@@ -203,7 +203,7 @@ for (let w of cli_what) {
                         if (ex === 'should_have_thrown') {
                             throw new Error('This command should have thrown!')
                         }
-                        const actual_error = ex.stderr.toString().split('\n')[0]
+                        const actual_error = ex.stderr.toString()
                         if (dump) {
                             fs.writeFileSync(path.join(t, 'error'), actual_error)
                         }

@@ -1,0 +1,1 @@
+const bad = require('nonexistent_require')
