@@ -6,6 +6,7 @@
 
 ### Major
 
+- Un-exclude kicad8 template during default kicad version switch!
 - Merge, generalize, uniform-ize and externalize footprints!
     - onnx-like incremental opset versioning
     - Template for creating them, built-in variables they can use, documentation, external links, etc.
