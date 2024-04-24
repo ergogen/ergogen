@@ -123,6 +123,7 @@ const footprint = exports._footprint = (points, net_indexer, component_indexer, 
     parsed_params.ref_hide = extra.references ? '' : 'hide'
 
     // footprint positioning
+    parsed_params.point = point
     parsed_params.x = point.x
     parsed_params.y = -point.y
     parsed_params.r = point.r
