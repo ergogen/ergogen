@@ -97,7 +97,7 @@ But even huger thanks are due to the following, *distinguished* sponsors:
 [Documentation]: https://docs.ergogen.xyz
 [Discord]: http://discord.ergogen.xyz
 [WebUI]: https://ergogen.xyz
-[Unofficial]: https://ergogen.cache.works/
+[Unofficial]: https://ergogen.ceoloide.com/
 [Topic]: https://github.com/topics/ergogen
 [Donate]: https://github.com/sponsors/mrzealot
 
