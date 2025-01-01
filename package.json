@@ -19,7 +19,7 @@
         "js-yaml": "^3.14.1",
         "jszip": "^3.10.1",
         "kle-serial": "github:ergogen/kle-serial#ergogen",
-        "makerjs": "github:ergogen/maker.js#ergogen",
+        "makerjs": "^0.18.1",
         "mathjs": "^11.5.0",
         "yargs": "^17.6.2"
     },

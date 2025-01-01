@@ -1,17 +1,13 @@
-const fs = require('fs')
-const path = require('path')
 const yaml = require('js-yaml')
 const ergogen = require('../../src/ergogen')
 const version = require('../../package.json').version
+const {fixture} = require('../helpers/fixture')
 
 // fixtures
-const load = name => yaml.safeLoad(fs.readFileSync(
-    path.join(__dirname, `../fixtures/${name}`)
-).toString())
-const minimal = load('minimal.yaml')
-const big = load('big.yaml')
-const minimal_kle = load('minimal_kle.json')
-const atreus_kle = load('atreus_kle.json')
+const minimal = fixture('minimal.yaml')
+const big = fixture('big.yaml')
+const minimal_kle = fixture('minimal_kle.json')
+const atreus_kle = fixture('atreus_kle.json')
 
 describe('Interface', function() {
 
