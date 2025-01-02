@@ -11,36 +11,6 @@ const io = require('./io')
 const pkg = require('../package.json')
 const ergogen = require('./ergogen')
 
-;(async () => {
-
-// command line args
-
-const args = yargs
-    .option('output', {
-        alias: 'o',
-        default: path.resolve('output'),
-        describe: 'Output folder',
-        type: 'string'
-    })
-    .option('debug', {
-        alias: 'd',
-        default: false,
-        describe: 'Debug mode',
-        type: 'boolean'
-    })
-    .option('clean', {
-        default: false,
-        describe: 'Clean output dir before parsing',
-        type: 'boolean'
-    })
-    .argv
-
-// greetings
-
-const title_suffix = args.debug ? ' (Debug Mode)' : ''
-console.log(`Ergogen v${pkg.version} CLI${title_suffix}`)
-console.log()
-
 // input helpers
 
 // zip handling is baked in at the io level, so that both the cli and the webui can use it
@@ -80,6 +50,147 @@ const zip_from_dir = async (dir) => {
     }, new jszip())
 }
 
+// output helpers
+
+const yamldump = data => yaml.dump(data, {indent: 4, noRefs: true})
+
+const single = (data, output_directory, rel) => {
+    if (!data) return
+    const abs = path.join(output_directory, rel)
+    fs.mkdirpSync(path.dirname(abs))
+    if (abs.endsWith('.yaml')) {
+        fs.writeFileSync(abs, yamldump(data))
+    } else {
+        fs.writeFileSync(abs, data)
+    }
+}
+
+const composite = (data, output_directory, rel) => {
+    if (!data) return
+    const abs = path.join(output_directory, rel)
+    if (data.yaml) {
+        fs.mkdirpSync(path.dirname(abs))
+        fs.writeFileSync(abs + '.yaml', yamldump(data.yaml))
+    }
+    for (const format of ['svg', 'dxf', 'jscad']) {
+        if (data[format]) {
+            fs.mkdirpSync(path.dirname(abs))
+            fs.writeFileSync(abs + '.' + format, data[format])
+        }
+    }
+}
+
+const read_config = async (config_file) => {
+    let config_text = ''
+    let injections = []
+
+    try {
+        if (config_file.endsWith('.zip') || config_file.endsWith('.ekb')) {
+            console.log('Analyzing bundle...');
+            [config_text, injections] = await io.unpack(
+                await (new jszip()).loadAsync(fs.readFileSync(config_file))
+            )
+        } else if (fs.statSync(config_file).isDirectory()) {
+            console.log('Analyzing folder...');
+            [config_text, injections] = await io.unpack(
+                await zip_from_dir(config_file)
+            )
+        } else {
+            config_text = fs.readFileSync(config_file).toString()
+            // no injections...
+        }
+        for (const [type, name, value] of injections) {
+            ergogen.inject(type, name, value)
+        }
+    } catch (err) {
+        console.error(`Could not read config file "${config_file}"!`)
+        throw err
+    }
+    return config_text
+}
+
+const process_context = async (config_text, debug) => {
+    let results
+    results = await ergogen.process(config_text, debug, s => console.log(s))
+    return results
+}
+
+const generate_output = async (results, output_directory, clean) => {
+    if (clean) {
+        console.log('Cleaning output folder...')
+        fs.removeSync(output_directory)
+    }
+    
+    console.log('Writing output to disk...')
+    fs.mkdirpSync(output_directory)
+    
+    single(results.raw, output_directory, 'source/raw.txt')
+    single(results.canonical, output_directory, 'source/canonical.yaml')
+    
+    single(results.units, output_directory, 'points/units.yaml')
+    single(results.points, output_directory, 'points/points.yaml')
+    composite(results.demo, output_directory, 'points/demo')
+    
+    for (const [name, outline] of Object.entries(results.outlines)) {
+        composite(outline,output_directory, `outlines/${name}`)
+    }
+    
+    for (const [name, _case] of Object.entries(results.cases)) {
+        composite(_case, output_directory, `cases/${name}`)
+    }
+    
+    for (const [name, pcb] of Object.entries(results.pcbs)) {
+        single(pcb, output_directory, `pcbs/${name}.kicad_pcb`)
+    }
+}
+
+const generate = async (config_text, output_directory, clean, debug) => {
+    try {
+        const results = await process_context(config_text, debug)
+        await generate_output(results, output_directory, clean)
+    } catch (err) {
+        console.error(err)
+    }
+    console.log('Done.')
+    console.log()
+}
+
+;(async () => {
+
+// command line args
+
+const args = yargs
+    .option('output', {
+        alias: 'o',
+        default: path.resolve('output'),
+        describe: 'Output folder',
+        type: 'string'
+    })
+    .option('debug', {
+        alias: 'd',
+        default: false,
+        describe: 'Debug mode',
+        type: 'boolean'
+    })
+    .option('clean', {
+        default: false,
+        describe: 'Clean output dir before parsing',
+        type: 'boolean'
+    })
+    .option('watch', {
+        alias: 'w',
+        default: false,
+        describe: 'Watch config file for changes and automatically regenerate files',
+        type: 'boolean'
+    })
+    .argv
+
+// greetings
+
+const title_suffix = args.debug ? ' (Debug Mode)' : ''
+console.log(`Ergogen v${pkg.version} CLI${title_suffix}`)
+console.log()
+
 // input reading
 
 const config_file = args._[0]
@@ -93,105 +204,20 @@ if (!fs.existsSync(config_file)) {
     process.exit(2)
 }
 
-let config_text = ''
-let injections = []
-
-try {
-    if (config_file.endsWith('.zip') || config_file.endsWith('.ekb')) {
-        console.log('Analyzing bundle...');
-        [config_text, injections] = await io.unpack(
-            await (new jszip()).loadAsync(fs.readFileSync(config_file))
-        )
-    } else if (fs.statSync(config_file).isDirectory()) {
-        console.log('Analyzing folder...');
-        [config_text, injections] = await io.unpack(
-            await zip_from_dir(config_file)
-        )
-    } else {
-        config_text = fs.readFileSync(config_file).toString()
-        // no injections...
-    }
-    for (const [type, name, value] of injections) {
-        ergogen.inject(type, name, value)
-    }
-} catch (err) {
-    console.error(`Could not read config file "${config_file}"!`)
-    console.error(err)
-    process.exit(2)
+let config_text = await read_config(config_file)
+if (args.w) {
+    console.log(`Watching "${config_file}" for changes... (Ctrl+C to stop)`)
+    await generate(config_text, args.o, args.clean, args.debug)
+    fs.watch(config_file, async (event, filename) => {
+        if (event !== 'change') return
+        const new_config_text = await read_config(config_file)
+        if (new_config_text === config_text) return
+        config_text = new_config_text
+        console.log(`"${config_file}" changed, regenerating...`)
+        await generate(config_text, args.o, args.clean, args.debug)
+    })
+} else {
+    const config_text = await read_config(config_file)
+    await generate(config_text, args.o, args.clean, args.debug)
 }
-
-// processing
-
-let results
-try {
-    results = await ergogen.process(config_text, args.debug, s => console.log(s))
-} catch (err) {
-    console.error(err)
-    process.exit(3)
-}
-
-// output helpers
-
-const yamldump = data => yaml.dump(data, {indent: 4, noRefs: true})
-
-const single = (data, rel) => {
-    if (!data) return
-    const abs = path.join(args.o, rel)
-    fs.mkdirpSync(path.dirname(abs))
-    if (abs.endsWith('.yaml')) {
-        fs.writeFileSync(abs, yamldump(data))
-    } else {
-        fs.writeFileSync(abs, data)
-    }
-}
-
-const composite = (data, rel) => {
-    if (!data) return
-    const abs = path.join(args.o, rel)
-    if (data.yaml) {
-        fs.mkdirpSync(path.dirname(abs))
-        fs.writeFileSync(abs + '.yaml', yamldump(data.yaml))
-    }
-    for (const format of ['svg', 'dxf', 'jscad']) {
-        if (data[format]) {
-            fs.mkdirpSync(path.dirname(abs))
-            fs.writeFileSync(abs + '.' + format, data[format])
-        }
-    }
-}
-
-// output generation
-
-if (args.clean) {
-    console.log('Cleaning output folder...')
-    fs.removeSync(args.o)
-}
-
-console.log('Writing output to disk...')
-fs.mkdirpSync(args.o)
-
-single(results.raw, 'source/raw.txt')
-single(results.canonical, 'source/canonical.yaml')
-
-single(results.units, 'points/units.yaml')
-single(results.points, 'points/points.yaml')
-composite(results.demo, 'points/demo')
-
-for (const [name, outline] of Object.entries(results.outlines)) {
-    composite(outline, `outlines/${name}`)
-}
-
-for (const [name, _case] of Object.entries(results.cases)) {
-    composite(_case, `cases/${name}`)
-}
-
-for (const [name, pcb] of Object.entries(results.pcbs)) {
-    single(pcb, `pcbs/${name}.kicad_pcb`)
-}
-
-// goodbye
-
-console.log('Done.')
-console.log()
-
 })()
