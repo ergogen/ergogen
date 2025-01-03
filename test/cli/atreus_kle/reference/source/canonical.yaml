@@ -1,0 +1,758 @@
+points:
+    zones:
+        key1:
+            key:
+                origin:
+                    - 0.5 u
+                    - 0.5 u
+                splay: -10
+                shift:
+                    - 3 u
+                    - 0.09999999999999998 u
+            columns:
+                key1col:
+                    rows:
+                        key1row:
+                            width: 1 u
+                            height: 1 u
+                            label: E
+                            column_net: GND
+                            row_net: key1
+        key2:
+            key:
+                origin:
+                    - 0.5 u
+                    - 0.5 u
+                splay: -10
+                shift:
+                    - 2 u
+                    - '-0.25 u'
+            columns:
+                key2col:
+                    rows:
+                        key2row:
+                            width: 1 u
+                            height: 1 u
+                            label: W
+                            column_net: GND
+                            row_net: key2
+        key3:
+            key:
+                origin:
+                    - 0.5 u
+                    - 0.5 u
+                splay: -10
+                shift:
+                    - 4 u
+                    - '-0.25 u'
+            columns:
+                key3col:
+                    rows:
+                        key3row:
+                            width: 1 u
+                            height: 1 u
+                            label: R
+                            column_net: GND
+                            row_net: key3
+        key4:
+            key:
+                origin:
+                    - 0.5 u
+                    - 0.5 u
+                splay: -10
+                shift:
+                    - 1 u
+                    - '-0.5 u'
+            columns:
+                key4col:
+                    rows:
+                        key4row:
+                            width: 1 u
+                            height: 1 u
+                            label: Q
+                            column_net: GND
+                            row_net: key4
+        key5:
+            key:
+                origin:
+                    - 0.5 u
+                    - 0.5 u
+                splay: -10
+                shift:
+                    - 5 u
+                    - '-0.6 u'
+            columns:
+                key5col:
+                    rows:
+                        key5row:
+                            width: 1 u
+                            height: 1 u
+                            label: T
+                            column_net: GND
+                            row_net: key5
+        key6:
+            key:
+                origin:
+                    - 0.5 u
+                    - 0.5 u
+                splay: -10
+                shift:
+                    - 3 u
+                    - '-0.9 u'
+            columns:
+                key6col:
+                    rows:
+                        key6row:
+                            width: 1 u
+                            height: 1 u
+                            label: D
+                            column_net: GND
+                            row_net: key6
+        key7:
+            key:
+                origin:
+                    - 0.5 u
+                    - 0.5 u
+                splay: -10
+                shift:
+                    - 2 u
+                    - '-1.25 u'
+            columns:
+                key7col:
+                    rows:
+                        key7row:
+                            width: 1 u
+                            height: 1 u
+                            label: S
+                            column_net: GND
+                            row_net: key7
+        key8:
+            key:
+                origin:
+                    - 0.5 u
+                    - 0.5 u
+                splay: -10
+                shift:
+                    - 4 u
+                    - '-1.25 u'
+            columns:
+                key8col:
+                    rows:
+                        key8row:
+                            width: 1 u
+                            height: 1 u
+                            label: F
+                            column_net: GND
+                            row_net: key8
+        key9:
+            key:
+                origin:
+                    - 0.5 u
+                    - 0.5 u
+                splay: -10
+                shift:
+                    - 1 u
+                    - '-1.5 u'
+            columns:
+                key9col:
+                    rows:
+                        key9row:
+                            width: 1 u
+                            height: 1 u
+                            label: A
+                            column_net: GND
+                            row_net: key9
+        key10:
+            key:
+                origin:
+                    - 0.5 u
+                    - 0.5 u
+                splay: -10
+                shift:
+                    - 5 u
+                    - '-1.6 u'
+            columns:
+                key10col:
+                    rows:
+                        key10row:
+                            width: 1 u
+                            height: 1 u
+                            label: G
+                            column_net: GND
+                            row_net: key10
+        key11:
+            key:
+                origin:
+                    - 0.5 u
+                    - 0.5 u
+                splay: -10
+                shift:
+                    - 3 u
+                    - '-1.9 u'
+            columns:
+                key11col:
+                    rows:
+                        key11row:
+                            width: 1 u
+                            height: 1 u
+                            label: C
+                            column_net: GND
+                            row_net: key11
+        key12:
+            key:
+                origin:
+                    - 0.5 u
+                    - 0.5 u
+                splay: -10
+                shift:
+                    - 2 u
+                    - '-2.25 u'
+            columns:
+                key12col:
+                    rows:
+                        key12row:
+                            width: 1 u
+                            height: 1 u
+                            label: X
+                            column_net: GND
+                            row_net: key12
+        key13:
+            key:
+                origin:
+                    - 0.5 u
+                    - 0.5 u
+                splay: -10
+                shift:
+                    - 4 u
+                    - '-2.25 u'
+            columns:
+                key13col:
+                    rows:
+                        key13row:
+                            width: 1 u
+                            height: 1 u
+                            label: V
+                            column_net: GND
+                            row_net: key13
+        key14:
+            key:
+                origin:
+                    - 0.5 u
+                    - 0.5 u
+                splay: -10
+                shift:
+                    - 1 u
+                    - '-2.5 u'
+            columns:
+                key14col:
+                    rows:
+                        key14row:
+                            width: 1 u
+                            height: 1 u
+                            label: Z
+                            column_net: GND
+                            row_net: key14
+        key15:
+            key:
+                origin:
+                    - 0.5 u
+                    - 0.5 u
+                splay: -10
+                shift:
+                    - 5 u
+                    - '-2.6 u'
+            columns:
+                key15col:
+                    rows:
+                        key15row:
+                            width: 1 u
+                            height: 1 u
+                            label: B
+                            column_net: GND
+                            row_net: key15
+        key16:
+            key:
+                origin:
+                    - 0.5 u
+                    - 0.5 u
+                splay: -10
+                shift:
+                    - 6 u
+                    - '-3.1 u'
+            columns:
+                key16col:
+                    rows:
+                        key16row:
+                            width: 1 u
+                            height: 1.5 u
+                            label: Ctrl
+                            column_net: GND
+                            row_net: key16
+        key17:
+            key:
+                origin:
+                    - 0.5 u
+                    - 0.5 u
+                splay: -10
+                shift:
+                    - 3 u
+                    - '-2.9 u'
+            columns:
+                key17col:
+                    rows:
+                        key17row:
+                            width: 1 u
+                            height: 1 u
+                            label: super
+                            column_net: GND
+                            row_net: key17
+        key18:
+            key:
+                origin:
+                    - 0.5 u
+                    - 0.5 u
+                splay: -10
+                shift:
+                    - 2 u
+                    - '-3.25 u'
+            columns:
+                key18col:
+                    rows:
+                        key18row:
+                            width: 1 u
+                            height: 1 u
+                            label: Tab
+                            column_net: GND
+                            row_net: key18
+        key19:
+            key:
+                origin:
+                    - 0.5 u
+                    - 0.5 u
+                splay: -10
+                shift:
+                    - 4 u
+                    - '-3.25 u'
+            columns:
+                key19col:
+                    rows:
+                        key19row:
+                            width: 1 u
+                            height: 1 u
+                            label: Shift
+                            column_net: GND
+                            row_net: key19
+        key20:
+            key:
+                origin:
+                    - 0.5 u
+                    - 0.5 u
+                splay: -10
+                shift:
+                    - 1 u
+                    - '-3.5 u'
+            columns:
+                key20col:
+                    rows:
+                        key20row:
+                            width: 1 u
+                            height: 1 u
+                            label: Esc
+                            column_net: GND
+                            row_net: key20
+        key21:
+            key:
+                origin:
+                    - 0.5 u
+                    - 0.5 u
+                splay: -10
+                shift:
+                    - 5 u
+                    - '-3.6 u'
+            columns:
+                key21col:
+                    rows:
+                        key21row:
+                            width: 1 u
+                            height: 1 u
+                            label: Bksp
+                            column_net: GND
+                            row_net: key21
+        key22:
+            key:
+                origin:
+                    - 6.5 u
+                    - '-0.46499999999999997 u'
+                splay: 10
+                shift:
+                    - 9 u
+                    - '-0.7649999999999998 u'
+            columns:
+                key22col:
+                    rows:
+                        key22row:
+                            width: 1 u
+                            height: 1 u
+                            label: I
+                            column_net: GND
+                            row_net: key22
+        key23:
+            key:
+                origin:
+                    - 6.5 u
+                    - '-0.46499999999999997 u'
+                splay: 10
+                shift:
+                    - 8 u
+                    - '-1.1149999999999998 u'
+            columns:
+                key23col:
+                    rows:
+                        key23row:
+                            width: 1 u
+                            height: 1 u
+                            label: U
+                            column_net: GND
+                            row_net: key23
+        key24:
+            key:
+                origin:
+                    - 6.5 u
+                    - '-0.46499999999999997 u'
+                splay: 10
+                shift:
+                    - 10 u
+                    - '-1.1149999999999998 u'
+            columns:
+                key24col:
+                    rows:
+                        key24row:
+                            width: 1 u
+                            height: 1 u
+                            label: O
+                            column_net: GND
+                            row_net: key24
+        key25:
+            key:
+                origin:
+                    - 6.5 u
+                    - '-0.46499999999999997 u'
+                splay: 10
+                shift:
+                    - 11 u
+                    - '-1.3649999999999998 u'
+            columns:
+                key25col:
+                    rows:
+                        key25row:
+                            width: 1 u
+                            height: 1 u
+                            label: P
+                            column_net: GND
+                            row_net: key25
+        key26:
+            key:
+                origin:
+                    - 6.5 u
+                    - '-0.46499999999999997 u'
+                splay: 10
+                shift:
+                    - 7 u
+                    - '-1.4649999999999999 u'
+            columns:
+                key26col:
+                    rows:
+                        key26row:
+                            width: 1 u
+                            height: 1 u
+                            label: 'Y'
+                            column_net: GND
+                            row_net: key26
+        key27:
+            key:
+                origin:
+                    - 6.5 u
+                    - '-0.46499999999999997 u'
+                splay: 10
+                shift:
+                    - 9 u
+                    - '-1.7649999999999997 u'
+            columns:
+                key27col:
+                    rows:
+                        key27row:
+                            width: 1 u
+                            height: 1 u
+                            label: K
+                            column_net: GND
+                            row_net: key27
+        key28:
+            key:
+                origin:
+                    - 6.5 u
+                    - '-0.46499999999999997 u'
+                splay: 10
+                shift:
+                    - 8 u
+                    - '-2.1149999999999998 u'
+            columns:
+                key28col:
+                    rows:
+                        key28row:
+                            width: 1 u
+                            height: 1 u
+                            label: J
+                            column_net: GND
+                            row_net: key28
+        key29:
+            key:
+                origin:
+                    - 6.5 u
+                    - '-0.46499999999999997 u'
+                splay: 10
+                shift:
+                    - 10 u
+                    - '-2.1149999999999998 u'
+            columns:
+                key29col:
+                    rows:
+                        key29row:
+                            width: 1 u
+                            height: 1 u
+                            label: L
+                            column_net: GND
+                            row_net: key29
+        key30:
+            key:
+                origin:
+                    - 6.5 u
+                    - '-0.46499999999999997 u'
+                splay: 10
+                shift:
+                    - 11 u
+                    - '-2.3649999999999998 u'
+            columns:
+                key30col:
+                    rows:
+                        key30row:
+                            width: 1 u
+                            height: 1 u
+                            label: ':'
+                            column_net: GND
+                            row_net: key30
+        key31:
+            key:
+                origin:
+                    - 6.5 u
+                    - '-0.46499999999999997 u'
+                splay: 10
+                shift:
+                    - 7 u
+                    - '-2.465 u'
+            columns:
+                key31col:
+                    rows:
+                        key31row:
+                            width: 1 u
+                            height: 1 u
+                            label: H
+                            column_net: GND
+                            row_net: key31
+        key32:
+            key:
+                origin:
+                    - 6.5 u
+                    - '-0.46499999999999997 u'
+                splay: 10
+                shift:
+                    - 9 u
+                    - '-2.7649999999999997 u'
+            columns:
+                key32col:
+                    rows:
+                        key32row:
+                            width: 1 u
+                            height: 1 u
+                            label: <
+                            column_net: GND
+                            row_net: key32
+        key33:
+            key:
+                origin:
+                    - 6.5 u
+                    - '-0.46499999999999997 u'
+                splay: 10
+                shift:
+                    - 8 u
+                    - '-3.1149999999999998 u'
+            columns:
+                key33col:
+                    rows:
+                        key33row:
+                            width: 1 u
+                            height: 1 u
+                            label: M
+                            column_net: GND
+                            row_net: key33
+        key34:
+            key:
+                origin:
+                    - 6.5 u
+                    - '-0.46499999999999997 u'
+                splay: 10
+                shift:
+                    - 10 u
+                    - '-3.1149999999999998 u'
+            columns:
+                key34col:
+                    rows:
+                        key34row:
+                            width: 1 u
+                            height: 1 u
+                            label: '>'
+                            column_net: GND
+                            row_net: key34
+        key35:
+            key:
+                origin:
+                    - 6.5 u
+                    - '-0.46499999999999997 u'
+                splay: 10
+                shift:
+                    - 11 u
+                    - '-3.3649999999999998 u'
+            columns:
+                key35col:
+                    rows:
+                        key35row:
+                            width: 1 u
+                            height: 1 u
+                            label: '?'
+                            column_net: GND
+                            row_net: key35
+        key36:
+            key:
+                origin:
+                    - 6.5 u
+                    - '-0.46499999999999997 u'
+                splay: 10
+                shift:
+                    - 7 u
+                    - '-3.465 u'
+            columns:
+                key36col:
+                    rows:
+                        key36row:
+                            width: 1 u
+                            height: 1 u
+                            label: 'N'
+                            column_net: GND
+                            row_net: key36
+        key37:
+            key:
+                origin:
+                    - 6.5 u
+                    - '-0.46499999999999997 u'
+                splay: 10
+                shift:
+                    - 6 u
+                    - '-3.9650000000000003 u'
+            columns:
+                key37col:
+                    rows:
+                        key37row:
+                            width: 1 u
+                            height: 1.5 u
+                            label: Alt
+                            column_net: GND
+                            row_net: key37
+        key38:
+            key:
+                origin:
+                    - 6.5 u
+                    - '-0.46499999999999997 u'
+                splay: 10
+                shift:
+                    - 9 u
+                    - '-3.765 u'
+            columns:
+                key38col:
+                    rows:
+                        key38row:
+                            width: 1 u
+                            height: 1 u
+                            label: _
+                            column_net: GND
+                            row_net: key38
+        key39:
+            key:
+                origin:
+                    - 6.5 u
+                    - '-0.46499999999999997 u'
+                splay: 10
+                shift:
+                    - 8 u
+                    - '-4.115 u'
+            columns:
+                key39col:
+                    rows:
+                        key39row:
+                            width: 1 u
+                            height: 1 u
+                            label: fn
+                            column_net: GND
+                            row_net: key39
+        key40:
+            key:
+                origin:
+                    - 6.5 u
+                    - '-0.46499999999999997 u'
+                splay: 10
+                shift:
+                    - 10 u
+                    - '-4.115 u'
+            columns:
+                key40col:
+                    rows:
+                        key40row:
+                            width: 1 u
+                            height: 1 u
+                            label: '"'
+                            column_net: GND
+                            row_net: key40
+        key41:
+            key:
+                origin:
+                    - 6.5 u
+                    - '-0.46499999999999997 u'
+                splay: 10
+                shift:
+                    - 11 u
+                    - '-4.365 u'
+            columns:
+                key41col:
+                    rows:
+                        key41row:
+                            width: 1 u
+                            height: 1 u
+                            label: Enter
+                            column_net: GND
+                            row_net: key41
+        key42:
+            key:
+                origin:
+                    - 6.5 u
+                    - '-0.46499999999999997 u'
+                splay: 10
+                shift:
+                    - 7 u
+                    - '-4.465 u'
+            columns:
+                key42col:
+                    rows:
+                        key42row:
+                            width: 1 u
+                            height: 1 u
+                            label: Space
+                            column_net: GND
+                            row_net: key42

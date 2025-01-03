@@ -1,0 +1,232 @@
+models:
+    export:
+        models:
+            key1_key1col_key1row:
+                paths:
+                    top:
+                        type: line
+                        origin:
+                            - -9.5
+                            - 9.5
+                        end:
+                            - 9.5
+                            - 9.5
+                    right:
+                        type: line
+                        origin:
+                            - 9.5
+                            - 9.5
+                        end:
+                            - 9.5
+                            - -9.5
+                    bottom:
+                        type: line
+                        origin:
+                            - 9.5
+                            - -9.5
+                        end:
+                            - -9.5
+                            - -9.5
+                    left:
+                        type: line
+                        origin:
+                            - -9.5
+                            - -9.5
+                        end:
+                            - -9.5
+                            - 9.5
+                origin:
+                    - 0
+                    - 0
+            key2_key2col_key2row:
+                paths:
+                    top:
+                        type: line
+                        origin:
+                            - 9.5
+                            - 9.5
+                        end:
+                            - 28.5
+                            - 9.5
+                    right:
+                        type: line
+                        origin:
+                            - 28.5
+                            - 9.5
+                        end:
+                            - 28.5
+                            - -9.5
+                    bottom:
+                        type: line
+                        origin:
+                            - 28.5
+                            - -9.5
+                        end:
+                            - 9.5
+                            - -9.5
+                    left:
+                        type: line
+                        origin:
+                            - 9.5
+                            - -9.5
+                        end:
+                            - 9.5
+                            - 9.5
+                origin:
+                    - 0
+                    - 0
+            key3_key3col_key3row:
+                paths:
+                    top:
+                        type: line
+                        origin:
+                            - -9.5
+                            - -9.5
+                        end:
+                            - 9.5
+                            - -9.5
+                    right:
+                        type: line
+                        origin:
+                            - 9.5
+                            - -9.5
+                        end:
+                            - 9.5
+                            - -28.5
+                    bottom:
+                        type: line
+                        origin:
+                            - 9.5
+                            - -28.5
+                        end:
+                            - -9.5
+                            - -28.5
+                    left:
+                        type: line
+                        origin:
+                            - -9.5
+                            - -28.5
+                        end:
+                            - -9.5
+                            - -9.5
+                origin:
+                    - 0
+                    - 0
+            key4_key4col_key4row:
+                paths:
+                    top:
+                        type: line
+                        origin:
+                            - 9.5
+                            - -9.5
+                        end:
+                            - 28.5
+                            - -9.5
+                    right:
+                        type: line
+                        origin:
+                            - 28.5
+                            - -9.5
+                        end:
+                            - 28.5
+                            - -28.5
+                    bottom:
+                        type: line
+                        origin:
+                            - 28.5
+                            - -28.5
+                        end:
+                            - 9.5
+                            - -28.5
+                    left:
+                        type: line
+                        origin:
+                            - 9.5
+                            - -28.5
+                        end:
+                            - 9.5
+                            - -9.5
+                origin:
+                    - 0
+                    - 0
+            key5_key5col_key5row:
+                paths:
+                    top:
+                        type: line
+                        origin:
+                            - -9.5
+                            - -28.5
+                        end:
+                            - 9.5
+                            - -28.5
+                    right:
+                        type: line
+                        origin:
+                            - 9.5
+                            - -28.5
+                        end:
+                            - 9.5
+                            - -47.5
+                    bottom:
+                        type: line
+                        origin:
+                            - 9.5
+                            - -47.5
+                        end:
+                            - -9.5
+                            - -47.5
+                    left:
+                        type: line
+                        origin:
+                            - -9.5
+                            - -47.5
+                        end:
+                            - -9.5
+                            - -28.5
+                origin:
+                    - 0
+                    - 0
+            key6_key6col_key6row:
+                paths:
+                    top:
+                        type: line
+                        origin:
+                            - 9.5
+                            - -28.5
+                        end:
+                            - 28.5
+                            - -28.5
+                    right:
+                        type: line
+                        origin:
+                            - 28.5
+                            - -28.5
+                        end:
+                            - 28.5
+                            - -47.5
+                    bottom:
+                        type: line
+                        origin:
+                            - 28.5
+                            - -47.5
+                        end:
+                            - 9.5
+                            - -47.5
+                    left:
+                        type: line
+                        origin:
+                            - 9.5
+                            - -47.5
+                        end:
+                            - 9.5
+                            - -28.5
+                origin:
+                    - 0
+                    - 0
+        origin:
+            - 0
+            - 0
+units: mm
+origin:
+    - 0
+    - 0

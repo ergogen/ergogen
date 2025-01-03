@@ -1,0 +1,2730 @@
+key1_key1col_key1row:
+    x: 54.9586422
+    'y': -6.2328274
+    r: -10
+    meta:
+        stagger: 0
+        spread: 19
+        splay: -10
+        origin:
+            - 9.5
+            - 9.5
+        orient: 0
+        shift:
+            - 57
+            - 1.8999999999999995
+        rotate: 0
+        adjust: {}
+        width: 19
+        height: 19
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: key1col_key1row
+        name: key1_key1col_key1row
+        label: E
+        column_net: GND
+        row_net: key1
+        zone:
+            key:
+                origin:
+                    - 0.5 u
+                    - 0.5 u
+                splay: -10
+                shift:
+                    - 3 u
+                    - 0.09999999999999998 u
+            columns:
+                key1col:
+                    rows:
+                        key1row:
+                            width: 1 u
+                            height: 1 u
+                            label: E
+                            column_net: GND
+                            row_net: key1
+                    key: {}
+                    name: key1col
+            name: key1
+        col:
+            rows:
+                key1row:
+                    width: 1 u
+                    height: 1 u
+                    label: E
+                    column_net: GND
+                    row_net: key1
+            key: {}
+            name: key1col
+        row: key1row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0
+key2_key2col_key2row:
+    x: 35.0925345
+    'y': -9.4824836
+    r: -10
+    meta:
+        stagger: 0
+        spread: 19
+        splay: -10
+        origin:
+            - 9.5
+            - 9.5
+        orient: 0
+        shift:
+            - 38
+            - -4.75
+        rotate: 0
+        adjust: {}
+        width: 19
+        height: 19
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: key2col_key2row
+        name: key2_key2col_key2row
+        label: W
+        column_net: GND
+        row_net: key2
+        zone:
+            key:
+                origin:
+                    - 0.5 u
+                    - 0.5 u
+                splay: -10
+                shift:
+                    - 2 u
+                    - '-0.25 u'
+            columns:
+                key2col:
+                    rows:
+                        key2row:
+                            width: 1 u
+                            height: 1 u
+                            label: W
+                            column_net: GND
+                            row_net: key2
+                    key: {}
+                    name: key2col
+            name: key2
+        col:
+            rows:
+                key2row:
+                    width: 1 u
+                    height: 1 u
+                    label: W
+                    column_net: GND
+                    row_net: key2
+            key: {}
+            name: key2col
+        row: key2row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0
+key3_key3col_key3row:
+    x: 72.5152291
+    'y': -16.081114300000003
+    r: -10
+    meta:
+        stagger: 0
+        spread: 19
+        splay: -10
+        origin:
+            - 9.5
+            - 9.5
+        orient: 0
+        shift:
+            - 76
+            - -4.75
+        rotate: 0
+        adjust: {}
+        width: 19
+        height: 19
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: key3col_key3row
+        name: key3_key3col_key3row
+        label: R
+        column_net: GND
+        row_net: key3
+        zone:
+            key:
+                origin:
+                    - 0.5 u
+                    - 0.5 u
+                splay: -10
+                shift:
+                    - 4 u
+                    - '-0.25 u'
+            columns:
+                key3col:
+                    rows:
+                        key3row:
+                            width: 1 u
+                            height: 1 u
+                            label: R
+                            column_net: GND
+                            row_net: key3
+                    key: {}
+                    name: key3col
+            name: key3
+        col:
+            rows:
+                key3row:
+                    width: 1 u
+                    height: 1 u
+                    label: R
+                    column_net: GND
+                    row_net: key3
+            key: {}
+            name: key3col
+        row: key3row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0
+key4_key4col_key4row:
+    x: 15.556358300000001
+    'y': -10.861005
+    r: -10
+    meta:
+        stagger: 0
+        spread: 19
+        splay: -10
+        origin:
+            - 9.5
+            - 9.5
+        orient: 0
+        shift:
+            - 19
+            - -9.5
+        rotate: 0
+        adjust: {}
+        width: 19
+        height: 19
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: key4col_key4row
+        name: key4_key4col_key4row
+        label: Q
+        column_net: GND
+        row_net: key4
+        zone:
+            key:
+                origin:
+                    - 0.5 u
+                    - 0.5 u
+                splay: -10
+                shift:
+                    - 1 u
+                    - '-0.5 u'
+            columns:
+                key4col:
+                    rows:
+                        key4row:
+                            width: 1 u
+                            height: 1 u
+                            label: Q
+                            column_net: GND
+                            row_net: key4
+                    key: {}
+                    name: key4col
+            name: key4
+        col:
+            rows:
+                key4row:
+                    width: 1 u
+                    height: 1 u
+                    label: Q
+                    column_net: GND
+                    row_net: key4
+            key: {}
+            name: key4col
+        row: key4row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0
+key5_key5col_key5row:
+    x: 90.071816
+    'y': -25.929401300000002
+    r: -10
+    meta:
+        stagger: 0
+        spread: 19
+        splay: -10
+        origin:
+            - 9.5
+            - 9.5
+        orient: 0
+        shift:
+            - 95
+            - -11.4
+        rotate: 0
+        adjust: {}
+        width: 19
+        height: 19
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: key5col_key5row
+        name: key5_key5col_key5row
+        label: T
+        column_net: GND
+        row_net: key5
+        zone:
+            key:
+                origin:
+                    - 0.5 u
+                    - 0.5 u
+                splay: -10
+                shift:
+                    - 5 u
+                    - '-0.6 u'
+            columns:
+                key5col:
+                    rows:
+                        key5row:
+                            width: 1 u
+                            height: 1 u
+                            label: T
+                            column_net: GND
+                            row_net: key5
+                    key: {}
+                    name: key5col
+            name: key5
+        col:
+            rows:
+                key5row:
+                    width: 1 u
+                    height: 1 u
+                    label: T
+                    column_net: GND
+                    row_net: key5
+            key: {}
+            name: key5col
+        row: key5row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0
+key6_key6col_key6row:
+    x: 51.659326799999995
+    'y': -24.944174699999998
+    r: -10
+    meta:
+        stagger: 0
+        spread: 19
+        splay: -10
+        origin:
+            - 9.5
+            - 9.5
+        orient: 0
+        shift:
+            - 57
+            - -17.1
+        rotate: 0
+        adjust: {}
+        width: 19
+        height: 19
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: key6col_key6row
+        name: key6_key6col_key6row
+        label: D
+        column_net: GND
+        row_net: key6
+        zone:
+            key:
+                origin:
+                    - 0.5 u
+                    - 0.5 u
+                splay: -10
+                shift:
+                    - 3 u
+                    - '-0.9 u'
+            columns:
+                key6col:
+                    rows:
+                        key6row:
+                            width: 1 u
+                            height: 1 u
+                            label: D
+                            column_net: GND
+                            row_net: key6
+                    key: {}
+                    name: key6col
+            name: key6
+        col:
+            rows:
+                key6row:
+                    width: 1 u
+                    height: 1 u
+                    label: D
+                    column_net: GND
+                    row_net: key6
+            key: {}
+            name: key6col
+        row: key6row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0
+key7_key7col_key7row:
+    x: 31.7932191
+    'y': -28.193830900000002
+    r: -10
+    meta:
+        stagger: 0
+        spread: 19
+        splay: -10
+        origin:
+            - 9.5
+            - 9.5
+        orient: 0
+        shift:
+            - 38
+            - -23.75
+        rotate: 0
+        adjust: {}
+        width: 19
+        height: 19
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: key7col_key7row
+        name: key7_key7col_key7row
+        label: S
+        column_net: GND
+        row_net: key7
+        zone:
+            key:
+                origin:
+                    - 0.5 u
+                    - 0.5 u
+                splay: -10
+                shift:
+                    - 2 u
+                    - '-1.25 u'
+            columns:
+                key7col:
+                    rows:
+                        key7row:
+                            width: 1 u
+                            height: 1 u
+                            label: S
+                            column_net: GND
+                            row_net: key7
+                    key: {}
+                    name: key7col
+            name: key7
+        col:
+            rows:
+                key7row:
+                    width: 1 u
+                    height: 1 u
+                    label: S
+                    column_net: GND
+                    row_net: key7
+            key: {}
+            name: key7col
+        row: key7row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0
+key8_key8col_key8row:
+    x: 69.2159137
+    'y': -34.792461599999996
+    r: -10
+    meta:
+        stagger: 0
+        spread: 19
+        splay: -10
+        origin:
+            - 9.5
+            - 9.5
+        orient: 0
+        shift:
+            - 76
+            - -23.75
+        rotate: 0
+        adjust: {}
+        width: 19
+        height: 19
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: key8col_key8row
+        name: key8_key8col_key8row
+        label: F
+        column_net: GND
+        row_net: key8
+        zone:
+            key:
+                origin:
+                    - 0.5 u
+                    - 0.5 u
+                splay: -10
+                shift:
+                    - 4 u
+                    - '-1.25 u'
+            columns:
+                key8col:
+                    rows:
+                        key8row:
+                            width: 1 u
+                            height: 1 u
+                            label: F
+                            column_net: GND
+                            row_net: key8
+                    key: {}
+                    name: key8col
+            name: key8
+        col:
+            rows:
+                key8row:
+                    width: 1 u
+                    height: 1 u
+                    label: F
+                    column_net: GND
+                    row_net: key8
+            key: {}
+            name: key8col
+        row: key8row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0
+key9_key9col_key9row:
+    x: 12.2570429
+    'y': -29.5723523
+    r: -10
+    meta:
+        stagger: 0
+        spread: 19
+        splay: -10
+        origin:
+            - 9.5
+            - 9.5
+        orient: 0
+        shift:
+            - 19
+            - -28.5
+        rotate: 0
+        adjust: {}
+        width: 19
+        height: 19
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: key9col_key9row
+        name: key9_key9col_key9row
+        label: A
+        column_net: GND
+        row_net: key9
+        zone:
+            key:
+                origin:
+                    - 0.5 u
+                    - 0.5 u
+                splay: -10
+                shift:
+                    - 1 u
+                    - '-1.5 u'
+            columns:
+                key9col:
+                    rows:
+                        key9row:
+                            width: 1 u
+                            height: 1 u
+                            label: A
+                            column_net: GND
+                            row_net: key9
+                    key: {}
+                    name: key9col
+            name: key9
+        col:
+            rows:
+                key9row:
+                    width: 1 u
+                    height: 1 u
+                    label: A
+                    column_net: GND
+                    row_net: key9
+            key: {}
+            name: key9col
+        row: key9row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0
+key10_key10col_key10row:
+    x: 86.7725006
+    'y': -44.640748599999995
+    r: -10
+    meta:
+        stagger: 0
+        spread: 19
+        splay: -10
+        origin:
+            - 9.5
+            - 9.5
+        orient: 0
+        shift:
+            - 95
+            - -30.400000000000002
+        rotate: 0
+        adjust: {}
+        width: 19
+        height: 19
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: key10col_key10row
+        name: key10_key10col_key10row
+        label: G
+        column_net: GND
+        row_net: key10
+        zone:
+            key:
+                origin:
+                    - 0.5 u
+                    - 0.5 u
+                splay: -10
+                shift:
+                    - 5 u
+                    - '-1.6 u'
+            columns:
+                key10col:
+                    rows:
+                        key10row:
+                            width: 1 u
+                            height: 1 u
+                            label: G
+                            column_net: GND
+                            row_net: key10
+                    key: {}
+                    name: key10col
+            name: key10
+        col:
+            rows:
+                key10row:
+                    width: 1 u
+                    height: 1 u
+                    label: G
+                    column_net: GND
+                    row_net: key10
+            key: {}
+            name: key10col
+        row: key10row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0
+key11_key11col_key11row:
+    x: 48.3600114
+    'y': -43.655522
+    r: -10
+    meta:
+        stagger: 0
+        spread: 19
+        splay: -10
+        origin:
+            - 9.5
+            - 9.5
+        orient: 0
+        shift:
+            - 57
+            - -36.1
+        rotate: 0
+        adjust: {}
+        width: 19
+        height: 19
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: key11col_key11row
+        name: key11_key11col_key11row
+        label: C
+        column_net: GND
+        row_net: key11
+        zone:
+            key:
+                origin:
+                    - 0.5 u
+                    - 0.5 u
+                splay: -10
+                shift:
+                    - 3 u
+                    - '-1.9 u'
+            columns:
+                key11col:
+                    rows:
+                        key11row:
+                            width: 1 u
+                            height: 1 u
+                            label: C
+                            column_net: GND
+                            row_net: key11
+                    key: {}
+                    name: key11col
+            name: key11
+        col:
+            rows:
+                key11row:
+                    width: 1 u
+                    height: 1 u
+                    label: C
+                    column_net: GND
+                    row_net: key11
+            key: {}
+            name: key11col
+        row: key11row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0
+key12_key12col_key12row:
+    x: 28.493903699999997
+    'y': -46.9051782
+    r: -10
+    meta:
+        stagger: 0
+        spread: 19
+        splay: -10
+        origin:
+            - 9.5
+            - 9.5
+        orient: 0
+        shift:
+            - 38
+            - -42.75
+        rotate: 0
+        adjust: {}
+        width: 19
+        height: 19
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: key12col_key12row
+        name: key12_key12col_key12row
+        label: X
+        column_net: GND
+        row_net: key12
+        zone:
+            key:
+                origin:
+                    - 0.5 u
+                    - 0.5 u
+                splay: -10
+                shift:
+                    - 2 u
+                    - '-2.25 u'
+            columns:
+                key12col:
+                    rows:
+                        key12row:
+                            width: 1 u
+                            height: 1 u
+                            label: X
+                            column_net: GND
+                            row_net: key12
+                    key: {}
+                    name: key12col
+            name: key12
+        col:
+            rows:
+                key12row:
+                    width: 1 u
+                    height: 1 u
+                    label: X
+                    column_net: GND
+                    row_net: key12
+            key: {}
+            name: key12col
+        row: key12row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0
+key13_key13col_key13row:
+    x: 65.9165983
+    'y': -53.503808899999996
+    r: -10
+    meta:
+        stagger: 0
+        spread: 19
+        splay: -10
+        origin:
+            - 9.5
+            - 9.5
+        orient: 0
+        shift:
+            - 76
+            - -42.75
+        rotate: 0
+        adjust: {}
+        width: 19
+        height: 19
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: key13col_key13row
+        name: key13_key13col_key13row
+        label: V
+        column_net: GND
+        row_net: key13
+        zone:
+            key:
+                origin:
+                    - 0.5 u
+                    - 0.5 u
+                splay: -10
+                shift:
+                    - 4 u
+                    - '-2.25 u'
+            columns:
+                key13col:
+                    rows:
+                        key13row:
+                            width: 1 u
+                            height: 1 u
+                            label: V
+                            column_net: GND
+                            row_net: key13
+                    key: {}
+                    name: key13col
+            name: key13
+        col:
+            rows:
+                key13row:
+                    width: 1 u
+                    height: 1 u
+                    label: V
+                    column_net: GND
+                    row_net: key13
+            key: {}
+            name: key13col
+        row: key13row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0
+key14_key14col_key14row:
+    x: 8.9577276
+    'y': -48.2836996
+    r: -10
+    meta:
+        stagger: 0
+        spread: 19
+        splay: -10
+        origin:
+            - 9.5
+            - 9.5
+        orient: 0
+        shift:
+            - 19
+            - -47.5
+        rotate: 0
+        adjust: {}
+        width: 19
+        height: 19
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: key14col_key14row
+        name: key14_key14col_key14row
+        label: Z
+        column_net: GND
+        row_net: key14
+        zone:
+            key:
+                origin:
+                    - 0.5 u
+                    - 0.5 u
+                splay: -10
+                shift:
+                    - 1 u
+                    - '-2.5 u'
+            columns:
+                key14col:
+                    rows:
+                        key14row:
+                            width: 1 u
+                            height: 1 u
+                            label: Z
+                            column_net: GND
+                            row_net: key14
+                    key: {}
+                    name: key14col
+            name: key14
+        col:
+            rows:
+                key14row:
+                    width: 1 u
+                    height: 1 u
+                    label: Z
+                    column_net: GND
+                    row_net: key14
+            key: {}
+            name: key14col
+        row: key14row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0
+key15_key15col_key15row:
+    x: 83.47318530000001
+    'y': -63.3520959
+    r: -10
+    meta:
+        stagger: 0
+        spread: 19
+        splay: -10
+        origin:
+            - 9.5
+            - 9.5
+        orient: 0
+        shift:
+            - 95
+            - -49.4
+        rotate: 0
+        adjust: {}
+        width: 19
+        height: 19
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: key15col_key15row
+        name: key15_key15col_key15row
+        label: B
+        column_net: GND
+        row_net: key15
+        zone:
+            key:
+                origin:
+                    - 0.5 u
+                    - 0.5 u
+                splay: -10
+                shift:
+                    - 5 u
+                    - '-2.6 u'
+            columns:
+                key15col:
+                    rows:
+                        key15row:
+                            width: 1 u
+                            height: 1 u
+                            label: B
+                            column_net: GND
+                            row_net: key15
+                    key: {}
+                    name: key15col
+            name: key15
+        col:
+            rows:
+                key15row:
+                    width: 1 u
+                    height: 1 u
+                    label: B
+                    column_net: GND
+                    row_net: key15
+            key: {}
+            name: key15col
+        row: key15row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0
+key16_key16col_key16row:
+    x: 100.5348749
+    'y': -76.00708490000001
+    r: -10
+    meta:
+        stagger: 0
+        spread: 19
+        splay: -10
+        origin:
+            - 9.5
+            - 9.5
+        orient: 0
+        shift:
+            - 114
+            - -58.9
+        rotate: 0
+        adjust: {}
+        width: 19
+        height: 28.5
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: key16col_key16row
+        name: key16_key16col_key16row
+        label: Ctrl
+        column_net: GND
+        row_net: key16
+        zone:
+            key:
+                origin:
+                    - 0.5 u
+                    - 0.5 u
+                splay: -10
+                shift:
+                    - 6 u
+                    - '-3.1 u'
+            columns:
+                key16col:
+                    rows:
+                        key16row:
+                            width: 1 u
+                            height: 1.5 u
+                            label: Ctrl
+                            column_net: GND
+                            row_net: key16
+                    key: {}
+                    name: key16col
+            name: key16
+        col:
+            rows:
+                key16row:
+                    width: 1 u
+                    height: 1.5 u
+                    label: Ctrl
+                    column_net: GND
+                    row_net: key16
+            key: {}
+            name: key16col
+        row: key16row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0
+key17_key17col_key17row:
+    x: 45.060696
+    'y': -62.3668693
+    r: -10
+    meta:
+        stagger: 0
+        spread: 19
+        splay: -10
+        origin:
+            - 9.5
+            - 9.5
+        orient: 0
+        shift:
+            - 57
+            - -55.1
+        rotate: 0
+        adjust: {}
+        width: 19
+        height: 19
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: key17col_key17row
+        name: key17_key17col_key17row
+        label: super
+        column_net: GND
+        row_net: key17
+        zone:
+            key:
+                origin:
+                    - 0.5 u
+                    - 0.5 u
+                splay: -10
+                shift:
+                    - 3 u
+                    - '-2.9 u'
+            columns:
+                key17col:
+                    rows:
+                        key17row:
+                            width: 1 u
+                            height: 1 u
+                            label: super
+                            column_net: GND
+                            row_net: key17
+                    key: {}
+                    name: key17col
+            name: key17
+        col:
+            rows:
+                key17row:
+                    width: 1 u
+                    height: 1 u
+                    label: super
+                    column_net: GND
+                    row_net: key17
+            key: {}
+            name: key17col
+        row: key17row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0
+key18_key18col_key18row:
+    x: 25.1945883
+    'y': -65.61652550000001
+    r: -10
+    meta:
+        stagger: 0
+        spread: 19
+        splay: -10
+        origin:
+            - 9.5
+            - 9.5
+        orient: 0
+        shift:
+            - 38
+            - -61.75
+        rotate: 0
+        adjust: {}
+        width: 19
+        height: 19
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: key18col_key18row
+        name: key18_key18col_key18row
+        label: Tab
+        column_net: GND
+        row_net: key18
+        zone:
+            key:
+                origin:
+                    - 0.5 u
+                    - 0.5 u
+                splay: -10
+                shift:
+                    - 2 u
+                    - '-3.25 u'
+            columns:
+                key18col:
+                    rows:
+                        key18row:
+                            width: 1 u
+                            height: 1 u
+                            label: Tab
+                            column_net: GND
+                            row_net: key18
+                    key: {}
+                    name: key18col
+            name: key18
+        col:
+            rows:
+                key18row:
+                    width: 1 u
+                    height: 1 u
+                    label: Tab
+                    column_net: GND
+                    row_net: key18
+            key: {}
+            name: key18col
+        row: key18row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0
+key19_key19col_key19row:
+    x: 62.61728299999999
+    'y': -72.2151563
+    r: -10
+    meta:
+        stagger: 0
+        spread: 19
+        splay: -10
+        origin:
+            - 9.5
+            - 9.5
+        orient: 0
+        shift:
+            - 76
+            - -61.75
+        rotate: 0
+        adjust: {}
+        width: 19
+        height: 19
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: key19col_key19row
+        name: key19_key19col_key19row
+        label: Shift
+        column_net: GND
+        row_net: key19
+        zone:
+            key:
+                origin:
+                    - 0.5 u
+                    - 0.5 u
+                splay: -10
+                shift:
+                    - 4 u
+                    - '-3.25 u'
+            columns:
+                key19col:
+                    rows:
+                        key19row:
+                            width: 1 u
+                            height: 1 u
+                            label: Shift
+                            column_net: GND
+                            row_net: key19
+                    key: {}
+                    name: key19col
+            name: key19
+        col:
+            rows:
+                key19row:
+                    width: 1 u
+                    height: 1 u
+                    label: Shift
+                    column_net: GND
+                    row_net: key19
+            key: {}
+            name: key19col
+        row: key19row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0
+key20_key20col_key20row:
+    x: 5.6584122
+    'y': -66.995047
+    r: -10
+    meta:
+        stagger: 0
+        spread: 19
+        splay: -10
+        origin:
+            - 9.5
+            - 9.5
+        orient: 0
+        shift:
+            - 19
+            - -66.5
+        rotate: 0
+        adjust: {}
+        width: 19
+        height: 19
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: key20col_key20row
+        name: key20_key20col_key20row
+        label: Esc
+        column_net: GND
+        row_net: key20
+        zone:
+            key:
+                origin:
+                    - 0.5 u
+                    - 0.5 u
+                splay: -10
+                shift:
+                    - 1 u
+                    - '-3.5 u'
+            columns:
+                key20col:
+                    rows:
+                        key20row:
+                            width: 1 u
+                            height: 1 u
+                            label: Esc
+                            column_net: GND
+                            row_net: key20
+                    key: {}
+                    name: key20col
+            name: key20
+        col:
+            rows:
+                key20row:
+                    width: 1 u
+                    height: 1 u
+                    label: Esc
+                    column_net: GND
+                    row_net: key20
+            key: {}
+            name: key20col
+        row: key20row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0
+key21_key21col_key21row:
+    x: 80.1738699
+    'y': -82.06344320000001
+    r: -10
+    meta:
+        stagger: 0
+        spread: 19
+        splay: -10
+        origin:
+            - 9.5
+            - 9.5
+        orient: 0
+        shift:
+            - 95
+            - -68.4
+        rotate: 0
+        adjust: {}
+        width: 19
+        height: 19
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: key21col_key21row
+        name: key21_key21col_key21row
+        label: Bksp
+        column_net: GND
+        row_net: key21
+        zone:
+            key:
+                origin:
+                    - 0.5 u
+                    - 0.5 u
+                splay: -10
+                shift:
+                    - 5 u
+                    - '-3.6 u'
+            columns:
+                key21col:
+                    rows:
+                        key21row:
+                            width: 1 u
+                            height: 1 u
+                            label: Bksp
+                            column_net: GND
+                            row_net: key21
+                    key: {}
+                    name: key21col
+            name: key21
+        col:
+            rows:
+                key21row:
+                    width: 1 u
+                    height: 1 u
+                    label: Bksp
+                    column_net: GND
+                    row_net: key21
+            key: {}
+            name: key21col
+        row: key21row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0
+key22_key22col_key22row:
+    x: 171.2681629
+    'y': -6.200115700000001
+    r: 10
+    meta:
+        stagger: 0
+        spread: 19
+        splay: 10
+        origin:
+            - 123.5
+            - -8.834999999999999
+        orient: 0
+        shift:
+            - 171
+            - -14.534999999999997
+        rotate: 0
+        adjust: {}
+        width: 19
+        height: 19
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: key22col_key22row
+        name: key22_key22col_key22row
+        label: I
+        column_net: GND
+        row_net: key22
+        zone:
+            key:
+                origin:
+                    - 6.5 u
+                    - '-0.46499999999999997 u'
+                splay: 10
+                shift:
+                    - 9 u
+                    - '-0.7649999999999998 u'
+            columns:
+                key22col:
+                    rows:
+                        key22row:
+                            width: 1 u
+                            height: 1 u
+                            label: I
+                            column_net: GND
+                            row_net: key22
+                    key: {}
+                    name: key22col
+            name: key22
+        col:
+            rows:
+                key22row:
+                    width: 1 u
+                    height: 1 u
+                    label: I
+                    column_net: GND
+                    row_net: key22
+            key: {}
+            name: key22col
+        row: key22row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0
+key23_key23col_key23row:
+    x: 153.711576
+    'y': -16.0484026
+    r: 10
+    meta:
+        stagger: 0
+        spread: 19
+        splay: 10
+        origin:
+            - 123.5
+            - -8.834999999999999
+        orient: 0
+        shift:
+            - 152
+            - -21.184999999999995
+        rotate: 0
+        adjust: {}
+        width: 19
+        height: 19
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: key23col_key23row
+        name: key23_key23col_key23row
+        label: U
+        column_net: GND
+        row_net: key23
+        zone:
+            key:
+                origin:
+                    - 6.5 u
+                    - '-0.46499999999999997 u'
+                splay: 10
+                shift:
+                    - 8 u
+                    - '-1.1149999999999998 u'
+            columns:
+                key23col:
+                    rows:
+                        key23row:
+                            width: 1 u
+                            height: 1 u
+                            label: U
+                            column_net: GND
+                            row_net: key23
+                    key: {}
+                    name: key23col
+            name: key23
+        col:
+            rows:
+                key23row:
+                    width: 1 u
+                    height: 1 u
+                    label: U
+                    column_net: GND
+                    row_net: key23
+            key: {}
+            name: key23col
+        row: key23row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0
+key24_key24col_key24row:
+    x: 191.1342706
+    'y': -9.4497719
+    r: 10
+    meta:
+        stagger: 0
+        spread: 19
+        splay: 10
+        origin:
+            - 123.5
+            - -8.834999999999999
+        orient: 0
+        shift:
+            - 190
+            - -21.184999999999995
+        rotate: 0
+        adjust: {}
+        width: 19
+        height: 19
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: key24col_key24row
+        name: key24_key24col_key24row
+        label: O
+        column_net: GND
+        row_net: key24
+        zone:
+            key:
+                origin:
+                    - 6.5 u
+                    - '-0.46499999999999997 u'
+                splay: 10
+                shift:
+                    - 10 u
+                    - '-1.1149999999999998 u'
+            columns:
+                key24col:
+                    rows:
+                        key24row:
+                            width: 1 u
+                            height: 1 u
+                            label: O
+                            column_net: GND
+                            row_net: key24
+                    key: {}
+                    name: key24col
+            name: key24
+        col:
+            rows:
+                key24row:
+                    width: 1 u
+                    height: 1 u
+                    label: O
+                    column_net: GND
+                    row_net: key24
+            key: {}
+            name: key24col
+        row: key24row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0
+key25_key25col_key25row:
+    x: 210.6704468
+    'y': -10.8282933
+    r: 10
+    meta:
+        stagger: 0
+        spread: 19
+        splay: 10
+        origin:
+            - 123.5
+            - -8.834999999999999
+        orient: 0
+        shift:
+            - 209
+            - -25.934999999999995
+        rotate: 0
+        adjust: {}
+        width: 19
+        height: 19
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: key25col_key25row
+        name: key25_key25col_key25row
+        label: P
+        column_net: GND
+        row_net: key25
+        zone:
+            key:
+                origin:
+                    - 6.5 u
+                    - '-0.46499999999999997 u'
+                splay: 10
+                shift:
+                    - 11 u
+                    - '-1.3649999999999998 u'
+            columns:
+                key25col:
+                    rows:
+                        key25row:
+                            width: 1 u
+                            height: 1 u
+                            label: P
+                            column_net: GND
+                            row_net: key25
+                    key: {}
+                    name: key25col
+            name: key25
+        col:
+            rows:
+                key25row:
+                    width: 1 u
+                    height: 1 u
+                    label: P
+                    column_net: GND
+                    row_net: key25
+            key: {}
+            name: key25col
+        row: key25row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0
+key26_key26col_key26row:
+    x: 136.1549891
+    'y': -25.896689600000002
+    r: 10
+    meta:
+        stagger: 0
+        spread: 19
+        splay: 10
+        origin:
+            - 123.5
+            - -8.834999999999999
+        orient: 0
+        shift:
+            - 133
+            - -27.834999999999997
+        rotate: 0
+        adjust: {}
+        width: 19
+        height: 19
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: key26col_key26row
+        name: key26_key26col_key26row
+        label: 'Y'
+        column_net: GND
+        row_net: key26
+        zone:
+            key:
+                origin:
+                    - 6.5 u
+                    - '-0.46499999999999997 u'
+                splay: 10
+                shift:
+                    - 7 u
+                    - '-1.4649999999999999 u'
+            columns:
+                key26col:
+                    rows:
+                        key26row:
+                            width: 1 u
+                            height: 1 u
+                            label: 'Y'
+                            column_net: GND
+                            row_net: key26
+                    key: {}
+                    name: key26col
+            name: key26
+        col:
+            rows:
+                key26row:
+                    width: 1 u
+                    height: 1 u
+                    label: 'Y'
+                    column_net: GND
+                    row_net: key26
+            key: {}
+            name: key26col
+        row: key26row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0
+key27_key27col_key27row:
+    x: 174.5674783
+    'y': -24.911463
+    r: 10
+    meta:
+        stagger: 0
+        spread: 19
+        splay: 10
+        origin:
+            - 123.5
+            - -8.834999999999999
+        orient: 0
+        shift:
+            - 171
+            - -33.535
+        rotate: 0
+        adjust: {}
+        width: 19
+        height: 19
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: key27col_key27row
+        name: key27_key27col_key27row
+        label: K
+        column_net: GND
+        row_net: key27
+        zone:
+            key:
+                origin:
+                    - 6.5 u
+                    - '-0.46499999999999997 u'
+                splay: 10
+                shift:
+                    - 9 u
+                    - '-1.7649999999999997 u'
+            columns:
+                key27col:
+                    rows:
+                        key27row:
+                            width: 1 u
+                            height: 1 u
+                            label: K
+                            column_net: GND
+                            row_net: key27
+                    key: {}
+                    name: key27col
+            name: key27
+        col:
+            rows:
+                key27row:
+                    width: 1 u
+                    height: 1 u
+                    label: K
+                    column_net: GND
+                    row_net: key27
+            key: {}
+            name: key27col
+        row: key27row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0
+key28_key28col_key28row:
+    x: 157.01089140000002
+    'y': -34.7597499
+    r: 10
+    meta:
+        stagger: 0
+        spread: 19
+        splay: 10
+        origin:
+            - 123.5
+            - -8.834999999999999
+        orient: 0
+        shift:
+            - 152
+            - -40.184999999999995
+        rotate: 0
+        adjust: {}
+        width: 19
+        height: 19
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: key28col_key28row
+        name: key28_key28col_key28row
+        label: J
+        column_net: GND
+        row_net: key28
+        zone:
+            key:
+                origin:
+                    - 6.5 u
+                    - '-0.46499999999999997 u'
+                splay: 10
+                shift:
+                    - 8 u
+                    - '-2.1149999999999998 u'
+            columns:
+                key28col:
+                    rows:
+                        key28row:
+                            width: 1 u
+                            height: 1 u
+                            label: J
+                            column_net: GND
+                            row_net: key28
+                    key: {}
+                    name: key28col
+            name: key28
+        col:
+            rows:
+                key28row:
+                    width: 1 u
+                    height: 1 u
+                    label: J
+                    column_net: GND
+                    row_net: key28
+            key: {}
+            name: key28col
+        row: key28row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0
+key29_key29col_key29row:
+    x: 194.43358600000002
+    'y': -28.1611192
+    r: 10
+    meta:
+        stagger: 0
+        spread: 19
+        splay: 10
+        origin:
+            - 123.5
+            - -8.834999999999999
+        orient: 0
+        shift:
+            - 190
+            - -40.184999999999995
+        rotate: 0
+        adjust: {}
+        width: 19
+        height: 19
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: key29col_key29row
+        name: key29_key29col_key29row
+        label: L
+        column_net: GND
+        row_net: key29
+        zone:
+            key:
+                origin:
+                    - 6.5 u
+                    - '-0.46499999999999997 u'
+                splay: 10
+                shift:
+                    - 10 u
+                    - '-2.1149999999999998 u'
+            columns:
+                key29col:
+                    rows:
+                        key29row:
+                            width: 1 u
+                            height: 1 u
+                            label: L
+                            column_net: GND
+                            row_net: key29
+                    key: {}
+                    name: key29col
+            name: key29
+        col:
+            rows:
+                key29row:
+                    width: 1 u
+                    height: 1 u
+                    label: L
+                    column_net: GND
+                    row_net: key29
+            key: {}
+            name: key29col
+        row: key29row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0
+key30_key30col_key30row:
+    x: 213.9697621
+    'y': -29.5396406
+    r: 10
+    meta:
+        stagger: 0
+        spread: 19
+        splay: 10
+        origin:
+            - 123.5
+            - -8.834999999999999
+        orient: 0
+        shift:
+            - 209
+            - -44.934999999999995
+        rotate: 0
+        adjust: {}
+        width: 19
+        height: 19
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: key30col_key30row
+        name: key30_key30col_key30row
+        label: ':'
+        column_net: GND
+        row_net: key30
+        zone:
+            key:
+                origin:
+                    - 6.5 u
+                    - '-0.46499999999999997 u'
+                splay: 10
+                shift:
+                    - 11 u
+                    - '-2.3649999999999998 u'
+            columns:
+                key30col:
+                    rows:
+                        key30row:
+                            width: 1 u
+                            height: 1 u
+                            label: ':'
+                            column_net: GND
+                            row_net: key30
+                    key: {}
+                    name: key30col
+            name: key30
+        col:
+            rows:
+                key30row:
+                    width: 1 u
+                    height: 1 u
+                    label: ':'
+                    column_net: GND
+                    row_net: key30
+            key: {}
+            name: key30col
+        row: key30row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0
+key31_key31col_key31row:
+    x: 139.4543045
+    'y': -44.6080369
+    r: 10
+    meta:
+        stagger: 0
+        spread: 19
+        splay: 10
+        origin:
+            - 123.5
+            - -8.834999999999999
+        orient: 0
+        shift:
+            - 133
+            - -46.834999999999994
+        rotate: 0
+        adjust: {}
+        width: 19
+        height: 19
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: key31col_key31row
+        name: key31_key31col_key31row
+        label: H
+        column_net: GND
+        row_net: key31
+        zone:
+            key:
+                origin:
+                    - 6.5 u
+                    - '-0.46499999999999997 u'
+                splay: 10
+                shift:
+                    - 7 u
+                    - '-2.465 u'
+            columns:
+                key31col:
+                    rows:
+                        key31row:
+                            width: 1 u
+                            height: 1 u
+                            label: H
+                            column_net: GND
+                            row_net: key31
+                    key: {}
+                    name: key31col
+            name: key31
+        col:
+            rows:
+                key31row:
+                    width: 1 u
+                    height: 1 u
+                    label: H
+                    column_net: GND
+                    row_net: key31
+            key: {}
+            name: key31col
+        row: key31row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0
+key32_key32col_key32row:
+    x: 177.86679370000002
+    'y': -43.6228103
+    r: 10
+    meta:
+        stagger: 0
+        spread: 19
+        splay: 10
+        origin:
+            - 123.5
+            - -8.834999999999999
+        orient: 0
+        shift:
+            - 171
+            - -52.535
+        rotate: 0
+        adjust: {}
+        width: 19
+        height: 19
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: key32col_key32row
+        name: key32_key32col_key32row
+        label: <
+        column_net: GND
+        row_net: key32
+        zone:
+            key:
+                origin:
+                    - 6.5 u
+                    - '-0.46499999999999997 u'
+                splay: 10
+                shift:
+                    - 9 u
+                    - '-2.7649999999999997 u'
+            columns:
+                key32col:
+                    rows:
+                        key32row:
+                            width: 1 u
+                            height: 1 u
+                            label: <
+                            column_net: GND
+                            row_net: key32
+                    key: {}
+                    name: key32col
+            name: key32
+        col:
+            rows:
+                key32row:
+                    width: 1 u
+                    height: 1 u
+                    label: <
+                    column_net: GND
+                    row_net: key32
+            key: {}
+            name: key32col
+        row: key32row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0
+key33_key33col_key33row:
+    x: 160.3102068
+    'y': -53.4710973
+    r: 10
+    meta:
+        stagger: 0
+        spread: 19
+        splay: 10
+        origin:
+            - 123.5
+            - -8.834999999999999
+        orient: 0
+        shift:
+            - 152
+            - -59.184999999999995
+        rotate: 0
+        adjust: {}
+        width: 19
+        height: 19
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: key33col_key33row
+        name: key33_key33col_key33row
+        label: M
+        column_net: GND
+        row_net: key33
+        zone:
+            key:
+                origin:
+                    - 6.5 u
+                    - '-0.46499999999999997 u'
+                splay: 10
+                shift:
+                    - 8 u
+                    - '-3.1149999999999998 u'
+            columns:
+                key33col:
+                    rows:
+                        key33row:
+                            width: 1 u
+                            height: 1 u
+                            label: M
+                            column_net: GND
+                            row_net: key33
+                    key: {}
+                    name: key33col
+            name: key33
+        col:
+            rows:
+                key33row:
+                    width: 1 u
+                    height: 1 u
+                    label: M
+                    column_net: GND
+                    row_net: key33
+            key: {}
+            name: key33col
+        row: key33row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0
+key34_key34col_key34row:
+    x: 197.7329014
+    'y': -46.8724665
+    r: 10
+    meta:
+        stagger: 0
+        spread: 19
+        splay: 10
+        origin:
+            - 123.5
+            - -8.834999999999999
+        orient: 0
+        shift:
+            - 190
+            - -59.184999999999995
+        rotate: 0
+        adjust: {}
+        width: 19
+        height: 19
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: key34col_key34row
+        name: key34_key34col_key34row
+        label: '>'
+        column_net: GND
+        row_net: key34
+        zone:
+            key:
+                origin:
+                    - 6.5 u
+                    - '-0.46499999999999997 u'
+                splay: 10
+                shift:
+                    - 10 u
+                    - '-3.1149999999999998 u'
+            columns:
+                key34col:
+                    rows:
+                        key34row:
+                            width: 1 u
+                            height: 1 u
+                            label: '>'
+                            column_net: GND
+                            row_net: key34
+                    key: {}
+                    name: key34col
+            name: key34
+        col:
+            rows:
+                key34row:
+                    width: 1 u
+                    height: 1 u
+                    label: '>'
+                    column_net: GND
+                    row_net: key34
+            key: {}
+            name: key34col
+        row: key34row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0
+key35_key35col_key35row:
+    x: 217.2690775
+    'y': -48.250988
+    r: 10
+    meta:
+        stagger: 0
+        spread: 19
+        splay: 10
+        origin:
+            - 123.5
+            - -8.834999999999999
+        orient: 0
+        shift:
+            - 209
+            - -63.934999999999995
+        rotate: 0
+        adjust: {}
+        width: 19
+        height: 19
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: key35col_key35row
+        name: key35_key35col_key35row
+        label: '?'
+        column_net: GND
+        row_net: key35
+        zone:
+            key:
+                origin:
+                    - 6.5 u
+                    - '-0.46499999999999997 u'
+                splay: 10
+                shift:
+                    - 11 u
+                    - '-3.3649999999999998 u'
+            columns:
+                key35col:
+                    rows:
+                        key35row:
+                            width: 1 u
+                            height: 1 u
+                            label: '?'
+                            column_net: GND
+                            row_net: key35
+                    key: {}
+                    name: key35col
+            name: key35
+        col:
+            rows:
+                key35row:
+                    width: 1 u
+                    height: 1 u
+                    label: '?'
+                    column_net: GND
+                    row_net: key35
+            key: {}
+            name: key35col
+        row: key35row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0
+key36_key36col_key36row:
+    x: 142.7536198
+    'y': -63.3193842
+    r: 10
+    meta:
+        stagger: 0
+        spread: 19
+        splay: 10
+        origin:
+            - 123.5
+            - -8.834999999999999
+        orient: 0
+        shift:
+            - 133
+            - -65.835
+        rotate: 0
+        adjust: {}
+        width: 19
+        height: 19
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: key36col_key36row
+        name: key36_key36col_key36row
+        label: 'N'
+        column_net: GND
+        row_net: key36
+        zone:
+            key:
+                origin:
+                    - 6.5 u
+                    - '-0.46499999999999997 u'
+                splay: 10
+                shift:
+                    - 7 u
+                    - '-3.465 u'
+            columns:
+                key36col:
+                    rows:
+                        key36row:
+                            width: 1 u
+                            height: 1 u
+                            label: 'N'
+                            column_net: GND
+                            row_net: key36
+                    key: {}
+                    name: key36col
+            name: key36
+        col:
+            rows:
+                key36row:
+                    width: 1 u
+                    height: 1 u
+                    label: 'N'
+                    column_net: GND
+                    row_net: key36
+            key: {}
+            name: key36col
+        row: key36row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0
+key37_key37col_key37row:
+    x: 125.6919302
+    'y': -75.9743732
+    r: 10
+    meta:
+        stagger: 0
+        spread: 19
+        splay: 10
+        origin:
+            - 123.5
+            - -8.834999999999999
+        orient: 0
+        shift:
+            - 114
+            - -75.33500000000001
+        rotate: 0
+        adjust: {}
+        width: 19
+        height: 28.5
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: key37col_key37row
+        name: key37_key37col_key37row
+        label: Alt
+        column_net: GND
+        row_net: key37
+        zone:
+            key:
+                origin:
+                    - 6.5 u
+                    - '-0.46499999999999997 u'
+                splay: 10
+                shift:
+                    - 6 u
+                    - '-3.9650000000000003 u'
+            columns:
+                key37col:
+                    rows:
+                        key37row:
+                            width: 1 u
+                            height: 1.5 u
+                            label: Alt
+                            column_net: GND
+                            row_net: key37
+                    key: {}
+                    name: key37col
+            name: key37
+        col:
+            rows:
+                key37row:
+                    width: 1 u
+                    height: 1.5 u
+                    label: Alt
+                    column_net: GND
+                    row_net: key37
+            key: {}
+            name: key37col
+        row: key37row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0
+key38_key38col_key38row:
+    x: 181.1661091
+    'y': -62.3341576
+    r: 10
+    meta:
+        stagger: 0
+        spread: 19
+        splay: 10
+        origin:
+            - 123.5
+            - -8.834999999999999
+        orient: 0
+        shift:
+            - 171
+            - -71.535
+        rotate: 0
+        adjust: {}
+        width: 19
+        height: 19
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: key38col_key38row
+        name: key38_key38col_key38row
+        label: _
+        column_net: GND
+        row_net: key38
+        zone:
+            key:
+                origin:
+                    - 6.5 u
+                    - '-0.46499999999999997 u'
+                splay: 10
+                shift:
+                    - 9 u
+                    - '-3.765 u'
+            columns:
+                key38col:
+                    rows:
+                        key38row:
+                            width: 1 u
+                            height: 1 u
+                            label: _
+                            column_net: GND
+                            row_net: key38
+                    key: {}
+                    name: key38col
+            name: key38
+        col:
+            rows:
+                key38row:
+                    width: 1 u
+                    height: 1 u
+                    label: _
+                    column_net: GND
+                    row_net: key38
+            key: {}
+            name: key38col
+        row: key38row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0
+key39_key39col_key39row:
+    x: 163.60952210000002
+    'y': -72.1824446
+    r: 10
+    meta:
+        stagger: 0
+        spread: 19
+        splay: 10
+        origin:
+            - 123.5
+            - -8.834999999999999
+        orient: 0
+        shift:
+            - 152
+            - -78.185
+        rotate: 0
+        adjust: {}
+        width: 19
+        height: 19
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: key39col_key39row
+        name: key39_key39col_key39row
+        label: fn
+        column_net: GND
+        row_net: key39
+        zone:
+            key:
+                origin:
+                    - 6.5 u
+                    - '-0.46499999999999997 u'
+                splay: 10
+                shift:
+                    - 8 u
+                    - '-4.115 u'
+            columns:
+                key39col:
+                    rows:
+                        key39row:
+                            width: 1 u
+                            height: 1 u
+                            label: fn
+                            column_net: GND
+                            row_net: key39
+                    key: {}
+                    name: key39col
+            name: key39
+        col:
+            rows:
+                key39row:
+                    width: 1 u
+                    height: 1 u
+                    label: fn
+                    column_net: GND
+                    row_net: key39
+            key: {}
+            name: key39col
+        row: key39row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0
+key40_key40col_key40row:
+    x: 201.03221670000002
+    'y': -65.5838138
+    r: 10
+    meta:
+        stagger: 0
+        spread: 19
+        splay: 10
+        origin:
+            - 123.5
+            - -8.834999999999999
+        orient: 0
+        shift:
+            - 190
+            - -78.185
+        rotate: 0
+        adjust: {}
+        width: 19
+        height: 19
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: key40col_key40row
+        name: key40_key40col_key40row
+        label: '"'
+        column_net: GND
+        row_net: key40
+        zone:
+            key:
+                origin:
+                    - 6.5 u
+                    - '-0.46499999999999997 u'
+                splay: 10
+                shift:
+                    - 10 u
+                    - '-4.115 u'
+            columns:
+                key40col:
+                    rows:
+                        key40row:
+                            width: 1 u
+                            height: 1 u
+                            label: '"'
+                            column_net: GND
+                            row_net: key40
+                    key: {}
+                    name: key40col
+            name: key40
+        col:
+            rows:
+                key40row:
+                    width: 1 u
+                    height: 1 u
+                    label: '"'
+                    column_net: GND
+                    row_net: key40
+            key: {}
+            name: key40col
+        row: key40row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0
+key41_key41col_key41row:
+    x: 220.56839290000002
+    'y': -66.9623353
+    r: 10
+    meta:
+        stagger: 0
+        spread: 19
+        splay: 10
+        origin:
+            - 123.5
+            - -8.834999999999999
+        orient: 0
+        shift:
+            - 209
+            - -82.935
+        rotate: 0
+        adjust: {}
+        width: 19
+        height: 19
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: key41col_key41row
+        name: key41_key41col_key41row
+        label: Enter
+        column_net: GND
+        row_net: key41
+        zone:
+            key:
+                origin:
+                    - 6.5 u
+                    - '-0.46499999999999997 u'
+                splay: 10
+                shift:
+                    - 11 u
+                    - '-4.365 u'
+            columns:
+                key41col:
+                    rows:
+                        key41row:
+                            width: 1 u
+                            height: 1 u
+                            label: Enter
+                            column_net: GND
+                            row_net: key41
+                    key: {}
+                    name: key41col
+            name: key41
+        col:
+            rows:
+                key41row:
+                    width: 1 u
+                    height: 1 u
+                    label: Enter
+                    column_net: GND
+                    row_net: key41
+            key: {}
+            name: key41col
+        row: key41row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0
+key42_key42col_key42row:
+    x: 146.0529352
+    'y': -82.0307315
+    r: 10
+    meta:
+        stagger: 0
+        spread: 19
+        splay: 10
+        origin:
+            - 123.5
+            - -8.834999999999999
+        orient: 0
+        shift:
+            - 133
+            - -84.835
+        rotate: 0
+        adjust: {}
+        width: 19
+        height: 19
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: key42col_key42row
+        name: key42_key42col_key42row
+        label: Space
+        column_net: GND
+        row_net: key42
+        zone:
+            key:
+                origin:
+                    - 6.5 u
+                    - '-0.46499999999999997 u'
+                splay: 10
+                shift:
+                    - 7 u
+                    - '-4.465 u'
+            columns:
+                key42col:
+                    rows:
+                        key42row:
+                            width: 1 u
+                            height: 1 u
+                            label: Space
+                            column_net: GND
+                            row_net: key42
+                    key: {}
+                    name: key42col
+            name: key42
+        col:
+            rows:
+                key42row:
+                    width: 1 u
+                    height: 1 u
+                    label: Space
+                    column_net: GND
+                    row_net: key42
+            key: {}
+            name: key42col
+        row: key42row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0

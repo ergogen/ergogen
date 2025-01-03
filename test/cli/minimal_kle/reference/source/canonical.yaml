@@ -1,0 +1,110 @@
+points:
+    zones:
+        key1:
+            key:
+                origin:
+                    - '-0.5 u'
+                    - 0.5 u
+                splay: 0
+                shift:
+                    - 0 u
+                    - 0 u
+            columns:
+                key1col:
+                    rows:
+                        key1row:
+                            width: 1 u
+                            height: 1 u
+                            label: '0_0'
+                            column_net: col_0
+                            row_net: row_0
+        key2:
+            key:
+                origin:
+                    - '-0.5 u'
+                    - 0.5 u
+                splay: 0
+                shift:
+                    - 1 u
+                    - 0 u
+            columns:
+                key2col:
+                    rows:
+                        key2row:
+                            width: 1 u
+                            height: 1 u
+                            label: '0_1'
+                            column_net: col_1
+                            row_net: row_0
+        key3:
+            key:
+                origin:
+                    - '-0.5 u'
+                    - 0.5 u
+                splay: 0
+                shift:
+                    - 0 u
+                    - '-1 u'
+            columns:
+                key3col:
+                    rows:
+                        key3row:
+                            width: 1 u
+                            height: 1 u
+                            label: '1_0'
+                            column_net: col_0
+                            row_net: row_1
+        key4:
+            key:
+                origin:
+                    - '-0.5 u'
+                    - 0.5 u
+                splay: 0
+                shift:
+                    - 1 u
+                    - '-1 u'
+            columns:
+                key4col:
+                    rows:
+                        key4row:
+                            width: 1 u
+                            height: 1 u
+                            label: '1_1'
+                            column_net: col_1
+                            row_net: row_1
+        key5:
+            key:
+                origin:
+                    - '-0.5 u'
+                    - 0.5 u
+                splay: 0
+                shift:
+                    - 0 u
+                    - '-2 u'
+            columns:
+                key5col:
+                    rows:
+                        key5row:
+                            width: 1 u
+                            height: 1 u
+                            label: ''
+                            column_net: GND
+                            row_net: key5
+        key6:
+            key:
+                origin:
+                    - '-0.5 u'
+                    - 0.5 u
+                splay: 0
+                shift:
+                    - 1 u
+                    - '-2 u'
+            columns:
+                key6col:
+                    rows:
+                        key6row:
+                            width: 1 u
+                            height: 1 u
+                            label: ''
+                            column_net: GND
+                            row_net: key6
