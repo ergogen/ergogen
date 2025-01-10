@@ -9,6 +9,7 @@ describe('Anchor', function() {
         rotated_o: new Point(0, 0, 90, {label: 'rotated_o'}),
         o_five: new Point(0, 5, 0, {label: 'o_five'}),
         five_o: new Point(5, 0, 0, {label: 'five_o'}),
+        minus_five_o: new Point(-5, 0, 0, {label: 'minus_five_o'}),
         five: new Point(5, 5, 90, {label: 'five'}),
         ten: new Point(10, 10, -90, {label: 'ten'}),
         mirror_ten: new Point(-10, 10, 90, {mirrored: true})
@@ -148,6 +149,50 @@ describe('Anchor', function() {
                 method: 'intersect'
             }
         }, 'name', points).should.throw(`Intersect expects exactly two parts, but it got 0!`)
+    })
+
+    it('midpoint', function() {
+        // midpoint at origin
+        check(
+            parse({
+                aggregate: {
+                    parts: ['o_five','five_o', 'minus_five_o'],
+                    method: 'midpoint'
+                }
+            }, 'name', points)(),
+            [0, 0, 0, {}]
+        )
+
+        // co-linear points
+        parse({
+            aggregate: {
+                parts: ['o','five', 'ten'],
+                method: 'midpoint'
+            }
+        }, 'name', points).should.throw(`Midpoint failed to compute, points are likely co-linear`)
+
+        // more than two parts
+        parse({
+            aggregate: {
+                parts: ['o', `five`, `ten`, `o_five`],
+                method: 'midpoint'
+            }
+        }, 'name', points).should.throw(`Midpoint expects exactly three parts, but it got 4!`)
+
+        // only one part
+        parse({
+            aggregate: {
+                parts: ['o'],
+                method: 'midpoint'
+            }
+        }, 'name', points).should.throw(`Midpoint expects exactly three parts, but it got 1!`)
+
+        // no parts
+        parse({
+            aggregate: {
+                method: 'midpoint'
+            }
+        }, 'name', points).should.throw(`Midpoint expects exactly three parts, but it got 0!`)
     })
 
     it('shift', function() {
