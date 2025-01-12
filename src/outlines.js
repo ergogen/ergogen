@@ -116,9 +116,11 @@ const polygon = (config, name, points, outlines, units) => {
 const bezier = (config, name, points, outlines, units) => {
 
   // prepare params
-  a.unexpected(config, `${name}`, ['type','accuracy','points'])
+  a.unexpected(config, `${name}`, ['type', 'accuracy', 'points'])
+  const type = a.in(config.type || 'cubic', `${name}.type`, ['cubic', 'quadratic'])
+  const accuracy = a.sane(config.accuracy || -1, `${name}.accuracy`, 'number')(units)
   const bezier_points = a.sane(config.points, `${name}.points`, 'array')()
-  throw new Error("Closed bezier splines yet implemented.")
+  throw new Error("Closed bezier splines are not yet implemented.")
 }
 
 const outline = (config, name, points, outlines, units) => {
