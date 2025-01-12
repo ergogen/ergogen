@@ -138,7 +138,7 @@ const bezier = (config, name, points, outlines, units) => {
         last_anchor = anchor(bezier_point, bezier_name, points, last_anchor)(units)
         parsed_points.push(last_anchor.p)
     }
-    return u.bezier(parsed_points, control_points, accuracy)
+    return u.bezier(parsed_points, control_points[type], accuracy)
   }, units]
 }
 
