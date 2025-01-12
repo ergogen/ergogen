@@ -76,7 +76,7 @@ exports.bezier = (points, control_points, accuracy) => {
   let measures = []
   for (let i=0; i<points.length; i=i+control_points+1) {
     const curve_name = 'bez' + (++counter)
-    const curve_points = []
+    let curve_points = []
     if(i+control_points+2 < points.length) {
       curve_points = points.slice(i, i+control_points+2)
     } else {
