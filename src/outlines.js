@@ -113,6 +113,14 @@ const polygon = (config, name, points, outlines, units) => {
     }, units]
 }
 
+const bezier = (config, name, points, outlines, units) => {
+
+  // prepare params
+  a.unexpected(config, `${name}`, ['type','accuracy','points'])
+  const bezier_points = a.sane(config.points, `${name}.points`, 'array')()
+  throw new Error("Closed bezier splines yet implemented.")
+}
+
 const outline = (config, name, points, outlines, units) => {
 
     // prepare params
@@ -133,7 +141,8 @@ const whats = {
     rectangle,
     circle,
     polygon,
-    outline
+    outline,
+    bezier
 }
 
 const expand_shorthand = (config, name, units) => {
@@ -184,7 +193,7 @@ exports.parse = (config, points, units) => {
 
             // process keys that are common to all part declarations
             const operation = u[a.in(part.operation || 'add', `${name}.operation`, ['add', 'subtract', 'intersect', 'stack'])]
-            const what = a.in(part.what || 'outline', `${name}.what`, ['rectangle', 'circle', 'polygon', 'outline'])
+            const what = a.in(part.what || 'outline', `${name}.what`, ['rectangle', 'circle', 'polygon', 'outline', 'bezier'])
             const bound = !!part.bound
             const asym = a.asym(part.asym || 'source', `${name}.asym`)
 
