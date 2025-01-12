@@ -83,9 +83,9 @@ exports.bezier = (points, control_points, accuracy) => {
       curve_points = points.slice(i, i+control_points+1)
       curve_points.push(points[0]); // Looping back to the start
     }
-    const bezier = (accuracy>=0 ? m.models.BezierCurve(curve_points, accuracy) : m.models.BezierCurve(curve_points))
-    m.model.addModel(res, bezier, curve_name)
-    measures.push(m.measure.modelExtents(bezier))
+    const model = (accuracy>=0 ? m.models.BezierCurve(curve_points, accuracy) : m.models.BezierCurve(curve_points))
+    m.model.addModel(res, model, curve_name)
+    measures.push(m.measure.modelExtents(model))
   }
   const bbox = {
     low: [
