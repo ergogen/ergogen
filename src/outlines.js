@@ -117,9 +117,14 @@ const bezier = (config, name, points, outlines, units) => {
 
   // prepare params
   a.unexpected(config, `${name}`, ['type', 'accuracy', 'points'])
-  const type = a.in(config.type || 'cubic', `${name}.type`, ['cubic', 'quadratic'])
+  const type = a.in(config.type || 'quadratic', `${name}.type`, ['cubic', 'quadratic'])
+  const control_points = {
+    'quadratic': 1,
+    'cubic': 2,
+  }
   const accuracy = a.sane(config.accuracy || -1, `${name}.accuracy`, 'number')(units)
   const bezier_points = a.sane(config.points, `${name}.points`, 'array')()
+  a.assert(config.points.length%(control_points[type]+1)==0, `${name}.points doesn't contain enough points to form a closed Bezier spline, there should be a multiple of ${control_points[type]+1} points.`)
   throw new Error("Closed bezier splines are not yet implemented.")
 }
 
