@@ -1,5 +1,5 @@
 const m = require('makerjs')
-const bezier = require('bezier')
+
 
 exports.deepcopy = value => {
     if (value === undefined) return undefined
