@@ -125,7 +125,21 @@ const bezier = (config, name, points, outlines, units) => {
   const accuracy = a.sane(config.accuracy || -1, `${name}.accuracy`, 'number')(units)
   const bezier_points = a.sane(config.points, `${name}.points`, 'array')()
   a.assert(config.points.length%(control_points[type]+1)==0, `${name}.points doesn't contain enough points to form a closed Bezier spline, there should be a multiple of ${control_points[type]+1} points.`)
-  throw new Error("Closed bezier splines are not yet implemented.")
+  
+  // return shape function and its units
+  return [point => {
+    const parsed_points = []
+    // the bezier starts at [0, 0] as it will be positioned later
+    // but we keep the point metadata for potential mirroring purposes
+    let last_anchor = new Point(0, 0, 0, point.meta)
+    let bezier_index = -1
+    for (const bezier_point of bezier_points) {
+        const bezier_name = `${name}.points[${++bezier_index}]`
+        last_anchor = anchor(bezier_point, bezier_name, points, last_anchor)(units)
+        parsed_points.push(last_anchor.p)
+    }
+    return u.bezier(parsed_points, control_points, accuracy)
+  }, units]
 }
 
 const outline = (config, name, points, outlines, units) => {
