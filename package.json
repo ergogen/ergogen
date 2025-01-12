@@ -15,6 +15,7 @@
         "coverage": "nyc --reporter=html --reporter=text npm test"
     },
     "dependencies": {
+        "bezier": "^0.1.0",
         "fs-extra": "^11.1.0",
         "js-yaml": "^3.14.1",
         "jszip": "^3.10.1",
