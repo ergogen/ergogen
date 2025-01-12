@@ -70,7 +70,7 @@ exports.poly = (arr) => {
 
 exports.bezier = (points, control_points, accuracy) => {
   let counter = 0
-  const res = {
+  let res = {
       models: {}
   }
   let measures = []
