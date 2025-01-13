@@ -4,7 +4,7 @@ import commonjs from '@rollup/plugin-commonjs'
 
 export default {
   input: 'src/ergogen.js',
-  external: ['makerjs', 'js-yaml', 'mathjs', 'kle-serial', 'jszip'],
+  external: ['makerjs', 'js-yaml', 'mathjs', 'kle-serial', 'jszip', 'hull'],
   output: {
     name: 'ergogen',
     file: 'dist/ergogen.js',
@@ -15,7 +15,8 @@ export default {
       'js-yaml': 'jsyaml',
       'mathjs': 'math',
       'kle-serial': 'kle',
-      'jszip': 'jszip'
+      'jszip': 'jszip',
+      'hull': 'hull'
     }
   },
   plugins: [
