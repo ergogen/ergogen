@@ -66,7 +66,9 @@ exports.parse = (config, outlines, units) => {
 
             let base
             if (what == 'outline') {
-                const extrude = a.sane(part.extrude || 1, `${part_qname}.extrude`, 'number')(units)
+                const extrude = a.sane(part.extrude ?? 1, `${part_qname}.extrude`, 'number')(units)
+                if (extrude <= 0) continue
+
                 const outline = outlines[name]
                 a.assert(outline, `Field "${part_qname}.name" does not name a valid outline!`)
                 // This is a hack to separate multiple calls to the same outline with different extrude values
@@ -100,7 +102,6 @@ exports.parse = (config, outlines, units) => {
             first = false
 
             body.push(`
-
                 // creating part ${part_name} of case ${case_name}
                 let ${part_var} = ${base};
 
