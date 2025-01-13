@@ -21,7 +21,8 @@
         "kle-serial": "github:ergogen/kle-serial#ergogen",
         "makerjs": "^0.18.1",
         "mathjs": "^11.5.0",
-        "yargs": "^17.6.2"
+        "yargs": "^17.6.2",
+        "hull": "github:andriiheonia/hull"
     },
     "devDependencies": {
         "@rollup/plugin-commonjs": "^24.0.1",

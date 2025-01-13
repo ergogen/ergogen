@@ -6,6 +6,7 @@ const Point = require('./point')
 const prep = require('./prepare')
 const anchor = require('./anchor').parse
 const filter = require('./filter').parse
+const hulljs = require('hull')
 
 const binding = (base, bbox, point, units) => {
 
@@ -142,6 +143,49 @@ const bezier = (config, name, points, outlines, units) => {
   }, units]
 }
 
+const hull = (config, name, points, outlines, units) => {
+
+  // prepare params
+  a.unexpected(config, `${name}`, ['concavity', 'extend', 'points'])
+  const concavity = a.sane(config.concavity || 50, `${name}.concavity`, 'number')(units)
+  const extend = a.sane(config.extend || true, `${name}.extend`, 'boolean')(units)
+  const hull_points = a.sane(config.points, `${name}.points`, 'array')()
+
+  // return shape function and its units
+  return [point => {
+    const parsed_points = []
+    // the poly starts at [0, 0] as it will be positioned later
+    // but we keep the point metadata for potential mirroring purposes
+    let last_anchor = new Point(0, 0, 0, point.meta)
+    let poly_index = -1
+    for (const poly_point of hull_points) {
+        const poly_name = `${name}.points[${++poly_index}]`
+        last_anchor = anchor(poly_point, poly_name, points, last_anchor)(units)
+        if(extend) {
+          const w = last_anchor.meta.width
+          const h = last_anchor.meta.height
+          const rect = u.rect(w, h, [-w/2, -h/2])
+          const model = last_anchor.position(rect)
+          let top_origin = model.paths.top.origin
+          let top_end =  model.paths.top.end
+          let bottom_origin =  model.paths.bottom.origin
+          let bottom_end =  model.paths.bottom.end
+          let model_origin = model.origin
+          parsed_points.push([top_origin[0] + model_origin[0], top_origin[1] + model_origin[1]])
+          parsed_points.push([top_end[0] + model_origin[0], top_end[1] + model_origin[1]])
+          parsed_points.push([bottom_origin[0] + model_origin[0], bottom_origin[1] + model_origin[1]])
+          parsed_points.push([bottom_end[0] + model_origin[0], bottom_end[1] + model_origin[1]])
+        } else {
+          parsed_points.push(last_anchor.p)
+        }
+    }
+    const poly_points = hulljs(parsed_points, concavity)
+    let poly = u.poly(poly_points)
+    const bbox = u.bbox(poly_points)
+    return [poly, bbox]
+  }, units]
+}
+
 const outline = (config, name, points, outlines, units) => {
 
     // prepare params
@@ -163,7 +207,8 @@ const whats = {
     circle,
     polygon,
     outline,
-    bezier
+    bezier,
+    hull
 }
 
 const expand_shorthand = (config, name, units) => {
@@ -214,7 +259,7 @@ exports.parse = (config, points, units) => {
 
             // process keys that are common to all part declarations
             const operation = u[a.in(part.operation || 'add', `${name}.operation`, ['add', 'subtract', 'intersect', 'stack'])]
-            const what = a.in(part.what || 'outline', `${name}.what`, ['rectangle', 'circle', 'polygon', 'outline', 'bezier'])
+            const what = a.in(part.what || 'outline', `${name}.what`, ['rectangle', 'circle', 'polygon', 'outline', 'bezier', 'hull'])
             const bound = !!part.bound
             const asym = a.asym(part.asym || 'source', `${name}.asym`)
 
