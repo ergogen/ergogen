@@ -148,7 +148,8 @@ const hull = (config, name, points, outlines, units) => {
   // prepare params
   a.unexpected(config, `${name}`, ['concavity', 'extend', 'points'])
   const concavity = a.sane(config.concavity || 50, `${name}.concavity`, 'number')(units)
-  const extend = a.sane(config.extend || true, `${name}.extend`, 'boolean')(units)
+  // Extend should default to `true` if not defined
+  const extend = a.sane(config.extend === undefined || config.extend, `${name}.extend`, 'boolean')(units)
   const hull_points = a.sane(config.points, `${name}.points`, 'array')()
 
   // return shape function and its units
