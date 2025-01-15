@@ -176,6 +176,33 @@ const hull = (config, name, points, outlines, units) => {
           parsed_points.push([top_end[0] + model_origin[0], top_end[1] + model_origin[1]])
           parsed_points.push([bottom_origin[0] + model_origin[0], bottom_origin[1] + model_origin[1]])
           parsed_points.push([bottom_end[0] + model_origin[0], bottom_end[1] + model_origin[1]])
+          // When width or height are too large, we need to add additional points along the sides, or
+          // the convex hull algorithm will fold "within" the key. Points are then added at regular
+          // intervals, their number being at least 2, since MakerJS places the first two points at
+          // either end of the path. When a side is longer than 18 divide the length of a side by
+          // that amount and add it to 2, this way we always have at least a middle point for sides
+          // longer than 18 
+          const l = 18
+          let intermediate_points = []
+          if (w > l) {
+            intermediate_points = intermediate_points.concat(m.path.toPoints(model.paths.top, 2 + Math.floor(w / l)))
+            intermediate_points = intermediate_points.concat(m.path.toPoints(model.paths.bottom, 2 + Math.floor(w / l)))
+          }
+          if (h > l) {
+            intermediate_points = intermediate_points.concat(m.path.toPoints(model.paths.left, 2 + Math.floor(h / l)))
+            intermediate_points = intermediate_points.concat(m.path.toPoints(model.paths.right, 2 + Math.floor(h / l)))
+          }
+          for (let i = 0; i < intermediate_points.length; i++) {
+            const p = intermediate_points[i];
+            if (!m.measure.isPointEqual(p, top_origin) &&
+              !m.measure.isPointEqual(p, top_end) &&
+              !m.measure.isPointEqual(p, bottom_origin) &&
+              !m.measure.isPointEqual(p, bottom_end)) {
+              // Not one of the corners
+              const intermediate_point = [p[0] + model_origin[0], p[1] + model_origin[1]]
+              parsed_points.push(intermediate_point)
+            }
+          }
         } else {
           parsed_points.push(last_anchor.p)
         }
