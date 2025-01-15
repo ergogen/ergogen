@@ -14,6 +14,9 @@ points:
         r1:
         r2:
         r3:
+    rotated:
+      rotate: -25
+      anchor.shift: [0,-25]
   mirror: 100
 outlines:
   defaults:
@@ -60,3 +63,10 @@ outlines:
         - matrix_c2_r3
         - mirror_matrix_c1_r1
         - mirror_matrix_c2_r3
+  rotation:
+    - what: hull
+      points:
+        - matrix_c2_r1
+        - matrix_c2_r2
+        - matrix_c2_r3
+        - rotated
