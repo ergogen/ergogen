@@ -167,11 +167,11 @@ const hull = (config, name, points, outlines, units) => {
           const h = last_anchor.meta.height
           const rect = u.rect(w, h, [-w/2, -h/2])
           const model = last_anchor.position(rect)
-          let top_origin = model.paths.top.origin
-          let top_end =  model.paths.top.end
-          let bottom_origin =  model.paths.bottom.origin
-          let bottom_end =  model.paths.bottom.end
-          let model_origin = model.origin
+          const top_origin = model.paths.top.origin
+          const top_end =  model.paths.top.end
+          const bottom_origin =  model.paths.bottom.origin
+          const bottom_end =  model.paths.bottom.end
+          const model_origin = model.origin
           parsed_points.push([top_origin[0] + model_origin[0], top_origin[1] + model_origin[1]])
           parsed_points.push([top_end[0] + model_origin[0], top_end[1] + model_origin[1]])
           parsed_points.push([bottom_origin[0] + model_origin[0], bottom_origin[1] + model_origin[1]])
