@@ -231,7 +231,40 @@ const outline = (config, name, points, outlines, units) => {
 }
 
 const path = (config, name, points, outlines, units) => {
-  
+
+    // prepare params
+    a.unexpected(config, `${name}`, ['segments'])
+    const segments = a.sane(config.segments, `${name}.segments`, 'array')()
+    for(const [index, segment] of segments.entries()) {
+      a.in(segment.type, `${name}.segments.${index}.type`, ['line', 'arc', 's_curve', 'bezier'])
+      a.sane(segment.points, `${name}.segments.${index}.points`, 'array')()
+      const num_points = segment.points.length
+      switch (segment.type) {
+       case 'bezier':
+          a.unexpected(segment, `${name}.segments.${index}`, ['type', `points`, 'accuracy'])
+          break
+        case 'arc':
+        case 'line':
+        case 's_curve':
+          a.unexpected(segment, `${name}.segments.${index}`, ['type', `points`])
+          break
+      }
+      switch (segment.type) {
+       case 'bezier':
+          a.assert(num_points > 2, `Bezier Curve needs 3 or 4 points, but ${num_points} were provided`)
+          break
+        case 'arc':
+          a.assert(num_points === 3, `Arc needs 3 points, but ${num_points} ${num_points === 1 ? 'was' : 'were'} provided`)
+          break
+        case 'line':
+          a.assert(num_points > 1, `Line need at least 2 points, but ${num_points} ${num_points === 1 ? 'was' : 'were'} provided`)
+          break
+        case 's_curve':
+          a.assert(num_points === 2, `S-Curve needs 2 points, but ${num_points} ${num_points === 1 ? 'was' : 'were'} provided`)
+          break
+      }
+    }
+
     throw new Error("Outline of type `path` is not yet implemented.");
 }
 
