@@ -230,13 +230,19 @@ const outline = (config, name, points, outlines, units) => {
     }, units]
 }
 
+const path = (config, name, points, outlines, units) => {
+  
+    throw new Error("Outline of type `path` is not yet implemented.");
+}
+
 const whats = {
     rectangle,
     circle,
     polygon,
     outline,
     bezier,
-    hull
+    hull,
+    path
 }
 
 const expand_shorthand = (config, name, units) => {
@@ -287,7 +293,7 @@ exports.parse = (config, points, units) => {
 
             // process keys that are common to all part declarations
             const operation = u[a.in(part.operation || 'add', `${name}.operation`, ['add', 'subtract', 'intersect', 'stack'])]
-            const what = a.in(part.what || 'outline', `${name}.what`, ['rectangle', 'circle', 'polygon', 'outline', 'bezier', 'hull'])
+            const what = a.in(part.what || 'outline', `${name}.what`, ['rectangle', 'circle', 'polygon', 'outline', 'bezier', 'hull', 'path'])
             const bound = !!part.bound
             const asym = a.asym(part.asym || 'source', `${name}.asym`)
 
