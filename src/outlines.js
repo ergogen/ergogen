@@ -252,16 +252,16 @@ const path = (config, name, points, outlines, units) => {
       }
       switch (segment.type) {
        case 'bezier':
-          a.assert(num_points > 2, `Bezier Curve needs 3 or 4 points, but ${num_points} were provided`)
+          a.assert(num_points > (index === 0 ? 2 : 1), `Bezier Curve needs 3 or 4 points, but ${num_points} were provided`)
           break
         case 'arc':
-          a.assert(num_points === 3, `Arc needs 3 points, but ${num_points} ${num_points === 1 ? 'was' : 'were'} provided`)
+          a.assert(num_points === (index === 0 ? 3 : 2), `Arc needs 3 points, but ${num_points} ${num_points === 1 ? 'was' : 'were'} provided`)
           break
         case 'line':
-          a.assert(num_points > 1, `Line need at least 2 points, but ${num_points} ${num_points === 1 ? 'was' : 'were'} provided`)
+          a.assert(num_points > (index === 0 ? 1 : 0), `Line need at least 2 points, but ${num_points} ${num_points === 1 ? 'was' : 'were'} provided`)
           break
         case 's_curve':
-          a.assert(num_points === 2, `S-Curve needs 2 points, but ${num_points} ${num_points === 1 ? 'was' : 'were'} provided`)
+          a.assert(num_points === (index === 0 ? 2 : 1), `S-Curve needs 2 points, but ${num_points} ${num_points === 1 ? 'was' : 'were'} provided`)
           break
       }
     }
@@ -278,6 +278,11 @@ const path = (config, name, points, outlines, units) => {
       let last_anchor = new Point(0, 0, 0, point.meta)
       for (const [index, segment] of segments.entries()){
         const parsed_points = []
+        // Segments after the first one need one less point, as the start is taken from the
+        // last segment
+        if (index > 0) {
+          parsed_points.push(last_anchor.p)
+        }
         let point_index = -1
         for (const segment_point of segments_points[index]) {
             const segment_points_name = `${name}.segments.${index}.points[${++point_index}]`
