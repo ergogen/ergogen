@@ -114,36 +114,6 @@ const polygon = (config, name, points, outlines, units) => {
     }, units]
 }
 
-const bezier = (config, name, points, outlines, units) => {
-
-  // prepare params
-  a.unexpected(config, `${name}`, ['type', 'accuracy', 'points'])
-  const type = a.in(config.type || 'quadratic', `${name}.type`, ['cubic', 'quadratic'])
-  const control_points = {
-    'quadratic': 1,
-    'cubic': 2,
-  }
-  const accuracy = a.sane(config.accuracy || -1, `${name}.accuracy`, 'number')(units)
-  const bezier_points = a.sane(config.points, `${name}.points`, 'array')()
-  a.assert(config.points.length%(control_points[type]+1)==0, `${name}.points doesn't contain enough points to form a closed Bezier spline, there should be a multiple of ${control_points[type]+1} points.`)
-  
-  // return shape function and its units
-  return [point => {
-    const parsed_points = []
-    // the bezier starts at [0, 0] as it will be positioned later
-    // but we keep the point metadata for potential mirroring purposes
-    let last_anchor = new Point(0, 0, 0, point.meta)
-    let bezier_index = -1
-    for (const bezier_point of bezier_points) {
-        const bezier_name = `${name}.points[${++bezier_index}]`
-        last_anchor = anchor(bezier_point, bezier_name, points, last_anchor)(units)
-        parsed_points.push(last_anchor.p)
-    }
-    return u.bezier(parsed_points, control_points[type], accuracy)
-  }, units]
-}
-
-
 const hull = (config, name, points, outlines, units) => {
 
   // prepare params
@@ -236,7 +206,6 @@ const whats = {
     circle,
     polygon,
     outline,
-    bezier,
     hull
 }
 
@@ -288,7 +257,7 @@ exports.parse = (config, points, units) => {
 
             // process keys that are common to all part declarations
             const operation = u[a.in(part.operation || 'add', `${name}.operation`, ['add', 'subtract', 'intersect', 'stack'])]
-            const what = a.in(part.what || 'outline', `${name}.what`, ['rectangle', 'circle', 'polygon', 'outline', 'bezier', 'hull'])
+            const what = a.in(part.what || 'outline', `${name}.what`, ['rectangle', 'circle', 'polygon', 'outline', 'hull'])
             const bound = !!part.bound
             const asym = a.asym(part.asym || 'source', `${name}.asym`)
 
