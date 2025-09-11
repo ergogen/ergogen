@@ -203,15 +203,25 @@ const parse_axis = exports._parse_axis = (config, name, points, units) => {
     } else return config
 }
 
-const perform_mirror = exports._perform_mirror = (point, axis) => {
+const perform_mirror = exports._perform_mirror = (point, axis, units) => {
     point.meta.mirrored = false
     if (point.meta.asym == 'source') return ['', null]
     const mp = point.clone().mirror(axis)
     const mirrored_name = `mirror_${point.meta.name}`
-    mp.meta = prep.extend(mp.meta, mp.meta.mirror || {})
+    const mirror_config = mp.meta.mirror || {}
+    mp.meta = prep.extend(mp.meta, mirror_config)
     mp.meta.name = mirrored_name
     mp.meta.colrow = `mirror_${mp.meta.colrow}`
     mp.meta.mirrored = true
+
+    // Re-sanitize overridden properties
+    if (mirror_config.width !== undefined) {
+        mp.meta.width = a.sane(mp.meta.width, `${mp.meta.name}.width`, 'number')(units)
+    }
+    if (mirror_config.height !== undefined) {
+        mp.meta.height = a.sane(mp.meta.height, `${mp.meta.name}.height`, 'number')(units)
+    }
+
     if (point.meta.asym == 'clone') {
         point.meta.skip = true
     }
@@ -350,7 +360,7 @@ exports.parse = (config, units) => {
         if (axis !== undefined) {
             const mirrored_points = {}
             for (const new_point of Object.values(new_points)) {
-                const [mname, mp] = perform_mirror(new_point, axis)
+                const [mname, mp] = perform_mirror(new_point, axis, units)
                 if (mp) {
                     mirrored_points[mname] = mp
                 }
@@ -371,7 +381,7 @@ exports.parse = (config, units) => {
     const global_mirrored_points = {}
     for (const point of Object.values(points)) {
         if (global_axis !== undefined && point.meta.mirrored === undefined) {
-            const [mname, mp] = perform_mirror(point, global_axis)
+            const [mname, mp] = perform_mirror(point, global_axis, units)
             if (mp) {
                 global_mirrored_points[mname] = mp
             }
