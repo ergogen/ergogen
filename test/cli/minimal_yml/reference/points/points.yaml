@@ -1,0 +1,44 @@
+matrix_col_row:
+    x: 0
+    'y': 0
+    r: 0
+    meta:
+        stagger: 0
+        spread: 19
+        splay: 0
+        origin:
+            - 0
+            - 0
+        orient: 0
+        shift:
+            - 0
+            - 0
+        rotate: 0
+        adjust: {}
+        width: 18
+        height: 18
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: col_row
+        name: matrix_col_row
+        zone:
+            columns:
+                col:
+                    rows: {}
+                    key: {}
+                    name: col
+            rows:
+                row: {}
+            name: matrix
+        col:
+            rows: {}
+            key: {}
+            name: col
+        row: row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0
