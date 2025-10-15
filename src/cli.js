@@ -164,7 +164,7 @@ const composite = (data, rel) => {
 
 if (args.clean) {
     console.log('Cleaning output folder...')
-    fs.removeSync(args.o)
+    fs.emptyDirSync(args.o)
 }
 
 console.log('Writing output to disk...')
