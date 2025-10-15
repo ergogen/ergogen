@@ -59,7 +59,7 @@ exports.interpret = (raw, logger) => {
     let format = 'OBJ'
     if (a.type(raw)() == 'string') {
         try {
-            config = yaml.safeLoad(raw)
+            config = yaml.load(raw)
             format = 'YAML'
         } catch (yamlex) {
             try {

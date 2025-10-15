@@ -7,7 +7,7 @@ exports.fixture = name => {
         path.join(__dirname, `../fixtures/${name}`)
     ).toString()
     if (name.endsWith('.json') || name.endsWith('.yaml')) {
-        return yaml.safeLoad(res)
+        return yaml.load(res)
     }
     return res
 }
