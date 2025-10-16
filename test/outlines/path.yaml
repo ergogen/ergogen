@@ -2,7 +2,6 @@ points.zones.point:
 outlines:
   3p_bezier:
     - what: path
-      operation: stack
       segments:
         - type: bezier
           points:
@@ -14,7 +13,6 @@ outlines:
               shift: [.5u,.5u]
   3p_bezier_path:
     - what: path
-      operation: stack
       segments:
         - type: line
           points:
@@ -30,7 +28,6 @@ outlines:
               shift: [.5u,.5u]
   4p_bezier:
     - what: path
-      operation: stack
       segments:
         - type: bezier
           points:
@@ -45,7 +42,6 @@ outlines:
   
   4p_bezier_path:
     - what: path
-      operation: stack
       segments:
         - type: line
           points:
@@ -64,7 +60,6 @@ outlines:
 
   arc:
     - what: path
-      operation: stack
       segments:
         - type: arc
           points:
@@ -76,7 +71,6 @@ outlines:
               shift: [.5u,.5u]
   arc_path:
     - what: path
-      operation: stack
       segments:
         - type: line
           points:
@@ -92,7 +86,6 @@ outlines:
               shift: [.5u,.5u]
   s_curve:
     - what: path
-      operation: stack
       segments:
         - type: s_curve
           points:
@@ -102,7 +95,6 @@ outlines:
               shift: [-.5u,-.5u]
   s_curve_path:
     - what: path
-      operation: stack
       segments:
         - type: line
           points:
@@ -116,7 +108,6 @@ outlines:
               shift: [-.5u,-.5u]
   line:
     - what: path
-      operation: stack
       segments:
         - type: line
           points:
