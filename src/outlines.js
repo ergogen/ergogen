@@ -223,16 +223,16 @@ const path = (config, name, points, outlines, units) => {
       }
       switch (segment.type) {
        case 'bezier':
-          a.assert(num_points > (index === 0 ? 2 : 1), `Bezier Curve needs 3 or 4 points, but ${num_points} were provided`)
+          a.assert(num_points > (index === 0 ? 2 : 1), `Bezier Curve needs 3 or 4 points, but ${index === 0 ? num_points : num_points + 1} were provided (${index === 0 ? '' : '1 inherited from the previous segment, '}${num_points} declared)`)
           break
         case 'arc':
-          a.assert(num_points === (index === 0 ? 3 : 2), `Arc needs 3 points, but ${num_points} ${num_points === 1 ? 'was' : 'were'} provided`)
+          a.assert(num_points === (index === 0 ? 3 : 2), `Arc needs 3 points, but ${index === 0 ? num_points : num_points + 1} were provided (${index === 0 ? '' : '1 inherited from the previous segment, '}${num_points} declared)`)
           break
         case 'line':
-          a.assert(num_points > (index === 0 ? 1 : 0), `Line need at least 2 points, but ${num_points} ${num_points === 1 ? 'was' : 'were'} provided`)
+          a.assert(num_points > (index === 0 ? 1 : 0), `Line need at least 2 points, but ${index === 0 ? num_points : num_points + 1} ${num_points === 1 ? 'was' : 'were'} provided (${index === 0 ? '' : '1 inherited from the previous segment, '}${num_points} declared)`)
           break
         case 's_curve':
-          a.assert(num_points === (index === 0 ? 2 : 1), `S-Curve needs 2 points, but ${num_points} ${num_points === 1 ? 'was' : 'were'} provided`)
+          a.assert(num_points === (index === 0 ? 2 : 1), `S-Curve needs 2 points, but ${index === 0 ? num_points : num_points + 1} ${num_points === 1 ? 'was' : 'were'} provided (${index === 0 ? '' : '1 inherited from the previous segment, '}${num_points} declared)`)
           break
       }
     }
