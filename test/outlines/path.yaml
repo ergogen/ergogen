@@ -115,5 +115,7 @@ outlines:
               shift: [-.5u,.5u]
             - ref: point
               shift: [0,u]
+        - type: line
+          points:
             - ref: point
               shift: [.5u,.5u]
