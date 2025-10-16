@@ -1,15 +1,24 @@
 const m = require('makerjs')
 const kicad5 = require('../../src/templates/kicad5')
+const kicad8 = require('../../src/templates/kicad8')
 const ergogen = require('../../src/ergogen')
 
 describe('Internals', function() {
 
-    it('pcb outline conversion', function() {
+    it('pcb outline conversion with kicad5', function() {
         // warn on unknown path type
         sinon.stub(m.model, 'walk').callsFake(function(model, config) {
             config.onPath({pathContext: {type: 'nonexistent'}})
         })
         kicad5.convert_outline.bind(this).should.throw("Can't convert path type")
+    })
+
+    it('pcb outline conversion with kicad8', function() {
+        // warn on unknown path type
+        sinon.stub(m.model, 'walk').callsFake(function(model, config) {
+            config.onPath({pathContext: {type: 'nonexistent'}})
+        })
+        kicad8.convert_outline.bind(this).should.throw("Can't convert path type")
     })
 
     it('injection', function() {
