@@ -1,5 +1,6 @@
 variables:
   key_width: 18
+  key_height: 18
 
 points:
   zones:
@@ -10,6 +11,7 @@ points:
             row1:
               mirror:
                 width: key_width
+                height: key_height
       mirror:
         ref: matrix_col1_row1
         distance: 10
