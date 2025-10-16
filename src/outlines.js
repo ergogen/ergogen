@@ -114,35 +114,6 @@ const polygon = (config, name, points, outlines, units) => {
     }, units]
 }
 
-const bezier = (config, name, points, outlines, units) => {
-
-  // prepare params
-  a.unexpected(config, `${name}`, ['type', 'accuracy', 'points'])
-  const type = a.in(config.type || 'quadratic', `${name}.type`, ['cubic', 'quadratic'])
-  const control_points = {
-    'quadratic': 1,
-    'cubic': 2,
-  }
-  const accuracy = a.sane(config.accuracy || -1, `${name}.accuracy`, 'number')(units)
-  const bezier_points = a.sane(config.points, `${name}.points`, 'array')()
-  a.assert(config.points.length%(control_points[type]+1)==0, `${name}.points doesn't contain enough points to form a closed Bezier spline, there should be a multiple of ${control_points[type]+1} points.`)
-  
-  // return shape function and its units
-  return [point => {
-    const parsed_points = []
-    // the bezier starts at [0, 0] as it will be positioned later
-    // but we keep the point metadata for potential mirroring purposes
-    let last_anchor = new Point(0, 0, 0, point.meta)
-    let bezier_index = -1
-    for (const bezier_point of bezier_points) {
-        const bezier_name = `${name}.points[${++bezier_index}]`
-        last_anchor = anchor(bezier_point, bezier_name, points, last_anchor)(units)
-        parsed_points.push(last_anchor.p)
-    }
-    return u.bezier(parsed_points, control_points[type], accuracy)
-  }, units]
-}
-
 const hull = (config, name, points, outlines, units) => {
 
   // prepare params
@@ -304,9 +275,9 @@ const path = (config, name, points, outlines, units) => {
             break
           case 's_curve':
             const origin = parsed_points[0]
-            a.assert(parsed_points[0][0] !== parsed_points[1][0], "The ${name}.segments.${index} S-Curve segment cannot have points on the same X axis")
+            a.assert(parsed_points[0][0] !== parsed_points[1][0], `The ${name}.segments.${index} S-Curve segment cannot have points on the same X axis`)
             const width = Math.abs(parsed_points[1][0] - parsed_points[0][0])
-            a.assert(parsed_points[0][1] !== parsed_points[1][1], "The ${name}.segments.${index} S-Curve segment cannot have points on the same Y axis")
+            a.assert(parsed_points[0][1] !== parsed_points[1][1], `The ${name}.segments.${index} S-Curve segment cannot have points on the same Y axis`)
             const height = Math.abs(parsed_points[1][1] - parsed_points[0][1])
             const mirrorX = parsed_points[0][0] > parsed_points[1][0]
             const mirrorY = parsed_points[0][1] > parsed_points[1][1]
@@ -314,6 +285,7 @@ const path = (config, name, points, outlines, units) => {
             const mirrored_s_curve = m.model.mirror(s_curve_raw, mirrorX, mirrorY)
             const s_curve = m.model.move(mirrored_s_curve, origin)
             shape.models[segment_name] = s_curve
+            break
           case 'bezier':
             let bezier = new m.models.BezierCurve(...parsed_points)
             shape.models[segment_name] = bezier

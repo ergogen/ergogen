@@ -69,38 +69,6 @@ exports.poly = (arr) => {
     return res
 }
 
-exports.bezier = (points, control_points, accuracy) => {
-  let counter = 0
-  let res = {
-      models: {}
-  }
-  let measures = []
-  for (let i=0; i<points.length; i=i+control_points+1) {
-    const curve_name = 'bez' + (++counter)
-    let curve_points = []
-    if(i+control_points+2 < points.length) {
-      curve_points = points.slice(i, i+control_points+2)
-    } else {
-      curve_points = points.slice(i, i+control_points+1)
-      curve_points.push(points[0]); // Looping back to the start
-    }
-    const model = (accuracy>=0 ? new m.models.BezierCurve(curve_points, accuracy) : new m.models.BezierCurve(curve_points))
-    m.model.addModel(res, model, curve_name)
-    measures.push(m.measure.modelExtents(model))
-  }
-  const bbox = {
-    low: [
-      measures.reduce((min, p) => Math.min(min,p.low[0]), Infinity),
-      measures.reduce((min, p) => Math.min(min,p.low[1]), Infinity)
-    ],
-    high: [
-      measures.reduce((max, p) => Math.max(max,p.high[0]), -Infinity),
-      measures.reduce((max, p) => Math.max(max,p.high[1]), -Infinity)
-    ]
-  }
-  return [res, bbox]
-}
-
 exports.bbox = (arr) => {
     let minx = Infinity
     let miny = Infinity
