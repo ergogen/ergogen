@@ -96,7 +96,8 @@ exports.interpret = (raw, logger) => {
     return [config, format]
 }
 
-exports.twodee = (model, debug) => {
+exports.twodee = (model, options) => {
+    const {debug, svg} = options
     const assembly = makerjs.model.originate({
         models: {
             export: u.deepcopy(model)
@@ -109,7 +110,9 @@ exports.twodee = (model, debug) => {
     }
     if (debug) {
         result.yaml = assembly
-        result.svg = makerjs.exporter.toSVG(assembly)
+    }
+    if (debug || svg) {
+      result.svg = makerjs.exporter.toSVG(assembly)
     }
     return result
 }

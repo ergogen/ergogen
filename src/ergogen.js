@@ -58,7 +58,7 @@ const process = async (raw, options={}, logger=()=>{}) => {
     }
     if (debug) {
         results.points = points
-        results.demo = io.twodee(points_lib.visualize(points, units), debug)
+        results.demo = io.twodee(points_lib.visualize(points, units), {debug, svg})
     }
 
     logger('Generating outlines...')
@@ -66,7 +66,7 @@ const process = async (raw, options={}, logger=()=>{}) => {
     results.outlines = {}
     for (const [name, outline] of Object.entries(outlines)) {
         if (!debug && name.startsWith('_')) continue
-        results.outlines[name] = io.twodee(outline, svg || debug)
+        results.outlines[name] = io.twodee(outline, {debug, svg})
         empty = false
     }
 
