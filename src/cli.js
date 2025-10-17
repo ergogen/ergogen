@@ -33,6 +33,12 @@ const args = yargs
         describe: 'Clean output dir before parsing',
         type: 'boolean'
     })
+    .option('svg', {
+        alias: 'generate-svg',
+        default: false,
+        describe: 'Generate SVG outputs',
+        type: 'boolean'
+    })
     .argv
 
 // greetings
@@ -124,7 +130,14 @@ try {
 
 let results
 try {
-    results = await ergogen.process(config_text, args.debug, s => console.log(s))
+    results = await ergogen.process(
+        config_text,
+        {
+            debug: args['debug'],
+            svg: args['svg']
+        },
+        s => console.log(s)
+    )
 } catch (err) {
     console.error(err)
     process.exit(3)
