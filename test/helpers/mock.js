@@ -1,3 +1,29 @@
+const FIXED_TIMESTAMP = 1760558400000; // 2025-10-16T12:00:00.000Z
+
+const OriginalDate = global.Date;
+
+// Mock Date to return a fixed date for deterministic test output
+global.Date = class extends OriginalDate {
+  constructor(...args) {
+    // If the constructor is called with arguments, pass them to the original Date constructor
+    if (args.length > 0) {
+      super(...args);
+    } else {
+      // Otherwise, create a date with the fixed timestamp
+      super(FIXED_TIMESTAMP);
+    }
+  }
+
+  static now() {
+    return FIXED_TIMESTAMP;
+  }
+};
+
+// Copy static properties from the original Date to the mock
+Object.getOwnPropertyNames(OriginalDate)
+  .filter(prop => prop !== 'length' && prop !== 'name' && prop !== 'prototype' && prop !== 'now')
+  .forEach(prop => (global.Date[prop] = OriginalDate[prop]));
+
 exports.inject = (ergogen) => {
     ergogen.inject('footprint', 'trace_test', {
         params: {
