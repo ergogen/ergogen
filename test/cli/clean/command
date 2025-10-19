@@ -1,1 +1,0 @@
-mkdir -p ./output && chmod a+rwx ./output && node src/cli.js test/fixtures/medium.yaml --clean && ls -ld ./output | awk '{print $1}'
