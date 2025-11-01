@@ -9,7 +9,7 @@ require('./helpers/mock').inject(ergogen)
 
 let what = process.env.npm_config_what
 const dump = process.env.npm_config_dump
-const lineends = /(?:\r\n|\r|\n)/g
+const lineends = require('./helpers/fixture').lineends
 
 const handle_slash = (() => {
   if (path.sep == '\\') {
@@ -165,9 +165,13 @@ for (let w of cli_what) {
                 if (!exists(t, 'error')) {
                     let ref_log = ''
                     if (exists(t, 'log')) {
-                        ref_log = read(t, 'log').replace(version_regex, '<version>')
+                        ref_log = read(t, 'log')
+                            .replace(version_regex, '<version>')
+                            .replace(lineends, '\n')
                     }
-                    const actual_log = execSync(command).toString().replace(version_regex, '<version>')
+                    const actual_log = execSync(command).toString()
+                        .replace(version_regex, '<version>')
+                        .replace(lineends, '\n')
                     if (dump) {
                         fs.writeFileSync(path.join(t, 'log'), actual_log)
                     }
@@ -189,9 +193,7 @@ for (let w of cli_what) {
                     } else {
                         fs.removeSync(output_path)
                     }
-                    const parse_act_log = actual_log.replace(lineends, '\n')
-                    const parse_ref_log = ref_log.replace(lineends, '\n')
-                    parse_act_log.should.equal(parse_ref_log)
+                    actual_log.should.equal(ref_log)
                     comp_res.same.should.be.true
                 // deliberately incorrect execution
                 } else {

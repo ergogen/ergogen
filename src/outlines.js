@@ -309,9 +309,8 @@ const whats = {
     circle,
     polygon,
     outline,
-    bezier,
-    hull,
-    path
+    path,
+    hull
 }
 
 const expand_shorthand = (config, name, units) => {
