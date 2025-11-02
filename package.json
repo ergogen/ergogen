@@ -15,6 +15,7 @@
         "coverage": "nyc --reporter=html --reporter=text npm test"
     },
     "dependencies": {
+        "@jscad/modeling": "^2.12.6",
         "fs-extra": "^11.3.2",
         "hull": "github:andriiheonia/hull",
         "js-yaml": "^3.14.1",
