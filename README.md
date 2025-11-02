@@ -51,7 +51,6 @@ Until there's a proper "Getting started" guide, try getting acquainted with **Er
     [![Button Official]][WebUI]   
     [![Button Unofficial]][Unofficial]
    
-    The unofficial deployment is probably better, tbh, and will soon be replacing the official one.
     Choose either one, then click things, look at outputs and see if things start to make sense.
    
     There is no need for you to download the **CLI** unless you want to do one of the following:
