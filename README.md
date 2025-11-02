@@ -51,8 +51,9 @@ Until there's a proper "Getting started" guide, try getting acquainted with **Er
     [![Button Official]][WebUI]   
     [![Button Unofficial]][Unofficial]
    
-    The unofficial deployment is probably better, tbh, and will soon be replacing the official one.
-    Choose either one, then click things, look at outputs and see if things start to make sense.
+    (The difference being that Stable runs the latest official release, while Nightly offers early access to in-progress features, both for the Ergogen engine and the UI.)
+    
+    Load example configs, click things, rewrite things, look at outputs and see if things start to make sense.
    
     There is no need for you to download the **CLI** unless you want to do one of the following:
    
@@ -77,6 +78,8 @@ Until there's a proper "Getting started" guide, try getting acquainted with **Er
 
 Feature ideas, documentation improvements, examples, tests, or pull requests welcome!
 Get in touch on our **[Discord]**, and we can definitely find something you can help with, if you'd like to.
+
+From an administrative standpoint, please note that we'd like to keep the Git history linear and the test suite comprehensive, so if you do issue a PR, make sure it's A) a straight chain of commits, B) it's always rebased on the current `develop`, and C) the test coverage remains at 100%.
 
 <br>
 
@@ -104,8 +107,8 @@ But even huger thanks are due to the following, *distinguished* sponsors:
 <!--------------------------------{ Buttons }---------------------------------->
 
 [Button WebUI]: https://img.shields.io/badge/Deployment-37a779?style=for-the-badge&logoColor=white&logo=AppleArcade
-[Button Unofficial]: https://img.shields.io/badge/Unofficial-yellow?style=for-the-badge
-[Button Official]: https://img.shields.io/badge/Official-37a779?style=for-the-badge
+[Button Official]: https://img.shields.io/badge/Stable-37a779?style=for-the-badge
+[Button Unofficial]: https://img.shields.io/badge/Nightly-yellow?style=for-the-badge
 [Button Documentation]: https://img.shields.io/badge/Documentation-1793D1?style=for-the-badge&logoColor=white&logo=GitBook
 [Button Discord]: https://img.shields.io/badge/Discord-5865F2?style=for-the-badge&logoColor=white&logo=Discord
 [Button Donate]: https://img.shields.io/badge/Donate-EA4AAA?style=for-the-badge&logoColor=white&logo=githubsponsors
