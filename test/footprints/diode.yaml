@@ -1,6 +1,41 @@
 points.zones.matrix:
 pcbs.pcb.footprints:
+  # base
   - what: diode
     params:
       from: from
       to: to
+
+  # THT only
+  - what: diode
+    params:
+      from: from
+      to: to
+      smd: false
+      tht: true
+
+  # SMD only
+  - what: diode
+    params:
+      from: from
+      to: to
+      smd: true
+      tht: false
+
+  # SMD with middle vias
+  - what: diode
+    params:
+      from: from
+      to: to
+      smd: true
+      tht: false
+      via: middle
+
+  # SMD with vias in pads
+  - what: diode
+    params:
+      from: from
+      to: to
+      smd: true
+      tht: false
+      via: pad
