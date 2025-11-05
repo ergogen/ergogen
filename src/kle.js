@@ -1,5 +1,5 @@
 const u = require('./utils')
-const kle = require('kle-serial')
+const kle = require('kle-serial2')
 const yaml = require('js-yaml')
 
 exports.convert = (config, logger) => {
