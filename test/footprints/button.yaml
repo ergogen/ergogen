@@ -13,4 +13,12 @@ pcbs.pcb.footprints:
       from: from
       to: to
       side: B
-    adjust.shift: [50, 0]
+    adjust.shift: [10, 0]
+
+  # PTS636_SK43_LFS variant
+  - what: button
+    params:
+      from: from
+      to: to
+      variant: PTS636_SK43_LFS
+    adjust.shift: [0, 10]

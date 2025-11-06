@@ -109,65 +109,83 @@
   )
 
   
-    
     (module E73:SW_TACT_ALPS_SKQGABE010 (layer F.Cu) (tstamp 5BF2CC94)
 
-        (descr "Low-profile SMD Tactile Switch, https://www.e-switch.com/product-catalog/tact/product-lines/tl3342-series-low-profile-smt-tact-switch")
-        (tags "SPST Tactile Switch")
+      (descr "Low-profile SMD Tactile Switch, https://www.e-switch.com/product-catalog/tact/product-lines/tl3342-series-low-profile-smt-tact-switch")
+      (tags "SPST Tactile Switch")
 
-        (at 0 0 0)
+      (at 0 0 0)
+      
+      (fp_text reference "B1" (at 0 0) (layer F.SilkS) hide (effects (font (size 1.27 1.27) (thickness 0.15))))
+      (fp_text value "" (at 0 0) (layer F.SilkS) hide (effects (font (size 1.27 1.27) (thickness 0.15))))
         
-        (fp_text reference "B1" (at 0 0) (layer F.SilkS) hide (effects (font (size 1.27 1.27) (thickness 0.15))))
-        (fp_text value "" (at 0 0) (layer F.SilkS) hide (effects (font (size 1.27 1.27) (thickness 0.15))))
-        
-        
-        (fp_line (start 2.75 1.25) (end 1.25 2.75) (layer F.SilkS) (width 0.15))
-        (fp_line (start 2.75 -1.25) (end 1.25 -2.75) (layer F.SilkS) (width 0.15))
-        (fp_line (start 2.75 -1.25) (end 2.75 1.25) (layer F.SilkS) (width 0.15))
-        (fp_line (start -1.25 2.75) (end 1.25 2.75) (layer F.SilkS) (width 0.15))
-        (fp_line (start -1.25 -2.75) (end 1.25 -2.75) (layer F.SilkS) (width 0.15))
-        (fp_line (start -2.75 1.25) (end -1.25 2.75) (layer F.SilkS) (width 0.15))
-        (fp_line (start -2.75 -1.25) (end -1.25 -2.75) (layer F.SilkS) (width 0.15))
-        (fp_line (start -2.75 -1.25) (end -2.75 1.25) (layer F.SilkS) (width 0.15))
-        
-        
-        (pad 1 smd rect (at -3.1 -1.85 0) (size 1.8 1.1) (layers F.Cu F.Paste F.Mask) (net 1 "from"))
-        (pad 1 smd rect (at 3.1 -1.85 0) (size 1.8 1.1) (layers F.Cu F.Paste F.Mask) (net 1 "from"))
-        (pad 2 smd rect (at -3.1 1.85 0) (size 1.8 1.1) (layers F.Cu F.Paste F.Mask) (net 2 "to"))
-        (pad 2 smd rect (at 3.1 1.85 0) (size 1.8 1.1) (layers F.Cu F.Paste F.Mask) (net 2 "to"))
-    )
-    
-    
+      
+      (fp_line (start 2.75 1.25) (end 1.25 2.75) (layer F.SilkS) (width 0.15))
+      (fp_line (start 2.75 -1.25) (end 1.25 -2.75) (layer F.SilkS) (width 0.15))
+      (fp_line (start 2.75 -1.25) (end 2.75 1.25) (layer F.SilkS) (width 0.15))
+      (fp_line (start -1.25 2.75) (end 1.25 2.75) (layer F.SilkS) (width 0.15))
+      (fp_line (start -1.25 -2.75) (end 1.25 -2.75) (layer F.SilkS) (width 0.15))
+      (fp_line (start -2.75 1.25) (end -1.25 2.75) (layer F.SilkS) (width 0.15))
+      (fp_line (start -2.75 -1.25) (end -1.25 -2.75) (layer F.SilkS) (width 0.15))
+      (fp_line (start -2.75 -1.25) (end -2.75 1.25) (layer F.SilkS) (width 0.15))
+      
+      
+      (pad 1 smd rect (at -3.1 -1.85 0) (size 1.8 1.1) (layers F.Cu F.Paste F.Mask) (net 1 "from"))
+      (pad 1 smd rect (at 3.1 -1.85 0) (size 1.8 1.1) (layers F.Cu F.Paste F.Mask) (net 1 "from"))
+      (pad 2 smd rect (at -3.1 1.85 0) (size 1.8 1.1) (layers F.Cu F.Paste F.Mask) (net 2 "to"))
+      (pad 2 smd rect (at 3.1 1.85 0) (size 1.8 1.1) (layers F.Cu F.Paste F.Mask) (net 2 "to"))
+    )   
+  
 
-    
     (module E73:SW_TACT_ALPS_SKQGABE010 (layer F.Cu) (tstamp 5BF2CC94)
 
-        (descr "Low-profile SMD Tactile Switch, https://www.e-switch.com/product-catalog/tact/product-lines/tl3342-series-low-profile-smt-tact-switch")
-        (tags "SPST Tactile Switch")
+      (descr "Low-profile SMD Tactile Switch, https://www.e-switch.com/product-catalog/tact/product-lines/tl3342-series-low-profile-smt-tact-switch")
+      (tags "SPST Tactile Switch")
 
-        (at 50 0 0)
+      (at 10 0 0)
+      
+      (fp_text reference "B2" (at 0 0) (layer F.SilkS) hide (effects (font (size 1.27 1.27) (thickness 0.15))))
+      (fp_text value "" (at 0 0) (layer F.SilkS) hide (effects (font (size 1.27 1.27) (thickness 0.15))))
         
-        (fp_text reference "B2" (at 0 0) (layer F.SilkS) hide (effects (font (size 1.27 1.27) (thickness 0.15))))
-        (fp_text value "" (at 0 0) (layer F.SilkS) hide (effects (font (size 1.27 1.27) (thickness 0.15))))
-        
-        
-        (fp_line (start 2.75 1.25) (end 1.25 2.75) (layer B.SilkS) (width 0.15))
-        (fp_line (start 2.75 -1.25) (end 1.25 -2.75) (layer B.SilkS) (width 0.15))
-        (fp_line (start 2.75 -1.25) (end 2.75 1.25) (layer B.SilkS) (width 0.15))
-        (fp_line (start -1.25 2.75) (end 1.25 2.75) (layer B.SilkS) (width 0.15))
-        (fp_line (start -1.25 -2.75) (end 1.25 -2.75) (layer B.SilkS) (width 0.15))
-        (fp_line (start -2.75 1.25) (end -1.25 2.75) (layer B.SilkS) (width 0.15))
-        (fp_line (start -2.75 -1.25) (end -1.25 -2.75) (layer B.SilkS) (width 0.15))
-        (fp_line (start -2.75 -1.25) (end -2.75 1.25) (layer B.SilkS) (width 0.15))
-        
-        
-        (pad 1 smd rect (at -3.1 -1.85 0) (size 1.8 1.1) (layers B.Cu B.Paste B.Mask) (net 1 "from"))
-        (pad 1 smd rect (at 3.1 -1.85 0) (size 1.8 1.1) (layers B.Cu B.Paste B.Mask) (net 1 "from"))
-        (pad 2 smd rect (at -3.1 1.85 0) (size 1.8 1.1) (layers B.Cu B.Paste B.Mask) (net 2 "to"))
-        (pad 2 smd rect (at 3.1 1.85 0) (size 1.8 1.1) (layers B.Cu B.Paste B.Mask) (net 2 "to"))
+      
+      (fp_line (start 2.75 1.25) (end 1.25 2.75) (layer B.SilkS) (width 0.15))
+      (fp_line (start 2.75 -1.25) (end 1.25 -2.75) (layer B.SilkS) (width 0.15))
+      (fp_line (start 2.75 -1.25) (end 2.75 1.25) (layer B.SilkS) (width 0.15))
+      (fp_line (start -1.25 2.75) (end 1.25 2.75) (layer B.SilkS) (width 0.15))
+      (fp_line (start -1.25 -2.75) (end 1.25 -2.75) (layer B.SilkS) (width 0.15))
+      (fp_line (start -2.75 1.25) (end -1.25 2.75) (layer B.SilkS) (width 0.15))
+      (fp_line (start -2.75 -1.25) (end -1.25 -2.75) (layer B.SilkS) (width 0.15))
+      (fp_line (start -2.75 -1.25) (end -2.75 1.25) (layer B.SilkS) (width 0.15))
+      
+      
+      (pad 1 smd rect (at -3.1 -1.85 0) (size 1.8 1.1) (layers B.Cu B.Paste B.Mask) (net 1 "from"))
+      (pad 1 smd rect (at 3.1 -1.85 0) (size 1.8 1.1) (layers B.Cu B.Paste B.Mask) (net 1 "from"))
+      (pad 2 smd rect (at -3.1 1.85 0) (size 1.8 1.1) (layers B.Cu B.Paste B.Mask) (net 2 "to"))
+      (pad 2 smd rect (at 3.1 1.85 0) (size 1.8 1.1) (layers B.Cu B.Paste B.Mask) (net 2 "to"))
+    )   
+  
+
+    (module SW_TACT_PTS636_SK43_LFS (layer F.Cu) (tstamp 5BF2CC94)
+  
+      (descr "THT Tactile Switch, https://www.ckswitches.com/media/2779/pts636.pdf")
+      (tags "THT Tactile Switch")
+  
+      (at 0 -10 0)
+      
+      (fp_text reference "B3" (at 0 0) (layer F.SilkS) hide (effects (font (size 1.27 1.27) (thickness 0.15))))
+      (fp_text value "" (at 0 0) (layer F.SilkS) hide (effects (font (size 1.27 1.27) (thickness 0.15))))
+      
+      
+      (fp_line (start -3 -1.75) (end 3 -1.75) (layer F.SilkS) (width 0.15))
+      (fp_line (start 3 -1.75) (end 3 1.75) (layer F.SilkS) (width 0.15))
+      (fp_line (start 3 1.75) (end -3 1.75) (layer F.SilkS) (width 0.15))
+      (fp_line (start -3 1.75) (end -3 -1.75) (layer F.SilkS) (width 0.15))
+      
+      
+      (pad 1 thru_hole circle (at 3.2 0 0) (size 2 2) (drill 1.2) (layers *.Cu *.Mask) (net 1 "from"))
+      (pad 2 thru_hole circle (at -3.2 0 0) (size 2 2) (drill 1.2) (layers *.Cu *.Mask) (net 2 "to"))
     )
-    
-    
+  
   
 
 )
