@@ -3,7 +3,7 @@
 (kicad_pcb
   (version 20240108)
   (generator "ergogen")
-  (generator_version "4.2.0")
+  (generator_version "4.2.1")
   (general
     (thickness 1.6)
     (legacy_teardrops no)
