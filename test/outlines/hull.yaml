@@ -70,3 +70,16 @@ outlines:
         - matrix_c2_r2
         - matrix_c2_r3
         - rotated
+  clockwise:
+    - what: hull
+      points:
+        - matrix_c2_r2
+        - matrix_c2_r3
+        - rotated
+  counter-clockwise:
+    - what: hull
+      points:
+        - matrix_c2_r2
+        - matrix_c2_r3
+        - rotated
+      clockwise: false
