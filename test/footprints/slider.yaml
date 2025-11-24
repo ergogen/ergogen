@@ -1,0 +1,23 @@
+points.zones.matrix:
+pcbs.pcb.footprints:
+
+  # front (left side)
+  - what: slider
+    params:
+      A: A
+      COM: COM
+
+  # front (left right size)
+  - what: slider
+    params:
+      B: B
+      COM: COM
+    adjust.shift: [10, 0]
+
+  # back
+  - what: slider
+    params:
+      A: A
+      COM: COM
+      side: B
+    adjust.shift: [0, 10]

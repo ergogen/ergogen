@@ -55,12 +55,6 @@ pcbs.pcb.footprints:
       D: D
     adjust.shift: [50, 100]
 
-  - what: slider
-    params:
-      from: from
-      to: to
-    adjust.shift: [100, 100]
-
   - what: via
     params:
       net: net
@@ -76,10 +70,3 @@ pcbs.pcb.footprints:
       D: D
       reverse: true
     adjust.shift: [50, 150]
-
-  - what: slider
-    params:
-      from: from
-      to: to
-      side: B
-    adjust.shift: [100, 150]
