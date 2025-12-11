@@ -35,11 +35,14 @@ The project aims to provide a common configuration format to describe ***ergonom
 
 ## Getting Started
 
+**NOTE:** Ergogen v4 makes a few breaking changes to the format. This makes the documentation for Ergogen and many examples available on the net somewhat obsolete. Rest assured that a complete documentation rewrite is underway to address this (preview at https://deploy-preview-12--ergogen.netlify.app/ , but it's mostly just for preprocessing and points for now). Until this matures, your best bet is relying on the community-driven migration guide ( https://github.com/tsteffek/Ergogen-V4-Migration-Guide ). Also, I hear there'll soon be a series of blog posts detailing the creation process of a complete keyboard using ergogen v4, so stay tuned for that as well. Also also, joining our Discord can get you many helpful answers in the meantime, should you get stuck ( http://discord.ergogen.xyz ).
+
+
 Until there's a proper "Getting started" guide, try getting acquainted with **Ergogen** by following these steps in order:
 
 <br>
 
-1. Read the **[Documentation]**.
+1. Read the **[Documentation]**. (But see note above!)
     
     D'uuh.
     They're not complete by any measure, but should give you a fairly good idea what you're dealing with here.
