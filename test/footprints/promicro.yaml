@@ -9,3 +9,17 @@ pcbs.pcb.footprints:
     params:
       orientation: up
     adjust.shift: [50, 0]
+
+  # downward on back
+  - what: promicro
+    params:
+      orientation: down
+      side: B
+    adjust.shift: [0, 50]
+
+  # upward on back
+  - what: promicro
+    params:
+      orientation: up
+      side: B
+    adjust.shift: [50, 50]
