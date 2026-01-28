@@ -71,7 +71,7 @@ const process = async (raw, options={}, logger=()=>{}) => {
     }
 
     logger('Modeling cases...')
-    const cases = cases_lib.parse(config.cases || {}, outlines, units)
+    const cases = cases_lib.parse(config, outlines, units)
     results.cases = {}
     for (const [case_name, case_script] of Object.entries(cases)) {
         if (!debug && case_name.startsWith('_')) continue
