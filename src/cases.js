@@ -4,7 +4,7 @@ const o = require('./operation')
 
 exports.parse = (config, outlines, units) => {
 
-    const cases_config = a.sane(config, 'cases', 'object')()
+    const cases_config = a.sane(config.cases || {}, 'cases', 'object')()
 
     const scripts = {}
     const cases = {}
@@ -77,6 +77,7 @@ exports.parse = (config, outlines, units) => {
                     scripts[extruded_name] = m.exporter.toJscadScript(outline, {
                         functionName: `${extruded_name}_outline_fn`,
                         extrude: extrude,
+                        maxArcFacet: config.meta?.maxArcFacet,
                         indent: 4
                     })
                 }
