@@ -33,6 +33,53 @@ The project aims to provide a common configuration format to describe ***ergonom
 <br>
 <br>
 
+## Fork Features
+
+This fork adds CadQuery-based case generation.
+Instead of writing case JSON or JSCAD files, the CLI writes Python scripts to `output/cases`.
+Each generated script exports matching STEP and STL files beside itself when run.
+
+```bash
+ergogen . --clean true
+for f in output/cases/*.py; do python "$f"; done
+```
+
+For example, `output/cases/left.py` exports:
+
+- `output/cases/left.step`
+- `output/cases/left.stl`
+
+An example config using these features is available at [Terence-1/simple34-2.0](https://github.com/Terence-1/simple34-2.0).
+
+Case parts support optional `fillet` and `chamfer` fields.
+Both options only affect the outermost top and bottom perimeter edges of that part; inner hole edges are left untouched.
+Use only one of `fillet` or `chamfer` on a given part.
+
+```yaml
+cases:
+  left:
+    - name: _wall
+      extrude: 6.6
+      fillet: 0.5
+```
+
+Use separate top and bottom values with either object syntax:
+
+```yaml
+fillet:
+  top: 0.5
+  bottom: 0.2
+```
+
+or array shorthand:
+
+```yaml
+chamfer: [0.5, 0.2] # [top, bottom]
+```
+
+<br>
+<br>
+
 ## Getting Started
 
 Until there's a proper "Getting started" guide, try getting acquainted with **Ergogen** by following these steps in order:

@@ -195,7 +195,7 @@ for (const [name, outline] of Object.entries(results.outlines)) {
 }
 
 for (const [name, _case] of Object.entries(results.cases)) {
-    composite(_case, `cases/${name}`)
+    single(_case.py, `cases/${name}.py`)
 }
 
 for (const [name, pcb] of Object.entries(results.pcbs)) {

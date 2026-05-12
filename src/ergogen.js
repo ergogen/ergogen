@@ -5,6 +5,7 @@ const units_lib = require('./units')
 const points_lib = require('./points')
 const outlines_lib = require('./outlines')
 const cases_lib = require('./cases')
+const cases_cadquery = require('./cases_cadquery')
 const pcbs_lib = require('./pcbs')
 
 const version = require('../package.json').version
@@ -75,7 +76,10 @@ const process = async (raw, options={}, logger=()=>{}) => {
     results.cases = {}
     for (const [case_name, case_script] of Object.entries(cases)) {
         if (!debug && case_name.startsWith('_')) continue
-        results.cases[case_name] = {jscad: case_script}
+        results.cases[case_name] = {
+            json: case_script,
+            py: cases_cadquery.generate_py(case_name, cases)
+        }
         empty = false
     }
 
