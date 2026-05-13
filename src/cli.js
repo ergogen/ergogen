@@ -39,6 +39,11 @@ const args = yargs
         describe: 'Generate SVG outputs',
         type: 'boolean'
     })
+    .option('cases_only', {
+        default: false,
+        describe: 'Only generate case outputs',
+        type: 'boolean'
+    })
     .argv
 
 // greetings
@@ -183,23 +188,27 @@ if (args.clean) {
 console.log('Writing output to disk...')
 fs.mkdirpSync(args.o)
 
-single(results.raw, 'source/raw.txt')
-single(results.canonical, 'source/canonical.yaml')
+if (!args.cases_only) {
+    single(results.raw, 'source/raw.txt')
+    single(results.canonical, 'source/canonical.yaml')
 
-single(results.units, 'points/units.yaml')
-single(results.points, 'points/points.yaml')
-composite(results.demo, 'points/demo')
+    single(results.units, 'points/units.yaml')
+    single(results.points, 'points/points.yaml')
+    composite(results.demo, 'points/demo')
 
-for (const [name, outline] of Object.entries(results.outlines)) {
-    composite(outline, `outlines/${name}`)
+    for (const [name, outline] of Object.entries(results.outlines)) {
+        composite(outline, `outlines/${name}`)
+    }
 }
 
 for (const [name, _case] of Object.entries(results.cases)) {
     single(_case.py, `cases/${name}.py`)
 }
 
-for (const [name, pcb] of Object.entries(results.pcbs)) {
-    single(pcb, `pcbs/${name}.kicad_pcb`)
+if (!args.cases_only) {
+    for (const [name, pcb] of Object.entries(results.pcbs)) {
+        single(pcb, `pcbs/${name}.kicad_pcb`)
+    }
 }
 
 // goodbye
