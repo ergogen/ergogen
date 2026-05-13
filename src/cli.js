@@ -46,6 +46,11 @@ const args = yargs
     })
     .argv
 
+if (args.clean && args.cases_only) {
+    console.error('Options "--clean" and "--cases_only" cannot be used together.')
+    process.exit(1)
+}
+
 // greetings
 
 const title_suffix = args.debug ? ' (Debug Mode)' : ''

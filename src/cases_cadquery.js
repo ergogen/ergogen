@@ -276,7 +276,7 @@ function fillet_lines(varname, fillet) {
     const inner_top = (fillet && fillet.inner && fillet.inner.top) || 0
     const inner_bottom = (fillet && fillet.inner && fillet.inner.bottom) || 0
     if (!outer_top && !outer_bottom && !inner_top && !inner_bottom) return []
-    return [`    ${varname} = _fillet_edges(${varname}, ${outer_top}, ${outer_bottom}, ${inner_top}, ${inner_bottom})`]
+    return [`    ${varname} = _fillet_edges(${varname}, "${varname}", ${outer_top}, ${outer_bottom}, ${inner_top}, ${inner_bottom})`]
 }
 
 function chamfer_lines(varname, chamfer) {
@@ -285,7 +285,7 @@ function chamfer_lines(varname, chamfer) {
     const inner_top = (chamfer && chamfer.inner && chamfer.inner.top) || 0
     const inner_bottom = (chamfer && chamfer.inner && chamfer.inner.bottom) || 0
     if (!outer_top && !outer_bottom && !inner_top && !inner_bottom) return []
-    return [`    ${varname} = _chamfer_edges(${varname}, ${outer_top}, ${outer_bottom}, ${inner_top}, ${inner_bottom})`]
+    return [`    ${varname} = _chamfer_edges(${varname}, "${varname}", ${outer_top}, ${outer_bottom}, ${inner_top}, ${inner_bottom})`]
 }
 
 function generate_py(case_name, cases) {
@@ -313,23 +313,29 @@ function generate_py(case_name, cases) {
     out.push(`            edges.extend(wire.Edges())`)
     out.push(`    return edges`)
     out.push(``)
-    out.push(`def _apply_edge_treatment(result, operation, outer_top=0, outer_bottom=0, inner_top=0, inner_bottom=0):`)
+    out.push(`def _apply_edge_treatment(result, part_name, operation_name, operation, outer_top=0, outer_bottom=0, inner_top=0, inner_bottom=0):`)
     out.push(`    for selector, outer_value, inner_value in (("<Z", outer_bottom, inner_bottom), (">Z", outer_top, inner_top)):`)
     out.push(`        if outer_value:`)
     out.push(`            edges = _outer_wire_edges(result, selector)`)
     out.push(`            if edges:`)
-    out.push(`                result = operation(result.newObject(edges), outer_value)`)
+    out.push(`                try:`)
+    out.push(`                    result = operation(result.newObject(edges), outer_value)`)
+    out.push(`                except Exception as exc:`)
+    out.push(`                    raise RuntimeError(f"{operation_name} failed on {part_name} outer {selector} edges with value {outer_value}") from exc`)
     out.push(`        if inner_value:`)
     out.push(`            edges = _inner_wire_edges(result, selector)`)
     out.push(`            if edges:`)
-    out.push(`                result = operation(result.newObject(edges), inner_value)`)
+    out.push(`                try:`)
+    out.push(`                    result = operation(result.newObject(edges), inner_value)`)
+    out.push(`                except Exception as exc:`)
+    out.push(`                    raise RuntimeError(f"{operation_name} failed on {part_name} inner {selector} edges with value {inner_value}") from exc`)
     out.push(`    return result`)
     out.push(``)
-    out.push(`def _fillet_edges(result, outer_top=0, outer_bottom=0, inner_top=0, inner_bottom=0):`)
-    out.push(`    return _apply_edge_treatment(result, lambda edges, value: edges.fillet(value), outer_top, outer_bottom, inner_top, inner_bottom)`)
+    out.push(`def _fillet_edges(result, part_name, outer_top=0, outer_bottom=0, inner_top=0, inner_bottom=0):`)
+    out.push(`    return _apply_edge_treatment(result, part_name, "fillet", lambda edges, value: edges.fillet(value), outer_top, outer_bottom, inner_top, inner_bottom)`)
     out.push(``)
-    out.push(`def _chamfer_edges(result, outer_top=0, outer_bottom=0, inner_top=0, inner_bottom=0):`)
-    out.push(`    return _apply_edge_treatment(result, lambda edges, value: edges.chamfer(value), outer_top, outer_bottom, inner_top, inner_bottom)`)
+    out.push(`def _chamfer_edges(result, part_name, outer_top=0, outer_bottom=0, inner_top=0, inner_bottom=0):`)
+    out.push(`    return _apply_edge_treatment(result, part_name, "chamfer", lambda edges, value: edges.chamfer(value), outer_top, outer_bottom, inner_top, inner_bottom)`)
     out.push(``)
 
     function emit_part(case_name, part, index) {
