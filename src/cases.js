@@ -1,7 +1,7 @@
 const a = require('./assert')
 const o = require('./operation')
 
-const edge_treatment = (raw, name, units) => {
+const edge_treatment_values = (raw, name, units) => {
     if (raw === undefined) return {top: 0, bottom: 0}
     const type = a.type(raw)(units)
     if (type == 'number') {
@@ -20,7 +20,33 @@ const edge_treatment = (raw, name, units) => {
     }
 }
 
-const has_edge_treatment = treatment => treatment.top || treatment.bottom
+const edge_treatment = (raw, name, units) => {
+    if (raw === undefined) {
+        return {
+            outer: {top: 0, bottom: 0},
+            inner: {top: 0, bottom: 0}
+        }
+    }
+    const type = a.type(raw)(units)
+    if (type == 'number' || type == 'array') {
+        return {
+            outer: edge_treatment_values(raw, name, units),
+            inner: {top: 0, bottom: 0}
+        }
+    }
+    a.unexpected(raw, name, ['top', 'bottom', 'all', 'outer', 'inner'])
+    const has_legacy_values = raw.top !== undefined || raw.bottom !== undefined || raw.all !== undefined
+    return {
+        outer: raw.outer === undefined
+            ? edge_treatment_values(has_legacy_values ? raw : undefined, name, units)
+            : edge_treatment_values(raw.outer, `${name}.outer`, units),
+        inner: edge_treatment_values(raw.inner, `${name}.inner`, units)
+    }
+}
+
+const has_edge_treatment = treatment => {
+    return treatment.outer.top || treatment.outer.bottom || treatment.inner.top || treatment.inner.bottom
+}
 
 exports.parse = (config, outlines, units) => {
 

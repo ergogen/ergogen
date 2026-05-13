@@ -52,7 +52,8 @@ For example, `output/cases/left.py` exports:
 An example config using these features is available at [Terence-1/simple34-2.0](https://github.com/Terence-1/simple34-2.0).
 
 Case parts support optional `fillet` and `chamfer` fields.
-Both options only affect the outermost top and bottom perimeter edges of that part; inner hole edges are left untouched.
+By default, both options affect only the outermost top and bottom perimeter edges of that part.
+Inner hole edges can be targeted separately with `inner`.
 Use only one of `fillet` or `chamfer` on a given part.
 
 ```yaml
@@ -75,6 +76,26 @@ or array shorthand:
 
 ```yaml
 chamfer: [0.5, 0.2] # [top, bottom]
+```
+
+Use `outer` and `inner` to target perimeter and hole edges separately:
+
+```yaml
+fillet:
+  outer:
+    top: 0.5
+    bottom: 0.2
+  inner:
+    top: 0.15
+    bottom: 0.15
+```
+
+The same shape works for `chamfer`:
+
+```yaml
+chamfer:
+  outer: 0.4
+  inner: [0.2, 0.1]
 ```
 
 <br>

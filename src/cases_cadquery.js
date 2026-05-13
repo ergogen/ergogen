@@ -271,17 +271,21 @@ function op_name(operation) {
 }
 
 function fillet_lines(varname, fillet) {
-    const top = (fillet && fillet.top) || 0
-    const bottom = (fillet && fillet.bottom) || 0
-    if (!top && !bottom) return []
-    return [`    ${varname} = _fillet_outer_edges(${varname}, ${top}, ${bottom})`]
+    const outer_top = (fillet && fillet.outer && fillet.outer.top) || 0
+    const outer_bottom = (fillet && fillet.outer && fillet.outer.bottom) || 0
+    const inner_top = (fillet && fillet.inner && fillet.inner.top) || 0
+    const inner_bottom = (fillet && fillet.inner && fillet.inner.bottom) || 0
+    if (!outer_top && !outer_bottom && !inner_top && !inner_bottom) return []
+    return [`    ${varname} = _fillet_edges(${varname}, ${outer_top}, ${outer_bottom}, ${inner_top}, ${inner_bottom})`]
 }
 
 function chamfer_lines(varname, chamfer) {
-    const top = (chamfer && chamfer.top) || 0
-    const bottom = (chamfer && chamfer.bottom) || 0
-    if (!top && !bottom) return []
-    return [`    ${varname} = _chamfer_outer_edges(${varname}, ${top}, ${bottom})`]
+    const outer_top = (chamfer && chamfer.outer && chamfer.outer.top) || 0
+    const outer_bottom = (chamfer && chamfer.outer && chamfer.outer.bottom) || 0
+    const inner_top = (chamfer && chamfer.inner && chamfer.inner.top) || 0
+    const inner_bottom = (chamfer && chamfer.inner && chamfer.inner.bottom) || 0
+    if (!outer_top && !outer_bottom && !inner_top && !inner_bottom) return []
+    return [`    ${varname} = _chamfer_edges(${varname}, ${outer_top}, ${outer_bottom}, ${inner_top}, ${inner_bottom})`]
 }
 
 function generate_py(case_name, cases) {
@@ -302,27 +306,30 @@ function generate_py(case_name, cases) {
     out.push(`        edges.extend(face.outerWire().Edges())`)
     out.push(`    return edges`)
     out.push(``)
-    out.push(`def _fillet_outer_edges(result, top=0, bottom=0):`)
-    out.push(`    if bottom:`)
-    out.push(`        edges = _outer_wire_edges(result, "<Z")`)
-    out.push(`        if edges:`)
-    out.push(`            result = result.newObject(edges).fillet(bottom)`)
-    out.push(`    if top:`)
-    out.push(`        edges = _outer_wire_edges(result, ">Z")`)
-    out.push(`        if edges:`)
-    out.push(`            result = result.newObject(edges).fillet(top)`)
+    out.push(`def _inner_wire_edges(result, selector):`)
+    out.push(`    edges = []`)
+    out.push(`    for face in result.faces(selector).vals():`)
+    out.push(`        for wire in face.innerWires():`)
+    out.push(`            edges.extend(wire.Edges())`)
+    out.push(`    return edges`)
+    out.push(``)
+    out.push(`def _apply_edge_treatment(result, operation, outer_top=0, outer_bottom=0, inner_top=0, inner_bottom=0):`)
+    out.push(`    for selector, outer_value, inner_value in (("<Z", outer_bottom, inner_bottom), (">Z", outer_top, inner_top)):`)
+    out.push(`        if outer_value:`)
+    out.push(`            edges = _outer_wire_edges(result, selector)`)
+    out.push(`            if edges:`)
+    out.push(`                result = operation(result.newObject(edges), outer_value)`)
+    out.push(`        if inner_value:`)
+    out.push(`            edges = _inner_wire_edges(result, selector)`)
+    out.push(`            if edges:`)
+    out.push(`                result = operation(result.newObject(edges), inner_value)`)
     out.push(`    return result`)
     out.push(``)
-    out.push(`def _chamfer_outer_edges(result, top=0, bottom=0):`)
-    out.push(`    if bottom:`)
-    out.push(`        edges = _outer_wire_edges(result, "<Z")`)
-    out.push(`        if edges:`)
-    out.push(`            result = result.newObject(edges).chamfer(bottom)`)
-    out.push(`    if top:`)
-    out.push(`        edges = _outer_wire_edges(result, ">Z")`)
-    out.push(`        if edges:`)
-    out.push(`            result = result.newObject(edges).chamfer(top)`)
-    out.push(`    return result`)
+    out.push(`def _fillet_edges(result, outer_top=0, outer_bottom=0, inner_top=0, inner_bottom=0):`)
+    out.push(`    return _apply_edge_treatment(result, lambda edges, value: edges.fillet(value), outer_top, outer_bottom, inner_top, inner_bottom)`)
+    out.push(``)
+    out.push(`def _chamfer_edges(result, outer_top=0, outer_bottom=0, inner_top=0, inner_bottom=0):`)
+    out.push(`    return _apply_edge_treatment(result, lambda edges, value: edges.chamfer(value), outer_top, outer_bottom, inner_top, inner_bottom)`)
     out.push(``)
 
     function emit_part(case_name, part, index) {
