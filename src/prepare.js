@@ -62,26 +62,68 @@ exports.unnest = config => traverse(config, config, [], (target, key, val) => {
     u.deep(target, key, val)
 })
 
-exports.inherit = config => traverse(config, config, [], (target, key, val, root, breadcrumbs) => {
-    if (val && val.$extends !== undefined) {
-        let candidates = u.deepcopy(val.$extends)
-        if (a.type(candidates)() !== 'array') candidates = [candidates]
-        const list = [val]
-        while (candidates.length) {
-            const path = candidates.shift()
-            const other = u.deep(root, path)
-            a.assert(other, `"${path}" (reached from "${breadcrumbs.join('.')}.$extends") does not name a valid inheritance target!`)
-            let parents = other.$extends || []
-            if (a.type(parents)() !== 'array') parents = [parents]
-            candidates = candidates.concat(parents)
-            a.assert(!list.includes(other), `"${path}" (reached from "${breadcrumbs.join('.')}.$extends") leads to a circular dependency!`)
-            list.unshift(other)
+exports.inherit = config => {
+    const cache = new Map()
+    const stack = []
+
+    const resolve = (val, breadcrumbs) => {
+        const type = a.type(val)()
+        if (type !== 'object' && type !== 'array') return val
+        if (cache.has(val)) return cache.get(val)
+
+        a.assert(!stack.includes(val), `"${breadcrumbs.join('.')}" leads to a circular dependency!`)
+
+        stack.push(val)
+        let res
+        if (type === 'object') {
+            let current = val
+            if (val.$extends !== undefined) {
+                let candidates = val.$extends
+                if (a.type(candidates)() !== 'array') candidates = [candidates]
+                const list = []
+                for (const path of candidates) {
+                    const other = u.deep(config, path)
+                    a.assert(other, `"${path}" (reached from "${breadcrumbs.join('.')}.$extends") does not name a valid inheritance target!`)
+                    list.push(resolve(other, path.split('.')))
+                }
+                const own = u.deepcopy(val)
+                delete own.$extends
+
+                if (list.length === 1 && Object.keys(own).length === 0) {
+                    current = list[0]
+                } else {
+                    list.push(own)
+                    current = extend.apply(null, list)
+                }
+            }
+
+            const current_type = a.type(current)()
+            if (current_type === 'object') {
+                res = {}
+                for (const [k, v] of Object.entries(current)) {
+                    res[k] = resolve(v, [...breadcrumbs, k])
+                }
+            } else if (current_type === 'array') {
+                res = []
+                for (let i = 0; i < current.length; i++) {
+                    res[i] = resolve(current[i], [...breadcrumbs, `[${i}]`])
+                }
+            } else {
+                res = current
+            }
+        } else { // array
+            res = []
+            for (let i = 0; i < val.length; i++) {
+                res[i] = resolve(val[i], [...breadcrumbs, `[${i}]`])
+            }
         }
-        val = extend.apply(null, list)
-        delete val.$extends
+        stack.pop()
+        cache.set(val, res)
+        return res
     }
-    target[key] = val
-})
+
+    return resolve(config, [])
+}
 
 exports.parameterize = config => traverse(config, config, [], (target, key, val, root, breadcrumbs) => {
 
