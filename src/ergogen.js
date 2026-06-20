@@ -28,6 +28,7 @@ const process = async (raw, options={}, logger=()=>{}) => {
     config = prepare.unnest(config)
     config = prepare.inherit(config)
     config = prepare.parameterize(config)
+    config = prepare.concat(config)
     const results = {}
     if (debug) {
         results.raw = raw

@@ -253,4 +253,81 @@ describe('Prepare', function() {
             }
         }).should.throw('valid')
     })
+
+    it('concat', function() {
+        // should concatenate references and literals
+        const config1 = {
+            meta: {
+                name: 'ThinkCorney',
+                version: 'v1-b1',
+                name_full: '$concat(meta.name, "-", meta.version)'
+            }
+        }
+        const unnested = p.unnest(config1)
+        const result1 = p.concat(unnested)
+        result1.meta.name_full.should.equal('ThinkCorney-v1-b1')
+
+        // should handle multiple references and literals
+        const config2 = {
+            a: 'foo',
+            b: 'bar',
+            c: 'baz',
+            res: '$concat(a, " and ", b, " and ", c)'
+        }
+        p.concat(config2).res.should.equal('foo and bar and baz')
+
+        // should handle nested concats
+        const config3 = {
+            a: 'foo',
+            b: 'bar',
+            res: '$concat(a, $concat("-", b))'
+        }
+        p.concat(config3).res.should.equal('foo-bar')
+
+        // should handle references to non-string values
+        const config4 = {
+            name: 'engine',
+            version: 4.0,
+            res: '$concat(name, ": ", version)'
+        }
+        p.concat(config4).res.should.equal('engine: 4')
+
+        // should throw on circular dependencies
+        const config5 = {
+            a: '$concat(b)',
+            b: '$concat(a)'
+        }
+        p.concat.bind(this, config5).should.throw('Circular dependency')
+
+        // should throw on unresolved references
+        const config6 = {
+            res: '$concat(nonexistent)'
+        }
+        p.concat.bind(this, config6).should.throw('Could not resolve reference')
+
+        // should handle mixed quotes and escaped quotes in literals
+        const config7 = {
+            res: '$concat("double", \'single\', "contains \\"quotes\\"")'
+        }
+        p.concat(config7).res.should.equal('doublesinglecontains "quotes"')
+
+        // should handle nested quotes of different types
+        const config8 = {
+            res: '$concat("it\'s a test", \'he said "hello"\')'
+        }
+        p.concat(config8).res.should.equal('it\'s a testhe said "hello"')
+
+        // should handle empty or whitespace-only arguments
+        const config9 = {
+            empty: '$concat()',
+            whitespace: '$concat( )',
+            mixed: '$concat(a, , b)',
+            a: 'foo',
+            b: 'bar'
+        }
+        const res9 = p.concat(config9)
+        res9.empty.should.equal('')
+        res9.whitespace.should.equal('')
+        res9.mixed.should.equal('foobar')
+    })
 })

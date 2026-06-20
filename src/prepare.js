@@ -173,3 +173,80 @@ exports.parameterize = config => traverse(config, config, [], (target, key, val,
     delete val.$args
     target[key] = val
 })
+
+const parseArgs = (inner) => {
+    const args = []
+    let current = ''
+    let depth = 0
+    let inQuote = false
+    let quoteChar = ''
+    for (let i = 0; i < inner.length; i++) {
+        const char = inner[i]
+        if ((char === '"' || char === "'") && (i === 0 || inner[i-1] !== '\\')) {
+            if (!inQuote) {
+                inQuote = true
+                quoteChar = char
+                current += char
+            } else if (char === quoteChar) {
+                inQuote = false
+                current += char
+            } else {
+                current += char
+            }
+        } else if (!inQuote && char === '(') {
+            depth++
+            current += char
+        } else if (!inQuote && char === ')') {
+            depth--
+            current += char
+        } else if (!inQuote && char === ',' && depth === 0) {
+            args.push(current.trim())
+            current = ''
+        } else {
+            current += char
+        }
+    }
+    if (current.trim().length > 0 || inner.length === 0) {
+        args.push(current.trim())
+    }
+    return args
+}
+
+const resolve = (val, root, breadcrumbs, seen = new Set()) => {
+    if (a.type(val)() !== 'string') return val
+    if (!val.startsWith('$concat(') || !val.endsWith(')')) return val
+
+    if (seen.has(val)) {
+        throw new Error(`Circular dependency detected in $concat at "${breadcrumbs.join('.')}": ${val}`)
+    }
+    seen.add(val)
+
+    const inner = val.substring(8, val.length - 1)
+    const args = parseArgs(inner)
+
+    const res = args
+        .filter(arg => arg.length > 0)
+        .map(arg => {
+            // String literal
+            if ((arg.startsWith('"') && arg.endsWith('"')) || (arg.startsWith("'") && arg.endsWith("'"))) {
+                return arg.substring(1, arg.length - 1).replace(/\\(.)/g, '$1')
+            }
+            // $concat call
+            if (arg.startsWith('$concat(')) {
+                return resolve(arg, root, breadcrumbs, seen)
+            }
+            // Reference
+            const ref = u.deep(root, arg)
+            if (ref === undefined) {
+                throw new Error(`Could not resolve reference "${arg}" in $concat at "${breadcrumbs.join('.')}"`)
+            }
+            return resolve(ref, root, breadcrumbs, seen)
+        }).join('')
+
+    seen.delete(val)
+    return res
+}
+
+exports.concat = config => traverse(config, config, [], (target, key, val, root, breadcrumbs) => {
+    target[key] = resolve(val, root, breadcrumbs)
+})
