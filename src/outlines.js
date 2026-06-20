@@ -117,11 +117,10 @@ const polygon = (config, name, points, outlines, units) => {
 const hull = (config, name, points, outlines, units) => {
 
   // prepare params
-  a.unexpected(config, `${name}`, ['concavity', 'extend', 'points', 'clockwise'])
+  a.unexpected(config, `${name}`, ['concavity', 'extend', 'points'])
   const concavity = a.sane(config.concavity || 50, `${name}.concavity`, 'number')(units)
   // Extend should default to `true` if not defined
   const extend = a.sane(config.extend === undefined || config.extend, `${name}.extend`, 'boolean')(units)
-  const clockwise = a.sane(config.clockwise === undefined || config.clockwise, `${name}.clockwise`, 'boolean')(units)
   const hull_points = a.sane(config.points, `${name}.points`, 'array')()
 
   // return shape function and its units
@@ -179,7 +178,7 @@ const hull = (config, name, points, outlines, units) => {
           parsed_points.push(last_anchor.p)
         }
     }
-    const poly_points = hulljs(parsed_points, concavity, undefined, clockwise)
+    const poly_points = hulljs(parsed_points, concavity)
     let poly = u.poly(poly_points)
     const bbox = u.bbox(poly_points)
     return [poly, bbox]
