@@ -1,6 +1,2 @@
 Could not read config file "test/cli/bad_template/input"!
 Error: Unknown dependency "nonexistent_require" among the requirements of injection "bad_template"!
-    at /workspaces/ergogen/src/io.js:19:18
-    at eval (eval at exports.unpack (/workspaces/ergogen/src/io.js:49:24), <anonymous>:5:13)
-    at exports.unpack (/workspaces/ergogen/src/io.js:49:85)
-    at async /workspaces/ergogen/src/cli.js:114:37

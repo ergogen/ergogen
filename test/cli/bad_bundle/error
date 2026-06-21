@@ -1,4 +1,2 @@
 Could not read config file "test/"!
 Error: Ambiguous config in bundle!
-    at exports.unpack (/workspaces/ergogen/src/io.js:27:15)
-    at /workspaces/ergogen/src/cli.js:114:46

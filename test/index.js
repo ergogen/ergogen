@@ -197,7 +197,12 @@ for (let w of cli_what) {
                     comp_res.same.should.be.true
                 // deliberately incorrect execution
                 } else {
-                    const ref_error = read(t, 'error')
+                    let ref_error = read(t, 'error')
+                        .split(/\r?\n/)
+                        .filter(line => !line.trim().startsWith('at '))
+                        .map(line => line.trim())
+                        .filter(line => line.length > 0)
+                        .join('\n')
                     try {
                         execSync(command, {stdio: 'pipe'})
                         throw 'should_have_thrown'
@@ -205,7 +210,12 @@ for (let w of cli_what) {
                         if (ex === 'should_have_thrown') {
                             throw new Error('This command should have thrown!')
                         }
-                        const actual_error = ex.stderr.toString()
+                        let actual_error = ex.stderr.toString()
+                            .split(/\r?\n/)
+                            .filter(line => !line.trim().startsWith('at '))
+                            .map(line => line.trim())
+                            .filter(line => line.length > 0)
+                            .join('\n')
                         if (dump) {
                             fs.writeFileSync(path.join(t, 'error'), actual_error)
                         }
