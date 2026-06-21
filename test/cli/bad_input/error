@@ -1,1 +1,11 @@
 Error: Input doesn't resolve into an object!
+    at exports.interpret (/workspaces/ergogen/src/io.js:89:15)
+    at Object.process (/workspaces/ergogen/src/ergogen.js:16:31)
+    at /workspaces/ergogen/src/cli.js:133:29
+    at Object.<anonymous> (/workspaces/ergogen/src/cli.js:210:3)
+    at Module._compile (node:internal/modules/cjs/loader:1812:14)
+    at Object..js (node:internal/modules/cjs/loader:1943:10)
+    at Module.load (node:internal/modules/cjs/loader:1533:32)
+    at Module._load (node:internal/modules/cjs/loader:1335:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
