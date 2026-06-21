@@ -5,6 +5,7 @@ const fsp = require('fs/promises')
 const path = require('path')
 const yaml = require('js-yaml')
 const yargs = require('yargs')
+const { hideBin } = require('yargs/helpers')
 const jszip = require('jszip')
 
 const io = require('./io')
@@ -15,7 +16,7 @@ const ergogen = require('./ergogen')
 
 // command line args
 
-const args = yargs
+const args = yargs(hideBin(process.argv))
     .option('output', {
         alias: 'o',
         default: path.resolve('output'),

@@ -3,4 +3,4 @@ Error: Unknown dependency "nonexistent_require" among the requirements of inject
     at /workspaces/ergogen/src/io.js:19:18
     at eval (eval at exports.unpack (/workspaces/ergogen/src/io.js:49:24), <anonymous>:5:13)
     at exports.unpack (/workspaces/ergogen/src/io.js:49:85)
-    at async /workspaces/ergogen/src/cli.js:113:37
+    at async /workspaces/ergogen/src/cli.js:114:37
