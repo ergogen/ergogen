@@ -25,7 +25,7 @@
         "yargs": "^17.7.2"
     },
     "devDependencies": {
-        "@rollup/plugin-commonjs": "^28.0.7",
+        "@rollup/plugin-commonjs": "^29.0.3",
         "@rollup/plugin-json": "^6.1.0",
         "chai": "^4.5.0",
         "chai-as-promised": "^7.1.2",
