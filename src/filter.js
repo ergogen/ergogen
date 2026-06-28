@@ -6,8 +6,8 @@ const anchor = anchor_lib.parse
 
 const _true = () => true
 const _false = () => false
-const _and = arr => p => arr.map(e => e(p)).reduce((a, b) => a && b)
-const _or = arr => p => arr.map(e => e(p)).reduce((a, b) => a || b)
+const _and = arr => p => arr.every(e => e(p))
+const _or = arr => p => arr.some(e => e(p))
 
 const similar = (keys, reference, name, units) => {
     let neg = false
