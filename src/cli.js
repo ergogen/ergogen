@@ -57,11 +57,10 @@ console.log()
 
 // return a flat array of absolute paths of all files recursively contained in the dir
 const list_files_in_dir = async (dir) => {
-    const list = await fsp.readdir(dir)
-    const statPromises = list.map(async (file) => {
-        const fullPath = path.resolve(dir, file)
-        const stat = await fsp.stat(fullPath)
-        if (stat && stat.isDirectory()) {
+    const list = await fsp.readdir(dir, { withFileTypes: true })
+    const statPromises = list.map(async (dirent) => {
+        const fullPath = path.resolve(dir, dirent.name)
+        if (dirent.isDirectory()) {
             return list_files_in_dir(fullPath)
         }
         return fullPath
