@@ -9,5 +9,5 @@ module.exports = (config, name, points, outlines, units) => {
         new_origin[0] += config.origin[0] || 0;
         new_origin[1] += config.origin[1] || 0;
     }
-    return u.svg_paths_to_outline(paths, config, name, points, outlines, units);
+    return u.svg_paths_to_outline(paths, {...config, origin: new_origin}, name, points, outlines, units);
 };
