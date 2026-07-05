@@ -4,6 +4,15 @@ outlines:
     - what: rectangle
       where: true
       size: 18
+  outline_embedded:
+    - what: choc_hotswap_socket
+      where: true
+  outline_injected_svg:
+    - what: outline_injected_svg
+      where: true
+  outline_injected_js:
+    - what: outline_injected_js
+      where: true
 pcbs:
   pcb:
     outlines.edge.outline: box
