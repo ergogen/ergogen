@@ -168,7 +168,6 @@ exports.svg_paths_to_outline = (paths_raw, config, name, points, outlines, units
             }
         }
         let shape = combined
-        shape = m.model.mirror(shape, false, true)
 
         if (origin[0] !== 0 || origin[1] !== 0) {
             shape = m.model.moveRelative(shape, [-origin[0], -origin[1]])
