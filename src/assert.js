@@ -1,6 +1,4 @@
 const m = require('makerjs')
-const u = require('./utils')
-const Point = require('./point')
 const mathjs = require('mathjs')
 
 const mathnum = exports.mathnum = raw => units => {
