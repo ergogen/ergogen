@@ -1,0 +1,1 @@
+SVG paths need to be closed shapes
