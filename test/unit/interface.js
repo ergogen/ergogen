@@ -1,17 +1,14 @@
-const fs = require('fs')
-const path = require('path')
 const yaml = require('js-yaml')
 const ergogen = require('../../src/ergogen')
 const version = require('../../package.json').version
+const {fixture} = require('../helpers/fixture')
 
 // fixtures
-const load = name => yaml.safeLoad(fs.readFileSync(
-    path.join(__dirname, `../fixtures/${name}`)
-).toString())
-const minimal = load('minimal.yaml')
-const big = load('big.yaml')
-const minimal_kle = load('minimal_kle.json')
-const atreus_kle = load('atreus_kle.json')
+const minimal = fixture('minimal.yaml')
+const medium = fixture('medium.yaml')
+const big = fixture('big.yaml')
+const minimal_kle = fixture('minimal_kle.json')
+const atreus_kle = fixture('atreus_kle.json')
 
 describe('Interface', function() {
 
@@ -29,8 +26,8 @@ describe('Interface', function() {
             return false
         }
         underscore(await ergogen.process(minimal)).should.be.false
-        underscore(await ergogen.process(big, false)).should.be.false
-        underscore(await ergogen.process(big, true)).should.be.true
+        underscore(await ergogen.process(big, {debug: false})).should.be.false
+        underscore(await ergogen.process(big, {debug: true})).should.be.true
     })
 
     it('formats', async function() {
@@ -40,22 +37,22 @@ describe('Interface', function() {
             }
         }
         return Promise.all([
-            ergogen.process(minimal, true, logger).should.be.rejectedWith('OBJ'),
-            ergogen.process(yaml.dump(minimal), true, logger).should.be.rejectedWith('YAML'),
+            ergogen.process(minimal, {debug: true}, logger).should.be.rejectedWith('OBJ'),
+            ergogen.process(yaml.dump(minimal), {debug: true}, logger).should.be.rejectedWith('YAML'),
             ergogen.process(`
                 //:
                 return {points: {}}
-            `, true, logger).should.be.rejectedWith('JS'),
+            `, {debug: true}, logger).should.be.rejectedWith('JS'),
             ergogen.process(`
                 //:
                 return 'not an object';
-            `, true, logger).should.be.rejectedWith('not valid'),
-            ergogen.process(minimal_kle, true, logger).should.be.rejectedWith('KLE'),
-            ergogen.process(atreus_kle, true, logger).should.be.rejectedWith('KLE'),
-            ergogen.process('not an object', true, logger).should.be.rejectedWith('object'),
-            ergogen.process({}, true, logger).should.be.rejectedWith('empty'),
-            ergogen.process({not_points: {}}, true, () => {}).should.be.rejectedWith('points clause'),
-            ergogen.process({points: {zones: {}}}, true, () => {}).should.be.rejectedWith('any points')
+            `, {debug: true}, logger).should.be.rejectedWith('not valid'),
+            ergogen.process(minimal_kle, {debug: true}, logger).should.be.rejectedWith('KLE'),
+            ergogen.process(atreus_kle, {debug: true}, logger).should.be.rejectedWith('KLE'),
+            ergogen.process('not an object', {debug: true}, logger).should.be.rejectedWith('object'),
+            ergogen.process({}, {debug: true}, logger).should.be.rejectedWith('empty'),
+            ergogen.process({not_points: {}}, {debug: true}, () => {}).should.be.rejectedWith('points clause'),
+            ergogen.process({points: {zones: {}}}, {debug: true}, () => {}).should.be.rejectedWith('any points')
         ])
     })
 
@@ -97,5 +94,11 @@ describe('Interface', function() {
             ergogen.process({'meta.engine': `${version}`}).should.be.rejectedWith('points clause')
         ])
     })
-    
+
+    it('svg', async function() {
+        const result_svg = await ergogen.process(medium, {svg: true})
+        result_svg.should.have.nested.property('outlines.export.svg')
+        const result_no_svg = await ergogen.process(medium, {svg: false})
+        result_no_svg.should.not.have.nested.property('outlines.export.svg')
+    })
 })

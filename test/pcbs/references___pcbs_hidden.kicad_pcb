@@ -1,12 +1,12 @@
 
-            
+
 (kicad_pcb (version 20171130) (host pcbnew 5.1.6)
 
   (page A3)
   (title_block
-    (title hidden)
-    (rev v1.0.0)
-    (company Unknown)
+    (title "hidden")
+    (rev "v1.0.0")
+    (company "Unknown")
   )
 
   (general
@@ -92,8 +92,8 @@
       (outputdirectory ""))
   )
 
-            (net 0 "")
-            
+  (net 0 "")
+
   (net_class Default "This is the default net class."
     (clearance 0.2)
     (trace_width 0.25)
@@ -104,9 +104,8 @@
     (add_net "")
   )
 
-            references hidden
-            
-            
+  references hidden
+  
+
 )
 
-        

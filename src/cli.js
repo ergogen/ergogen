@@ -33,6 +33,12 @@ const args = yargs
         describe: 'Clean output dir before parsing',
         type: 'boolean'
     })
+    .option('svg', {
+        alias: 'generate-svg',
+        default: false,
+        describe: 'Generate SVG outputs',
+        type: 'boolean'
+    })
     .argv
 
 // greetings
@@ -124,7 +130,14 @@ try {
 
 let results
 try {
-    results = await ergogen.process(config_text, args.debug, s => console.log(s))
+    results = await ergogen.process(
+        config_text,
+        {
+            debug: args['debug'],
+            svg: args['svg']
+        },
+        s => console.log(s)
+    )
 } catch (err) {
     console.error(err)
     process.exit(3)
@@ -132,12 +145,14 @@ try {
 
 // output helpers
 
+const yamldump = data => yaml.dump(data, {indent: 4, noRefs: true})
+
 const single = (data, rel) => {
     if (!data) return
     const abs = path.join(args.o, rel)
     fs.mkdirpSync(path.dirname(abs))
     if (abs.endsWith('.yaml')) {
-        fs.writeFileSync(abs, yaml.dump(data, {indent: 4}))
+        fs.writeFileSync(abs, yamldump(data))
     } else {
         fs.writeFileSync(abs, data)
     }
@@ -148,7 +163,7 @@ const composite = (data, rel) => {
     const abs = path.join(args.o, rel)
     if (data.yaml) {
         fs.mkdirpSync(path.dirname(abs))
-        fs.writeFileSync(abs + '.yaml', yaml.dump(data.yaml, {indent: 4}))
+        fs.writeFileSync(abs + '.yaml', yamldump(data.yaml))
     }
     for (const format of ['svg', 'dxf', 'jscad']) {
         if (data[format]) {
@@ -162,7 +177,7 @@ const composite = (data, rel) => {
 
 if (args.clean) {
     console.log('Cleaning output folder...')
-    fs.removeSync(args.o)
+    fs.emptyDirSync(args.o)
 }
 
 console.log('Writing output to disk...')

@@ -1,12 +1,12 @@
 
-            
+
 (kicad_pcb (version 20171130) (host pcbnew 5.1.6)
 
   (page A3)
   (title_block
-    (title main)
-    (rev v1.0.0)
-    (company Unknown)
+    (title "main")
+    (rev "v1.0.0")
+    (company "Unknown")
   )
 
   (general
@@ -92,8 +92,8 @@
       (outputdirectory ""))
   )
 
-            (net 0 "")
-            
+  (net 0 "")
+
   (net_class Default "This is the default net class."
     (clearance 0.2)
     (trace_width 0.25)
@@ -104,8 +104,8 @@
     (add_net "")
   )
 
-            
-            (gr_line (start -5.7 9.5) (end 5.699999999999999 9.5) (angle 90) (layer Edge.Cuts) (width 0.15))
+  
+  (gr_line (start -5.7 9.5) (end 5.699999999999999 9.5) (angle 90) (layer Edge.Cuts) (width 0.15))
 (gr_line (start 9.5 5.7) (end 9.5 -5.699999999999999) (angle 90) (layer Edge.Cuts) (width 0.15))
 (gr_line (start 5.699999999999999 -9.5) (end -5.7 -9.5) (angle 90) (layer Edge.Cuts) (width 0.15))
 (gr_line (start -9.5 -5.699999999999999) (end -9.5 5.7) (angle 90) (layer Edge.Cuts) (width 0.15))
@@ -126,7 +126,6 @@
 (gr_line (start 14.25 0) (end 19 -4.75) (angle 90) (layer Edge.Cuts) (width 0.15))
 (gr_line (start 19 -4.75) (end 23.75 0) (angle 90) (layer Edge.Cuts) (width 0.15))
 (gr_line (start 23.75 0) (end 19 4.75) (angle 90) (layer Edge.Cuts) (width 0.15))
-            
+
 )
 
-        

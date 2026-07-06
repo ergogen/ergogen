@@ -16,14 +16,14 @@ module.exports = {
         (fp_text value OLED (at 0 -7.3) (layer F.Fab) (effects (font (size 1 1) (thickness 0.15))))
 
         ${'' /* pins */}
-        (pad 4 thru_hole oval (at 1.6 2.18 ${p.rot+270}) (size 1.7 1.7) (drill 1) (layers *.Cu *.Mask)
-        ${p.SDA.str})
-        (pad 3 thru_hole oval (at 1.6 4.72 ${p.rot+270}) (size 1.7 1.7) (drill 1) (layers *.Cu *.Mask)
-        ${p.SCL.str})
-        (pad 2 thru_hole oval (at 1.6 7.26 ${p.rot+270}) (size 1.7 1.7) (drill 1) (layers *.Cu *.Mask)
-        ${p.VCC.str})
-        (pad 1 thru_hole rect (at 1.6 9.8 ${p.rot+270}) (size 1.7 1.7) (drill 1) (layers *.Cu *.Mask)
-        ${p.GND.str})
+        (pad 4 thru_hole oval (at 1.6 2.18 ${p.r+270}) (size 1.7 1.7) (drill 1) (layers *.Cu *.Mask)
+        ${p.SDA})
+        (pad 3 thru_hole oval (at 1.6 4.72 ${p.r+270}) (size 1.7 1.7) (drill 1) (layers *.Cu *.Mask)
+        ${p.SCL})
+        (pad 2 thru_hole oval (at 1.6 7.26 ${p.r+270}) (size 1.7 1.7) (drill 1) (layers *.Cu *.Mask)
+        ${p.VCC})
+        (pad 1 thru_hole rect (at 1.6 9.8 ${p.r+270}) (size 1.7 1.7) (drill 1) (layers *.Cu *.Mask)
+        ${p.GND})
         )
         `
 }

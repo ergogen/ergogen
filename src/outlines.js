@@ -6,6 +6,7 @@ const Point = require('./point')
 const prep = require('./prepare')
 const anchor = require('./anchor').parse
 const filter = require('./filter').parse
+const hulljs = require('hull')
 
 const binding = (base, bbox, point, units) => {
 
@@ -113,6 +114,77 @@ const polygon = (config, name, points, outlines, units) => {
     }, units]
 }
 
+const hull = (config, name, points, outlines, units) => {
+
+  // prepare params
+  a.unexpected(config, `${name}`, ['concavity', 'extend', 'points'])
+  const concavity = a.sane(config.concavity || 50, `${name}.concavity`, 'number')(units)
+  // Extend should default to `true` if not defined
+  const extend = a.sane(config.extend === undefined || config.extend, `${name}.extend`, 'boolean')(units)
+  const hull_points = a.sane(config.points, `${name}.points`, 'array')()
+
+  // return shape function and its units
+  return [point => {
+    const parsed_points = []
+    // the poly starts at [0, 0] as it will be positioned later
+    // but we keep the point metadata for potential mirroring purposes
+    let last_anchor = new Point(0, 0, 0, point.meta)
+    let poly_index = -1
+    for (const poly_point of hull_points) {
+        const poly_name = `${name}.points[${++poly_index}]`
+        last_anchor = anchor(poly_point, poly_name, points, last_anchor)(units)
+        if(extend) {
+          const w = last_anchor.meta.width
+          const h = last_anchor.meta.height
+          const rect = u.rect(w, h, [-w/2, -h/2])
+          const model = last_anchor.position(rect)
+          const top_origin = model.paths.top.origin
+          const top_end =  model.paths.top.end
+          const bottom_origin =  model.paths.bottom.origin
+          const bottom_end =  model.paths.bottom.end
+          const model_origin = model.origin
+          parsed_points.push([top_origin[0] + model_origin[0], top_origin[1] + model_origin[1]])
+          parsed_points.push([top_end[0] + model_origin[0], top_end[1] + model_origin[1]])
+          parsed_points.push([bottom_origin[0] + model_origin[0], bottom_origin[1] + model_origin[1]])
+          parsed_points.push([bottom_end[0] + model_origin[0], bottom_end[1] + model_origin[1]])
+          // When width or height are too large, we need to add additional points along the sides, or
+          // the convex hull algorithm will fold "within" the key. Points are then added at regular
+          // intervals, their number being at least 2, since MakerJS places the first two points at
+          // either end of the path. When a side is longer than 18 divide the length of a side by
+          // that amount and add it to 2, this way we always have at least a middle point for sides
+          // longer than 18 
+          const l = 18
+          let intermediate_points = []
+          if (w > l) {
+            intermediate_points = intermediate_points.concat(m.path.toPoints(model.paths.top, 2 + Math.floor(w / l)))
+            intermediate_points = intermediate_points.concat(m.path.toPoints(model.paths.bottom, 2 + Math.floor(w / l)))
+          }
+          if (h > l) {
+            intermediate_points = intermediate_points.concat(m.path.toPoints(model.paths.left, 2 + Math.floor(h / l)))
+            intermediate_points = intermediate_points.concat(m.path.toPoints(model.paths.right, 2 + Math.floor(h / l)))
+          }
+          for (let i = 0; i < intermediate_points.length; i++) {
+            const p = intermediate_points[i];
+            if (!m.measure.isPointEqual(p, top_origin) &&
+              !m.measure.isPointEqual(p, top_end) &&
+              !m.measure.isPointEqual(p, bottom_origin) &&
+              !m.measure.isPointEqual(p, bottom_end)) {
+              // Not one of the corners
+              const intermediate_point = [p[0] + model_origin[0], p[1] + model_origin[1]]
+              parsed_points.push(intermediate_point)
+            }
+          }
+        } else {
+          parsed_points.push(last_anchor.p)
+        }
+    }
+    const poly_points = hulljs(parsed_points, concavity)
+    let poly = u.poly(poly_points)
+    const bbox = u.bbox(poly_points)
+    return [poly, bbox]
+  }, units]
+}
+
 const outline = (config, name, points, outlines, units) => {
 
     // prepare params
@@ -129,11 +201,116 @@ const outline = (config, name, points, outlines, units) => {
     }, units]
 }
 
+const path = (config, name, points, outlines, units) => {
+
+    // prepare params
+    a.unexpected(config, `${name}`, ['segments'])
+    const segments = a.sane(config.segments, `${name}.segments`, 'array')()
+    const segments_points = [];
+    for(const [index, segment] of segments.entries()) {
+      a.in(segment.type, `${name}.segments.${index}.type`, ['line', 'arc', 's_curve', 'bezier'])
+      segments_points.push(a.sane(segment.points, `${name}.segments.${index}.points`, 'array')())
+      const num_points = segment.points.length
+      switch (segment.type) {
+       case 'bezier':
+          a.unexpected(segment, `${name}.segments.${index}`, ['type', `points`, 'accuracy'])
+          break
+        case 'arc':
+        case 'line':
+        case 's_curve':
+          a.unexpected(segment, `${name}.segments.${index}`, ['type', `points`])
+          break
+      }
+      switch (segment.type) {
+       case 'bezier':
+          a.assert(num_points > (index === 0 ? 2 : 1), `Bezier Curve needs 3 or 4 points, but ${index === 0 ? num_points : num_points + 1} were provided (${index === 0 ? '' : '1 inherited from the previous segment, '}${num_points} declared)`)
+          break
+        case 'arc':
+          a.assert(num_points === (index === 0 ? 3 : 2), `Arc needs 3 points, but ${index === 0 ? num_points : num_points + 1} were provided (${index === 0 ? '' : '1 inherited from the previous segment, '}${num_points} declared)`)
+          break
+        case 'line':
+          a.assert(num_points > (index === 0 ? 1 : 0), `Line need at least 2 points, but ${index === 0 ? num_points : num_points + 1} ${num_points === 1 ? 'was' : 'were'} provided (${index === 0 ? '' : '1 inherited from the previous segment, '}${num_points} declared)`)
+          break
+        case 's_curve':
+          a.assert(num_points === (index === 0 ? 2 : 1), `S-Curve needs 2 points, but ${index === 0 ? num_points : num_points + 1} ${num_points === 1 ? 'was' : 'were'} provided (${index === 0 ? '' : '1 inherited from the previous segment, '}${num_points} declared)`)
+          break
+      }
+    }
+
+    // return shape function and its units
+    return [(point) => {
+      let shape = {
+        models: {},
+        paths: {}
+      }
+      // the segment starts at [0, 0] as it will be positioned later
+      // but we keep the point metadata for potential mirroring purposes
+      let first_anchor = undefined
+      let last_anchor = new Point(0, 0, 0, point.meta)
+      for (const [index, segment] of segments.entries()){
+        const parsed_points = []
+        // Segments after the first one need one less point, as the start is taken from the
+        // last segment
+        if (index > 0) {
+          parsed_points.push(last_anchor.p)
+        }
+        let point_index = -1
+        for (const segment_point of segments_points[index]) {
+            const segment_points_name = `${name}.segments.${index}.points[${++point_index}]`
+            last_anchor = anchor(segment_point, segment_points_name, points, last_anchor)(units)
+            if(first_anchor === undefined) {
+              first_anchor = last_anchor
+            }
+            parsed_points.push(last_anchor.p)
+        }
+        const segment_name = `path${index}`
+        switch (segment.type) {
+          case 'line':
+            let line = new m.models.ConnectTheDots(false, parsed_points)
+            shape.models[segment_name] = line
+            break
+          case 'arc':
+            let arc = new m.paths.Arc(...parsed_points)
+            shape.paths[segment_name] = arc
+            break
+          case 's_curve':
+            const origin = parsed_points[0]
+            a.assert(parsed_points[0][0] !== parsed_points[1][0], `The ${name}.segments.${index} S-Curve segment cannot have points on the same X axis`)
+            const width = Math.abs(parsed_points[1][0] - parsed_points[0][0])
+            a.assert(parsed_points[0][1] !== parsed_points[1][1], `The ${name}.segments.${index} S-Curve segment cannot have points on the same Y axis`)
+            const height = Math.abs(parsed_points[1][1] - parsed_points[0][1])
+            const mirrorX = parsed_points[0][0] > parsed_points[1][0]
+            const mirrorY = parsed_points[0][1] > parsed_points[1][1]
+            const s_curve_raw = new m.models.SCurve(width, height)
+            const mirrored_s_curve = m.model.mirror(s_curve_raw, mirrorX, mirrorY)
+            const s_curve = m.model.move(mirrored_s_curve, origin)
+            shape.models[segment_name] = s_curve
+            break
+          case 'bezier':
+            let bezier = new m.models.BezierCurve(...parsed_points)
+            shape.models[segment_name] = bezier
+            break
+        }
+      }
+      // We always close the shape with a line between the first and last anchor, if they are not already the same
+      if(first_anchor.x !== last_anchor.x || first_anchor.y != last_anchor.y) {
+        let closing_line = new m.paths.Line([first_anchor.x, first_anchor.y], [last_anchor.x, last_anchor.y])
+        shape.paths["closing_line"] = closing_line
+      }
+      const chain = m.model.findSingleChain(shape)
+      a.assert(chain.endless, "The provided path configuration doesn't generate a closed shape.")
+      const bbox = m.measure.modelExtents(shape)
+      return [shape, {low: bbox.low, high: bbox.high}]
+    }, units]
+}
+
 const whats = {
     rectangle,
     circle,
     polygon,
-    outline
+    outline,
+    path,
+    hull
 }
 
 const expand_shorthand = (config, name, units) => {
@@ -184,7 +361,7 @@ exports.parse = (config, points, units) => {
 
             // process keys that are common to all part declarations
             const operation = u[a.in(part.operation || 'add', `${name}.operation`, ['add', 'subtract', 'intersect', 'stack'])]
-            const what = a.in(part.what || 'outline', `${name}.what`, ['rectangle', 'circle', 'polygon', 'outline'])
+            const what = a.in(part.what || 'outline', `${name}.what`, ['rectangle', 'circle', 'polygon', 'outline', 'path', 'hull'])
             const bound = !!part.bound
             const asym = a.asym(part.asym || 'source', `${name}.asym`)
 
@@ -194,7 +371,6 @@ exports.parse = (config, points, units) => {
             const where = units => filter(original_where, `${name}.where`, points, units, asym)
             
             const original_adjust = part.adjust // same as above
-            const adjust = start => anchor(original_adjust || {}, `${name}.adjust`, points, start)(units)
             const fillet = a.sane(part.fillet || 0, `${name}.fillet`, 'number')(units)
             expand_shorthand(part, `${name}.expand`, units)
             const expand = a.sane(part.expand || 0, `${name}.expand`, 'number')(units)
@@ -215,6 +391,7 @@ exports.parse = (config, points, units) => {
 
             // a prototype "shape" maker (and its units) are computed
             const [shape_maker, shape_units] = whats[what](part, name, points, outlines, units)
+            const adjust = start => anchor(original_adjust || {}, `${name}.adjust`, points, start)(shape_units)
 
             // and then the shape is repeated for all where positions
             for (const w of where(shape_units)) {

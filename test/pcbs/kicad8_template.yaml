@@ -1,0 +1,24 @@
+points.zones.matrix:
+outlines.outline:
+  - what: rectangle
+    where: true
+    size: [25,50]
+    fillet: 0.5
+  - what: circle
+    where: true
+    radius: 25
+  - what: circle
+    radius: 10
+    where:
+      - ref: matrix
+        shift: [50,0]
+pcbs:
+  main:
+    template: kicad8
+    outlines.main.outline: outline
+    footprints:
+      test:
+        what: mx
+        params:
+          to: to
+          from: from

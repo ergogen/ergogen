@@ -1,6 +1,7 @@
 const u = require('./utils')
 const a = require('./assert')
 const Point = require('./point')
+const m = require('makerjs')
 
 const mirror_ref = exports.mirror = (ref, mirror=true) => {
     if (mirror) {
@@ -28,7 +29,41 @@ const aggregators = {
             r += part.r
         }
         return new Point(x / len, y / len, r / len)
-    }
+    },
+    intersect: (config, name, parts) => {
+        // a line is generated from a point by taking their
+        // (rotated) Y axis. The line is not extended to
+        // +/- Infinity as that doesn't work with makerjs.
+        // An arbitrary offset of 1 meter is considered
+        // sufficient for practical purposes, and the point
+        // coordinates are used as pivot point for the rotation.
+        const get_line_from_point = (point, offset=1000) => {
+            const origin = [point.x, point.y]
+            const p1 = [point.x, point.y - offset]
+            const p2 = [point.x, point.y + offset]
+
+            let line = new m.paths.Line(p1, p2)
+            line = m.path.rotate(line, point.r, origin)
+
+            return line
+        }
+
+        a.unexpected(config, name, aggregator_common)
+        a.assert(parts.length==2, `Intersect expects exactly two parts, but it got ${parts.length}!`)
+
+        const line1 = get_line_from_point(parts[0])
+        const line2 = get_line_from_point(parts[1])
+        const intersection = m.path.intersection(line1, line2)
+
+        a.assert(intersection, `The points under "${name}.parts" do not intersect!`)
+
+        const intersection_point_arr = intersection.intersectionPoints[0]
+        const intersection_point = new Point(
+            intersection_point_arr[0], intersection_point_arr[1], 0
+        )
+
+        return intersection_point
+    },
 }
 
 const anchor = exports.parse = (raw, name, points={}, start=new Point(), mirror=false) => units => {
@@ -56,7 +91,7 @@ const anchor = exports.parse = (raw, name, points={}, start=new Point(), mirror=
     //
     // Reference or aggregate handling
     //
-    
+
     let point = start.clone()
     if (raw.ref !== undefined && raw.aggregate !== undefined) {
         throw new Error(`Fields "ref" and "aggregate" cannot appear together in anchor "${name}"!`)

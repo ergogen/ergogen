@@ -1,3 +1,29 @@
+const FIXED_TIMESTAMP = 1760558400000; // 2025-10-16T12:00:00.000Z
+
+const OriginalDate = global.Date;
+
+// Mock Date to return a fixed date for deterministic test output
+global.Date = class extends OriginalDate {
+  constructor(...args) {
+    // If the constructor is called with arguments, pass them to the original Date constructor
+    if (args.length > 0) {
+      super(...args);
+    } else {
+      // Otherwise, create a date with the fixed timestamp
+      super(FIXED_TIMESTAMP);
+    }
+  }
+
+  static now() {
+    return FIXED_TIMESTAMP;
+  }
+};
+
+// Copy static properties from the original Date to the mock
+Object.getOwnPropertyNames(OriginalDate)
+  .filter(prop => prop !== 'length' && prop !== 'name' && prop !== 'prototype' && prop !== 'now')
+  .forEach(prop => (global.Date[prop] = OriginalDate[prop]));
+
 exports.inject = (ergogen) => {
     ergogen.inject('footprint', 'trace_test', {
         params: {
@@ -13,15 +39,15 @@ exports.inject = (ergogen) => {
 
                     ${p.at /* parametric position */}
 
-                    (pad 1 smd rect (at ${p.ixy(0, 0)} ${p.rot}) (size 1 1) (layers ${p.side}.Cu ${p.side}.Paste ${p.side}.Mask)
-                        ${p.P1.str} (solder_mask_margin 0.2))
+                    (pad 1 smd rect (at ${p.isxy(0, 0)} ${p.r}) (size 1 1) (layers ${p.side}.Cu ${p.side}.Paste ${p.side}.Mask)
+                        ${p.P1} (solder_mask_margin 0.2))
 
-                    (pad 2 smd rect (at ${p.ixy(5, 5)} ${p.rot}) (size 1 1) (layers ${p.side}.Cu ${p.side}.Paste ${p.side}.Mask)
-                        ${p.P1.str} (solder_mask_margin 0.2))
+                    (pad 2 smd rect (at ${p.isxy(5, 5)} ${p.r}) (size 1 1) (layers ${p.side}.Cu ${p.side}.Paste ${p.side}.Mask)
+                        ${p.P1} (solder_mask_margin 0.2))
 
                 )
 
-                (segment (start ${p.sxy(0, 0)}) (end ${p.sxy(5, 5)}) (width ${p.width}) (layer ${p.side}.Cu) (net ${p.P1.index}))
+                (segment (start ${p.esxy(0, 0)}) (end ${p.esxy(5, 5)}) (width ${p.width}) (layer ${p.side}.Cu) (net ${p.P1.index}))
 
             `
         }
@@ -40,11 +66,11 @@ exports.inject = (ergogen) => {
 
                     ${p.at /* parametric position */}
 
-                    (pad 1 smd rect (at 0 0 ${p.rot}) (size 1 1) (layers ${p.side}.Cu ${p.side}.Paste ${p.side}.Mask)
-                        ${p.P1.str} (solder_mask_margin 0.2))
+                    (pad 1 smd rect (at 0 0 ${p.r}) (size 1 1) (layers ${p.side}.Cu ${p.side}.Paste ${p.side}.Mask)
+                        ${p.P1} (solder_mask_margin 0.2))
 
-                    (pad 2 smd rect (at 5 5 ${p.rot}) (size 1 1) (layers ${p.side}.Cu ${p.side}.Paste ${p.side}.Mask)
-                        ${p.P1.str} (solder_mask_margin 0.2))
+                    (pad 2 smd rect (at ${p.iaxy(5, 5)} ${p.r}) (size 1 1) (layers ${p.side}.Cu ${p.side}.Paste ${p.side}.Mask)
+                        ${p.P1} (solder_mask_margin 0.2))
 
                 )
 
@@ -52,7 +78,7 @@ exports.inject = (ergogen) => {
                     (connect_pads (clearance 0.508))
                     (min_thickness 0.254)
                     (fill yes (arc_segments 32) (thermal_gap 0.508) (thermal_bridge_width 0.508))
-                    (polygon (pts (xy ${p.xy(5, 5)}) (xy ${p.xy(5, -5)}) (xy ${p.xy(-5, -5)}) (xy ${p.xy(-5, 5)})))
+                    (polygon (pts (xy ${p.eaxy(5, 5)}) (xy ${p.eaxy(5, -5)}) (xy ${p.eaxy(-5, -5)}) (xy ${p.eaxy(-5, 5)})))
                 )
 
             `
@@ -71,14 +97,14 @@ exports.inject = (ergogen) => {
 
                     ${p.at /* parametric position */}
 
-                    (pad 1 smd rect (at 0 0 ${p.rot}) (size 1 1) (layers ${p.side}.Cu ${p.side}.Paste ${p.side}.Mask)
-                        ${p.local_net('1').str} (solder_mask_margin 0.2))
+                    (pad 1 smd rect (at 0 0 ${p.r}) (size 1 1) (layers ${p.side}.Cu ${p.side}.Paste ${p.side}.Mask)
+                        ${p.local_net('1')} (solder_mask_margin 0.2))
 
-                    (pad 1 smd rect (at 0 0 ${p.rot}) (size 1 1) (layers ${p.side}.Cu ${p.side}.Paste ${p.side}.Mask)
-                        ${p.local_net('2').str} (solder_mask_margin 0.2))
+                    (pad 1 smd rect (at 0 0 ${p.r}) (size 1 1) (layers ${p.side}.Cu ${p.side}.Paste ${p.side}.Mask)
+                        ${p.local_net('2')} (solder_mask_margin 0.2))
 
-                    (pad 1 smd rect (at 0 0 ${p.rot}) (size 1 1) (layers ${p.side}.Cu ${p.side}.Paste ${p.side}.Mask)
-                        ${p.local_net('3').str} (solder_mask_margin 0.2))
+                    (pad 1 smd rect (at 0 0 ${p.r}) (size 1 1) (layers ${p.side}.Cu ${p.side}.Paste ${p.side}.Mask)
+                        ${p.local_net('3')} (solder_mask_margin 0.2))
 
                 )
 
@@ -137,6 +163,13 @@ exports.inject = (ergogen) => {
         params: {},
         body: p => {
             return `references ${p.ref_hide ? 'hidden' : 'shown'}`
+        }
+    })
+
+    ergogen.inject('template', 'template_test', {
+        convert_outline: () => {},
+        body: params => {
+            return `Custom template override. The secret is ${params.custom.secret}.`
         }
     })
 }

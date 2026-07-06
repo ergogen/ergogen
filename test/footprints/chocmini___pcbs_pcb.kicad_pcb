@@ -1,12 +1,12 @@
 
-            
+
 (kicad_pcb (version 20171130) (host pcbnew 5.1.6)
 
   (page A3)
   (title_block
-    (title pcb)
-    (rev v1.0.0)
-    (company Unknown)
+    (title "pcb")
+    (rev "v1.0.0")
+    (company "Unknown")
   )
 
   (general
@@ -92,10 +92,10 @@
       (outputdirectory ""))
   )
 
-            (net 0 "")
+  (net 0 "")
 (net 1 "from")
 (net 2 "to")
-            
+
   (net_class Default "This is the default net class."
     (clearance 0.2)
     (trace_width 0.25)
@@ -108,7 +108,7 @@
 (add_net "to")
   )
 
-            
+  
           
         (module lib:Kailh_PG1232 (layer F.Cu) (tedit 5E1ADAC2)
         (at 0 0 0) 
@@ -328,8 +328,7 @@
 			  )
 
           
-            
-            
+  
+
 )
 
-        

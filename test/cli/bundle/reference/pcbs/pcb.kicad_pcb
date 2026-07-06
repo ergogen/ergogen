@@ -1,12 +1,12 @@
 
-            
+
 (kicad_pcb (version 20171130) (host pcbnew 5.1.6)
 
   (page A3)
   (title_block
-    (title pcb)
-    (rev v1.0.0)
-    (company Unknown)
+    (title "pcb")
+    (rev "v1.0.0")
+    (company "Unknown")
   )
 
   (general
@@ -92,8 +92,8 @@
       (outputdirectory ""))
   )
 
-            (net 0 "")
-            
+  (net 0 "")
+
   (net_class Default "This is the default net class."
     (clearance 0.2)
     (trace_width 0.25)
@@ -104,7 +104,7 @@
     (add_net "")
   )
 
-            
+  
     (module injected_test_footprint (layer F.Cu) (tedit 5E1ADAC2)
     (at 0 0 0) 
 
@@ -112,11 +112,10 @@
     (fp_text reference "I1" (at 0 0) (layer F.SilkS) hide (effects (font (size 1.27 1.27) (thickness 0.15))))
     )
   
-            (gr_line (start -9 9) (end 9 9) (angle 90) (layer Edge.Cuts) (width 0.15))
+  (gr_line (start -9 9) (end 9 9) (angle 90) (layer Edge.Cuts) (width 0.15))
 (gr_line (start 9 9) (end 9 -9) (angle 90) (layer Edge.Cuts) (width 0.15))
 (gr_line (start 9 -9) (end -9 -9) (angle 90) (layer Edge.Cuts) (width 0.15))
 (gr_line (start -9 -9) (end -9 9) (angle 90) (layer Edge.Cuts) (width 0.15))
-            
+
 )
 
-        

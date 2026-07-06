@@ -61,6 +61,12 @@ describe('Prepare', function() {
             y: 2,
             z: 3
         })
+        // should be able to detect circular dependencies and error out
+        p.inherit.bind(this, {
+            a: {
+                $extends: 'a'
+            }
+        }).should.throw('circular dependency')
     })
 
     it('parameterize', function() {

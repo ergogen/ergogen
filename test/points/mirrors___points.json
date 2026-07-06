@@ -61,13 +61,13 @@
                 "name": "left"
             },
             "row": "bottom",
+            "mirrored": false,
             "bind": [
-                10,
+                0,
                 10,
                 0,
                 0
-            ],
-            "mirrored": false
+            ]
         }
     },
     "matrix_right_bottom": {
@@ -125,13 +125,13 @@
                 "name": "right"
             },
             "row": "bottom",
+            "mirrored": false,
             "bind": [
                 10,
                 0,
                 0,
                 10
-            ],
-            "mirrored": false
+            ]
         }
     },
     "matrix_right_top": {
@@ -189,13 +189,13 @@
                 "name": "right"
             },
             "row": "top",
+            "mirrored": false,
             "bind": [
                 0,
                 0,
                 10,
-                10
-            ],
-            "mirrored": false
+                0
+            ]
         }
     },
     "other_left_bottom": {
@@ -260,13 +260,13 @@
                 "name": "left"
             },
             "row": "bottom",
+            "mirrored": false,
             "bind": [
-                10,
+                0,
                 10,
                 0,
                 0
-            ],
-            "mirrored": false
+            ]
         }
     },
     "other_right_bottom": {
@@ -324,13 +324,13 @@
                 "name": "right"
             },
             "row": "bottom",
+            "mirrored": false,
             "bind": [
                 10,
                 0,
                 0,
                 10
-            ],
-            "mirrored": false
+            ]
         }
     },
     "other_right_top": {
@@ -388,13 +388,13 @@
                 "name": "right"
             },
             "row": "top",
+            "mirrored": false,
             "bind": [
                 0,
                 0,
                 10,
-                10
-            ],
-            "mirrored": false
+                0
+            ]
         }
     },
     "mirror_other_left_top": {
@@ -459,13 +459,13 @@
                 "name": "left"
             },
             "row": "top",
+            "mirrored": true,
             "bind": [
                 0,
                 10,
-                10,
+                0,
                 0
-            ],
-            "mirrored": true
+            ]
         }
     },
     "mirror_other_right_bottom": {
@@ -523,13 +523,13 @@
                 "name": "right"
             },
             "row": "bottom",
+            "mirrored": true,
             "bind": [
                 10,
                 0,
                 0,
-                10
-            ],
-            "mirrored": true
+                0
+            ]
         }
     },
     "mirror_other_right_top": {
@@ -587,13 +587,13 @@
                 "name": "right"
             },
             "row": "top",
+            "mirrored": true,
             "bind": [
                 0,
                 0,
                 10,
                 10
-            ],
-            "mirrored": true
+            ]
         }
     },
     "mirror_matrix_left_top": {
@@ -658,13 +658,13 @@
                 "name": "left"
             },
             "row": "top",
+            "mirrored": true,
             "bind": [
                 0,
                 10,
-                10,
+                0,
                 0
-            ],
-            "mirrored": true
+            ]
         }
     },
     "mirror_matrix_right_bottom": {
@@ -722,13 +722,13 @@
                 "name": "right"
             },
             "row": "bottom",
+            "mirrored": true,
             "bind": [
                 10,
                 0,
                 0,
-                10
-            ],
-            "mirrored": true
+                0
+            ]
         }
     },
     "mirror_matrix_right_top": {
@@ -786,13 +786,13 @@
                 "name": "right"
             },
             "row": "top",
+            "mirrored": true,
             "bind": [
                 0,
                 0,
                 10,
                 10
-            ],
-            "mirrored": true
+            ]
         }
     }
 }

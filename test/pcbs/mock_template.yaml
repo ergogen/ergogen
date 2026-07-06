@@ -1,0 +1,6 @@
+points.zones.matrix:
+pcbs:
+  main:
+    template: template_test
+    params:
+      secret: 42

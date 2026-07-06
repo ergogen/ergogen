@@ -11,3 +11,8 @@ pcbs:
       injected:
         what: injected
         where: matrix
+  custom_template:
+    outlines.edge.outline: box
+    template: custom_template
+    params:
+      secret: 42

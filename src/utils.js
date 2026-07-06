@@ -1,5 +1,6 @@
 const m = require('makerjs')
 
+
 exports.deepcopy = value => {
     if (value === undefined) return undefined
     return JSON.parse(JSON.stringify(value))

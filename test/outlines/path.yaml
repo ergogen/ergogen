@@ -1,0 +1,121 @@
+points.zones.point:
+outlines:
+  3p_bezier:
+    - what: path
+      segments:
+        - type: bezier
+          points:
+            - ref: point
+              shift: [-.5u,.5u]
+            - ref: point
+              shift: [-25,20]
+            - ref: point
+              shift: [.5u,.5u]
+  3p_bezier_path:
+    - what: path
+      segments:
+        - type: line
+          points:
+            - ref: point
+              shift: [.5u,.5u]
+            - ref: point
+              shift: [-.5u,.5u]
+        - type: bezier
+          points:
+            - ref: point
+              shift: [-25,20]
+            - ref: point
+              shift: [.5u,.5u]
+  4p_bezier:
+    - what: path
+      segments:
+        - type: bezier
+          points:
+            - ref: point
+              shift: [-.5u,.5u]
+            - ref: point
+              shift: [-25,20]
+            - ref: point
+              shift: [25,20]
+            - ref: point
+              shift: [.5u,.5u]
+  
+  4p_bezier_path:
+    - what: path
+      segments:
+        - type: line
+          points:
+            - ref: point
+              shift: [.5u,.5u]
+            - ref: point
+              shift: [-.5u,.5u]
+        - type: bezier
+          points:
+            - ref: point
+              shift: [-25,20]
+            - ref: point
+              shift: [25,20]
+            - ref: point
+              shift: [.5u,.5u]
+
+  arc:
+    - what: path
+      segments:
+        - type: arc
+          points:
+            - ref: point
+              shift: [-.5u,.5u]
+            - ref: point
+              shift: [0,u]
+            - ref: point
+              shift: [.5u,.5u]
+  arc_path:
+    - what: path
+      segments:
+        - type: line
+          points:
+            - ref: point
+              shift: [.5u,.5u]
+            - ref: point
+              shift: [-.5u,.5u]
+        - type: arc
+          points:
+            - ref: point
+              shift: [0,u]
+            - ref: point
+              shift: [.5u,.5u]
+  s_curve:
+    - what: path
+      segments:
+        - type: s_curve
+          points:
+            - ref: point
+              shift: [.5u,.5u]
+            - ref: point
+              shift: [-.5u,-.5u]
+  s_curve_path:
+    - what: path
+      segments:
+        - type: line
+          points:
+            - ref: point
+              shift: [-.5u,-.5u]
+            - ref: point
+              shift: [.5u,.5u]
+        - type: s_curve
+          points:
+            - ref: point
+              shift: [-.5u,-.5u]
+  line:
+    - what: path
+      segments:
+        - type: line
+          points:
+            - ref: point
+              shift: [-.5u,.5u]
+            - ref: point
+              shift: [0,u]
+        - type: line
+          points:
+            - ref: point
+              shift: [.5u,.5u]

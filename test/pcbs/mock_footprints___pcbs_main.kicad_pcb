@@ -1,12 +1,12 @@
 
-            
+
 (kicad_pcb (version 20171130) (host pcbnew 5.1.6)
 
   (page A3)
   (title_block
-    (title main)
-    (rev v1.0.0)
-    (company Unknown)
+    (title "main")
+    (rev "v1.0.0")
+    (company "Unknown")
   )
 
   (general
@@ -92,12 +92,12 @@
       (outputdirectory ""))
   )
 
-            (net 0 "")
+  (net 0 "")
 (net 1 "P1")
 (net 2 "T4_1")
 (net 3 "T4_2")
 (net 4 "T4_3")
-            
+
   (net_class Default "This is the default net class."
     (clearance 0.2)
     (trace_width 0.25)
@@ -112,7 +112,7 @@
 (add_net "T4_3")
   )
 
-            
+  
 
                 (module trace_test (layer F.Cu) (tedit 5CF31DEF)
 
@@ -234,7 +234,7 @@
                 )
 
             
-            (gr_line (start -9.5 9.5) (end 9.5 9.5) (angle 90) (layer Edge.Cuts) (width 0.15))
+  (gr_line (start -9.5 9.5) (end 9.5 9.5) (angle 90) (layer Edge.Cuts) (width 0.15))
 (gr_line (start 9.5 9.5) (end 9.5 -9.5) (angle 90) (layer Edge.Cuts) (width 0.15))
 (gr_line (start 9.5 -9.5) (end -9.5 -9.5) (angle 90) (layer Edge.Cuts) (width 0.15))
 (gr_line (start -9.5 -9.5) (end -9.5 9.5) (angle 90) (layer Edge.Cuts) (width 0.15))
@@ -242,7 +242,6 @@
 (gr_line (start 29.5 9.5) (end 29.5 -9.5) (angle 90) (layer Edge.Cuts) (width 0.15))
 (gr_line (start 29.5 -9.5) (end 10.5 -9.5) (angle 90) (layer Edge.Cuts) (width 0.15))
 (gr_line (start 10.5 -9.5) (end 10.5 9.5) (angle 90) (layer Edge.Cuts) (width 0.15))
-            
+
 )
 
-        

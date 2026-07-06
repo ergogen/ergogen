@@ -1,0 +1,10 @@
+points.zones.matrix:
+outlines:
+  box:
+    - what: rectangle
+      where: true
+      size: 18
+pcbs:
+  bad_template:
+    outlines.edge.outline: box
+    template: bad_template

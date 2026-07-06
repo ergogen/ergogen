@@ -16,6 +16,12 @@ outlines:
       where: true
       size: cy
       bound: true
+  adjust:
+    - what: circle
+      where: true
+      radius: 2
+      # adjust works, and it can use shape-specific units
+      adjust.shift: [0, r]
   fillet:
     - name: base
       fillet: 2

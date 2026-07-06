@@ -1,0 +1,72 @@
+points:
+  zones:
+    matrix:
+      columns:
+        c1:
+          key.width: 18*4
+          key.height: 18*4
+          rows:
+            r2.skip: true
+            r3.skip: true
+        c2:
+          key.spread: 18*2.5
+      rows:
+        r1:
+        r2:
+        r3:
+    rotated:
+      rotate: -25
+      anchor.shift: [0,-25]
+  mirror: 100
+outlines:
+  defaults:
+    - what: hull
+      points:
+        - matrix_c1_r1
+        - matrix_c2_r1
+        - matrix_c2_r2
+        - matrix_c2_r3
+  mirror:
+    - what: hull
+      points:
+        - matrix_c1_r1
+        - matrix_c2_r1
+        - matrix_c2_r2
+        - mirror_matrix_c1_r1
+        - mirror_matrix_c2_r1
+        - mirror_matrix_c2_r2
+  extend:
+    - what: hull
+      extend: false
+      points:
+        - matrix_c1_r1
+        - matrix_c2_r1
+        - matrix_c2_r2
+        - matrix_c2_r3
+        - mirror_matrix_c1_r1
+        - mirror_matrix_c2_r1
+        - mirror_matrix_c2_r2
+        - mirror_matrix_c2_r3
+  concavity-low:
+    - what: hull
+      concavity: 15
+      points:
+        - matrix_c1_r1
+        - matrix_c2_r3
+        - mirror_matrix_c1_r1
+        - mirror_matrix_c2_r3
+  concavity-high:
+    - what: hull
+      concavity: 100
+      points:
+        - matrix_c1_r1
+        - matrix_c2_r3
+        - mirror_matrix_c1_r1
+        - mirror_matrix_c2_r3
+  rotation:
+    - what: hull
+      points:
+        - matrix_c2_r1
+        - matrix_c2_r2
+        - matrix_c2_r3
+        - rotated

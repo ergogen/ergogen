@@ -69,11 +69,12 @@ exports.inherit = config => traverse(config, config, [], (target, key, val, root
         const list = [val]
         while (candidates.length) {
             const path = candidates.shift()
-            const other = u.deepcopy(u.deep(root, path))
+            const other = u.deep(root, path)
             a.assert(other, `"${path}" (reached from "${breadcrumbs.join('.')}.$extends") does not name a valid inheritance target!`)
             let parents = other.$extends || []
             if (a.type(parents)() !== 'array') parents = [parents]
             candidates = candidates.concat(parents)
+            a.assert(!list.includes(other), `"${path}" (reached from "${breadcrumbs.join('.')}.$extends") leads to a circular dependency!`)
             list.unshift(other)
         }
         val = extend.apply(null, list)

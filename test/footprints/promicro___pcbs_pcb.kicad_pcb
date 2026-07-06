@@ -1,12 +1,12 @@
 
-            
+
 (kicad_pcb (version 20171130) (host pcbnew 5.1.6)
 
   (page A3)
   (title_block
-    (title pcb)
-    (rev v1.0.0)
-    (company Unknown)
+    (title "pcb")
+    (rev "v1.0.0")
+    (company "Unknown")
   )
 
   (general
@@ -92,7 +92,7 @@
       (outputdirectory ""))
   )
 
-            (net 0 "")
+  (net 0 "")
 (net 1 "RAW")
 (net 2 "GND")
 (net 3 "RST")
@@ -115,7 +115,7 @@
 (net 20 "P7")
 (net 21 "P8")
 (net 22 "P9")
-            
+
   (net_class Default "This is the default net class."
     (clearance 0.2)
     (trace_width 0.25)
@@ -148,7 +148,7 @@
 (add_net "P9")
   )
 
-            
+  
         
       (module ProMicro (layer F.Cu) (tedit 5B307E4C)
       (at 0 0 0)
@@ -312,8 +312,7 @@
         (pad 24 thru_hole circle (at 13.97 7.62 0) (size 1.7526 1.7526) (drill 1.0922) (layers *.Cu *.SilkS *.Mask) (net 22 "P9"))
       )
         
-            
-            
+  
+
 )
 
-        

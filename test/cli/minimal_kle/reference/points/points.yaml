@@ -1,0 +1,390 @@
+key1_key1col_key1row:
+    x: 0
+    'y': 0
+    r: 0
+    meta:
+        stagger: 0
+        spread: 19
+        splay: 0
+        origin:
+            - -9.5
+            - 9.5
+        orient: 0
+        shift:
+            - 0
+            - 0
+        rotate: 0
+        adjust: {}
+        width: 19
+        height: 19
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: key1col_key1row
+        name: key1_key1col_key1row
+        label: '0_0'
+        column_net: col_0
+        row_net: row_0
+        zone:
+            key:
+                origin:
+                    - '-0.5 u'
+                    - 0.5 u
+                splay: -0.0
+                shift:
+                    - 0 u
+                    - 0 u
+            columns:
+                key1col:
+                    rows:
+                        key1row:
+                            width: 1 u
+                            height: 1 u
+                            label: '0_0'
+                            column_net: col_0
+                            row_net: row_0
+                    key: {}
+                    name: key1col
+            name: key1
+        col:
+            rows:
+                key1row:
+                    width: 1 u
+                    height: 1 u
+                    label: '0_0'
+                    column_net: col_0
+                    row_net: row_0
+            key: {}
+            name: key1col
+        row: key1row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0
+key2_key2col_key2row:
+    x: 19
+    'y': 0
+    r: 0
+    meta:
+        stagger: 0
+        spread: 19
+        splay: 0
+        origin:
+            - -9.5
+            - 9.5
+        orient: 0
+        shift:
+            - 19
+            - 0
+        rotate: 0
+        adjust: {}
+        width: 19
+        height: 19
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: key2col_key2row
+        name: key2_key2col_key2row
+        label: '0_1'
+        column_net: col_1
+        row_net: row_0
+        zone:
+            key:
+                origin:
+                    - '-0.5 u'
+                    - 0.5 u
+                splay: -0.0
+                shift:
+                    - 1 u
+                    - 0 u
+            columns:
+                key2col:
+                    rows:
+                        key2row:
+                            width: 1 u
+                            height: 1 u
+                            label: '0_1'
+                            column_net: col_1
+                            row_net: row_0
+                    key: {}
+                    name: key2col
+            name: key2
+        col:
+            rows:
+                key2row:
+                    width: 1 u
+                    height: 1 u
+                    label: '0_1'
+                    column_net: col_1
+                    row_net: row_0
+            key: {}
+            name: key2col
+        row: key2row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0
+key3_key3col_key3row:
+    x: 0
+    'y': -19
+    r: 0
+    meta:
+        stagger: 0
+        spread: 19
+        splay: 0
+        origin:
+            - -9.5
+            - 9.5
+        orient: 0
+        shift:
+            - 0
+            - -19
+        rotate: 0
+        adjust: {}
+        width: 19
+        height: 19
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: key3col_key3row
+        name: key3_key3col_key3row
+        label: '1_0'
+        column_net: col_0
+        row_net: row_1
+        zone:
+            key:
+                origin:
+                    - '-0.5 u'
+                    - 0.5 u
+                splay: -0.0
+                shift:
+                    - 0 u
+                    - '-1 u'
+            columns:
+                key3col:
+                    rows:
+                        key3row:
+                            width: 1 u
+                            height: 1 u
+                            label: '1_0'
+                            column_net: col_0
+                            row_net: row_1
+                    key: {}
+                    name: key3col
+            name: key3
+        col:
+            rows:
+                key3row:
+                    width: 1 u
+                    height: 1 u
+                    label: '1_0'
+                    column_net: col_0
+                    row_net: row_1
+            key: {}
+            name: key3col
+        row: key3row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0
+key4_key4col_key4row:
+    x: 19
+    'y': -19
+    r: 0
+    meta:
+        stagger: 0
+        spread: 19
+        splay: 0
+        origin:
+            - -9.5
+            - 9.5
+        orient: 0
+        shift:
+            - 19
+            - -19
+        rotate: 0
+        adjust: {}
+        width: 19
+        height: 19
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: key4col_key4row
+        name: key4_key4col_key4row
+        label: '1_1'
+        column_net: col_1
+        row_net: row_1
+        zone:
+            key:
+                origin:
+                    - '-0.5 u'
+                    - 0.5 u
+                splay: -0.0
+                shift:
+                    - 1 u
+                    - '-1 u'
+            columns:
+                key4col:
+                    rows:
+                        key4row:
+                            width: 1 u
+                            height: 1 u
+                            label: '1_1'
+                            column_net: col_1
+                            row_net: row_1
+                    key: {}
+                    name: key4col
+            name: key4
+        col:
+            rows:
+                key4row:
+                    width: 1 u
+                    height: 1 u
+                    label: '1_1'
+                    column_net: col_1
+                    row_net: row_1
+            key: {}
+            name: key4col
+        row: key4row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0
+key5_key5col_key5row:
+    x: 0
+    'y': -38
+    r: 0
+    meta:
+        stagger: 0
+        spread: 19
+        splay: 0
+        origin:
+            - -9.5
+            - 9.5
+        orient: 0
+        shift:
+            - 0
+            - -38
+        rotate: 0
+        adjust: {}
+        width: 19
+        height: 19
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: key5col_key5row
+        name: key5_key5col_key5row
+        label: ''
+        column_net: GND
+        row_net: key5
+        zone:
+            key:
+                origin:
+                    - '-0.5 u'
+                    - 0.5 u
+                splay: -0.0
+                shift:
+                    - 0 u
+                    - '-2 u'
+            columns:
+                key5col:
+                    rows:
+                        key5row:
+                            width: 1 u
+                            height: 1 u
+                            label: ''
+                            column_net: GND
+                            row_net: key5
+                    key: {}
+                    name: key5col
+            name: key5
+        col:
+            rows:
+                key5row:
+                    width: 1 u
+                    height: 1 u
+                    label: ''
+                    column_net: GND
+                    row_net: key5
+            key: {}
+            name: key5col
+        row: key5row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0
+key6_key6col_key6row:
+    x: 19
+    'y': -38
+    r: 0
+    meta:
+        stagger: 0
+        spread: 19
+        splay: 0
+        origin:
+            - -9.5
+            - 9.5
+        orient: 0
+        shift:
+            - 19
+            - -38
+        rotate: 0
+        adjust: {}
+        width: 19
+        height: 19
+        padding: 19
+        autobind: 10
+        skip: false
+        asym: both
+        colrow: key6col_key6row
+        name: key6_key6col_key6row
+        label: ''
+        column_net: GND
+        row_net: key6
+        zone:
+            key:
+                origin:
+                    - '-0.5 u'
+                    - 0.5 u
+                splay: -0.0
+                shift:
+                    - 1 u
+                    - '-2 u'
+            columns:
+                key6col:
+                    rows:
+                        key6row:
+                            width: 1 u
+                            height: 1 u
+                            label: ''
+                            column_net: GND
+                            row_net: key6
+                    key: {}
+                    name: key6col
+            name: key6
+        col:
+            rows:
+                key6row:
+                    width: 1 u
+                    height: 1 u
+                    label: ''
+                    column_net: GND
+                    row_net: key6
+            key: {}
+            name: key6col
+        row: key6row
+        bind:
+            - 0
+            - 0
+            - 0
+            - 0

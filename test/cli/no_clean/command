@@ -1,0 +1,1 @@
+node -e "const fs = require('fs-extra'); fs.mkdirpSync('output'); fs.writeFileSync('output/sentinel.txt', 'Ergogen CLI --clean test sentinel');" && node src/cli.js test/fixtures/medium.yaml

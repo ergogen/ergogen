@@ -1,0 +1,1 @@
+Ergogen CLI --clean test sentinel

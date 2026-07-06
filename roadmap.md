@@ -6,11 +6,18 @@
 
 ### Major
 
+- Straightforward-ize `extends` behaviour for tagging (see #129)
+- Un-exclude kicad8 template from coverage during default kicad version switch!
 - Merge, generalize, uniform-ize and externalize footprints!
     - onnx-like incremental opset versioning
     - Template for creating them, built-in variables they can use, documentation, external links, etc.
         - Add access to whole set of points + filtering logic, so they can implement their own connection logic as well maybe (see daisy chaining)
+        - Maybe ordering for the filter (so every instance can know that it really is the next in line)
+        - Add `chain` to footprint API similarly to how `local_net` behaves, only for daisy chaining
+        - Also, rename `local_net` to `local`, probably
     - Also considering how (or, on which layer) they define their silks, universal mirroring behaviour (see ixy/xy/sxy note), etc.
+    - When breaking anyway, remove a lot of footprints from built-in status
+        - And make sure the external infrastructure + bundling support is there to make up for it
 
 ### Minor
 
