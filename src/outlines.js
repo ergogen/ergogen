@@ -6,6 +6,7 @@ const Point = require('./point')
 const prep = require('./prepare')
 const anchor = require('./anchor').parse
 const filter = require('./filter').parse
+const injected_outlines = require('./outlines/index')
 const hulljs = require('hull')
 
 const binding = (base, bbox, point, units) => {
@@ -304,12 +305,17 @@ const path = (config, name, points, outlines, units) => {
     }, units]
 }
 
+const svg = (config, name, points, outlines, units) => {
+    return u.svg_paths_to_outline(config.paths, config, name, points, outlines, units)
+}
+
 const whats = {
     rectangle,
     circle,
     polygon,
     outline,
     path,
+    svg,
     hull
 }
 
@@ -361,7 +367,7 @@ exports.parse = (config, points, units) => {
 
             // process keys that are common to all part declarations
             const operation = u[a.in(part.operation || 'add', `${name}.operation`, ['add', 'subtract', 'intersect', 'stack'])]
-            const what = a.in(part.what || 'outline', `${name}.what`, ['rectangle', 'circle', 'polygon', 'outline', 'path', 'hull'])
+            const what = a.in(part.what || 'outline', `${name}.what`, ['rectangle', 'circle', 'polygon', 'outline', 'path', 'hull', 'svg', ...Object.keys(injected_outlines)])
             const bound = !!part.bound
             const asym = a.asym(part.asym || 'source', `${name}.asym`)
 
@@ -390,7 +396,7 @@ exports.parse = (config, points, units) => {
             delete part.scale
 
             // a prototype "shape" maker (and its units) are computed
-            const [shape_maker, shape_units] = whats[what](part, name, points, outlines, units)
+            const [shape_maker, shape_units] = (whats[what] || injected_outlines[what])(part, name, points, outlines, units)
             const adjust = start => anchor(original_adjust || {}, `${name}.adjust`, points, start)(shape_units)
 
             // and then the shape is repeated for all where positions
@@ -428,4 +434,8 @@ exports.parse = (config, points, units) => {
     }
 
     return outlines
-}   
+}
+
+exports.inject_outline = (name, outline) => {
+    injected_outlines[name] = outline
+}

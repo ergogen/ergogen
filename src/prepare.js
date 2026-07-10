@@ -62,26 +62,68 @@ exports.unnest = config => traverse(config, config, [], (target, key, val) => {
     u.deep(target, key, val)
 })
 
-exports.inherit = config => traverse(config, config, [], (target, key, val, root, breadcrumbs) => {
-    if (val && val.$extends !== undefined) {
-        let candidates = u.deepcopy(val.$extends)
-        if (a.type(candidates)() !== 'array') candidates = [candidates]
-        const list = [val]
-        while (candidates.length) {
-            const path = candidates.shift()
-            const other = u.deep(root, path)
-            a.assert(other, `"${path}" (reached from "${breadcrumbs.join('.')}.$extends") does not name a valid inheritance target!`)
-            let parents = other.$extends || []
-            if (a.type(parents)() !== 'array') parents = [parents]
-            candidates = candidates.concat(parents)
-            a.assert(!list.includes(other), `"${path}" (reached from "${breadcrumbs.join('.')}.$extends") leads to a circular dependency!`)
-            list.unshift(other)
+exports.inherit = config => {
+    const cache = new Map()
+    const stack = []
+
+    const resolve = (val, breadcrumbs) => {
+        const type = a.type(val)()
+        if (type !== 'object' && type !== 'array') return val
+        if (cache.has(val)) return cache.get(val)
+
+        a.assert(!stack.includes(val), `"${breadcrumbs.join('.')}" leads to a circular dependency!`)
+
+        stack.push(val)
+        let res
+        if (type === 'object') {
+            let current = val
+            if (val.$extends !== undefined) {
+                let candidates = val.$extends
+                if (a.type(candidates)() !== 'array') candidates = [candidates]
+                const list = []
+                for (const path of candidates) {
+                    const other = u.deep(config, path)
+                    a.assert(other, `"${path}" (reached from "${breadcrumbs.join('.')}.$extends") does not name a valid inheritance target!`)
+                    list.push(resolve(other, path.split('.')))
+                }
+                const own = u.deepcopy(val)
+                delete own.$extends
+
+                if (list.length === 1 && Object.keys(own).length === 0) {
+                    current = list[0]
+                } else {
+                    list.push(own)
+                    current = extend.apply(null, list)
+                }
+            }
+
+            const current_type = a.type(current)()
+            if (current_type === 'object') {
+                res = {}
+                for (const [k, v] of Object.entries(current)) {
+                    res[k] = resolve(v, [...breadcrumbs, k])
+                }
+            } else if (current_type === 'array') {
+                res = []
+                for (let i = 0; i < current.length; i++) {
+                    res[i] = resolve(current[i], [...breadcrumbs, `[${i}]`])
+                }
+            } else {
+                res = current
+            }
+        } else { // array
+            res = []
+            for (let i = 0; i < val.length; i++) {
+                res[i] = resolve(val[i], [...breadcrumbs, `[${i}]`])
+            }
         }
-        val = extend.apply(null, list)
-        delete val.$extends
+        stack.pop()
+        cache.set(val, res)
+        return res
     }
-    target[key] = val
-})
+
+    return resolve(config, [])
+}
 
 exports.parameterize = config => traverse(config, config, [], (target, key, val, root, breadcrumbs) => {
 
@@ -130,4 +172,81 @@ exports.parameterize = config => traverse(config, config, [], (target, key, val,
     delete val.$params
     delete val.$args
     target[key] = val
+})
+
+const parseArgs = (inner) => {
+    const args = []
+    let current = ''
+    let depth = 0
+    let inQuote = false
+    let quoteChar = ''
+    for (let i = 0; i < inner.length; i++) {
+        const char = inner[i]
+        if ((char === '"' || char === "'") && (i === 0 || inner[i-1] !== '\\')) {
+            if (!inQuote) {
+                inQuote = true
+                quoteChar = char
+                current += char
+            } else if (char === quoteChar) {
+                inQuote = false
+                current += char
+            } else {
+                current += char
+            }
+        } else if (!inQuote && char === '(') {
+            depth++
+            current += char
+        } else if (!inQuote && char === ')') {
+            depth--
+            current += char
+        } else if (!inQuote && char === ',' && depth === 0) {
+            args.push(current.trim())
+            current = ''
+        } else {
+            current += char
+        }
+    }
+    if (current.trim().length > 0 || inner.length === 0) {
+        args.push(current.trim())
+    }
+    return args
+}
+
+const resolve = (val, root, breadcrumbs, seen = new Set()) => {
+    if (a.type(val)() !== 'string') return val
+    if (!val.startsWith('$concat(') || !val.endsWith(')')) return val
+
+    if (seen.has(val)) {
+        throw new Error(`Circular dependency detected in $concat at "${breadcrumbs.join('.')}": ${val}`)
+    }
+    seen.add(val)
+
+    const inner = val.substring(8, val.length - 1)
+    const args = parseArgs(inner)
+
+    const res = args
+        .filter(arg => arg.length > 0)
+        .map(arg => {
+            // String literal
+            if ((arg.startsWith('"') && arg.endsWith('"')) || (arg.startsWith("'") && arg.endsWith("'"))) {
+                return arg.substring(1, arg.length - 1).replace(/\\(.)/g, '$1')
+            }
+            // $concat call
+            if (arg.startsWith('$concat(')) {
+                return resolve(arg, root, breadcrumbs, seen)
+            }
+            // Reference
+            const ref = u.deep(root, arg)
+            if (ref === undefined) {
+                throw new Error(`Could not resolve reference "${arg}" in $concat at "${breadcrumbs.join('.')}"`)
+            }
+            return resolve(ref, root, breadcrumbs, seen)
+        }).join('')
+
+    seen.delete(val)
+    return res
+}
+
+exports.concat = config => traverse(config, config, [], (target, key, val, root, breadcrumbs) => {
+    target[key] = resolve(val, root, breadcrumbs)
 })

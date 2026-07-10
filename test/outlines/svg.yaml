@@ -1,0 +1,52 @@
+points:
+  zones:
+    matrix:
+      columns.c1:
+      rows.r1:
+  mirror.distance: 40
+outlines:
+  reference:
+    - what: rectangle
+      where: true
+      size: 20
+  svg-path-inline:
+    - what: svg
+      where: matrix_c1_r1
+      paths: M 0 0 L 0 -2.5 L -2.5 -2.5 L -2.5 0 Z
+    - what: outline
+      name: reference
+      operation: stack
+  svg-path-single:
+    - what: svg
+      where: matrix_c1_r1
+      paths:
+        - M 0 0 L 0 -2.5 L -2.5 -2.5 L -2.5 0 Z
+    - what: outline
+      name: reference
+      operation: stack
+  svg-path-multiple:
+    - what: svg
+      where: matrix_c1_r1
+      paths:
+        - M 0 0 L 0 -2.5 L -2.5 -2.5 L -2.5 0 Z
+        - M 5 5 L 10 5 L 10 10 L 5 10 Z
+    - what: outline
+      name: reference
+      operation: stack
+  svg-path-mirror:
+    - what: svg
+      where: true
+      paths: M 0 0 L 0 -2.5 L -2.5 -2.5 L -2.5 5 Z
+    - what: outline
+      name: reference
+      operation: stack
+  svg-path-flip:
+    - what: svg
+      where: true
+      flip_vertically: true
+      flip_horizontally: true
+      origin: [-10,-10]
+      paths: M 0 0 L 0 -2.5 L -2.5 -2.5 L -2.5 5 Z
+    - what: outline
+      name: reference
+      operation: stack

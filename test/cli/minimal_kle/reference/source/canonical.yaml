@@ -15,7 +15,7 @@ points:
                         key1row:
                             width: 1 u
                             height: 1 u
-                            label: '0_0'
+                            label: 0_0
                             column_net: col_0
                             row_net: row_0
         key2:
@@ -33,7 +33,7 @@ points:
                         key2row:
                             width: 1 u
                             height: 1 u
-                            label: '0_1'
+                            label: 0_1
                             column_net: col_1
                             row_net: row_0
         key3:
@@ -51,7 +51,7 @@ points:
                         key3row:
                             width: 1 u
                             height: 1 u
-                            label: '1_0'
+                            label: 1_0
                             column_net: col_0
                             row_net: row_1
         key4:
@@ -69,7 +69,7 @@ points:
                         key4row:
                             width: 1 u
                             height: 1 u
-                            label: '1_1'
+                            label: 1_1
                             column_net: col_1
                             row_net: row_1
         key5:

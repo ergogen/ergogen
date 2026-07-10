@@ -2,11 +2,11 @@ points:
   zones:
     matrix:
       columns:
-        left.key.bind: [,10,,]
-        right.key.bind: [,,,10]
+        left.key.bind: [0, 10, 0, 0]
+        right.key.bind: [0, 0, 0, 10]
       rows:
-        bottom.key.bind: [10,,,]
-        top.key.bind: [,,10,]
+        bottom.key.bind: [10, 0, 0, 0]
+        top.key.bind: [0, 0, 10, 0]
       key:
         bind: [0, 0, 0, 0]
 outlines:

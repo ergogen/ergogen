@@ -61,6 +61,9 @@ describe('Filter', function() {
         names(filter([['even', 'prime']], '', points)).should.deep.equal(['two'])
         // arbitrary nesting should be possible
         names(filter([[['even', 'odd'], 'prime']], '', points)).should.deep.equal(['two', 'three'])
+        // empty arrays should work, too (or by default is false, and by default is true)
+        names(filter([], '', points)).should.deep.equal([])
+        names(filter([[]], '', points)).should.deep.equal(Object.values(points).map(p => p.meta.name))
         // invalid regexes should throw meaningful errors
         filter.bind(this, '/\\/', '', points).should.throw('Invalid regex')
         // anything other than string/array/object/undefined is also an error

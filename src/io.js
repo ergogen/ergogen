@@ -51,6 +51,31 @@ exports.unpack = async (zip) => {
         injections.push(['template', name, parsed])
     }
 
+    // bundled outlines
+    const ots = zip.folder('outlines')
+    for (const ot of ots.file(/.*\.(svg|js)$/)) {
+        const name = ot.name.slice('outlines/'.length).replace(/\.(svg|js)$/, '')
+        const text = await ot.async('string')
+        if (ot.name.endsWith('.js')) {
+            const parsed = new Function('require', module_prefix + text + module_suffix)(fake_require(name))
+            injections.push(['outline', name, parsed])
+        } else {
+            // Simple SVG path extraction
+            const paths = []
+            const pathRegex = /<path[\s\S]*?\sd=["']([\s\S]*?)["']/gi
+            let match
+            while ((match = pathRegex.exec(text)) !== null) {
+                paths.push(match[1])
+            }
+
+            const svg_injected = (config, name, points, outlines, units) => {
+                return u.svg_paths_to_outline(paths, config, name, points, outlines, units)
+            }
+
+            injections.push(['outline', name, svg_injected])
+        }
+    }
+
     return [config_text, injections]
 }
 

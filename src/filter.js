@@ -6,8 +6,8 @@ const anchor = anchor_lib.parse
 
 const _true = () => true
 const _false = () => false
-const _and = arr => p => arr.map(e => e(p)).reduce((a, b) => a && b)
-const _or = arr => p => arr.map(e => e(p)).reduce((a, b) => a || b)
+const _and = arr => p => arr.every(e => e(p))
+const _or = arr => p => arr.some(e => e(p))
 
 const similar = (keys, reference, name, units) => {
     let neg = false
@@ -143,11 +143,11 @@ exports.parse = (config, name, points={}, units={}, asym='source') => {
         if (['clone', 'both'].includes(asym)) {
             // this is permissive: we only include mirrored versions if they exist, and don't fuss if they don't
             // also, we check for duplicates as clones can potentially refer back to their sources, too
-            const pool = result.map(p => p.meta.name)
+            const pool = new Set(result.map(p => p.meta.name))
             result = result.concat(
                 source.map(p => points[anchor_lib.mirror(p.meta.name)])
                 .filter(p => !!p)
-                .filter(p => !pool.includes(p.meta.name))
+                .filter(p => !pool.has(p.meta.name))
             )
         }
     }
