@@ -1,0 +1,33 @@
+points:
+  zones:
+    matrix:
+      columns:
+        a:
+          rows:
+            r1:
+        b:
+          rows:
+            r1:
+      rows:
+        r1:
+outlines:
+  # expand applies to the stacked circle only, not to the rectangle it is stacked onto
+  stack:
+    - what: rectangle
+      where: matrix_a_r1
+      size: 10
+    - operation: stack
+      what: circle
+      where: matrix_b_r1
+      radius: 4
+      expand: 1
+  # expand applies to the subtracted circle only, so the rectangle keeps its size
+  subtract:
+    - what: rectangle
+      where: matrix_a_r1
+      size: 10
+    - operation: subtract
+      what: circle
+      where: matrix_a_r1
+      radius: 3
+      expand: 1

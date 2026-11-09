@@ -394,6 +394,7 @@ exports.parse = (config, points, units) => {
             const adjust = start => anchor(original_adjust || {}, `${name}.adjust`, points, start)(shape_units)
 
             // and then the shape is repeated for all where positions
+            const positioned = []
             for (const w of where(shape_units)) {
                 const point = adjust(w.clone())
                 let [shape, bbox] = shape_maker(point) // point is passed for mirroring metadata only...
@@ -401,17 +402,32 @@ exports.parse = (config, points, units) => {
                     shape = binding(shape, bbox, point, shape_units)
                 }
                 shape = point.position(shape) // ...actual positioning happens here
-                outlines[outline_name] = operation(outlines[outline_name], shape)
+                positioned.push(shape)
+            }
+
+            if (expand && positioned.length) {
+                // expand only this part: combine its own positions first, then outset that group and apply the
+                // operation once. Expanding the outline built so far (the old behaviour) grew the other parts too.
+                // Subtracting the positions one by one equals subtracting their union, and intersecting or
+                // stacking them is folded with the same operation, so only subtract needs the union.
+                // The scale below multiplies the offset as well, so divide it out here.
+                const combine_part = operation === u.subtract ? u.add : operation
+                let group = null
+                for (const shape of positioned) {
+                    group = group ? combine_part(group, shape) : shape
+                }
+                group = m.model.outline(
+                    group, Math.abs(expand) / Math.abs(scale), joints, (expand < 0), {farPoint: u.farPoint}
+                )
+                outlines[outline_name] = operation(outlines[outline_name], group)
+            } else {
+                for (const shape of positioned) {
+                    outlines[outline_name] = operation(outlines[outline_name], shape)
+                }
             }
 
             if (scale !== 1) {
                 outlines[outline_name] = m.model.scale(outlines[outline_name], scale)
-            }
-    
-            if (expand) {
-                outlines[outline_name] = m.model.outline(
-                    outlines[outline_name], Math.abs(expand), joints, (expand < 0), {farPoint: u.farPoint}
-                )
             }
 
             if (fillet) {
