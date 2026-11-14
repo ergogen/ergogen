@@ -1,0 +1,10 @@
+points.zones.thumbs:
+  columns:
+    cluster:
+      rows:
+        a:
+          key:
+            width: 1.5u
+  rows:
+    a:
+    b:

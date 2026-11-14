@@ -1,0 +1,1 @@
+Reserved key "key" within field "points.zones.thumbs.columns.cluster.rows.a": this block is already a key-level config; move its fields up one level!

@@ -86,6 +86,113 @@ describe('Interface', function() {
         ])
     })
     
+    it('reserved keys', async function() {
+        const reserved = (config, field, key) => ergogen.process(config).should.be.rejectedWith(
+            `Reserved key "${key}" within field "${field}"`
+        )
+        const structure = 'this block is already a key-level config; move its fields up one level!'
+        const metadata = 'it is reserved for engine-managed point metadata!'
+        const zone = {'points.zones.matrix': {}}
+        return Promise.all([
+            // every reserved name, with a reason fitting the name
+            ergogen.process({...zone, 'points.key.key': {}}).should.be.rejectedWith(
+                `Reserved key "key" within field "points.key": ${structure}`
+            ),
+            reserved({...zone, 'points.key.zones': {}}, 'points.key', 'zones'),
+            reserved({...zone, 'points.key.columns': {}}, 'points.key', 'columns'),
+            reserved({...zone, 'points.key.rows': {}}, 'points.key', 'rows'),
+            ergogen.process({...zone, 'points.key.zone': 'z'}).should.be.rejectedWith(
+                `Reserved key "zone" within field "points.key": ${metadata}`
+            ),
+            reserved({...zone, 'points.key.col': 'c'}, 'points.key', 'col'),
+            reserved({...zone, 'points.key.row': 'r'}, 'points.key', 'row'),
+            // every key-level site, with dotted unnesting
+            reserved({'points.zones.matrix.key.rows': {}}, 'points.zones.matrix.key', 'rows'),
+            reserved({'points.zones.matrix.columns.c.key.columns': {}}, 'points.zones.matrix.columns.c.key', 'columns'),
+            reserved({'points.zones.matrix.rows.r.key.width': 30}, 'points.zones.matrix.rows.r', 'key'),
+            reserved({'points.zones.matrix.columns.c.rows.r.col': 'c'}, 'points.zones.matrix.columns.c.rows.r', 'col'),
+            // immediate mirror overrides can't restructure, even without an active mirror
+            reserved({...zone, 'points.key.mirror.key': {}}, 'points.key.mirror', 'key'),
+            reserved({'points.zones.matrix.key.mirror.zones': {}}, 'points.zones.matrix.key.mirror', 'zones'),
+            reserved({'points.zones.matrix.columns.c.key.mirror.columns': {}}, 'points.zones.matrix.columns.c.key.mirror', 'columns'),
+            reserved({'points.zones.matrix.rows.r.mirror.rows': {}}, 'points.zones.matrix.rows.r.mirror', 'rows'),
+            reserved({'points.zones.matrix.columns.c.rows.r.mirror.key': {}}, 'points.zones.matrix.columns.c.rows.r.mirror', 'key'),
+            // inherited declarations are reported where they are used
+            reserved({
+                'shared.row.key.width': 30,
+                'points.zones.matrix.rows.r.$extends': 'shared.row'
+            }, 'points.zones.matrix.rows.r', 'key'),
+            // an unset only resolves away through inheritance, otherwise the field survives
+            reserved({'points.zones.matrix.rows.r.key': '$unset'}, 'points.zones.matrix.rows.r', 'key'),
+            // later merge levels (or skipping the keys) can't rescue a surviving declaration
+            reserved({
+                'points.zones.matrix.key.skip': true,
+                'points.zones.matrix.rows.r.key.width': 30,
+                'points.zones.matrix.columns.c.rows.r': '$unset'
+            }, 'points.zones.matrix.rows.r', 'key'),
+            // inheriting and unsetting in the same object is fine
+            ergogen.process({
+                'shared.row': {key: {width: 30}, height: 20},
+                'points.zones.matrix.rows.r': {$extends: 'shared.row', key: '$unset'}
+            }).should.eventually.have.nested.property('points.matrix_default_r.meta.height', 20)
+        ])
+    })
+
+    it('unreserved metadata', async function() {
+        const names = result => Object.keys(result.points)
+
+        // column-level row unsets still work, without new row type checks
+        names(await ergogen.process({'points.zones.matrix': {
+            rows: {a: {}, b: {}},
+            columns: {c: {rows: {a: '$unset'}}, d: {}}
+        }})).should.deep.equal(['matrix_c_b', 'matrix_d_a', 'matrix_d_b'])
+        names(await ergogen.process({'points.zones.matrix': {
+            rows: {gone: 123, keep: {}},
+            columns: {single: {rows: {gone: '$unset'}}}
+        }})).should.deep.equal(['matrix_single_keep'])
+
+        // nested custom metadata isn't inspected, and prototype names aren't reserved
+        const custom = (await ergogen.process({
+            'points.zones.matrix': {},
+            'points.key': {custom: {key: 1, rows: 2, col: 3}, toString: 'ts', constructor: 'ctor'}
+        })).points.matrix.meta
+        custom.custom.should.deep.equal({key: 1, rows: 2, col: 3})
+        custom.toString.should.equal('ts')
+        custom.constructor.should.equal('ctor')
+
+        // allowed metadata can be consumed by templates and filters
+        const consumed = await ergogen.process({
+            'points.zones.matrix.columns': {
+                one: {key: {'anchor.pin': 'P1'}},
+                two: {key: {'anchor.pin': 'P2'}}
+            },
+            'points.key': {'extra.net': 'GND', label: '{{anchor.pin}}_{{extra.net}}'},
+            'outlines.pins.main': {what: 'rectangle', where: 'meta.anchor.pin ~ P1', size: 4}
+        }, {debug: true})
+        consumed.points.matrix_one.meta.label.should.equal('P1_GND')
+        consumed.points.matrix_two.meta.label.should.equal('P2_GND')
+        const lines = consumed.outlines.pins.dxf.split('\n').filter(line => line.trim() == 'LINE')
+        lines.length.should.equal(4) // a single rectangle, around the P1 key only
+
+        // mirror overrides keep their null/false/$unset semantics, and can relabel rows
+        const mirrored = (await ergogen.process({
+            'points.mirror': 100,
+            'points.key.mirror.width': 30,
+            'points.zones.matrix.columns.c': {},
+            'points.zones.matrix.rows': {
+                inherit: {mirror: null},
+                cleared: {mirror: false},
+                unset: {mirror: '$unset'},
+                relabel: {mirror: {row: 'P1', mirror: {key: 'inner'}}}
+            }
+        })).points
+        mirrored.mirror_matrix_c_inherit.meta.width.should.equal(30)
+        mirrored.mirror_matrix_c_cleared.meta.width.should.equal(18)
+        mirrored.mirror_matrix_c_unset.meta.width.should.equal(18)
+        mirrored.mirror_matrix_c_relabel.meta.row.should.equal('P1')
+        mirrored.matrix_c_relabel.meta.mirror.mirror.should.deep.equal({key: 'inner'})
+    })
+
     it('engine', async function() {
         return Promise.all([
             ergogen.process({'meta.engine': 'invalid'}).should.be.rejectedWith('Invalid'),
