@@ -143,9 +143,12 @@ exports.parse = (config, name, points={}, units={}, asym='source') => {
         if (['clone', 'both'].includes(asym)) {
             // this is permissive: we only include mirrored versions if they exist, and don't fuss if they don't
             // also, we check for duplicates as clones can potentially refer back to their sources, too
+            // and if both halves of a mirrored pair match, only the source half gets cloned
             const pool = new Set(result.map(p => p.meta.name))
+            const matched = new Set(source.map(p => p.meta.name))
             result = result.concat(
-                source.map(p => points[anchor_lib.mirror(p.meta.name)])
+                source.filter(p => !p.meta.mirrored || !matched.has(anchor_lib.mirror(p.meta.name)))
+                .map(p => points[anchor_lib.mirror(p.meta.name)])
                 .filter(p => !!p)
                 .filter(p => !pool.has(p.meta.name))
             )

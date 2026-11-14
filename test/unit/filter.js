@@ -27,8 +27,12 @@ describe('Filter', function() {
         // points should only be returned on their respective halves
         // - so `source` is every match
         filter(true, '', points, undefined, 'source').should.deep.equal(Object.values(points))
-        // - `clone` is the mirror image of every match, which maps one to mirror_one, mirror_one to one, and two/three to nothing (as they don't have mirror parts)
-        filter(true, '', points, undefined, 'clone').should.deep.equal([points.mirror_one, points.one])
+        // - `clone` is the mirror image of every match, which maps one to mirror_one, and two/three to nothing (as they don't have mirror parts)
+        // mirror_one is not cloned back to one, as its source half also matched
+        filter(true, '', points, undefined, 'clone').should.deep.equal([points.mirror_one])
+        filter('/^o/', '', points, undefined, 'clone').should.deep.equal([points.mirror_one])
+        // but a match on the mirrored half only still clones back to the source half
+        filter('mirror_one', '', points, undefined, 'clone').should.deep.equal([points.one])
         // - and `both` is every match plus its mirror image as well
         filter(true, '', points, undefined, 'both').should.deep.equal(Object.values(points))
         // objects just propagate to anchor (and then wrap in array for consistency)
