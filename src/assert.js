@@ -1,14 +1,52 @@
 const m = require('makerjs')
 const mathjs = require('mathjs')
 
-const mathnum = exports.mathnum = raw => units => {
-    return mathjs.evaluate(`${raw}`, units || {})
-}
-
 const assert = exports.assert = (exp, msg) => {
     if (!exp) {
         throw new Error(msg)
     }
+}
+
+// trigonometry solvers from makerjs, callable from any math expression
+
+const solver_args = (fn, args, names) => {
+    assert(args.length === 3, `Function "${fn}" expects 3 arguments, got ${args.length}!`)
+    for (const [index, arg] of args.entries()) {
+        assert(typeof arg === 'number' && Number.isFinite(arg) && arg > 0, `Argument "${names[index]}" of "${fn}" must be a positive finite number!`)
+    }
+    return args
+}
+
+const solvers = {
+    // the angle (in degrees) opposite the first side
+    triangle_sss: (...args) => {
+        const sides = solver_args('triangle_sss', args, ['opposite_side', 'side', 'other_side'])
+        const msg = 'Sides in "triangle_sss" must form a numerically resolvable non-degenerate triangle!'
+        // normalizing by the longest side keeps the squares within floating point range
+        const longest = Math.max(...sides)
+        const [opposite_side, side, other_side] = sides.map(val => val / longest)
+        assert(opposite_side < side + other_side && side < opposite_side + other_side && other_side < opposite_side + side, msg)
+        const angle = m.solvers.solveTriangleSSS(opposite_side, side, other_side)
+        assert(angle > 0 && angle < 180, msg)
+        return angle
+    },
+    // the length opposite the first angle, with the side being between the two angles
+    triangle_asa: (...args) => {
+        const [opposite_angle, side, other_angle] = solver_args('triangle_asa', args, ['opposite_angle', 'side', 'other_angle'])
+        const third_angle = 180 - opposite_angle - other_angle
+        assert(third_angle > 0 && third_angle < 180, 'Angles in "triangle_asa" must form a numerically resolvable triangle with a sum below 180 degrees!')
+        const length = m.solvers.solveTriangleASA(opposite_angle, side, other_angle)
+        assert(Number.isFinite(length) && length > 0, 'Result of "triangle_asa" must be a positive finite number!')
+        return length
+    }
+}
+
+// a private mathjs instance, so the solvers don't leak into the global one
+const math = mathjs.create(mathjs.all)
+math.import(solvers)
+
+const mathnum = exports.mathnum = raw => units => {
+    return math.evaluate(`${raw}`, units || {})
 }
 
 const type = exports.type = val => units => {
