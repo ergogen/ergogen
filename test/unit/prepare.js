@@ -330,4 +330,124 @@ describe('Prepare', function() {
         res9.whitespace.should.equal('')
         res9.mixed.should.equal('foobar')
     })
+
+    it('concat escapes', function() {
+        const config = {a: 'foo', b: 'bar'}
+        const concat = res => p.concat({...config, res}).res
+
+        // a trailing escaped backslash closes the literal, in both quote styles
+        concat(String.raw`$concat("folder\\", "file")`).should.equal(String.raw`folder\file`)
+        concat(String.raw`$concat('folder\\', 'file')`).should.equal(String.raw`folder\file`)
+
+        // even and odd runs of backslashes before a quote
+        concat(String.raw`$concat("a\\\\")`).should.equal(String.raw`a\\`)
+        concat(String.raw`$concat("a\\\"b")`).should.equal(String.raw`a\"b`)
+        concat(String.raw`$concat('a\\\'b')`).should.equal(String.raw`a\'b`)
+
+        // a single escaped quote
+        concat(String.raw`$concat("say \"hi\"")`).should.equal('say "hi"')
+
+        // nested calls and references after such literals
+        concat(String.raw`$concat("x\\", $concat(a, "\\"), b)`).should.equal(String.raw`x\foo\bar`)
+    })
+
+    it('concat line terminators', function() {
+        const concat = res => p.concat({res}).res
+
+        // a backslash before a line terminator is kept, in both quote styles
+        for (const terminator of ['\n', '\r', '\u2028', '\u2029', '\r\n']) {
+            concat(`$concat("a\\${terminator}b")`).should.equal(`a\\${terminator}b`)
+            concat(`$concat('a\\${terminator}b')`).should.equal(`a\\${terminator}b`)
+        }
+
+        // an escaped backslash before a line terminator still pairs up
+        concat('$concat("a\\\\\nb")').should.equal('a\\\nb')
+    })
+
+    it('concat syntax', function() {
+        const config = {a: 'foo', b: 'bar', c: 'baz'}
+        const concat = res => p.concat({...config, res}).res
+        const invalid = res => p.concat.bind(this, {...config, res})
+
+        // sibling calls and trailing tokens
+        invalid('$concat("a") + $concat("b")').should.throw('Invalid $concat expression')
+        invalid('$concat(a) - $concat(b, c)').should.throw('trailing')
+        invalid('$concat(a))').should.throw('trailing')
+        invalid('$concat(a) ').should.throw('trailing')
+
+        // extra tokens inside an argument
+        invalid('$concat("a" + "b")').should.throw('unexpected "+"')
+        invalid('$concat(a b)').should.throw('unexpected "b"')
+        invalid('$concat((a)').should.throw('unexpected "("')
+        invalid('$concat(a(b))').should.throw('unexpected "("')
+        invalid('$concat("a""b")').should.throw('unexpected """')
+        invalid('$concat($concat(a)b)').should.throw('unexpected "b"')
+
+        // a single quote character is not a literal
+        invalid('$concat(")').should.throw('unterminated')
+        invalid('$concat(\')').should.throw('unterminated')
+        invalid('$concat("abc)').should.throw('unterminated')
+        invalid('$concat("abc\\').should.throw('unterminated')
+
+        // a missing closing parenthesis is still validated
+        invalid('$concat(').should.throw('missing closing parenthesis')
+        invalid('$concat(a').should.throw('missing closing parenthesis')
+        invalid('$concat("a"').should.throw('missing closing parenthesis')
+        invalid('$concat(a, $concat(b)').should.throw('missing closing parenthesis')
+
+        // errors name the field
+        invalid('$concat(a').should.throw('at "res"')
+
+        // nested calls and empty arguments stay valid
+        concat('$concat(a, $concat("-", $concat(b, c)))').should.equal('foo-barbaz')
+        concat('$concat( a ,b , )').should.equal('foobar')
+        concat('$concat(,)').should.equal('')
+
+        // strings that are not a $concat expression are left alone
+        concat('concat(a)').should.equal('concat(a)')
+        concat(' $concat(a)').should.equal(' $concat(a)')
+        concat('prefix $concat(a)').should.equal('prefix $concat(a)')
+        concat('$concat').should.equal('$concat')
+    })
+
+    it('concat references', function() {
+        // string, number and boolean primitives, including falsy ones
+        p.concat({
+            zero: 0,
+            no: false,
+            yes: true,
+            arr: ['p', 'q'],
+            res: '$concat(zero, no, yes, arr.1)'
+        }).res.should.equal('0falsetrueq')
+
+        // objects, arrays and null are rejected
+        p.concat.bind(this, {meta: {x: 1}, res: '$concat(meta)'}).should.throw('should be a string, number or boolean, not object')
+        p.concat.bind(this, {arr: ['a', 'b'], res: '$concat(arr)'}).should.throw('not array')
+        p.concat.bind(this, {nothing: null, res: '$concat(nothing)'}).should.throw('not null')
+
+        // paths through primitives and inherited properties do not resolve
+        p.concat.bind(this, {a: 'x', res: '$concat(a.b)'}).should.throw('Could not resolve reference "a.b"')
+        p.concat.bind(this, {res: '$concat(constructor)'}).should.throw('Could not resolve reference')
+        p.concat.bind(this, {s: 'abc', res: '$concat(s.toString)'}).should.throw('Could not resolve reference "s.toString"')
+
+        // a failed lookup does not mutate the config
+        const config = {a: {}, res: '$concat(missing.sub, a.deeper.still)'}
+        p.concat.bind(this, config).should.throw('Could not resolve reference "missing.sub"')
+        config.should.deep.equal({a: {}, res: '$concat(missing.sub, a.deeper.still)'})
+        const config2 = {a: {}, res: '$concat(a.deeper.still)'}
+        p.concat.bind(this, config2).should.throw('Could not resolve reference "a.deeper.still"')
+        config2.should.deep.equal({a: {}, res: '$concat(a.deeper.still)'})
+
+        // paths through null or undefined values do not resolve
+        p.concat.bind(this, {nothing: null, res: '$concat(nothing.sub)'}).should.throw('Could not resolve reference "nothing.sub"')
+        p.concat.bind(this, {nothing: undefined, res: '$concat(nothing.sub)'}).should.throw('Could not resolve reference "nothing.sub"')
+
+        // cycles through nested calls are still detected
+        p.concat.bind(this, {a: '$concat("x", $concat(a))'}).should.throw('Circular dependency')
+    })
+
+    it('concat string properties', function() {
+        // own properties of a referenced string resolve
+        p.concat({s: 'abc', res: '$concat(s.length, "-", s.0)'}).res.should.equal('3-a')
+    })
 })

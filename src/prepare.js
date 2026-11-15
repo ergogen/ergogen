@@ -174,74 +174,95 @@ exports.parameterize = config => traverse(config, config, [], (target, key, val,
     target[key] = val
 })
 
-const parseArgs = (inner) => {
-    const args = []
-    let current = ''
-    let depth = 0
-    let inQuote = false
-    let quoteChar = ''
-    for (let i = 0; i < inner.length; i++) {
-        const char = inner[i]
-        if ((char === '"' || char === "'") && (i === 0 || inner[i-1] !== '\\')) {
-            if (!inQuote) {
-                inQuote = true
-                quoteChar = char
-                current += char
-            } else if (char === quoteChar) {
-                inQuote = false
-                current += char
-            } else {
-                current += char
+const concat_prefix = '$concat('
+
+const parse_concat = (val, breadcrumbs) => {
+    const fail = reason => {
+        throw new Error(`Invalid $concat expression "${val}" at "${breadcrumbs.join('.')}": ${reason}!`)
+    }
+    let pos = 0
+    const skip_whitespace = () => {
+        while (pos < val.length && /\s/.test(val[pos])) pos++
+    }
+    const parse_literal = () => {
+        const quote = val[pos++]
+        let value = ''
+        while (pos < val.length) {
+            const char = val[pos++]
+            if (char === quote) return {type: 'literal', value}
+            // a backslash always escapes the next character, so runs of backslashes pair up
+            if (char === '\\') {
+                if (pos === val.length) break
+                // a backslash before a line terminator is not an escape, so it stays in the value
+                if (!/./.test(val[pos])) value += char
+                value += val[pos++]
+            } else value += char
+        }
+        fail(`unterminated ${quote} string literal`)
+    }
+    const parse_reference = () => {
+        const start = pos
+        while (pos < val.length && !/[\s,()"']/.test(val[pos])) pos++
+        return {type: 'reference', path: val.substring(start, pos)}
+    }
+    const parse_call = () => {
+        pos += concat_prefix.length
+        const args = []
+        while (true) {
+            skip_whitespace()
+            const char = val[pos]
+            // empty arguments are allowed and contribute nothing
+            if (char === '"' || char === "'") args.push(parse_literal())
+            else if (val.startsWith(concat_prefix, pos)) args.push(parse_call())
+            else if (char !== ',' && char !== ')') args.push(parse_reference())
+            skip_whitespace()
+            if (pos === val.length) fail('missing closing parenthesis')
+            if (val[pos] === ')') {
+                pos++
+                return {type: 'call', args}
             }
-        } else if (!inQuote && char === '(') {
-            depth++
-            current += char
-        } else if (!inQuote && char === ')') {
-            depth--
-            current += char
-        } else if (!inQuote && char === ',' && depth === 0) {
-            args.push(current.trim())
-            current = ''
-        } else {
-            current += char
+            if (val[pos] !== ',') fail(`unexpected "${val[pos]}" at position ${pos}`)
+            pos++
         }
     }
-    if (current.trim().length > 0 || inner.length === 0) {
-        args.push(current.trim())
+    const expression = parse_call()
+    if (pos < val.length) fail(`unexpected trailing "${val.substring(pos)}" after the closing parenthesis`)
+    return expression
+}
+
+// read-only lookup, so that a missing path does not create intermediate objects in the config
+const lookup = (root, path) => {
+    let step = root
+    for (const level of path.split('.')) {
+        // own properties of strings (like "length" or an index) are still readable
+        if (step === null || step === undefined || !Object.prototype.hasOwnProperty.call(step, level)) return undefined
+        step = step[level]
     }
-    return args
+    return step
 }
 
 const resolve = (val, root, breadcrumbs, seen = new Set()) => {
     if (a.type(val)() !== 'string') return val
-    if (!val.startsWith('$concat(') || !val.endsWith(')')) return val
+    if (!val.startsWith(concat_prefix)) return val
 
     if (seen.has(val)) {
         throw new Error(`Circular dependency detected in $concat at "${breadcrumbs.join('.')}": ${val}`)
     }
     seen.add(val)
 
-    const inner = val.substring(8, val.length - 1)
-    const args = parseArgs(inner)
-
-    const res = args
-        .filter(arg => arg.length > 0)
-        .map(arg => {
-            // String literal
-            if ((arg.startsWith('"') && arg.endsWith('"')) || (arg.startsWith("'") && arg.endsWith("'"))) {
-                return arg.substring(1, arg.length - 1).replace(/\\(.)/g, '$1')
-            }
-            // $concat call
-            if (arg.startsWith('$concat(')) {
-                return resolve(arg, root, breadcrumbs, seen)
-            }
-            // Reference
-            const ref = u.deep(root, arg)
-            if (ref === undefined) {
-                throw new Error(`Could not resolve reference "${arg}" in $concat at "${breadcrumbs.join('.')}"`)
-            }
-            return resolve(ref, root, breadcrumbs, seen)
-        }).join('')
+    const evaluate = node => {
+        if (node.type == 'literal') return node.value
+        if (node.type == 'call') return node.args.map(evaluate).join('')
+        const ref = lookup(root, node.path)
+        if (ref === undefined) {
+            throw new Error(`Could not resolve reference "${node.path}" in $concat at "${breadcrumbs.join('.')}"`)
+        }
+        if (!['string', 'number', 'boolean'].includes(typeof ref)) {
+            throw new Error(`Reference "${node.path}" in $concat at "${breadcrumbs.join('.')}" should be a string, number or boolean, not ${a.type(ref)()}!`)
+        }
+        return resolve(ref, root, breadcrumbs, seen)
+    }
+    const res = evaluate(parse_concat(val, breadcrumbs))
 
     seen.delete(val)
     return res
