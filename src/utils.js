@@ -155,6 +155,7 @@ exports.svg_paths_to_outline = (paths_raw, config, name, points, outlines, units
         } else {
             a.assert(false, `Field "paths" for SVG outline "${name}" must be a string or an array!`)
         }
+        a.assert(paths.length > 0, `SVG outline "${name}" must have at least one path!`)
 
         let combined = undefined
         for (const [i, p] of paths.entries()) {
