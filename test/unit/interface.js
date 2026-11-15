@@ -1,3 +1,4 @@
+const m = require('makerjs')
 const yaml = require('js-yaml')
 const ergogen = require('../../src/ergogen')
 const version = require('../../package.json').version
@@ -86,6 +87,50 @@ describe('Interface', function() {
         ])
     })
     
+    it('nested inheritance', async function() {
+        // the zone's key extends its own template, unsetting the padding,
+        // instead of keeping the key fields the zone template already set
+        const result = await ergogen.process({
+            'shared.wide': {spread: 30, padding: 25, tag: 'wide'},
+            'shared.zone': {
+                key: {spread: 19, tag: 'zone'},
+                columns: {a: {}, b: {}},
+                rows: {bottom: {}, top: {}}
+            },
+            'points.zones.matrix': {
+                $extends: 'shared.zone',
+                key: {$extends: 'shared.wide', padding: '$unset'}
+            }
+        }, {debug: true})
+        result.canonical.points.zones.matrix.key.should.deep.equal({spread: 30, tag: 'wide'})
+        const layout = Object.entries(result.points).map(([name, point]) => [name, point.x, point.y])
+        layout.should.deep.equal([
+            ['matrix_a_bottom', 0, 0],
+            ['matrix_a_top', 0, 19],
+            ['matrix_b_bottom', 30, 0],
+            ['matrix_b_top', 30, 19]
+        ])
+        for (const point of Object.values(result.points)) {
+            point.meta.spread.should.equal(30)
+            point.meta.padding.should.equal(19)
+            point.meta.tag.should.equal('wide')
+        }
+
+        // the same holds for the parts of array-form outlines
+        const outlines = await ergogen.process({
+            wide_part: {what: 'rectangle', where: true, size: 20, corner: 4},
+            base_outlines: {panel: [{what: 'rectangle', where: true, size: 10}]},
+            points: {zones: {matrix: {}}},
+            outlines: {$extends: 'base_outlines', panel: [{$extends: 'wide_part', corner: '$unset'}]}
+        }, {debug: true})
+        outlines.canonical.outlines.panel.should.deep.equal([{what: 'rectangle', where: true, size: 20}])
+        const panel = outlines.outlines.panel.yaml
+        m.measure.modelExtents(panel).should.deep.include({low: [-10, -10], high: [10, 10]})
+        let arcs = 0
+        m.model.walk(panel, {onPath: walked => { if (walked.pathContext.type == 'arc') arcs++ }})
+        arcs.should.equal(0)
+    })
+
     it('reserved keys', async function() {
         const reserved = (config, field, key) => ergogen.process(config).should.be.rejectedWith(
             `Reserved key "${key}" within field "${field}"`

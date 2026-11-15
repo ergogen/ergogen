@@ -194,6 +194,167 @@ describe('Prepare', function() {
         p.inherit(config_primitive_inh_number).extended.should.equal(42)
     })
 
+    it('nested inherit', function() {
+        // a child's own $extends beats what the parent's child inherits
+        p.inherit({
+            base_child: {b1: 10},
+            A: {child: {b1: 99}},
+            C: {$extends: 'A', child: {$extends: 'base_child'}}
+        }).C.child.should.deep.equal({b1: 10})
+
+        // fields only the parent's child has survive, explicit child fields win
+        p.inherit({
+            base_child: {b1: 10, b2: 20},
+            A: {child: {b1: 99, b3: 30, b4: 40}},
+            C: {$extends: 'A', child: {$extends: 'base_child', b2: 21, b4: 41}}
+        }).C.child.should.deep.equal({b1: 10, b2: 21, b3: 30, b4: 41})
+
+        // the child's $unset applies after its own targets...
+        p.inherit({
+            t: {k: 1, j: 2},
+            A: {child: {k: 5}},
+            C: {$extends: 'A', child: {$extends: 't', j: '$unset'}}
+        }).C.child.should.deep.equal({k: 1})
+        // ...and still reaches fields that only the parent's child has
+        p.inherit({
+            t: {k: 1},
+            A: {child: {k: 5, z: 3}},
+            C: {$extends: 'A', child: {$extends: 't', z: '$unset'}}
+        }).C.child.should.deep.equal({k: 1})
+
+        // two levels down, through a target that has its own nested $extends
+        p.inherit({
+            t: {k: 1, j: 2},
+            u: {inner: {$extends: 't', m: 2}},
+            A: {c: {inner: {k: 50}}},
+            C: {$extends: 'A', c: {$extends: 'u'}}
+        }).C.c.should.deep.equal({inner: {k: 1, j: 2, m: 2}})
+        // two levels down, with the nested $extends written locally
+        p.inherit({
+            t: {k: 1, j: 2},
+            A: {c: {inner: {k: 50, n: 3}}},
+            C: {$extends: 'A', c: {inner: {$extends: 't', j: '$unset'}}}
+        }).C.c.should.deep.equal({inner: {k: 1, n: 3}})
+
+        // multiple child targets keep their left-to-right order
+        const ordered = {
+            x: {v: 'x', only_x: 1},
+            y: {v: 'y', only_y: 2},
+            A: {child: {v: 'A', only_A: 3}},
+            C: {$extends: 'A', child: {$extends: ['x', 'y']}},
+            D: {$extends: 'A', child: {$extends: ['y', 'x']}}
+        }
+        const ordered_res = p.inherit(ordered)
+        ordered_res.C.child.should.deep.equal({v: 'y', only_x: 1, only_y: 2, only_A: 3})
+        ordered_res.D.child.should.deep.equal({v: 'x', only_x: 1, only_y: 2, only_A: 3})
+        // and a repeated target applies once
+        p.inherit({
+            x: {v: 'x', list: [1]},
+            C: {child: {$extends: ['x', 'x']}}
+        }).C.child.should.deep.equal({v: 'x', list: [1]})
+
+        // diamonds resolve once, and results don't share mutable state
+        const diamond = {
+            root: {r: 1, list: [1, 2]},
+            left: {$extends: 'root', l: 2},
+            right: {$extends: 'root', r: 3},
+            A: {child: {r: 0, a: 4}},
+            C: {$extends: 'A', child: {$extends: ['left', 'right']}},
+            D: {$extends: 'A', child: {$extends: ['left', 'right']}}
+        }
+        const diamond_res = p.inherit(diamond)
+        diamond_res.C.child.should.deep.equal({r: 3, list: [1, 2], l: 2, a: 4})
+        diamond_res.C.child.list.push(3)
+        diamond_res.D.child.list.should.deep.equal([1, 2])
+        diamond_res.root.list.should.deep.equal([1, 2])
+        diamond.root.list.should.deep.equal([1, 2])
+        diamond.C.child.should.deep.equal({$extends: ['left', 'right']})
+
+        // children the parent doesn't have still resolve their own $extends
+        p.inherit({
+            t: {k: 1, j: 2},
+            A: {child: {k: 5}, flag: true},
+            C: {$extends: 'A', fresh: {inner: {$extends: 't', j: '$unset'}}, flag: {inner: {$extends: 't'}}}
+        }).C.should.deep.equal({child: {k: 5}, fresh: {inner: {k: 1}}, flag: {inner: {k: 1, j: 2}}})
+
+        // non-object targets still replace the parent's child
+        p.inherit({
+            n: 42,
+            arr: [1, 2],
+            A: {num: {x: 1}, list: {x: 1}},
+            C: {$extends: 'A', num: {$extends: 'n'}, list: {$extends: 'arr'}}
+        }).C.should.deep.equal({num: 42, list: [1, 2]})
+        // ...including the parent's arrays and primitives, compared strictly
+        p.inherit({
+            arr: [9],
+            one: 1,
+            yes: true,
+            A: {list: [1, 2, 3], str: '1', flag: 1, wrapped: [1]},
+            C: {$extends: 'A', list: {$extends: 'arr'}, str: {$extends: 'one'}, flag: {$extends: 'yes'}, wrapped: {$extends: 'one'}}
+        }).C.should.deep.equal({list: [9], str: 1, flag: true, wrapped: 1})
+        // while literal arrays still merge by index
+        p.inherit({
+            A: {list: [1, 2, 3]},
+            C: {$extends: 'A', list: [9]}
+        }).C.list.should.deep.equal([9, 2, 3])
+
+        // array elements layer their own $extends the same way
+        p.inherit({
+            t: {k: 1, j: 2},
+            A: {child: [{k: 5}]},
+            C: {$extends: 'A', child: [{$extends: 't', j: '$unset'}]}
+        }).C.child.should.deep.equal([{k: 1}])
+        p.inherit({
+            t: {k: 1, j: 2},
+            A: {child: [{k: 5, z: 3}, {inner: {k: 5, n: 3}}]},
+            C: {$extends: 'A', child: [{$extends: 't', j: 4}, {inner: {$extends: 't', j: '$unset'}}]}
+        }).C.child.should.deep.equal([{k: 1, j: 4, z: 3}, {inner: {k: 1, n: 3}}])
+        // null keeps a slot, $unset empties it, and extra slots are appended
+        p.inherit({
+            t: {k: 1},
+            A: {child: [1, 2, {k: 5}]},
+            C: {$extends: 'A', child: [null, '$unset', {$extends: 't'}, 4]}
+        }).C.child.should.deep.equal([1, undefined, {k: 1}, 4])
+        p.inherit.bind(this, {
+            A: {child: [{}]},
+            C: {$extends: 'A', child: [{$extends: 'missing'}]}
+        }).should.throw('"missing" (reached from "C.child.[0].$extends")')
+
+        // single targets don't share mutable state either, with or without a parent child
+        for (const parent of [{child: {b1: 99}}, {}]) {
+            const single_res = p.inherit({
+                base_child: {b1: 10, list: [1, 2]},
+                A: parent,
+                C: {$extends: 'A', child: {$extends: 'base_child'}},
+                D: {$extends: 'A', child: {$extends: 'base_child'}}
+            })
+            single_res.C.child.b1 = 0
+            single_res.C.child.list.push(3)
+            single_res.D.child.should.deep.equal({b1: 10, list: [1, 2]})
+            single_res.base_child.should.deep.equal({b1: 10, list: [1, 2]})
+        }
+
+        // the parent's keys come first, and its nested objects are replaced
+        // by a target's non-object value before the local fields apply
+        const layered = p.inherit({
+            t: {k: 1, j: 2, d: 4},
+            A: {child: {z: 0, k: 5, d: {a: 1}}},
+            C: {$extends: 'A', child: {$extends: 't', m: 3, d: {b: 1}}}
+        }).C.child
+        layered.should.deep.equal({z: 0, k: 1, d: {b: 1}, j: 2, m: 3})
+        Object.keys(layered).should.deep.equal(['z', 'k', 'd', 'j', 'm'])
+
+        // nested errors keep pointing to the nested field
+        p.inherit.bind(this, {
+            A: {child: {}},
+            C: {$extends: 'A', child: {$extends: 'missing'}}
+        }).should.throw('"missing" (reached from "C.child.$extends")')
+        p.inherit.bind(this, {
+            A: {child: {}},
+            C: {$extends: 'A', child: {$extends: 'C'}}
+        }).should.throw('circular dependency')
+    })
+
     it('parameterize', function() {
         p.parameterize(1).should.equal(1)
 
