@@ -193,6 +193,103 @@ describe('Interface', function() {
         mirrored.matrix_c_relabel.meta.mirror.mirror.should.deep.equal({key: 'inner'})
     })
 
+    it('mirror overrides', async function() {
+        const mirrored = {'points.mirror': 100, 'points.zones.matrix.columns.c': {}}
+        const invalid = (config, field, _type) => ergogen.process({...mirrored, ...config}).should.be.rejectedWith(
+            `Field "${field}" should be of type ${_type}!`
+        )
+
+        await Promise.all([
+            // the override itself has to be an object (or one of the clearing forms)
+            invalid({'points.key.mirror': 'oops'}, 'matrix_c.mirror', 'object'),
+            invalid({'points.key.mirror': 5}, 'matrix_c.mirror', 'object'),
+            invalid({'points.key.mirror': true}, 'matrix_c.mirror', 'object'),
+            invalid({'points.key.mirror': [{width: 30}]}, 'matrix_c.mirror', 'object'),
+            // checked on the merged key, so the breadcrumb names the affected key
+            invalid({'points.zones.matrix.rows.r.mirror': 'oops'}, 'matrix_c_r.mirror', 'object'),
+            // zone and column references can be relabeled, but not replaced
+            invalid({'points.key.mirror.zone': 'z'}, 'matrix_c.mirror.zone', 'object'),
+            invalid({'points.key.mirror.zone': '$unset'}, 'matrix_c.mirror.zone', 'object'),
+            invalid({'points.key.mirror.zone.columns': '$unset'}, 'matrix_c.mirror.zone.columns', 'object'),
+            invalid({'points.key.mirror.col': 'c'}, 'matrix_c.mirror.col', 'object'),
+            // zone-level mirroring goes through the same checks
+            ergogen.process({
+                'points.zones.matrix': {mirror: 100, columns: {c: {}}},
+                'points.key.mirror.zone': 'z'
+            }).should.be.rejectedWith('Field "matrix_c.mirror.zone" should be of type object!')
+        ])
+
+        // without an active mirror, or for source-only keys, the override stays inert metadata
+        const inert = (await ergogen.process({'points.zones.matrix': {}, 'points.key.mirror': 'oops'})).points
+        inert.matrix.meta.mirror.should.equal('oops')
+        const source = (await ergogen.process({
+            ...mirrored, 'points.key': {asym: 'source', mirror: {zone: 'z'}}
+        })).points
+        Object.keys(source).should.deep.equal(['matrix_c'])
+
+        // a later level can clear an invalid override before it's used
+        const cleared = (await ergogen.process({
+            ...mirrored,
+            'points.key.mirror': {zone: 'z', col: 'c', width: 30},
+            'points.zones.matrix.rows': {
+                unset: {mirror: {zone: '$unset', col: '$unset'}},
+                cleared: {mirror: false},
+                replaced: {mirror: {zone: {name: 'thumb'}, col: {name: 'outer'}}}
+            }
+        })).points
+        cleared.mirror_matrix_c_unset.meta.width.should.equal(30)
+        cleared.mirror_matrix_c_unset.meta.zone.name.should.equal('matrix')
+        cleared.mirror_matrix_c_unset.meta.col.name.should.equal('c')
+        cleared.mirror_matrix_c_cleared.meta.width.should.equal(18)
+        cleared.mirror_matrix_c_replaced.meta.zone.name.should.equal('thumb')
+        cleared.mirror_matrix_c_replaced.meta.col.name.should.equal('outer')
+
+        // valid relabels keep the rest of the shared structure, and nested metadata isn't inspected
+        const relabeled = (await ergogen.process({
+            ...mirrored,
+            'points.zones.matrix.columns.d': {},
+            'points.key.mirror': {
+                zone: {name: 'thumb', label: 5},
+                col: {name: 'outer'},
+                row: 7,
+                custom: 'anything',
+                mirror: 'inert'
+            }
+        })).points
+        const relabeled_meta = relabeled.mirror_matrix_c.meta
+        relabeled_meta.zone.name.should.equal('thumb')
+        relabeled_meta.zone.label.should.equal(5)
+        Object.keys(relabeled_meta.zone.columns).should.deep.equal(['c', 'd'])
+        relabeled_meta.col.name.should.equal('outer')
+        relabeled_meta.row.should.equal(7)
+        relabeled_meta.custom.should.equal('anything')
+        // the source keys keep their own zone and column
+        relabeled.matrix_c.meta.mirror.mirror.should.equal('inert')
+        relabeled.matrix_c.meta.zone.name.should.equal('matrix')
+        relabeled.matrix_c.meta.col.name.should.equal('c')
+
+        // names that read as numbers or math constants stay plain names, with global or zone mirroring
+        const numeric = (await ergogen.process({
+            'points.mirror': 100,
+            'points.zones': {
+                1: {columns: {1: {}, e: {}}},
+                e: {mirror: 50, columns: {pi: {}}}
+            }
+        })).points
+        Object.keys(numeric).should.have.members(['1_1', '1_e', 'e_pi', 'mirror_e_pi', 'mirror_1_1', 'mirror_1_e'])
+        numeric.mirror_1_1.meta.zone.name.should.equal('1')
+        numeric.mirror_1_e.meta.col.name.should.equal('e')
+        numeric.mirror_e_pi.meta.zone.name.should.equal('e')
+        numeric.mirror_e_pi.meta.col.name.should.equal('pi')
+
+        // and so do numeric relabels
+        const renumbered = (await ergogen.process({
+            ...mirrored, 'points.key.mirror': {zone: {name: 5}, col: {name: 7}}
+        })).points
+        renumbered.mirror_matrix_c.meta.zone.name.should.equal(5)
+        renumbered.mirror_matrix_c.meta.col.name.should.equal(7)
+    })
+
     it('engine', async function() {
         return Promise.all([
             ergogen.process({'meta.engine': 'invalid'}).should.be.rejectedWith('Invalid'),

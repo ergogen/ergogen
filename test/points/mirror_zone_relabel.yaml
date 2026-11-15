@@ -1,0 +1,8 @@
+points:
+  mirror: 100
+  zones.matrix:
+    columns:
+      c:
+    key:
+      mirror:
+        zone: z

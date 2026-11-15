@@ -255,11 +255,17 @@ const perform_mirror = exports._perform_mirror = (point, axis, units) => {
     if (point.meta.asym == 'source') return ['', null]
     const mp = point.clone().mirror(axis)
     const mirrored_name = `mirror_${point.meta.name}`
-    const mirror_config = mp.meta.mirror || {}
+    const mirror_name = `${point.meta.name}.mirror`
+    const mirror_config = a.sane(mp.meta.mirror || {}, mirror_name, 'object')()
     mp.meta = prep.extend(mp.meta, mirror_config)
     mp.meta.name = mirrored_name
     mp.meta.colrow = `mirror_${mp.meta.colrow}`
     mp.meta.mirrored = true
+
+    // zone and column overrides can only relabel, as autobind relies on their structure
+    a.sane(mp.meta.zone, `${mirror_name}.zone`, 'object')()
+    a.sane(mp.meta.zone.columns, `${mirror_name}.zone.columns`, 'object')()
+    a.sane(mp.meta.col, `${mirror_name}.col`, 'object')()
 
     // Re-sanitize overridden properties
     if (mirror_config.width !== undefined) {
