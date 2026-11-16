@@ -70,3 +70,13 @@ outlines:
         - matrix_c2_r2
         - matrix_c2_r3
         - rotated
+  symmetric-off:
+    - what: hull
+      symmetric: false
+      points:
+        - matrix_c1_r1
+        - matrix_c2_r1
+        - matrix_c2_r2
+        - mirror_matrix_c1_r1
+        - mirror_matrix_c2_r1
+        - mirror_matrix_c2_r2
