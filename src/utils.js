@@ -139,14 +139,14 @@ const satisfies = exports.satisfies = (current, expected) => {
 }
 
 // imports a single path, and validates it before a union could hide its problems
-const import_svg_path = (raw, index, name, accuracy) => {
+const import_svg_path = (raw, index, name, options) => {
     a.assert(a.type(raw)() == 'string', `Path ${index} for SVG outline "${name}" must be a string!`)
     a.assert(raw.trim() !== '', `Path ${index} for SVG outline "${name}" cannot be empty!`)
     // malformed path data is rejected before makerjs could misread it, or hang on it
     const data = svg_lib.path_data(raw, `Path ${index} for SVG outline "${name}"`)
     let model
     try {
-        model = m.importer.fromSVGPathData(data, accuracy)
+        model = m.importer.fromSVGPathData(data, options)
     } catch (ex) {
         throw new Error(`Path ${index} for SVG outline "${name}" could not be imported: ${ex.message}`, {cause: ex})
     }
@@ -160,10 +160,15 @@ const import_svg_path = (raw, index, name, accuracy) => {
     return model
 }
 
-exports.svg_paths_to_outline = (paths_raw, config, name, points, outlines, units, accuracy=0.0001) => {
+exports.svg_paths_to_outline = (paths_raw, config, name, points, outlines, units) => {
     a.unexpected(config, name, ['accuracy', 'flip_horizontally', 'flip_vertically', 'origin'])
-    const actual_accuracy = a.sane(config.accuracy === undefined ? accuracy : config.accuracy, `${name}.accuracy`, 'number')(units)
-    a.assert(Number.isFinite(actual_accuracy) && actual_accuracy > 0, `Field "${name}.accuracy" should be a positive finite number!`)
+    // without an explicit accuracy, makerjs derives one from the size of each curve
+    // (a fixed fine default would make unions of curved paths orders of magnitude slower)
+    const options = {}
+    if (config.accuracy !== undefined) {
+        options.bezierAccuracy = a.sane(config.accuracy, `${name}.accuracy`, 'number')(units)
+        a.assert(Number.isFinite(options.bezierAccuracy) && options.bezierAccuracy > 0, `Field "${name}.accuracy" should be a positive finite number!`)
+    }
 
     const flip_horizontally = a.sane(config.flip_horizontally || false, `${name}.flip_horizontally`, 'boolean')(units)
     const flip_vertically = a.sane(config.flip_vertically || false, `${name}.flip_vertically`, 'boolean')(units)
@@ -178,7 +183,7 @@ exports.svg_paths_to_outline = (paths_raw, config, name, points, outlines, units
     // this happens once per part (even without placements), and each placement gets its own copy
     let shape = undefined
     for (const [index, raw] of paths.entries()) {
-        const imported = import_svg_path(raw, index, name, actual_accuracy)
+        const imported = import_svg_path(raw, index, name, options)
         if (shape === undefined) {
             shape = imported
         } else {

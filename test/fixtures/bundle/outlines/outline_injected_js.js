@@ -6,7 +6,7 @@ module.exports = (config, name, points, outlines, units) => {
     ];
     
     return [(point) => {
-        let shape = makerjs.importer.fromSVGPathData(paths[0], 0.0001);
+        let shape = makerjs.importer.fromSVGPathData(paths[0]);
         shape = makerjs.model.mirror(shape, false, true);
         if (point.meta.mirrored) {
             shape = makerjs.model.mirror(shape, true, false);

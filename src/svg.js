@@ -1,3 +1,4 @@
+const m = require('makerjs')
 const a = require('./assert')
 
 // path extraction for SVG outlines, shared by bundle loading (io.js) and the rollup build
@@ -72,9 +73,24 @@ const path_space = ' \t\n\f\r'
 const path_number_regex = new RegExp(number_source, 'y')
 const path_flag_regex = /[01]/y
 
+// makerjs centers an arc on one of its endpoints when they nearly coincide, leaving a stray zero-span arc or a misplaced
+// circle, as it takes the circles of the arc's radius around them (after undoing the rotation and the ellipse ratio)
+// within 0.0001 of each other for the same circle, unless the radius is too small to need them (its own calculation)
+const unplaceable_arc = (from, to, rx, ry, rotation) => {
+    // makerjs coordinates have y pointing up
+    const origin = [from[0], -from[1]]
+    let chord = new m.paths.Line(origin, m.point.rotate([to[0], -to[1]], rotation, origin))
+    if (rx !== ry) chord = m.path.distort(chord, 1, rx / ry)
+    return m.measure.isPointEqual(chord.origin, chord.end, 0.0001) && m.round(rx - m.measure.pointDistance(chord.origin, chord.end) / 2) > 0
+}
+
 // validates path data against the svg path grammar, and returns it with its tokens separated by spaces
 // (makerjs would silently skip unknown commands, read missing arguments as NaN, hang on some truncated
 // curves, and split valid compact forms like the arc flags in "0 018.6" or the number "05" differently)
+// arc segments with a zero radius or coinciding endpoints become lines, as the svg spec says they should
+// (makerjs would bulge, fail or leave a zero-span arc on them instead), while later smooth curves stay unaffected
+// arcs with nearly, but not exactly, coinciding endpoints are rejected, as they can be float noise around a left out
+// arc or a deliberate (almost) full ellipse, and makerjs would import neither of them correctly
 const path_data = exports.path_data = (data, label) => {
     const fail = reason => {
         throw new Error(`${label} has invalid path data, ${reason}!`)
@@ -108,6 +124,9 @@ const path_data = exports.path_data = (data, label) => {
         pos = regex.lastIndex
         return Object.is(value, -0) ? '-0' : String(value)
     }
+    // the current point and the start of its subpath (in path units), to recognize coinciding arc endpoints
+    let current = [0, 0]
+    let subpath = [0, 0]
     skip()
     while (pos < data.length) {
         const start = pos
@@ -116,16 +135,44 @@ const path_data = exports.path_data = (data, label) => {
         if (!has(path_commands, command)) fail(`unexpected "${letter}" at offset ${pos}`)
         if (!tokens.length && command != 'm') fail(`it should start with a moveto ("M" or "m"), not "${letter}"`)
         const arity = path_commands[command]
-        tokens.push(letter)
+        const relative = letter == command
+        let emitted = undefined
+        // makerjs only reads the first argument of "H" and "V", so every further one gets its own command
+        const emit = (key, values) => {
+            if (key != emitted || arity == 1) tokens.push(key)
+            emitted = key
+            tokens.push(...values)
+        }
+        if (!arity) {
+            tokens.push(letter)
+            current = subpath
+        }
         pos++
         let count = 0
+        let segment = []
         while (arity) {
-            const value = argument(command, count % arity, count === 0)
+            const value = argument(command, segment.length, count === 0)
             if (value === undefined) break
-            // makerjs only reads the first argument of "H" and "V", so every further one gets its own command
-            if (count && arity == 1) tokens.push(letter)
-            tokens.push(value)
+            segment.push(value)
             count++
+            if (segment.length < arity) continue
+            const values = segment.map(Number)
+            const origin = relative ? current : [0, 0]
+            const end = command == 'h' ? [origin[0] + values[0], current[1]]
+                : command == 'v' ? [current[0], origin[1] + values[0]]
+                : [origin[0] + values[arity - 2], origin[1] + values[arity - 1]]
+            if (command == 'm' && count == arity) subpath = end
+            const degenerate = command == 'a' && (values[0] === 0 || values[1] === 0 || (end[0] === current[0] && end[1] === current[1]))
+            if (degenerate) emit(relative ? 'l' : 'L', segment.slice(-2))
+            else {
+                if (command == 'a' && unplaceable_arc(current, end, values[0], values[1], values[2])) {
+                    throw new Error(`${label} has an arc to "${segment[5]} ${segment[6]}" in the command "${letter}" at offset ${start}, ` +
+                        'whose endpoints nearly coincide, which is not supported! Make them identical to leave the arc out, or move them further apart.')
+                }
+                emit(letter, segment)
+            }
+            current = end
+            segment = []
         }
         if (arity && (!count || count % arity)) fail(`the command "${letter}" at offset ${start} takes ${arity} argument${arity == 1 ? '' : 's'} per segment, not ${count}`)
         skip()

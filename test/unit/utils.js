@@ -206,6 +206,30 @@ describe('Utils', function() {
             ;(await shape({paths: square})).chains.should.equal(1)
         })
 
+        it('curve accuracy', async function() {
+            const curve = async part => {
+                const model = (await ergogen.process({points: {zones: {matrix: null}}, outlines: {o: [{what: 'svg', where: true, ...part}]}}, {debug: true})).outlines.o.yaml
+                let paths = 0
+                m.model.walk(model, {onPath: () => paths++})
+                return {paths, bounds: extents(model), length: round(m.measure.modelPathLength(model))}
+            }
+            const cubic = 'M0 0 C0 100 100 100 100 0 Z'
+            const elliptical = 'M0 0 A20 10 0 0 1 40 0 Z'
+            // without an accuracy, curves are approximated just like makerjs does by default
+            for (const paths of [cubic, elliptical]) {
+                let expected = 0
+                m.model.walk(m.importer.fromSVGPathData(paths), {onPath: () => expected++})
+                ;(await curve({paths})).paths.should.equal(expected)
+            }
+            // an explicit accuracy (even as an expression) refines a cubic curve towards its exact bounds and length
+            ;(await curve({paths: cubic, accuracy: 10})).should.deep.equal({paths: 5, bounds: [[-0.092966, -75], [100.017312, 0]], length: 300.108329})
+            ;(await curve({paths: cubic, accuracy: 1})).should.deep.equal({paths: 13, bounds: [[-0.000702, -75], [100, 0]], length: 300.00306})
+            ;(await curve({paths: cubic, accuracy: '1 / 100'})).should.deep.equal({paths: 112, bounds: [[0, -75], [100, 0]], length: 300.000001})
+            // and an elliptical arc as well
+            ;(await curve({paths: elliptical, accuracy: 10})).should.deep.equal({paths: 5, bounds: [[0, 0], [40, 10.005936]], length: 88.449285})
+            ;(await curve({paths: elliptical, accuracy: 0.01})).should.deep.equal({paths: 39, bounds: [[0, 0], [40, 10]], length: 88.44237})
+        })
+
         it('validation without placements', async function() {
             // paths are validated when the part is set up, even when nothing gets placed
             const unplaced = (paths, snippet) => shape({paths, where: false}).should.be.rejectedWith(snippet)
@@ -259,6 +283,42 @@ describe('Utils', function() {
                 ;(await outline(explicit)).should.deep.equal(expected, explicit)
                 ;(await outline(repeated)).should.deep.equal(expected, repeated)
             }
+        })
+
+        it('degenerate arcs', async function() {
+            // arcs with a zero radius or coinciding endpoints are drawn as lines, so no stray arc remains
+            const outline = async paths => {
+                const results = await ergogen.process({points: {zones: {matrix: null}}, outlines: {o: [{what: 'svg', where: true, paths}]}}, {debug: true})
+                const model = results.outlines.o.yaml
+                return {bounds: extents(model), length: round(m.measure.modelPathLength(model)), arcs: results.outlines.o.dxf.includes('\nARC\n')}
+            }
+            const unit = {bounds: [[0, -10], [10, 0]], length: 40, arcs: false}
+            for (const paths of [
+                'M0 0 A0 0 0 0 1 10 0 L10 10 L0 10 Z',
+                'M0 0 a0 0 0 0 1 10 0 l0 10 l-10 0 z',
+                'M0 0 A0 10 0 0 1 10 0 L10 10 L0 10 Z',
+                'M0 0 a10 0 0 0 1 10 0 l0 10 l-10 0 z',
+                'M0 0 A0 0 0 0 1 5 0 5 0 0 0 1 10 0 L10 10 L0 10 Z',
+                'M0 0 L10 0 A5 5 0 0 1 10 0 L10 10 L0 10 Z',
+                'M0 0 L10 0 a5 5 0 0 1 0 0 L10 10 L0 10 Z',
+                'M20 20 L30 20 L30 30 L20 30 Z m-20 -20 l10 0 A5 5 0 0 1 10 0 L10 10 L0 10 Z',
+            ]) {
+                const expected = paths.startsWith('M20') ? {bounds: [[0, -30], [30, 0]], length: 80, arcs: false} : unit
+                ;(await outline(paths)).should.deep.equal(expected, paths)
+            }
+            // a later smooth curve reflects nothing from the replaced arc, just like after an explicit line
+            for (const [degenerate, explicit] of [
+                ['M0 0 C0 5 5 5 5 0 A0 0 0 0 1 10 0 S15 5 20 0 L20 -5 L0 -5 Z', 'M0 0 C0 5 5 5 5 0 L10 0 S15 5 20 0 L20 -5 L0 -5 Z'],
+                ['M0 0 Q5 5 10 0 a5 5 0 0 1 0 0 T20 0 L20 -5 L0 -5 Z', 'M0 0 Q5 5 10 0 l0 0 T20 0 L20 -5 L0 -5 Z'],
+            ]) {
+                ;(await outline(degenerate)).should.deep.equal(await outline(explicit), degenerate)
+            }
+            // proper arcs are kept, even nearly full ones
+            ;(await outline('M0 0 A5 5 0 0 1 10 0 Z')).should.deep.equal({bounds: [[0, 0], [10, 5]], length: 25.707963, arcs: true})
+            ;(await outline('M0 0 A5 5 0 1 1 0.01 0 Z')).should.deep.equal({bounds: [[-4.995, 0], [5.005, 9.999997]], length: 31.415927, arcs: true})
+            // while nearly coinciding endpoints fail, instead of leaving a stray arc or a misplaced circle
+            await reject({paths: 'M0 0 L10 0 A5 5 0 0 1 10 1e-9 L10 10 L0 10 Z'}, 'Path 0 for SVG outline "outlines.o.0" has an arc to "10 1e-9"')
+            await reject({paths: 'M0.1 0 h0.2 A5 5 0 1 1 0.3 0 L10 0 L10 10 L0.1 10 Z'}, 'whose endpoints nearly coincide')
         })
 
         it('every path is closed', async function() {

@@ -9,6 +9,9 @@
     "bugs": "https://github.com/ergogen/ergogen/issues",
     "main": "./src/ergogen.js",
     "bin": "./src/cli.js",
+    "engines": {
+        "node": "^20.19.0 || ^22.12.0 || >=23"
+    },
     "scripts": {
         "build": "rollup -c",
         "test": "mocha -r test/helpers/register test/index.js",

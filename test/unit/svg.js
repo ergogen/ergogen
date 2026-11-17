@@ -224,9 +224,46 @@ describe('SVG', function() {
             'M 0 0 1 1 C 1 1 2 2 3 3 4 4 5 5 6 6 S 4 4 5 5 c 1 1 2 2 3 3 s 1 1 2 2 Q 1 1 2 2 T 3 3 q 1 1 2 2 t 1 1 L 1 2 l 3 4 H 1 h 2 V 3 v 4 A 1 2 3 1 0 5 6 z M 1 1 z')
         // compact numbers: signs, fractions, exponents, leading zeros and compressed arc flags
         valid('m0-0l+1e1,0,0 10-.5.5 05 1.5E-1a1.5,1.5 0 018.6,2.2Z', 'm 0 -0 l 10 0 0 10 -0.5 0.5 5 0.15 a 1.5 1.5 0 0 1 8.6 2.2 Z')
-        valid('M0 0a0 -0 -30 1,1 1 1', 'M 0 0 a 0 -0 -30 1 1 1 1')
+        valid('M0 0a.5 -0e1 -30 1,1 1 1', 'M 0 0 l 1 1')
+        valid('M0 0a.5 1e0 -30 1,1 1 1', 'M 0 0 a 0.5 1 -30 1 1 1 1')
         // repeated horizontal and vertical arguments each get their own command, other repeats are kept
         valid('M0 0 1 1H5 10V10,20h1-2v3 4 5L1 1 2 2', 'M 0 0 1 1 H 5 H 10 V 10 V 20 h 1 h -2 v 3 v 4 v 5 L 1 1 2 2')
+        // arcs with a zero radius become lines, absolute or relative, even within repeated segments
+        valid('M0 0A0 0 0 0 1 10 0', 'M 0 0 L 10 0')
+        valid('M0 0a0 5 0 0 1 10 0', 'M 0 0 l 10 0')
+        valid('M0 0A5 0 0 0 1 10 0', 'M 0 0 L 10 0')
+        valid('M0 0A5 5 0 0 1 10 0 0 5 0 0 1 20 0 5 5 0 0 1 30 0 5 5 0 0 1 40 0',
+            'M 0 0 A 5 5 0 0 1 10 0 L 20 0 A 5 5 0 0 1 30 0 5 5 0 0 1 40 0')
+        valid('M0 0a5 5 0 0 1 10 0 5 0 0 0 1 10 0', 'M 0 0 a 5 5 0 0 1 10 0 l 10 0')
+        // so do arcs ending where they start, wherever the current point came from
+        valid('M1 2L3 4A5 5 0 0 1 3 4', 'M 1 2 L 3 4 L 3 4')
+        valid('M1 2a5 5 0 0 1 -0 0', 'M 1 2 l -0 0')
+        valid('M0 0H5V5h-5v-5A5 5 0 0 1 0 0', 'M 0 0 H 5 V 5 h -5 v -5 L 0 0')
+        valid('M0 0C1 1 2 2 3 3S5 5 6 6Q1 1 2 2T4 4c1 1 2 2 3 3s1 1 2 2q1 1 2 2t1 1A5 5 0 0 1 12 12',
+            'M 0 0 C 1 1 2 2 3 3 S 5 5 6 6 Q 1 1 2 2 T 4 4 c 1 1 2 2 3 3 s 1 1 2 2 q 1 1 2 2 t 1 1 L 12 12')
+        // closing a subpath returns to its start, which only the first pair of a moveto sets
+        valid('M1 2L3 4L5 2ZA5 5 0 0 1 1 2', 'M 1 2 L 3 4 L 5 2 Z L 1 2')
+        valid('M1 1h4v4zm2 2A5 5 0 0 1 3 3', 'M 1 1 h 4 v 4 z m 2 2 L 3 3')
+        valid('M1 1 5 5zA5 5 0 0 1 1 1', 'M 1 1 5 5 z L 1 1')
+        // arcs between nearly, but not exactly, coinciding endpoints are rejected, small or large, absolute or relative
+        const near = (data, end, letter, offset) => svg_lib.path_data.bind(this, data, 'P')
+            .should.throw(`P has an arc to "${end}" in the command "${letter}" at offset ${offset}, whose endpoints nearly coincide, which is not supported!`)
+        near('M0 0A5 5 0 0 1 0 1e-9', '0 1e-9', 'A', 4)
+        near('M0 0A5 5 0 1 1 1e-9 0', '1e-9 0', 'A', 4)
+        near('M0 0a5 5 0 0 1 1e-12 0', '1e-12 0', 'a', 4)
+        near('M0 0a5 5 0 0 1 10 0 5 5 0 1 1 1e-12 0', '1e-12 0', 'a', 4)
+        // including the float drift of an absolute endpoint after relative moves (0.1 + 0.2 is not 0.3)
+        near('M0.1 0h0.2A5 5 0 0 1 0.3 0', '0.3 0', 'A', 10)
+        near('M0.1 0h0.2A5 5 0 1 1 0.3 0', '0.3 0', 'A', 10)
+        // up to the 0.0001 that makerjs cannot tell apart, measured after undoing the rotation and the ellipse ratio
+        near('M0 0A5 5 0 1 1 0.0001 0', '0.0001 0', 'A', 4)
+        valid('M0 0A5 5 0 1 1 0.000101 0', 'M 0 0 A 5 5 0 1 1 0.000101 0')
+        valid('M0 0A1 20 0 1 1 0.001 0', 'M 0 0 A 1 20 0 1 1 0.001 0')
+        near('M0 0A1 20 0 1 1 0 0.001', '0 0.001', 'A', 4)
+        near('M0 0A1 20 90 1 1 0.001 0', '0.001 0', 'A', 4)
+        // unless the radius is too small to span them, so that the arc is a half circle between them
+        valid('M0 0A2e-5 2e-5 0 0 1 4e-5 0', 'M 0 0 A 0.00002 0.00002 0 0 1 0.00004 0')
+        near('M0 0A3e-5 3e-5 0 0 1 4e-5 0', '0.00004 0', 'A', 4)
         // empty, or not starting with a moveto
         invalid('', 'it should start with a moveto ("M" or "m")')
         invalid(' ', 'it should start with a moveto ("M" or "m")')
