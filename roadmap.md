@@ -7,7 +7,7 @@
 ### Major
 
 - Straightforward-ize `extends` behaviour for tagging (see #129)
-- Un-exclude kicad8 template from coverage during default kicad version switch!
+- Switch to Kicad 8 as the default template, updating footprints to match the new Kicad 8 syntax
 - Merge, generalize, uniform-ize and externalize footprints!
     - onnx-like incremental opset versioning
     - Template for creating them, built-in variables they can use, documentation, external links, etc.
@@ -27,21 +27,16 @@
 - Include raw kicad footprint integrations
     - pull torik's script to be able to convert raw kicad footprints into positionable ergogen ones
     - have a `dummy` footprint which can just be updated from schematic
-- Allow footprints to publish outlines
-    - Make these usable in the `outlines` section through a new `what`
 - Add footprint sanitization to check compatibility for externally loaded ones
     - Or to double check internal ones for compliance
 - 3D orient for cases
 - Even more extreme anchor stuff
     - Checkpoints, intersects, distances, weighted combinations?
     - Extend the "turning towards" capabilities of `orient` and `rotate` to `shift` as well (to move as much as it would take the current anchor location to get there)
-- SVG input (for individual outlines, or even combinations parsed by line color, etc.)
-    - And once that's done, possibly even STL or other input for cases or pcb renders
+- STL or other input for cases or pcb renders
 - Support text silk output to PCBs (in configurable fonts, through SVG?)
     - Maybe a partial markdown preprocess to support bold and italic?
-- Look into gr_curve to possibly add beziers to the kicad conversion
-    - Support curves (arcs as well as Béziers) in polygons
-    - Also, three point arcs, tangents, earier "circle tools" in general
+- Add tangents, earier "circle tools" in general
 - Add snappable line footprint
 - Figure out a manual, but still reasonably comfortable routing method directly from the config
 - Eeschema support for pcbs
@@ -49,7 +44,6 @@
 - Export **to** KLE?
 - Include 3D models paths in kicad output for visualization
     - Also, provide 3D models for built-in footprints
-- Look into kicad 5 vs. 6 output format
 - Update json schema and add syntax highlight to editors
 - Support different netclasses
 - Allow a potential filter for filleting (only on angles =90°, <45°, left turn vs. right turn when going clockwise, etc.)
@@ -59,42 +53,12 @@
 
 ### Patch
 
-- YAML lib v4 update - breaking changes in how undefined is handled!
-- Prevent double mirroring (see discord "mirror_mirror_")
 - Check unexpected keys at top level, too
 - Better error handling for the fillet option?
-- Integration and end2end tests to get coverage to 100%
 - Add custom fillet implementation that considers line-line connections only?
 - Add nicer filleting error messages when makerjs dies for some reason
 - Empty nets should be allowed (to mean unconnected)
 - Debug point (orient+shift) differences in circles vs. polygons (see Discord)
-
-
-## WEBUI
-
-### Major
-
-- Change over to Cache's live preview implementation
-- Add missing KLE functionality
-- Create browserified version of semver lib
-    - Or at least a shim with a console warning
-- Visualizing multiple outlines at once, with different colors
-- Add snapping/measurement capabilities for quicker iteration
-
-### Minor
-
-- Propagate log output from the ergogen module
-- Attempt to auto-compile (if inactive for n secs, or whatever)
-- Support saving to gists
-- Add kicad_pcb visualization as well
-- Get dropdown examples from a separate repo
-- Expand the config dropdown with opensource stuff: corne, lily, ergodox, atreus...
-
-### Patch
-
-- Streamline (and document) an update pipeline
-- Add puppeteer tests
-
 
 
 ## DOCS
