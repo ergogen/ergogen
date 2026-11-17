@@ -5,6 +5,7 @@ const makerjs = require('makerjs')
 const u = require('./utils')
 const a = require('./assert')
 const kle = require('./kle')
+const svg_lib = require('./svg')
 
 const package_json = require('../package.json')
 
@@ -60,13 +61,8 @@ exports.unpack = async (zip) => {
             const parsed = new Function('require', module_prefix + text + module_suffix)(fake_require(name))
             injections.push(['outline', name, parsed])
         } else {
-            // Simple SVG path extraction
-            const paths = []
-            const pathRegex = /<path[\s\S]*?\sd=["']([\s\S]*?)["']/gi
-            let match
-            while ((match = pathRegex.exec(text)) !== null) {
-                paths.push(match[1])
-            }
+            // the path data is extracted (and the svg validated) once, while loading the bundle
+            const paths = svg_lib.extract(text, name)
 
             const svg_injected = (config, name, points, outlines, units) => {
                 return u.svg_paths_to_outline(paths, config, name, points, outlines, units)
