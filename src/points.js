@@ -39,7 +39,7 @@ const reserved = (obj, name, disallowed) => {
 }
 
 // shallow check of a key-level declaration (and its immediate mirror override)
-const key_level = (obj, name) => {
+const check_key_reserved_fields = (obj, name) => {
     reserved(obj, name, reserved_key)
     if (a.type(obj.mirror)() == 'object') {
         // mirror overrides can't restructure the hierarchy, but can relabel the zone/col/row
@@ -48,9 +48,9 @@ const key_level = (obj, name) => {
     return obj
 }
 
-const key_level_rows = (rows, name) => {
+const check_row_reserved_fields = (rows, name) => {
     for (const [key, val] of Object.entries(rows)) {
-        if (a.type(val)() == 'object') key_level(val, `${name}.${key}`)
+        if (a.type(val)() == 'object') check_key_reserved_fields(val, `${name}.${key}`)
     }
 }
 
@@ -65,8 +65,8 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key,
     for (const [key, val] of Object.entries(zone_wide_rows)) {
         zone_wide_rows[key] = val || {} // no check yet, as it will be extended later
     }
-    key_level_rows(zone_wide_rows, `points.zones.${zone_name}.rows`)
-    const zone_wide_key = key_level(
+    check_row_reserved_fields(zone_wide_rows, `points.zones.${zone_name}.rows`)
+    const zone_wide_key = check_key_reserved_fields(
         a.sane(zone.key || {}, `points.zones.${zone_name}.key`, 'object')(),
         `points.zones.${zone_name}.key`
     )
@@ -109,8 +109,8 @@ const render_zone = exports._render_zone = (zone_name, zone, anchor, global_key,
         for (const [key, val] of Object.entries(col.rows)) {
             col.rows[key] = val || {} // again, no check yet, as it will be extended later
         }
-        key_level_rows(col.rows, `points.zones.${zone_name}.columns.${col_name}.rows`)
-        col.key = key_level(
+        check_row_reserved_fields(col.rows, `points.zones.${zone_name}.columns.${col_name}.rows`)
+        col.key = check_key_reserved_fields(
             a.sane(
                 col.key || {},
                 `points.zones.${zone_name}.columns.${col_name}.key`,
@@ -359,7 +359,7 @@ exports.parse = (config, units) => {
     // config sanitization
     a.unexpected(config, 'points', ['zones', 'key', 'rotate', 'mirror'])
     const zones = a.sane(config.zones, 'points.zones', 'object')()
-    const global_key = key_level(a.sane(config.key || {}, 'points.key', 'object')(), 'points.key')
+    const global_key = check_key_reserved_fields(a.sane(config.key || {}, 'points.key', 'object')(), 'points.key')
     const global_rotate = a.sane(config.rotate || 0, 'points.rotate', 'number')(units)
     const global_mirror = config.mirror
     let points = {}
