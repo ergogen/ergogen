@@ -60,7 +60,9 @@ const list_files_in_dir = async (dir) => {
     const list = await fsp.readdir(dir, { withFileTypes: true })
     const statPromises = list.map(async (dirent) => {
         const fullPath = path.resolve(dir, dirent.name)
-        if (dirent.isDirectory()) {
+        // dirents describe the link itself, so stat symlinks to follow linked directories
+        const entry = dirent.isSymbolicLink() ? await fsp.stat(fullPath) : dirent
+        if (entry.isDirectory()) {
             return list_files_in_dir(fullPath)
         }
         return fullPath
