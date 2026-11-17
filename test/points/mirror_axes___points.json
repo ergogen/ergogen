@@ -1,0 +1,730 @@
+{
+    "global": {
+        "x": 10,
+        "y": 0,
+        "r": 0,
+        "meta": {
+            "stagger": 0,
+            "spread": 19,
+            "splay": 0,
+            "origin": [
+                0,
+                0
+            ],
+            "orient": 0,
+            "shift": [
+                0,
+                0
+            ],
+            "rotate": 0,
+            "adjust": {},
+            "width": 18,
+            "height": 18,
+            "padding": 19,
+            "autobind": 10,
+            "skip": false,
+            "asym": "both",
+            "colrow": "default_default",
+            "name": "global",
+            "zone": {
+                "columns": {
+                    "default": {
+                        "rows": {},
+                        "key": {},
+                        "name": "default"
+                    }
+                },
+                "name": "global"
+            },
+            "col": {
+                "rows": {},
+                "key": {},
+                "name": "default"
+            },
+            "row": "default",
+            "mirrored": false,
+            "bind": [
+                0,
+                0,
+                0,
+                0
+            ]
+        }
+    },
+    "zero": {
+        "x": 10,
+        "y": 20,
+        "r": 0,
+        "meta": {
+            "stagger": 0,
+            "spread": 19,
+            "splay": 0,
+            "origin": [
+                0,
+                0
+            ],
+            "orient": 0,
+            "shift": [
+                0,
+                0
+            ],
+            "rotate": 0,
+            "adjust": {},
+            "width": 18,
+            "height": 18,
+            "padding": 19,
+            "autobind": 10,
+            "skip": false,
+            "asym": "both",
+            "colrow": "default_default",
+            "name": "zero",
+            "zone": {
+                "columns": {
+                    "default": {
+                        "rows": {},
+                        "key": {},
+                        "name": "default"
+                    }
+                },
+                "name": "zero"
+            },
+            "col": {
+                "rows": {},
+                "key": {},
+                "name": "default"
+            },
+            "row": "default",
+            "mirrored": false,
+            "bind": [
+                0,
+                0,
+                0,
+                0
+            ]
+        }
+    },
+    "mirror_zero": {
+        "x": -10,
+        "y": 20,
+        "r": 0,
+        "meta": {
+            "stagger": 0,
+            "spread": 19,
+            "splay": 0,
+            "origin": [
+                0,
+                0
+            ],
+            "orient": 0,
+            "shift": [
+                0,
+                0
+            ],
+            "rotate": 0,
+            "adjust": {},
+            "width": 18,
+            "height": 18,
+            "padding": 19,
+            "autobind": 10,
+            "skip": false,
+            "asym": "both",
+            "colrow": "mirror_default_default",
+            "name": "mirror_zero",
+            "zone": {
+                "columns": {
+                    "default": {
+                        "rows": {},
+                        "key": {},
+                        "name": "default"
+                    }
+                },
+                "name": "zero"
+            },
+            "col": {
+                "rows": {},
+                "key": {},
+                "name": "default"
+            },
+            "row": "default",
+            "mirrored": true,
+            "bind": [
+                0,
+                0,
+                0,
+                0
+            ]
+        }
+    },
+    "literal": {
+        "x": 10,
+        "y": 40,
+        "r": 0,
+        "meta": {
+            "stagger": 0,
+            "spread": 19,
+            "splay": 0,
+            "origin": [
+                0,
+                0
+            ],
+            "orient": 0,
+            "shift": [
+                0,
+                0
+            ],
+            "rotate": 0,
+            "adjust": {},
+            "width": 18,
+            "height": 18,
+            "padding": 19,
+            "autobind": 10,
+            "skip": false,
+            "asym": "both",
+            "colrow": "default_default",
+            "name": "literal",
+            "zone": {
+                "columns": {
+                    "default": {
+                        "rows": {},
+                        "key": {},
+                        "name": "default"
+                    }
+                },
+                "name": "literal"
+            },
+            "col": {
+                "rows": {},
+                "key": {},
+                "name": "default"
+            },
+            "row": "default",
+            "mirrored": false,
+            "bind": [
+                0,
+                0,
+                0,
+                0
+            ]
+        }
+    },
+    "mirror_literal": {
+        "x": 50,
+        "y": 40,
+        "r": 0,
+        "meta": {
+            "stagger": 0,
+            "spread": 19,
+            "splay": 0,
+            "origin": [
+                0,
+                0
+            ],
+            "orient": 0,
+            "shift": [
+                0,
+                0
+            ],
+            "rotate": 0,
+            "adjust": {},
+            "width": 18,
+            "height": 18,
+            "padding": 19,
+            "autobind": 10,
+            "skip": false,
+            "asym": "both",
+            "colrow": "mirror_default_default",
+            "name": "mirror_literal",
+            "zone": {
+                "columns": {
+                    "default": {
+                        "rows": {},
+                        "key": {},
+                        "name": "default"
+                    }
+                },
+                "name": "literal"
+            },
+            "col": {
+                "rows": {},
+                "key": {},
+                "name": "default"
+            },
+            "row": "default",
+            "mirrored": true,
+            "bind": [
+                0,
+                0,
+                0,
+                0
+            ]
+        }
+    },
+    "quoted": {
+        "x": 10,
+        "y": 60,
+        "r": 0,
+        "meta": {
+            "stagger": 0,
+            "spread": 19,
+            "splay": 0,
+            "origin": [
+                0,
+                0
+            ],
+            "orient": 0,
+            "shift": [
+                0,
+                0
+            ],
+            "rotate": 0,
+            "adjust": {},
+            "width": 18,
+            "height": 18,
+            "padding": 19,
+            "autobind": 10,
+            "skip": false,
+            "asym": "both",
+            "colrow": "default_default",
+            "name": "quoted",
+            "zone": {
+                "columns": {
+                    "default": {
+                        "rows": {},
+                        "key": {},
+                        "name": "default"
+                    }
+                },
+                "name": "quoted"
+            },
+            "col": {
+                "rows": {},
+                "key": {},
+                "name": "default"
+            },
+            "row": "default",
+            "mirrored": false,
+            "bind": [
+                0,
+                0,
+                0,
+                0
+            ]
+        }
+    },
+    "mirror_quoted": {
+        "x": 66,
+        "y": 60,
+        "r": 0,
+        "meta": {
+            "stagger": 0,
+            "spread": 19,
+            "splay": 0,
+            "origin": [
+                0,
+                0
+            ],
+            "orient": 0,
+            "shift": [
+                0,
+                0
+            ],
+            "rotate": 0,
+            "adjust": {},
+            "width": 18,
+            "height": 18,
+            "padding": 19,
+            "autobind": 10,
+            "skip": false,
+            "asym": "both",
+            "colrow": "mirror_default_default",
+            "name": "mirror_quoted",
+            "zone": {
+                "columns": {
+                    "default": {
+                        "rows": {},
+                        "key": {},
+                        "name": "default"
+                    }
+                },
+                "name": "quoted"
+            },
+            "col": {
+                "rows": {},
+                "key": {},
+                "name": "default"
+            },
+            "row": "default",
+            "mirrored": true,
+            "bind": [
+                0,
+                0,
+                0,
+                0
+            ]
+        }
+    },
+    "unit": {
+        "x": 10,
+        "y": 80,
+        "r": 0,
+        "meta": {
+            "stagger": 0,
+            "spread": 19,
+            "splay": 0,
+            "origin": [
+                0,
+                0
+            ],
+            "orient": 0,
+            "shift": [
+                0,
+                0
+            ],
+            "rotate": 0,
+            "adjust": {},
+            "width": 18,
+            "height": 18,
+            "padding": 19,
+            "autobind": 10,
+            "skip": false,
+            "asym": "both",
+            "colrow": "default_default",
+            "name": "unit",
+            "zone": {
+                "columns": {
+                    "default": {
+                        "rows": {},
+                        "key": {},
+                        "name": "default"
+                    }
+                },
+                "name": "unit"
+            },
+            "col": {
+                "rows": {},
+                "key": {},
+                "name": "default"
+            },
+            "row": "default",
+            "mirrored": false,
+            "bind": [
+                0,
+                0,
+                0,
+                0
+            ]
+        }
+    },
+    "mirror_unit": {
+        "x": 28,
+        "y": 80,
+        "r": 0,
+        "meta": {
+            "stagger": 0,
+            "spread": 19,
+            "splay": 0,
+            "origin": [
+                0,
+                0
+            ],
+            "orient": 0,
+            "shift": [
+                0,
+                0
+            ],
+            "rotate": 0,
+            "adjust": {},
+            "width": 18,
+            "height": 18,
+            "padding": 19,
+            "autobind": 10,
+            "skip": false,
+            "asym": "both",
+            "colrow": "mirror_default_default",
+            "name": "mirror_unit",
+            "zone": {
+                "columns": {
+                    "default": {
+                        "rows": {},
+                        "key": {},
+                        "name": "default"
+                    }
+                },
+                "name": "unit"
+            },
+            "col": {
+                "rows": {},
+                "key": {},
+                "name": "default"
+            },
+            "row": "default",
+            "mirrored": true,
+            "bind": [
+                0,
+                0,
+                0,
+                0
+            ]
+        }
+    },
+    "expression": {
+        "x": 10,
+        "y": 100,
+        "r": 0,
+        "meta": {
+            "stagger": 0,
+            "spread": 19,
+            "splay": 0,
+            "origin": [
+                0,
+                0
+            ],
+            "orient": 0,
+            "shift": [
+                0,
+                0
+            ],
+            "rotate": 0,
+            "adjust": {},
+            "width": 18,
+            "height": 18,
+            "padding": 19,
+            "autobind": 10,
+            "skip": false,
+            "asym": "both",
+            "colrow": "default_default",
+            "name": "expression",
+            "zone": {
+                "columns": {
+                    "default": {
+                        "rows": {},
+                        "key": {},
+                        "name": "default"
+                    }
+                },
+                "name": "expression"
+            },
+            "col": {
+                "rows": {},
+                "key": {},
+                "name": "default"
+            },
+            "row": "default",
+            "mirrored": false,
+            "bind": [
+                0,
+                0,
+                0,
+                0
+            ]
+        }
+    },
+    "mirror_expression": {
+        "x": 68,
+        "y": 100,
+        "r": 0,
+        "meta": {
+            "stagger": 0,
+            "spread": 19,
+            "splay": 0,
+            "origin": [
+                0,
+                0
+            ],
+            "orient": 0,
+            "shift": [
+                0,
+                0
+            ],
+            "rotate": 0,
+            "adjust": {},
+            "width": 18,
+            "height": 18,
+            "padding": 19,
+            "autobind": 10,
+            "skip": false,
+            "asym": "both",
+            "colrow": "mirror_default_default",
+            "name": "mirror_expression",
+            "zone": {
+                "columns": {
+                    "default": {
+                        "rows": {},
+                        "key": {},
+                        "name": "default"
+                    }
+                },
+                "name": "expression"
+            },
+            "col": {
+                "rows": {},
+                "key": {},
+                "name": "default"
+            },
+            "row": "default",
+            "mirrored": true,
+            "bind": [
+                0,
+                0,
+                0,
+                0
+            ]
+        }
+    },
+    "anchored": {
+        "x": 10,
+        "y": 120,
+        "r": 0,
+        "meta": {
+            "stagger": 0,
+            "spread": 19,
+            "splay": 0,
+            "origin": [
+                0,
+                0
+            ],
+            "orient": 0,
+            "shift": [
+                0,
+                0
+            ],
+            "rotate": 0,
+            "adjust": {},
+            "width": 18,
+            "height": 18,
+            "padding": 19,
+            "autobind": 10,
+            "skip": false,
+            "asym": "both",
+            "colrow": "default_default",
+            "name": "anchored",
+            "zone": {
+                "columns": {
+                    "default": {
+                        "rows": {},
+                        "key": {},
+                        "name": "default"
+                    }
+                },
+                "name": "anchored"
+            },
+            "col": {
+                "rows": {},
+                "key": {},
+                "name": "default"
+            },
+            "row": "default",
+            "mirrored": false,
+            "bind": [
+                0,
+                0,
+                0,
+                0
+            ]
+        }
+    },
+    "mirror_anchored": {
+        "x": 32,
+        "y": 120,
+        "r": 0,
+        "meta": {
+            "stagger": 0,
+            "spread": 19,
+            "splay": 0,
+            "origin": [
+                0,
+                0
+            ],
+            "orient": 0,
+            "shift": [
+                0,
+                0
+            ],
+            "rotate": 0,
+            "adjust": {},
+            "width": 18,
+            "height": 18,
+            "padding": 19,
+            "autobind": 10,
+            "skip": false,
+            "asym": "both",
+            "colrow": "mirror_default_default",
+            "name": "mirror_anchored",
+            "zone": {
+                "columns": {
+                    "default": {
+                        "rows": {},
+                        "key": {},
+                        "name": "default"
+                    }
+                },
+                "name": "anchored"
+            },
+            "col": {
+                "rows": {},
+                "key": {},
+                "name": "default"
+            },
+            "row": "default",
+            "mirrored": true,
+            "bind": [
+                0,
+                0,
+                0,
+                0
+            ]
+        }
+    },
+    "mirror_global": {
+        "x": 66,
+        "y": 0,
+        "r": 0,
+        "meta": {
+            "stagger": 0,
+            "spread": 19,
+            "splay": 0,
+            "origin": [
+                0,
+                0
+            ],
+            "orient": 0,
+            "shift": [
+                0,
+                0
+            ],
+            "rotate": 0,
+            "adjust": {},
+            "width": 18,
+            "height": 18,
+            "padding": 19,
+            "autobind": 10,
+            "skip": false,
+            "asym": "both",
+            "colrow": "mirror_default_default",
+            "name": "mirror_global",
+            "zone": {
+                "columns": {
+                    "default": {
+                        "rows": {},
+                        "key": {},
+                        "name": "default"
+                    }
+                },
+                "name": "global"
+            },
+            "col": {
+                "rows": {},
+                "key": {},
+                "name": "default"
+            },
+            "row": "default",
+            "mirrored": true,
+            "bind": [
+                0,
+                0,
+                0,
+                0
+            ]
+        }
+    }
+}

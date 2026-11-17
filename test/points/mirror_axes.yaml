@@ -1,0 +1,36 @@
+units:
+  u: 19
+
+points:
+  # global axis as a math expression: 2 * 38 - 10 = 66
+  mirror: u * 2
+  zones:
+    # zone axis omitted, so the global axis applies
+    global:
+      anchor.shift: [10, 0]
+    # literal zero: 2 * 0 - 10 = -10
+    zero:
+      anchor.shift: [10, 20]
+      mirror: 0
+    # literal number: 2 * 30 - 10 = 50
+    literal:
+      anchor.shift: [10, 40]
+      mirror: 30
+    # quoted number: 2 * 38 - 10 = 66
+    quoted:
+      anchor.shift: [10, 60]
+      mirror: '38'
+    # unit name: 2 * 19 - 10 = 28
+    unit:
+      anchor.shift: [10, 80]
+      mirror: u
+    # math expression: 2 * 39 - 10 = 68
+    expression:
+      anchor.shift: [10, 100]
+      mirror: u * 2 + 1
+    # anchor object: 2 * (19 + 4 / 2) - 10 = 32
+    anchored:
+      anchor.shift: [10, 120]
+      mirror:
+        shift: [u, 0]
+        distance: u - 15

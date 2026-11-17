@@ -247,7 +247,7 @@ const parse_axis = exports._parse_axis = (config, name, points, units) => {
         let axis = anchor_lib.parse(mirror_obj, name, points)(units).x
         axis += distance / 2
         return axis
-    } else return config
+    } else return config === undefined ? undefined : a.sane(config, name, 'number')(units)
 }
 
 const perform_mirror = exports._perform_mirror = (point, axis, units) => {
