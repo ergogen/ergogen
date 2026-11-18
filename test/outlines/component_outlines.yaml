@@ -1,0 +1,25 @@
+points.zones.matrix:
+outlines:
+  # each outline matches the built-in footprint of the same name, seen from the top
+  jstph:
+    - what: jstph
+      where: true
+  oled:
+    - what: oled
+      where: true
+  promicro:
+    - what: promicro
+      where: true
+  rgb:
+    - what: rgb
+      where: true
+  # details like the knob stay visible as separate loops
+  rotary:
+    - what: rotary
+      where: true
+  scrollwheel:
+    - what: scrollwheel
+      where: true
+  trrs:
+    - what: trrs
+      where: true
