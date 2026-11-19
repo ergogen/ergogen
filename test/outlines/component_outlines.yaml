@@ -1,5 +1,9 @@
 points.zones.matrix:
 outlines:
+  # a decoration without a footprint, made of the three strokes of the logo
+  logo:
+    - what: ergogen_logo
+      where: true
   # each outline matches the built-in footprint of the same name, seen from the top
   jstph:
     - what: jstph

@@ -24,8 +24,6 @@ module.exports = (config, name, points, outlines, units) => {
         'M -17.78 -8.89 L 15.24 -8.89 L 15.24 8.89 L -17.78 8.89 L -17.78 4.47 L -19.304 4.47 L -19.304 -4.47 L -17.78 -4.47 Z',
         // the shell of the connector on the board
         'M -17.28 -4.47 L -12.45 -4.47 A 0.5 0.5 0 0 1 -11.95 -3.97 L -11.95 3.97 A 0.5 0.5 0 0 1 -12.45 4.47 L -17.28 4.47 Z',
-        // the cpu, a 7mm package rotated by 45 degrees
-        'M 2 -4.95 L 6.95 0 L 2 4.95 L -2.95 0 Z',
         ...pins()
     ].join(' ')]
     return u.svg_paths_to_outline(paths, config, name, points, outlines, units)
