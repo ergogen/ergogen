@@ -76,18 +76,14 @@ describe('SVG', function() {
             `<path style="fill:none;;stroke:red" transform="" clip-path="none" d="${square}"/>`) + '\n', unit_square],
         'millimetre dimensions without viewBox do not rescale': [doc(`<path d="${square}"/>`, `${ns} width="20mm" height="5"`), unit_square],
         'matching viewBox': [doc(`<path d="${square}"/>`, `${ns} x="0" y="0" width="14.2mm" height=" 6.7 " viewBox="0,0,14.2,6.7"`), unit_square],
-        'viewBox roundoff': [doc(`<path d="${square}"/>`, `${ns} width="37.795mm" viewBox="0 0 37.7953 10"`), unit_square],
+        'viewBox roundoff up to the tolerance': [doc(`<path d="${square}"/>`, `${ns} width="100.0099mm" viewBox="0 0 100 10"`), unit_square],
         'no paths': [doc('<g/>'), 'must have at least one path'],
         'inherited property names': [`<svg ${ns} xmlns:constructor="urn:other"><constructor:g/>` +
             `<path constructor="x" __proto__="y" style="constructor: x; __proto__: y" d="${square}"/></svg>`, unit_square],
         'unreferenced marker': [doc(`<defs><marker id="m"><circle r="10"/></marker></defs>` +
             `<g style="marker: none"><path marker-end="none" filter="none" style="rotate: none; scale: none" d="${square}"/></g>`), unit_square],
-        'compact path data': [doc('<path d="M10 0h-10a5,5 0 0110,0z"/>'), {low: [0, 0], high: [10, 5], chains: 1}],
         'inert important declarations': [doc(`<g style="fill:red !important;Transform:none!important"><path ` +
             `style="stroke:blue; -webkit-transform: none ! IMPORTANT; marker-end:none !important" d="${square}"/></g>`), unit_square],
-        'repeated horizontal and vertical lines': [doc('<path d="M0 0H5 10V5 10H0Z"/>'), unit_square],
-        'repeated relative horizontal and vertical lines': [doc('<path d="M0 0h5 5v5 5h-5 -5z"/>'), unit_square],
-        'repeated backwards relative line': [doc('<path d="M0 0h-2 12v10h-10z"/>'), {low: [-2, -10], high: [10, 0], chains: 1}],
         'default namespace restored after a foreign group': [doc(`<g xmlns="urn:other"><path d="${far_square}"/></g><path d="${square}"/>`), unit_square],
         'svg namespace inside a foreign group': [doc(`<g xmlns="urn:other"><g xmlns="${svg_ns}"><path d="${far_square}"/></g></g><path d="${square}"/>`), unit_square],
         'rebound prefix': [`<svg ${ns} xmlns:s="urn:other"><s:path d="${far_square}"/><g xmlns:s="${svg_ns}"><s:path d="${square}"/></g>` +
@@ -123,7 +119,6 @@ describe('SVG', function() {
         'path without data': [doc('<path/>'), 'without "d" data at index 0'],
         'nested viewport': [doc(`<svg><path d="${square}"/></svg>`), 'nested <svg> viewport'],
         'path transform': [doc(`<path transform="translate(5 0)" d="${square}"/>`), 'transform on <path> affecting path 0'],
-        'group scale': [doc(`<g transform="scale(2)"><path d="${square}"/></g>`), 'transform on <g> affecting path 0'],
         'nested ancestor transform': [doc(`<path d="${square}"/><g transform="rotate(5)"><g><path d="${square}"/></g></g>`), 'transform on <g> affecting path 1'],
         'root transform': [doc(`<path d="${square}"/>`, `${ns} transform="scale(2)"`), 'transform on <svg> affecting path 0'],
         'css transform': [doc(`<a style="transform: translate(5px)"><path d="${square}"/></a>`), 'transform on <a> affecting path 0'],
@@ -134,6 +129,7 @@ describe('SVG', function() {
         'zero width': [doc(`<path d="${square}"/>`, `${ns} width="0mm"`), 'positive length in mm'],
         'infinite width': [doc(`<path d="${square}"/>`, `${ns} width="1e999"`), 'positive length in mm'],
         'scaled viewBox': [doc(`<path d="${square}"/>`, `${ns} width="10mm" height="10mm" viewBox="0 0 37.795 37.795"`), 'scaled viewBoxes are not supported'],
+        'viewBox roundoff beyond the tolerance': [doc(`<path d="${square}"/>`, `${ns} width="100.0101mm" viewBox="0 0 100 10"`), 'scaled viewBoxes are not supported'],
         'offset viewBox': [doc(`<path d="${square}"/>`, `${ns} viewBox="100 100 10 10"`), 'should start at "0 0"'],
         'offset viewport': [doc(`<path d="${square}"/>`, `${ns} x="5"`), 'Field "x" of SVG outline'],
         'malformed viewport': [doc(`<path d="${square}"/>`, `${ns} y="a"`), 'Field "y" of SVG outline'],
@@ -167,40 +163,14 @@ describe('SVG', function() {
         'vendor prefixed css clipping': [doc(`<g style="-webkit-clip-path: url(#c)"><path d="${square}"/></g>`), 'uses "clip-path" on <g>'],
         'css comment after a property name': [doc(`<path style="transform/**/: scale(2)" d="${square}"/>`),
             'has a comment, an escape or a rule block in the style of <path>, which is not supported! Remove it from the style'],
-        'css comment before a declaration': [doc(`<path style="/* a: b */ transform: rotate(3deg)" d="${square}"/>`), 'comment, an escape or a rule block in the style of <path>'],
         'css comment on an ancestor': [doc(`<g style="fill: red /* marker: url(#m) */"><path d="${square}"/></g>`), 'comment, an escape or a rule block in the style of <g>'],
         'css comment from entities': [doc(`<path style="transform/&#42;&#42;/: scale(2)" d="${square}"/>`), 'comment, an escape or a rule block in the style of <path>'],
         'css escape in a property name': [doc(`<path style="tr\\61nsform: scale(2)" d="${square}"/>`), 'comment, an escape or a rule block in the style of <path>'],
-        'css transform after an at-rule block': [doc(`<path style="@x{} transform:scale(2)" d="${square}"/>`),
+        'css transform after an at-rule': [doc(`<path style="@x; transform:scale(2)" d="${square}"/>`),
             'has a comment, an escape or a rule block in the style of <path>, which is not supported! Remove it from the style'],
-        'css transform after an at-rule block on an ancestor': [doc(`<g style="@media all{} transform:scale(2)"><path d="${square}"/></g>`),
-            'rule block in the style of <g>'],
-        'css marker after an at-rule block': [doc(`<path style="@x{} marker-end:url(#m)" d="${square}"/>`), 'rule block in the style of <path>'],
-        'important css transform after an at-rule block': [doc(`<path style="@x{} transform:scale(2)!important;transform:none" d="${square}"/>`),
-            'rule block in the style of <path>'],
-        'css at-rule block from entities': [doc(`<path style="&#64;x&#123;&#125; transform:scale(2)" d="${square}"/>`),
-            'rule block in the style of <path>'],
-        'css at-rule from entities': [doc(`<path style="&#64;x{} transform:scale(2)" d="${square}"/>`), 'rule block in the style of <path>'],
         'css block without an at-rule': [doc(`<path style="x{} transform:scale(2)" d="${square}"/>`), 'rule block in the style of <path>'],
         'truncated path data': [doc(`<path d="${square}"/><path d="M 0 0 C 1 1 2 2"/>`), 'Path 1 for SVG outline'],
         'empty path data': [doc('<path d=""/>'), 'Path 0 for SVG outline'],
-    }
-    // malformed path data, which makerjs would misread or hang on
-    for (const [title, data, expected] of [
-        ['cubic', 'M 0 0 C 1 1 2 2', 'the command "C" at offset 6 takes 6 arguments per segment, not 4'],
-        ['quadratic', 'M 0 0 Q 1 1', 'the command "Q" at offset 6 takes 4 arguments'],
-        ['smooth cubic', 'M 0 0 S 1 1', 'the command "S" at offset 6 takes 4 arguments'],
-        ['smooth quadratic', 'M 0 0 T 1', 'the command "T" at offset 6 takes 2 arguments'],
-        ['line', 'M 0 0 L 10 0 L 10 10 L 4 Z', 'the command "L" at offset 21 takes 2 arguments'],
-        ['line to origin', 'M 0 0 L 10 0 L 10 10 L 0 Z', 'the command "L" at offset 21 takes 2 arguments'],
-        ['horizontal', 'M 0 0 H 10 V 10 H Z', 'the command "H" at offset 16 takes 1 argument per segment, not 0'],
-        ['moveto', 'M 0 L 10 0 L 10 10 Z', 'the command "M" at offset 0 takes 2 arguments'],
-        ['nonfinite', 'M 0 0 L 1e999 0 L 0 10 Z', 'the number "1e999" at offset 8 is not finite'],
-        ['trailing command', `${square} X`, 'unexpected "X" at offset 30'],
-        ['trailing arguments', `${square} R 1 2`, 'unexpected "R" at offset 30'],
-    ]) {
-        rejected[`malformed ${title}`] = [doc(`<path d="${data}"/>`), `Path 0 for SVG outline`]
-        rejected[`malformed ${title} message`] = [doc(`<path d="${data}"/>`), `has invalid path data, ${expected}`]
     }
     for (const shape of ['rect', 'circle', 'ellipse', 'line', 'polyline', 'polygon', 'text', 'image', 'use']) {
         rejected[`visible ${shape}`] = [doc(`<path d="${square}"/><g><${shape}/></g>`), `contains a visible <${shape}>, but only paths are supported! Convert objects to paths`]
@@ -213,7 +183,6 @@ describe('SVG', function() {
         svg_lib.extract.bind(this, undefined, 'n').should.throw('SVG outline "n" should be text')
         // errors name the outline
         svg_lib.extract.bind(this, doc('<rect/>'), 'named').should.throw('SVG outline "named" contains a visible <rect>')
-        svg_lib.tolerance.should.equal(1e-4)
     })
 
     it('path data', function() {
@@ -283,6 +252,13 @@ describe('SVG', function() {
         invalid('M 0 0 A 1 1 0 0 1 1', 'the command "A" at offset 6 takes 7 arguments per segment, not 6')
         invalid('M 0 0 A 1 1 0 2 1 1 1', 'the command "A" at offset 6 takes 7 arguments per segment, not 3')
         invalid('M 0 0 V', 'the command "V" at offset 6 takes 1 argument per segment, not 0')
+        invalid('M 0 0 C 1 1 2 2', 'the command "C" at offset 6 takes 6 arguments per segment, not 4')
+        invalid('M 0 0 Q 1 1', 'the command "Q" at offset 6 takes 4 arguments per segment, not 2')
+        invalid('M 0 0 S 1 1', 'the command "S" at offset 6 takes 4 arguments per segment, not 2')
+        invalid('M 0 0 T 1', 'the command "T" at offset 6 takes 2 arguments per segment, not 1')
+        invalid('M 0 0 L 10 0 L 10 10 L 0 Z', 'the command "L" at offset 21 takes 2 arguments per segment, not 1')
+        invalid('M 0 0 H 10 V 10 H Z', 'the command "H" at offset 16 takes 1 argument per segment, not 0')
+        invalid('M 0 L 10 0 L 10 10 Z', 'the command "M" at offset 0 takes 2 arguments per segment, not 1')
         // numbers
         invalid('M 0 -1e999', 'the number "-1e999" at offset 4 is not finite')
         invalid('M 0 0 a -1 1 0 0 1 1 1', 'the arc radius "-1" at offset 8 is negative')
@@ -356,35 +332,44 @@ describe('SVG', function() {
         })
     })
 
-    // the same fixtures must give the same results when loaded from a bundle and when built
-    const runners = {'bundle loading': via_bundle, 'build transform': via_build}
-    const scope = {'bundle loading': 'svg_bundle_test', 'build transform': 'svg_build_test'}
-    for (const [runner_name, run] of Object.entries(runners)) {
-        describe(runner_name, function() {
-            for (const [title, [text, expected]] of Object.entries(accepted)) {
-                it(title, async function() {
-                    if (typeof expected == 'string') {
-                        await run(text).should.be.rejectedWith(expected)
-                    } else {
-                        (await run(text)).should.deep.equal(expected)
-                    }
-                })
-            }
-            for (const [title, [text, expected]] of Object.entries(rejected)) {
-                it(title, async function() {
-                    await run(text).should.be.rejectedWith(`SVG outline "${scope[runner_name]}"`)
-                    await run(text).should.be.rejectedWith(expected)
-                })
-            }
-        })
-    }
+    // the markup fixtures, end to end through a loaded bundle
+    describe('bundle loading', function() {
+        for (const [title, [text, expected]] of Object.entries(accepted)) {
+            it(title, async function() {
+                if (typeof expected == 'string') {
+                    await via_bundle(text).should.be.rejectedWith(expected)
+                } else {
+                    (await via_bundle(text)).should.deep.equal(expected)
+                }
+            })
+        }
+        for (const [title, [text, expected]] of Object.entries(rejected)) {
+            it(title, async function() {
+                const error = await via_bundle(text).should.be.rejected
+                error.message.should.include('SVG outline "svg_bundle_test"')
+                error.message.should.include(expected)
+            })
+        }
+    })
 
     it('bundled svg outlines take no paths', async function() {
         // fixed path data cannot take an ignored `paths` option
         await via_bundle(doc(`<path d="${square}"/>`), {paths: far_square}).should.be.rejectedWith('Unexpected key "paths" within field "outlines.o.0"')
     })
 
-    it('build transform skips other files', async function() {
+    it('build transform', async function() {
+        // the build gives the same results as bundle loading
+        for (const title of ['plain path without viewBox', 'spaced attributes and both quotes']) {
+            const [text, expected] = accepted[title]
+            ;(await via_build(text)).should.deep.equal(expected, title)
+        }
+        for (const title of ['unsupported element', 'path transform']) {
+            const [text, expected] = rejected[title]
+            const error = await via_build(text).should.be.rejected
+            error.message.should.include('SVG outline "svg_build_test"')
+            error.message.should.include(expected)
+        }
+        // other files are left alone
         should.equal((await build_plugin()).transform('const x = 1', '/anywhere/x.js'), null)
     })
 

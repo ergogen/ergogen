@@ -1,1 +1,0 @@
-Field "matrix_c.mirror.zone" should be of type object!

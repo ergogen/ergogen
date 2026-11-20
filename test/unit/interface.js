@@ -238,6 +238,31 @@ describe('Interface', function() {
         mirrored.matrix_c_relabel.meta.mirror.mirror.should.deep.equal({key: 'inner'})
     })
 
+    it('mirror axes', async function() {
+        // every way to give a mirror axis, where a point at x=10 is mirrored to 2 * axis - 10
+        const axes = {
+            // zone axis omitted, so the global axis (a math expression) applies
+            global: [undefined, 66],
+            zero: [0, -10],
+            literal: [30, 50],
+            quoted: ['37', 64],
+            unit: ['u', 28],
+            expression: ['u * 2 + 1', 68],
+            // an anchor object: 2 * (19 + 4 / 2) - 10
+            anchored: [{shift: ['u', 0], distance: 'u - 15'}, 32],
+        }
+        const zones = Object.fromEntries(Object.entries(axes).map(([name, [mirror]], index) => [name, {anchor: {shift: [10, 20 * index]}, mirror}]))
+        const points = (await ergogen.process({units: {u: 19}, points: {mirror: 'u * 2', zones}})).points
+        // each zone has a single point and its mirror image, at the same height
+        const actual = Object.fromEntries(Object.entries(points).map(([name, point]) => [name, [point.x, point.y]]))
+        const expected = {}
+        for (const [index, [name, [, x]]] of Object.entries(axes).entries()) {
+            expected[name] = [10, 20 * index]
+            expected[`mirror_${name}`] = [x, 20 * index]
+        }
+        actual.should.deep.equal(expected)
+    })
+
     it('mirror overrides', async function() {
         const mirrored = {'points.mirror': 100, 'points.zones.matrix.columns.c': {}}
         const invalid = (config, field, _type) => ergogen.process({...mirrored, ...config}).should.be.rejectedWith(

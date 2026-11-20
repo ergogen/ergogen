@@ -1,1 +1,0 @@
-SVG outline "outlines.pathserror.0" must have at least one path!

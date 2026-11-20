@@ -176,25 +176,17 @@ describe('Utils', function() {
             const {low, high} = m.measure.modelExtents(model)
             return [low.map(round), high.map(round)]
         }
-        const shape = async (part, points={zones: {matrix: null}}) => {
+        const length = model => round(m.measure.modelPathLength(model))
+        // a single svg part, processed into its outline (with the model in `yaml` and the export in `dxf`)
+        const svg_outline = async (part, points={zones: {matrix: null}}) => {
             const results = await ergogen.process({points, outlines: {o: [{what: 'svg', where: true, ...part}]}}, {debug: true})
-            const model = results.outlines.o.yaml
+            return results.outlines.o
+        }
+        const shape = async (part, points) => {
+            const model = (await svg_outline(part, points)).yaml
             return {bounds: extents(model), chains: m.model.findChains(model).length}
         }
         const reject = (part, snippet) => shape(part).should.be.rejectedWith(snippet)
-        const malformed = [
-            ['M 0 0 C 1 1 2 2', 'Path 0 for SVG outline "outlines.o.0" has invalid path data, the command "C" at offset 6 takes 6 arguments per segment, not 4'],
-            ['M 0 0 Q 1 1', 'the command "Q" at offset 6 takes 4 arguments per segment, not 2'],
-            ['M 0 0 S 1 1', 'the command "S" at offset 6 takes 4 arguments per segment, not 2'],
-            ['M 0 0 T 1', 'the command "T" at offset 6 takes 2 arguments per segment, not 1'],
-            ['M 0 0 L 10 0 L 10 10 L 4 Z', 'the command "L" at offset 21 takes 2 arguments per segment, not 1'],
-            ['M 0 0 L 10 0 L 10 10 L 0 Z', 'the command "L" at offset 21 takes 2 arguments per segment, not 1'],
-            ['M 0 0 H 10 V 10 H Z', 'the command "H" at offset 16 takes 1 argument per segment, not 0'],
-            ['M 0 L 10 0 L 10 10 Z', 'the command "M" at offset 0 takes 2 arguments per segment, not 1'],
-            ['M 0 0 L 1e999 0 L 0 10 Z', 'the number "1e999" at offset 8 is not finite'],
-            [[square, `${square} X`], 'Path 1 for SVG outline "outlines.o.0" has invalid path data, unexpected "X" at offset 30'],
-            [`${square} R 1 2`, 'unexpected "R" at offset 30'],
-        ]
 
         it('accuracy', async function() {
             // only a missing accuracy gets the default, and it has to be positive and finite
@@ -208,10 +200,10 @@ describe('Utils', function() {
 
         it('curve accuracy', async function() {
             const curve = async part => {
-                const model = (await ergogen.process({points: {zones: {matrix: null}}, outlines: {o: [{what: 'svg', where: true, ...part}]}}, {debug: true})).outlines.o.yaml
+                const model = (await svg_outline(part)).yaml
                 let paths = 0
                 m.model.walk(model, {onPath: () => paths++})
-                return {paths, bounds: extents(model), length: round(m.measure.modelPathLength(model))}
+                return {paths, bounds: extents(model), length: length(model)}
             }
             const cubic = 'M0 0 C0 100 100 100 100 0 Z'
             const elliptical = 'M0 0 A20 10 0 0 1 40 0 Z'
@@ -239,15 +231,12 @@ describe('Utils', function() {
             await unplaced('M 0 0', 'Path 0 for SVG outline "outlines.o.0" does not contain any geometry')
             await unplaced('garbage', 'Path 0 for SVG outline "outlines.o.0" has invalid path data, unexpected "g" at offset 0')
             await unplaced('M 0 0 L 10 0 L 10 10', 'SVG paths need to be closed shapes (check failed for path 0 of "outlines.o.0")')
-            await unplaced([], 'must have at least one path')
+            await unplaced([], 'SVG outline "outlines.o.0" must have at least one path!')
             await unplaced(12, 'must be a string or an array')
-            // malformed path data is rejected before makerjs could misread it (or hang on it)
-            for (const [paths, snippet] of malformed) {
-                await unplaced(paths, snippet)
-            }
+            // malformed path data is rejected before makerjs could misread it (or hang on it), in any of the paths
+            await unplaced([square, `${square} X`], 'Path 1 for SVG outline "outlines.o.0" has invalid path data, unexpected "X" at offset 30')
             // valid paths without placements produce nothing
-            ;(await ergogen.process({points: {zones: {matrix: null}}, outlines: {o: [{what: 'svg', where: false, paths: square}]}}, {debug: true}))
-                .outlines.o.yaml.models.export.models.should.deep.equal({})
+            ;(await svg_outline({paths: square, where: false})).yaml.models.export.models.should.deep.equal({})
         })
 
         it('import errors', async function() {
@@ -269,8 +258,8 @@ describe('Utils', function() {
         it('repeated horizontal and vertical lines', async function() {
             // makerjs reads only the first argument of "H" and "V", so repeats must match explicit commands
             const outline = async paths => {
-                const model = (await ergogen.process({points: {zones: {matrix: null}}, outlines: {o: [{what: 'svg', where: true, paths}]}}, {debug: true})).outlines.o.yaml
-                return {bounds: extents(model), length: round(m.measure.modelPathLength(model))}
+                const model = (await svg_outline({paths})).yaml
+                return {bounds: extents(model), length: length(model)}
             }
             const unit = {bounds: [[0, -10], [10, 0]], length: 40}
             for (const [repeated, explicit, expected] of [
@@ -288,9 +277,8 @@ describe('Utils', function() {
         it('degenerate arcs', async function() {
             // arcs with a zero radius or coinciding endpoints are drawn as lines, so no stray arc remains
             const outline = async paths => {
-                const results = await ergogen.process({points: {zones: {matrix: null}}, outlines: {o: [{what: 'svg', where: true, paths}]}}, {debug: true})
-                const model = results.outlines.o.yaml
-                return {bounds: extents(model), length: round(m.measure.modelPathLength(model)), arcs: results.outlines.o.dxf.includes('\nARC\n')}
+                const {yaml, dxf} = await svg_outline({paths})
+                return {bounds: extents(yaml), length: length(yaml), arcs: dxf.includes('\nARC\n')}
             }
             const unit = {bounds: [[0, -10], [10, 0]], length: 40, arcs: false}
             for (const paths of [

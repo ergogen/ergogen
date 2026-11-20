@@ -1,0 +1,27 @@
+points:
+  zones:
+    matrix:
+    # a rotated point and its mirror image, so that every shape is placed in each orientation
+    rotated:
+      anchor:
+        shift: [30, 0]
+        rotate: 30
+      mirror.distance: 100
+outlines:
+  # there is no reference, as the shapes are free to change: this only shows that each of them can be placed
+  shapes:
+    - what: alps
+    - what: choc_hotswap_socket
+    - what: choc_v1
+    - what: choc_v2
+    - what: debug
+    - what: ergogen_logo
+    - what: jstph
+    - what: mx
+    - what: mx_hotswap_socket
+    - what: oled
+    - what: promicro
+    - what: rgb
+    - what: rotary
+    - what: scrollwheel
+    - what: trrs
