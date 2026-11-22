@@ -137,6 +137,28 @@ describe('Prepare', function() {
         primitive_inh.extended_string.should.equal('primitive')
         primitive_inh.extended_boolean.should.equal(true)
         primitive_inh.extended_number.should.equal(42)
+
+        // a list of non-object targets folds left to right, and a repeated target applies once
+        const list_inh = p.inherit({
+            arr1: [1, 2],
+            arr2: [3],
+            s1: 'one',
+            s2: 'two',
+            o: {k: 1},
+            arrays: {$extends: ['arr1', 'arr2']},
+            same_array: {$extends: ['arr1', 'arr1']},
+            scalars: {$extends: ['s1', 's2']},
+            same_scalar: {$extends: ['s1', 's1']},
+            mixed: {$extends: ['o', 'arr2']},
+            none: {$extends: []}
+        })
+        list_inh.arrays.should.deep.equal([3, 2])
+        list_inh.same_array.should.deep.equal([1, 2])
+        list_inh.scalars.should.equal('two')
+        list_inh.same_scalar.should.equal('one')
+        list_inh.mixed.should.deep.equal([3])
+        // with no targets, the block stays an empty object
+        list_inh.none.should.deep.equal({})
     })
 
     it('nested inherit', function() {
@@ -242,6 +264,13 @@ describe('Prepare', function() {
             A: {list: [1, 2, 3]},
             C: {$extends: 'A', list: [9]}
         }).C.list.should.deep.equal([9, 2, 3])
+        // a list of non-object targets replaces the parent's child too, folded left to right
+        p.inherit({
+            arr1: [1, 2],
+            arr2: [3],
+            A: {list: {x: 1}},
+            C: {$extends: 'A', list: {$extends: ['arr1', 'arr2']}}
+        }).C.list.should.deep.equal([3, 2])
 
         // array elements layer their own $extends the same way
         p.inherit({

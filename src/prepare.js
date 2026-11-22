@@ -129,7 +129,8 @@ exports.inherit = config => {
             }
             // the targets are cached, so results must not share their data
             base = copy(base)
-            if (list.length === 1 && Object.keys(local).length === 0) return base
+            // without local fields the block is its targets, whatever their type
+            if (list.length > 0 && Object.keys(local).length === 0) return base
         }
         if (a.type(base)() !== 'object') return _extend(base, local)
         const res = u.deepcopy(base)
