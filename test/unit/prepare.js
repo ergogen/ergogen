@@ -76,6 +76,43 @@ describe('Prepare', function() {
             }).should.throw(`"${target}" (reached from "b.$extends") does not name a valid inheritance target!`)
         }
 
+        // null targets are still rejected
+        p.inherit.bind(this, {
+            nil: null,
+            b: {$extends: 'nil'}
+        }).should.throw('"nil" (reached from "b.$extends") does not name a valid inheritance target!')
+
+        // non-string $extends values are rejected cleanly
+        for (const [value, label] of [
+            [null, 'null'],
+            [123, '123'],
+            [true, 'true'],
+            [{}, '[object Object]'],
+            [['a', null], 'null']
+        ]) {
+            p.inherit.bind(this, {
+                a: {x: 1},
+                b: {$extends: value}
+            }).should.throw(`"${label}" (reached from "b.$extends") does not name a valid inheritance target!`)
+        }
+
+        // array breadcrumbs stay consistent regardless of visit order
+        p.inherit.bind(this, {
+            res: {$extends: 'list.0'},
+            list: [{$extends: 'missing'}]
+        }).should.throw('"missing" (reached from "list.[0].$extends") does not name a valid inheritance target!')
+        p.inherit.bind(this, {
+            list: [{$extends: 'missing'}],
+            res: {$extends: 'list.0'}
+        }).should.throw('"missing" (reached from "list.[0].$extends") does not name a valid inheritance target!')
+        p.inherit.bind(this, {
+            list: [{$extends: 'list.0'}]
+        }).should.throw('"list.[0]" leads to a circular dependency!')
+        p.inherit.bind(this, {
+            res: {$extends: 'list.0'},
+            list: [{$extends: 'list.0'}]
+        }).should.throw('"list.[0]" leads to a circular dependency!')
+
         // Issue #100: Order of extends
         const config100 = {
             A: { prop: 'A' },
@@ -167,6 +204,45 @@ describe('Prepare', function() {
         list_inh.mixed.should.deep.equal([3])
         // with no targets, the block stays an empty object
         list_inh.none.should.deep.equal({})
+
+        // falsy scalars inherit cleanly at top level and in lists
+        const falsy_inh = p.inherit({
+            zero: 0,
+            no: false,
+            empty: '',
+            num: 42,
+            yes: true,
+            str: 'text',
+            obj: {k: 1},
+            ext_zero: {$extends: 'zero'},
+            ext_no: {$extends: 'no'},
+            ext_empty: {$extends: 'empty'},
+            empty_then_zero: {$extends: ['empty', 'zero']},
+            zero_then_zero: {$extends: ['zero', 'zero']},
+            num_then_zero: {$extends: ['num', 'zero']},
+            yes_then_no: {$extends: ['yes', 'no']},
+            str_then_empty: {$extends: ['str', 'empty']},
+            obj_then_zero: {$extends: ['obj', 'zero']}
+        })
+        falsy_inh.ext_zero.should.equal(0)
+        falsy_inh.ext_no.should.equal(false)
+        falsy_inh.ext_empty.should.equal('')
+        falsy_inh.empty_then_zero.should.equal(0)
+        falsy_inh.zero_then_zero.should.equal(0)
+        falsy_inh.num_then_zero.should.equal(0)
+        falsy_inh.yes_then_no.should.equal(false)
+        falsy_inh.str_then_empty.should.equal('')
+        falsy_inh.obj_then_zero.should.equal(0)
+
+        // string paths naming numeric or math-constant keys still resolve
+        const special_key_inh = p.inherit({
+            '1': {x: 1},
+            e: {y: 2},
+            a: {$extends: '1'},
+            b: {$extends: 'e'}
+        })
+        special_key_inh.a.should.deep.equal({x: 1})
+        special_key_inh.b.should.deep.equal({y: 2})
     })
 
     it('nested inherit', function() {
@@ -279,6 +355,23 @@ describe('Prepare', function() {
             A: {list: {x: 1}},
             C: {$extends: 'A', list: {$extends: ['arr1', 'arr2']}}
         }).C.list.should.deep.equal([3, 2])
+
+        // falsy scalar targets replace object and truthy parent values
+        p.inherit({
+            zero: 0,
+            no: false,
+            empty: '',
+            A: {obj_num: {x: 1}, obj_bool: {x: 1}, obj_str: {x: 1}, num: 1, flag: true, text: 'hi'},
+            C: {
+                $extends: 'A',
+                obj_num: {$extends: 'zero'},
+                obj_bool: {$extends: 'no'},
+                obj_str: {$extends: 'empty'},
+                num: {$extends: 'zero'},
+                flag: {$extends: 'no'},
+                text: {$extends: 'empty'}
+            }
+        }).C.should.deep.equal({obj_num: 0, obj_bool: false, obj_str: '', num: 0, flag: false, text: ''})
 
         // array elements layer their own $extends the same way
         p.inherit({

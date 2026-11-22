@@ -65,6 +65,7 @@ exports.unnest = config => traverse(config, config, [], (target, key, val) => {
 // read-only lookup, so that a missing path does not create intermediate objects in the config,
 // which also returns the breadcrumbs of the field it reaches, written the way traverse writes them
 const lookup = (root, path) => {
+    if (typeof path !== 'string') return {}
     let step = root
     const breadcrumbs = []
     for (const level of path.split('.')) {
@@ -127,12 +128,12 @@ exports.inherit = config => {
         if (local_type !== 'object') return _extend(base, local)
         if (local.$extends !== undefined) {
             let candidates = local.$extends
-            if (a.type(candidates)() !== 'array') candidates = [candidates]
+            if (!Array.isArray(candidates)) candidates = [candidates]
             const list = []
             for (const path of candidates) {
-                const other = lookup(config, path).value
-                a.assert(other, `"${path}" (reached from "${breadcrumbs.join('.')}.$extends") does not name a valid inheritance target!`)
-                list.push(resolve(other, path.split('.')))
+                const ref = lookup(config, path)
+                a.assert(ref.value !== undefined && ref.value !== null, `"${path}" (reached from "${breadcrumbs.join('.')}.$extends") does not name a valid inheritance target!`)
+                list.push(resolve(ref.value, ref.breadcrumbs))
             }
             delete local.$extends
             // only an object parent is layered under the targets, anything
