@@ -474,6 +474,25 @@ describe('SVG', function() {
             ;(await shape({paths: square})).chains.should.equal(1)
         })
 
+        it('resist', async function() {
+            // a source point at x 0 and its mirror at x 40
+            const points = {zones: {matrix: null}, mirror: {distance: 40}}
+            const x_span = async part => (await shape(part, points)).bounds.map(([x]) => x)
+            const source = {where: 'matrix'}
+            const mirrored = {where: 'mirror_matrix'}
+            const flag = 'M 0 0 L 0 -2.5 L -2.5 -2.5 L -2.5 5 Z'
+            // the shape is flipped on mirrored points by default, and kept as drawn with resist
+            ;(await x_span({...source, paths: flag})).should.deep.equal([-2.5, 0])
+            ;(await x_span({...mirrored, paths: flag})).should.deep.equal([40, 42.5])
+            ;(await x_span({...mirrored, paths: flag, resist: true})).should.deep.equal([37.5, 40])
+            // resist changes nothing on source points
+            ;(await x_span({...source, paths: flag, resist: true})).should.deep.equal([-2.5, 0])
+            // built-in outlines share the option, so the x arrow of `debug` keeps pointing right
+            ;(await x_span({...mirrored, what: 'debug'})).should.deep.equal([35, 41])
+            ;(await x_span({...mirrored, what: 'debug', resist: true})).should.deep.equal([39, 45])
+            await reject({paths: flag, resist: 'yes'}, 'Field "outlines.o.0.resist" should be of type boolean')
+        })
+
         it('curve accuracy', async function() {
             const curve = async part => {
                 const model = (await svg_outline(part)).yaml

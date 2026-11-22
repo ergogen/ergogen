@@ -40,6 +40,14 @@ outlines:
     - what: outline
       name: reference
       operation: stack
+  svg-path-resist:
+    - what: svg
+      where: true
+      resist: true
+      paths: M 0 0 L 0 -2.5 L -2.5 -2.5 L -2.5 5 Z
+    - what: outline
+      name: reference
+      operation: stack
   svg-path-flip:
     - what: svg
       where: true
