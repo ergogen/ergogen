@@ -48,6 +48,8 @@ const doctype_regex = /<!DOCTYPE[^<>\[\]]*>/y
 const number_source = '[+-]?(?:\\d+(?:\\.\\d*)?|\\.\\d+)(?:[eE][+-]?\\d+)?'
 const number_regex = new RegExp(`^${number_source}$`)
 const length_regex = new RegExp(`^\\s*(${number_source})(mm)?\\s*$`)
+// a zero root offset is no offset in any unit
+const offset_regex = new RegExp(`^\\s*(${number_source})(?:px|mm|cm|in|pt|pc|em|ex|%)?\\s*$`)
 
 // maps keyed by svg input never inherit (e.g. "constructor") from Object.prototype
 const own = (fields={}) => Object.assign(Object.create(null), fields)
@@ -233,7 +235,8 @@ const positive_length = (raw, field, name) => {
 const check_root = (attributes, name) => {
     for (const field of ['x', 'y']) {
         if (attributes[field] === undefined) continue
-        a.assert(number_regex.test(attributes[field].trim()) && parseFloat(attributes[field]) === 0,
+        const match = offset_regex.exec(attributes[field])
+        a.assert(match && parseFloat(match[1]) === 0,
             `Field "${field}" of SVG outline "${name}" should be 0, offset root viewports are not supported!`)
     }
     const dimensions = {}

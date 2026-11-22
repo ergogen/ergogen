@@ -75,6 +75,7 @@ describe('SVG', function() {
             `<path style="fill:none;;stroke:red" transform="" clip-path="none" d="${square}"/>`) + '\n', unit_square],
         'millimetre dimensions without viewBox do not rescale': [doc(`<path d="${square}"/>`, `${ns} width="20mm" height="5"`), unit_square],
         'matching viewBox': [doc(`<path d="${square}"/>`, `${ns} x="0" y="0" width="14.2mm" height=" 6.7 " viewBox="0,0,14.2,6.7"`), unit_square],
+        'zero viewport offsets with units': [doc(`<path d="${square}"/>`, `${ns} x="0px" y="0mm"`), unit_square],
         'viewBox roundoff up to the tolerance': [doc(`<path d="${square}"/>`, `${ns} width="100.0099mm" viewBox="0 0 100 10"`), unit_square],
         'no paths': [doc('<g/>'), 'must have at least one path'],
         'inherited property names': [`<svg ${ns} xmlns:constructor="urn:other"><constructor:g/>` +
@@ -131,6 +132,7 @@ describe('SVG', function() {
         'viewBox roundoff beyond the tolerance': [doc(`<path d="${square}"/>`, `${ns} width="100.0101mm" viewBox="0 0 100 10"`), 'scaled viewBoxes are not supported'],
         'offset viewBox': [doc(`<path d="${square}"/>`, `${ns} viewBox="100 100 10 10"`), 'should start at "0 0"'],
         'offset viewport': [doc(`<path d="${square}"/>`, `${ns} x="5"`), 'Field "x" of SVG outline'],
+        'offset viewport with a unit': [doc(`<path d="${square}"/>`, `${ns} y="5px"`), 'Field "y" of SVG outline'],
         'malformed viewport': [doc(`<path d="${square}"/>`, `${ns} y="a"`), 'Field "y" of SVG outline'],
         'short viewBox': [doc(`<path d="${square}"/>`, `${ns} viewBox="0 0 10"`), 'four finite numbers'],
         'nonnumeric viewBox': [doc(`<path d="${square}"/>`, `${ns} viewBox="0 0 10 x"`), 'four finite numbers'],
@@ -266,14 +268,16 @@ describe('SVG', function() {
 
     it('number grammar', function() {
         const root = attributes => svg_lib.extract(doc(`<path d="${square}"/>`, `${ns} ${attributes}`), 'n')
-        // signs, leading and trailing dots, leading zeros, exponents and negative zero
+        // signs, leading and trailing dots, leading zeros, exponents, negative zero and units of zero offsets
         for (const attributes of ['width="5."', 'width=".5e1mm"', 'width="+5E0"', 'width=" 05mm "', 'x="-0" y=".0e-5"', 'x="+0." y="0e5"',
+            'x="0cm" y="-0in"', 'x="0.pt" y="+0pc"', 'x="0e1em" y=" .0ex "', 'x="0%"',
             'width="5" height="5" viewBox="0,0,5.,+.5E+1"', 'viewBox="-0 0. 1e1 10"']) {
             root(attributes).should.deep.equal([square], attributes)
         }
-        // numbers without digits, with repeated parts or with exponents without digits
+        // numbers without digits, with repeated parts, with exponents without digits or with spaced or unknown units
         for (const [attributes, field] of [['width="."', 'width'], ['width="5..mm"', 'width'], ['width="e5"', 'width'], ['width="1e"', 'width'],
             ['width="--1"', 'width'], ['width="5 mm"', 'width'], ['height="1e+"', 'height'], ['x="0.0."', 'x'], ['y="0x0"', 'y'],
+            ['x="0 px"', 'x'], ['y="0PX"', 'y'], ['x="0pxmm"', 'x'], ['y="px"', 'y'],
             ['viewBox="0 0 5. ."', 'viewBox'], ['viewBox="0 0 .e1 5"', 'viewBox']]) {
             root.bind(this, attributes).should.throw(`Field "${field}" of SVG outline "n"`)
         }
