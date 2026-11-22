@@ -68,6 +68,14 @@ describe('Prepare', function() {
             }
         }).should.throw('circular dependency')
 
+        // targets have to be fields of the config, not names inherited from Object.prototype
+        for (const target of ['missing', 'a.missing', 'constructor', '__proto__', 'toString', 'a.hasOwnProperty']) {
+            p.inherit.bind(this, {
+                a: {x: 1},
+                b: {$extends: target}
+            }).should.throw(`"${target}" (reached from "b.$extends") does not name a valid inheritance target!`)
+        }
+
         // Issue #100: Order of extends
         const config100 = {
             A: { prop: 'A' },

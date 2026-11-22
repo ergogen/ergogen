@@ -62,6 +62,20 @@ exports.unnest = config => traverse(config, config, [], (target, key, val) => {
     u.deep(target, key, val)
 })
 
+// read-only lookup, so that a missing path does not create intermediate objects in the config,
+// which also returns the breadcrumbs of the field it reaches, written the way traverse writes them
+const lookup = (root, path) => {
+    let step = root
+    const breadcrumbs = []
+    for (const level of path.split('.')) {
+        // own properties of strings (like "length" or an index) are still readable
+        if (step === null || step === undefined || !Object.prototype.hasOwnProperty.call(step, level)) return {}
+        breadcrumbs.push(Array.isArray(step) ? `[${level}]` : level)
+        step = step[level]
+    }
+    return {value: step, breadcrumbs}
+}
+
 exports.inherit = config => {
     const cache = new Map()
     const stack = []
@@ -116,7 +130,7 @@ exports.inherit = config => {
             if (a.type(candidates)() !== 'array') candidates = [candidates]
             const list = []
             for (const path of candidates) {
-                const other = u.deep(config, path)
+                const other = lookup(config, path).value
                 a.assert(other, `"${path}" (reached from "${breadcrumbs.join('.')}.$extends") does not name a valid inheritance target!`)
                 list.push(resolve(other, path.split('.')))
             }
@@ -255,20 +269,6 @@ const parse_concat = (val, breadcrumbs) => {
     const expression = parse_call()
     if (pos < val.length) fail(`unexpected trailing "${val.substring(pos)}" after the closing parenthesis`)
     return expression
-}
-
-// read-only lookup, so that a missing path does not create intermediate objects in the config,
-// which also returns the breadcrumbs of the field it reaches, written the way traverse writes them
-const lookup = (root, path) => {
-    let step = root
-    const breadcrumbs = []
-    for (const level of path.split('.')) {
-        // own properties of strings (like "length" or an index) are still readable
-        if (step === null || step === undefined || !Object.prototype.hasOwnProperty.call(step, level)) return {}
-        breadcrumbs.push(Array.isArray(step) ? `[${level}]` : level)
-        step = step[level]
-    }
-    return {value: step, breadcrumbs}
 }
 
 exports.concat = config => {
