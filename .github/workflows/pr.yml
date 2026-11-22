@@ -1,9 +1,15 @@
 name: Check for 100% test coverage
 on: pull_request
+# a new push to a pull request cancels the run for the previous one
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
+      # report every node version, even when one of them fails
+      fail-fast: false
       matrix:
         include:
           - node-version: '24.x'
