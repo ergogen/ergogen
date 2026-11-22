@@ -257,44 +257,57 @@ const parse_concat = (val, breadcrumbs) => {
     return expression
 }
 
-// read-only lookup, so that a missing path does not create intermediate objects in the config
+// read-only lookup, so that a missing path does not create intermediate objects in the config,
+// which also returns the breadcrumbs of the field it reaches, written the way traverse writes them
 const lookup = (root, path) => {
     let step = root
+    const breadcrumbs = []
     for (const level of path.split('.')) {
         // own properties of strings (like "length" or an index) are still readable
-        if (step === null || step === undefined || !Object.prototype.hasOwnProperty.call(step, level)) return undefined
+        if (step === null || step === undefined || !Object.prototype.hasOwnProperty.call(step, level)) return {}
+        breadcrumbs.push(Array.isArray(step) ? `[${level}]` : level)
         step = step[level]
     }
-    return step
+    return {value: step, breadcrumbs}
 }
 
-const resolve = (val, root, breadcrumbs, seen = new Set()) => {
-    if (a.type(val)() !== 'string') return val
-    if (!val.startsWith(concat_prefix)) return val
+exports.concat = config => {
+    const cache = new Map()
+    const stack = []
 
-    if (seen.has(val)) {
-        throw new Error(`Circular dependency detected in $concat at "${breadcrumbs.join('.')}": ${val}`)
-    }
-    seen.add(val)
+    // each field is resolved once, under its own breadcrumbs, however many fields reference it
+    const resolve = (val, breadcrumbs) => {
+        if (typeof val !== 'string' || !val.startsWith(concat_prefix)) return val
+        // keys can contain dots, so the joined breadcrumbs could name two fields
+        const id = JSON.stringify(breadcrumbs)
+        if (cache.has(id)) return cache.get(id)
 
-    const evaluate = node => {
-        if (node.type == 'literal') return node.value
-        if (node.type == 'call') return node.args.map(evaluate).join('')
-        const ref = lookup(root, node.path)
-        if (ref === undefined) {
-            throw new Error(`Could not resolve reference "${node.path}" in $concat at "${breadcrumbs.join('.')}"`)
+        const name = breadcrumbs.join('.')
+        if (stack.includes(id)) {
+            throw new Error(`Circular dependency detected in $concat expression "${val}" at "${name}"!`)
         }
-        if (!['string', 'number', 'boolean'].includes(typeof ref)) {
-            throw new Error(`Reference "${node.path}" in $concat at "${breadcrumbs.join('.')}" should be a string, number or boolean, not ${a.type(ref)()}!`)
-        }
-        return resolve(ref, root, breadcrumbs, seen)
-    }
-    const res = evaluate(parse_concat(val, breadcrumbs))
+        stack.push(id)
 
-    seen.delete(val)
-    return res
+        const evaluate = node => {
+            if (node.type == 'literal') return node.value
+            if (node.type == 'call') return node.args.map(evaluate).join('')
+            const ref = lookup(config, node.path)
+            if (ref.value === undefined) {
+                throw new Error(`Could not resolve reference "${node.path}" in $concat at "${name}"!`)
+            }
+            if (!['string', 'number', 'boolean'].includes(typeof ref.value)) {
+                throw new Error(`Reference "${node.path}" in $concat at "${name}" should be a string, number or boolean, not ${a.type(ref.value)()}!`)
+            }
+            return resolve(ref.value, ref.breadcrumbs)
+        }
+        const res = evaluate(parse_concat(val, breadcrumbs))
+
+        stack.pop()
+        cache.set(id, res)
+        return res
+    }
+
+    return traverse(config, config, [], (target, key, val, root, breadcrumbs) => {
+        target[key] = resolve(val, breadcrumbs)
+    })
 }
-
-exports.concat = config => traverse(config, config, [], (target, key, val, root, breadcrumbs) => {
-    target[key] = resolve(val, root, breadcrumbs)
-})

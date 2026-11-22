@@ -568,4 +568,57 @@ describe('Prepare', function() {
         // cycles through nested calls are still detected
         p.concat.bind(this, {a: '$concat("x", $concat(a))'}).should.throw('Circular dependency')
     })
+
+    it('concat breadcrumbs', function() {
+        const invalid = config => p.concat.bind(this, config)
+
+        // errors inside a referenced field name that field, not the one referencing it
+        invalid({a: '$concat(b)', b: '$concat(missing)'}).should.throw('reference "missing" in $concat at "b"')
+        invalid({a: '$concat(b)', b: '$concat(oops'}).should.throw('"$concat(oops" at "b"')
+        invalid({a: '$concat(b)', b: '$concat(c)', c: {}}).should.throw('Reference "c" in $concat at "b"')
+        invalid({meta: {
+            title: '$concat(meta.board, " rev ", meta.rev)',
+            board: '$concat(meta.prefix, "-split")',
+            rev: 2
+        }}).should.throw('reference "meta.prefix" in $concat at "meta.board"')
+
+        // array elements are named the same way, whether referenced or visited first
+        invalid({res: '$concat(list.1)', list: ['x', '$concat(missing)']}).should.throw('at "list.[1]"')
+        invalid({list: ['x', '$concat(missing)'], res: '$concat(list.1)'}).should.throw('at "list.[1]"')
+
+        // a cycle is reported at the field where it closes
+        invalid({a: '$concat(b)', b: '$concat(c)', c: '$concat(b)'}).should.throw('"$concat(c)" at "b"')
+        invalid({list: ['$concat(list.0)']}).should.throw('"$concat(list.0)" at "list.[0]"')
+    })
+
+    it('concat reuse', function() {
+        // a referenced field is resolved once and used everywhere
+        p.concat({meta: {
+            title: '$concat(meta.board, " rev ", meta.rev)',
+            board: '$concat(meta.prefix, "-split")',
+            prefix: 'corney',
+            rev: 2
+        }}).meta.should.deep.equal({title: 'corney-split rev 2', board: 'corney-split', prefix: 'corney', rev: 2})
+
+        // a dotted key and the nested field it spells out stay separate
+        p.concat({
+            x: 'x',
+            y: 'y',
+            'a.b': '$concat(x)',
+            a: {b: '$concat(y)'}
+        }).should.deep.equal({x: 'x', y: 'y', 'a.b': 'x', a: {b: 'y'}})
+
+        // each level references the previous one twice, so following every
+        // reference again would read "l0" 2^40 times to resolve "l40"
+        let reads = 0
+        const chain = {
+            get l0() {
+                // fail at once rather than hang
+                if (++reads > 10) throw new Error('"l0" was read too often')
+                return ''
+            }
+        }
+        for (let i = 1; i <= 40; i++) chain[`l${i}`] = `$concat(l${i - 1}, l${i - 1})`
+        p.concat(chain).l40.should.equal('')
+    })
 })
