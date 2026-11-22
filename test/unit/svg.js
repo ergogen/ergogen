@@ -283,24 +283,33 @@ describe('SVG', function() {
         }
     })
 
-    // svg.extract in its own node process, which is stopped at the deadline (instead of hanging the tests)
+    // svg.extract in its own node process, so a regression fails the test instead of hanging it or exhausting its heap
+    // the budget is the cpu time of the extract calls alone, which neither process startup nor a busy machine inflates
+    // (the regressions took tens of seconds, while the fixed code takes well under a second)
+    // the deadline only stops a hung process, so it covers startup on a loaded machine with a wide margin
     const isolated = (inputs, args=[]) => {
-        const deadline = 10000
+        const budget = 5000
+        const deadline = 60000
         const script = `const svg = require(${JSON.stringify(require.resolve('../../src/svg'))})
+            const inputs = JSON.parse(require('fs').readFileSync(0, 'utf8'))
             const results = {}
-            for (const [name, text] of Object.entries(JSON.parse(require('fs').readFileSync(0, 'utf8')))) {
+            const start = process.cpuUsage()
+            for (const [name, text] of Object.entries(inputs)) {
                 try {
                     results[name] = svg.extract(text, name)
                 } catch (ex) {
                     results[name] = ex.message
                 }
             }
-            process.stdout.write(JSON.stringify(results))`
+            const {user, system} = process.cpuUsage(start)
+            process.stdout.write(JSON.stringify({results, cpu: (user + system) / 1000}))`
         const result = child_process.spawnSync(process.execPath, [...args, '-e', script],
             {input: JSON.stringify(inputs), encoding: 'utf8', timeout: deadline, maxBuffer: 2 ** 26})
         should.equal(result.signal, null, `svg.extract did not finish within ${deadline}ms and the heap limit`)
         result.status.should.equal(0, result.stderr)
-        return JSON.parse(result.stdout)
+        const {results, cpu} = JSON.parse(result.stdout)
+        cpu.should.be.below(budget, `svg.extract took ${cpu}ms of cpu time`)
+        return results
     }
 
     it('long numbers', function() {
