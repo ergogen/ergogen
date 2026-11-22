@@ -35,3 +35,15 @@ outlines:
   expand:
     - name: combination
       expand: 1
+  choc:
+    - what: choc_hotswap_socket
+      where: true
+      origin: [1, 2]
+      flip_horizontally: true
+  choczero:
+    - what: choc_hotswap_socket
+      where: true
+      origin: [0, 0]
+      flip_vertically: true
+
+

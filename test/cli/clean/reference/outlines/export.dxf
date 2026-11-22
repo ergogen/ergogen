@@ -21,7 +21,7 @@ LTYPE
 72
 65
 70
-64
+0
 2
 CONTINUOUS
 3
@@ -30,6 +30,42 @@ ______
 0
 40
 0
+0
+LTYPE
+72
+65
+70
+0
+2
+DASHED
+3
+_ _ _ 
+73
+2
+40
+7.5
+49
+5
+49
+-2.5
+0
+LTYPE
+72
+65
+70
+0
+2
+DOTTED
+3
+. . . 
+73
+2
+40
+1.5
+49
+0.5
+49
+-1
 0
 ENDTAB
 0
@@ -48,6 +84,8 @@ ENTITIES
 LINE
 8
 0
+6
+CONTINUOUS
 10
 -9
 20
@@ -60,6 +98,8 @@ LINE
 LINE
 8
 0
+6
+CONTINUOUS
 10
 9
 20
@@ -72,6 +112,8 @@ LINE
 LINE
 8
 0
+6
+CONTINUOUS
 10
 9
 20
@@ -84,6 +126,8 @@ LINE
 LINE
 8
 0
+6
+CONTINUOUS
 10
 -9
 20

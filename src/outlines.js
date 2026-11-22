@@ -6,6 +6,7 @@ const Point = require('./point')
 const prep = require('./prepare')
 const anchor = require('./anchor').parse
 const filter = require('./filter').parse
+const svg_lib = require('./svg')
 const hulljs = require('hull')
 
 const binding = (base, bbox, point, units) => {
@@ -117,10 +118,12 @@ const polygon = (config, name, points, outlines, units) => {
 const hull = (config, name, points, outlines, units) => {
 
   // prepare params
-  a.unexpected(config, `${name}`, ['concavity', 'extend', 'points'])
+  a.unexpected(config, `${name}`, ['concavity', 'extend', 'points', 'symmetric'])
   const concavity = a.sane(config.concavity || 50, `${name}.concavity`, 'number')(units)
   // Extend should default to `true` if not defined
   const extend = a.sane(config.extend === undefined || config.extend, `${name}.extend`, 'boolean')(units)
+  // symmetric should default to `true` if not defined, so mirrored points get a mirrored hull
+  const symmetric = a.sane(config.symmetric === undefined || config.symmetric, `${name}.symmetric`, 'boolean')(units)
   const hull_points = a.sane(config.points, `${name}.points`, 'array')()
 
   // return shape function and its units
@@ -178,7 +181,7 @@ const hull = (config, name, points, outlines, units) => {
           parsed_points.push(last_anchor.p)
         }
     }
-    const poly_points = hulljs(parsed_points, concavity)
+    const poly_points = hulljs(parsed_points, concavity, undefined, {symmetric})
     let poly = u.poly(poly_points)
     const bbox = u.bbox(poly_points)
     return [poly, bbox]
@@ -304,14 +307,24 @@ const path = (config, name, points, outlines, units) => {
     }, units]
 }
 
-const whats = {
+const svg = (config, name, points, outlines, units) => {
+    // only inline svg outlines take their path data from the config
+    const {paths, ...rest} = config
+    return svg_lib.outline(paths)(rest, name, points, outlines, units)
+}
+
+// built-in and library outlines share one registry, which injections can extend or override
+// it has no prototype, so names like "constructor" or "__proto__" are ordinary entries
+const whats = exports._whats = Object.assign(Object.create(null), {
     rectangle,
     circle,
     polygon,
     outline,
     path,
-    hull
-}
+    hull,
+    svg,
+    ...require('./outlines/index')
+})
 
 const expand_shorthand = (config, name, units) => {
     if (a.type(config.expand)(units) == 'string') {
@@ -361,7 +374,7 @@ exports.parse = (config, points, units) => {
 
             // process keys that are common to all part declarations
             const operation = u[a.in(part.operation || 'add', `${name}.operation`, ['add', 'subtract', 'intersect', 'stack'])]
-            const what = a.in(part.what || 'outline', `${name}.what`, ['rectangle', 'circle', 'polygon', 'outline', 'path', 'hull'])
+            const what = a.in(part.what || 'outline', `${name}.what`, Object.keys(whats))
             const bound = !!part.bound
             const asym = a.asym(part.asym || 'source', `${name}.asym`)
 
@@ -428,4 +441,9 @@ exports.parse = (config, points, units) => {
     }
 
     return outlines
-}   
+}
+
+exports.inject_outline = (name, outline) => {
+    a.assert(typeof outline == 'function', `Outline "${name}" should be a function!`)
+    whats[name] = outline
+}

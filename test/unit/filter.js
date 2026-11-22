@@ -27,8 +27,12 @@ describe('Filter', function() {
         // points should only be returned on their respective halves
         // - so `source` is every match
         filter(true, '', points, undefined, 'source').should.deep.equal(Object.values(points))
-        // - `clone` is the mirror image of every match, which maps one to mirror_one, mirror_one to one, and two/three to nothing (as they don't have mirror parts)
-        filter(true, '', points, undefined, 'clone').should.deep.equal([points.mirror_one, points.one])
+        // - `clone` is the mirror image of every match, which maps one to mirror_one, and two/three to nothing (as they don't have mirror parts)
+        // mirror_one is not cloned back to one, as its source half also matched
+        filter(true, '', points, undefined, 'clone').should.deep.equal([points.mirror_one])
+        filter('/^o/', '', points, undefined, 'clone').should.deep.equal([points.mirror_one])
+        // but a match on the mirrored half only still clones back to the source half
+        filter('mirror_one', '', points, undefined, 'clone').should.deep.equal([points.one])
         // - and `both` is every match plus its mirror image as well
         filter(true, '', points, undefined, 'both').should.deep.equal(Object.values(points))
         // objects just propagate to anchor (and then wrap in array for consistency)
@@ -61,6 +65,9 @@ describe('Filter', function() {
         names(filter([['even', 'prime']], '', points)).should.deep.equal(['two'])
         // arbitrary nesting should be possible
         names(filter([[['even', 'odd'], 'prime']], '', points)).should.deep.equal(['two', 'three'])
+        // empty arrays should work, too (or by default is false, and by default is true)
+        names(filter([], '', points)).should.deep.equal([])
+        names(filter([[]], '', points)).should.deep.equal(Object.values(points).map(p => p.meta.name))
         // invalid regexes should throw meaningful errors
         filter.bind(this, '/\\/', '', points).should.throw('Invalid regex')
         // anything other than string/array/object/undefined is also an error

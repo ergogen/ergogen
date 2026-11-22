@@ -1,1 +1,2 @@
-Unknown dependency "nonexistent_require" among the requirements of injection "bad_template"!
+Could not read config file "test/cli/bad_template/input"!
+Error: Unknown dependency "nonexistent_require" among the requirements of injection "bad_template"!

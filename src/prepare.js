@@ -1,6 +1,13 @@
 const u = require('./utils')
 const a = require('./assert')
 
+// like u.deepcopy, but keeps undefined array slots left by $unset
+const copy = val => {
+    if (Array.isArray(val)) return Array.from(val, copy)
+    if (val && typeof val === 'object') return Object.fromEntries(Object.entries(val).map(([k, v]) => [k, copy(v)]))
+    return val
+}
+
 const _extend = exports._extend = (to, from) => {
     const to_type = a.type(to)()
     const from_type = a.type(from)()
@@ -8,14 +15,14 @@ const _extend = exports._extend = (to, from) => {
     if (from === '$unset') return undefined
     if (to_type != from_type) return from
     if (from_type == 'object') {
-        const res = u.deepcopy(to)
+        const res = copy(to)
         for (const key of Object.keys(from)) {
             res[key] = _extend(to[key], from[key])
             if (res[key] === undefined) delete res[key]
         }
         return res
     } else if (from_type == 'array') {
-        const res = u.deepcopy(to)
+        const res = copy(to)
         for (const [i, val] of from.entries()) {
             res[i] = _extend(res[i], val)
         }
@@ -62,26 +69,101 @@ exports.unnest = config => traverse(config, config, [], (target, key, val) => {
     u.deep(target, key, val)
 })
 
-exports.inherit = config => traverse(config, config, [], (target, key, val, root, breadcrumbs) => {
-    if (val && val.$extends !== undefined) {
-        let candidates = u.deepcopy(val.$extends)
-        if (a.type(candidates)() !== 'array') candidates = [candidates]
-        const list = [val]
-        while (candidates.length) {
-            const path = candidates.shift()
-            const other = u.deep(root, path)
-            a.assert(other, `"${path}" (reached from "${breadcrumbs.join('.')}.$extends") does not name a valid inheritance target!`)
-            let parents = other.$extends || []
-            if (a.type(parents)() !== 'array') parents = [parents]
-            candidates = candidates.concat(parents)
-            a.assert(!list.includes(other), `"${path}" (reached from "${breadcrumbs.join('.')}.$extends") leads to a circular dependency!`)
-            list.unshift(other)
-        }
-        val = extend.apply(null, list)
-        delete val.$extends
+// read-only lookup, so that a missing path does not create intermediate objects in the config,
+// which also returns the breadcrumbs of the field it reaches, written the way traverse writes them
+const lookup = (root, path) => {
+    if (typeof path !== 'string') return {}
+    let step = root
+    const breadcrumbs = []
+    for (const level of path.split('.')) {
+        // own properties of strings (like "length" or an index) are still readable
+        if (step === null || step === undefined || !Object.prototype.hasOwnProperty.call(step, level)) return {}
+        breadcrumbs.push(Array.isArray(step) ? `[${level}]` : level)
+        step = step[level]
     }
-    target[key] = val
-})
+    return {value: step, breadcrumbs}
+}
+
+exports.inherit = config => {
+    const cache = new Map()
+    const stack = []
+
+    const resolve = (val, breadcrumbs) => {
+        const type = a.type(val)()
+        if (type !== 'object' && type !== 'array') return val
+        if (cache.has(val)) return cache.get(val)
+
+        a.assert(!stack.includes(val), `"${breadcrumbs.join('.')}" leads to a circular dependency!`)
+
+        stack.push(val)
+        let current = val
+        if (type === 'object' && val.$extends !== undefined) {
+            current = overlay(undefined, copy(val), breadcrumbs)
+        }
+
+        const current_type = a.type(current)()
+        let res = current
+        if (current_type === 'object') {
+            res = {}
+            for (const [k, v] of Object.entries(current)) {
+                res[k] = resolve(v, [...breadcrumbs, k])
+            }
+        } else if (current_type === 'array') {
+            // the index loop turns array holes into explicit undefined slots
+            res = []
+            for (let i = 0; i < current.length; i++) {
+                res[i] = resolve(current[i], [...breadcrumbs, `[${i}]`])
+            }
+        }
+        stack.pop()
+        cache.set(val, res)
+        return res
+    }
+
+    // merges a local value onto already resolved data, placing the targets of
+    // its own (or any nested) $extends in between, so that the local fields,
+    // including their $unset markers, still apply last
+    const overlay = (base, local, breadcrumbs) => {
+        const local_type = a.type(local)()
+        if (local_type === 'array' && a.type(base)() === 'array') {
+            const res = copy(base)
+            for (const [i, val] of local.entries()) {
+                res[i] = overlay(res[i], val, [...breadcrumbs, `[${i}]`])
+            }
+            return res
+        }
+        if (local_type !== 'object') return _extend(base, local)
+        if (local.$extends !== undefined) {
+            let candidates = local.$extends
+            if (!Array.isArray(candidates)) candidates = [candidates]
+            const list = []
+            for (const path of candidates) {
+                const ref = lookup(config, path)
+                a.assert(ref.value !== undefined && ref.value !== null, `"${path}" (reached from "${breadcrumbs.join('.')}.$extends") does not name a valid inheritance target!`)
+                list.push(resolve(ref.value, ref.breadcrumbs))
+            }
+            delete local.$extends
+            // only an object parent is layered under the targets, anything
+            // else is replaced by them, and duplicate targets apply once
+            if (a.type(base)() !== 'object') base = undefined
+            for (const target of list) {
+                if (base !== target) base = _extend(base, target)
+            }
+            // without local fields the block is its targets, whatever their type;
+            // the targets are cached, so results must not share their data
+            if (list.length > 0 && Object.keys(local).length === 0) return copy(base)
+        }
+        if (a.type(base)() !== 'object') return _extend(base, local)
+        const res = copy(base)
+        for (const [key, val] of Object.entries(local)) {
+            res[key] = overlay(res[key], val, [...breadcrumbs, key])
+            if (res[key] === undefined) delete res[key]
+        }
+        return res
+    }
+
+    return resolve(config, [])
+}
 
 exports.parameterize = config => traverse(config, config, [], (target, key, val, root, breadcrumbs) => {
 
@@ -131,3 +213,100 @@ exports.parameterize = config => traverse(config, config, [], (target, key, val,
     delete val.$args
     target[key] = val
 })
+
+const concat_prefix = '$concat('
+
+const parse_concat = (val, breadcrumbs) => {
+    const fail = reason => {
+        throw new Error(`Invalid $concat expression "${val}" at "${breadcrumbs.join('.')}": ${reason}!`)
+    }
+    let pos = 0
+    const skip_whitespace = () => {
+        while (pos < val.length && /\s/.test(val[pos])) pos++
+    }
+    const parse_literal = () => {
+        const quote = val[pos++]
+        let value = ''
+        while (pos < val.length) {
+            const char = val[pos++]
+            if (char === quote) return {type: 'literal', value}
+            // a backslash always escapes the next character, so runs of backslashes pair up
+            if (char === '\\') {
+                if (pos === val.length) break
+                // a backslash before a line terminator is not an escape, so it stays in the value
+                if (!/./.test(val[pos])) value += char
+                value += val[pos++]
+            } else value += char
+        }
+        fail(`unterminated ${quote} string literal`)
+    }
+    const parse_reference = () => {
+        const start = pos
+        while (pos < val.length && !/[\s,()"']/.test(val[pos])) pos++
+        return {type: 'reference', path: val.substring(start, pos)}
+    }
+    const parse_call = () => {
+        pos += concat_prefix.length
+        const args = []
+        while (true) {
+            skip_whitespace()
+            const char = val[pos]
+            // empty arguments are allowed and contribute nothing
+            if (char === '"' || char === "'") args.push(parse_literal())
+            else if (val.startsWith(concat_prefix, pos)) args.push(parse_call())
+            else if (char !== ',' && char !== ')') args.push(parse_reference())
+            skip_whitespace()
+            if (pos === val.length) fail('missing closing parenthesis')
+            if (val[pos] === ')') {
+                pos++
+                return {type: 'call', args}
+            }
+            if (val[pos] !== ',') fail(`unexpected "${val[pos]}" at position ${pos}`)
+            pos++
+        }
+    }
+    const expression = parse_call()
+    if (pos < val.length) fail(`unexpected trailing "${val.substring(pos)}" after the closing parenthesis`)
+    return expression
+}
+
+exports.concat = config => {
+    const cache = new Map()
+    const stack = []
+
+    // each field is resolved once, under its own breadcrumbs, however many fields reference it
+    const resolve = (val, breadcrumbs) => {
+        if (typeof val !== 'string' || !val.startsWith(concat_prefix)) return val
+        // keys can contain dots, so the joined breadcrumbs could name two fields
+        const id = JSON.stringify(breadcrumbs)
+        if (cache.has(id)) return cache.get(id)
+
+        const name = breadcrumbs.join('.')
+        if (stack.includes(id)) {
+            throw new Error(`Circular dependency detected in $concat expression "${val}" at "${name}"!`)
+        }
+        stack.push(id)
+
+        const evaluate = node => {
+            if (node.type == 'literal') return node.value
+            if (node.type == 'call') return node.args.map(evaluate).join('')
+            const ref = lookup(config, node.path)
+            if (ref.value === undefined) {
+                throw new Error(`Could not resolve reference "${node.path}" in $concat at "${name}"!`)
+            }
+            if (!['string', 'number', 'boolean'].includes(typeof ref.value)) {
+                throw new Error(`Reference "${node.path}" in $concat at "${name}" should be a string, number or boolean, not ${a.type(ref.value)()}!`)
+            }
+            return resolve(ref.value, ref.breadcrumbs)
+        }
+        const res = evaluate(parse_concat(val, breadcrumbs))
+
+        stack.pop()
+        cache.set(id, res)
+        return res
+    }
+
+    return traverse(config, config, [], (target, key, val, root, breadcrumbs) => {
+        target[key] = resolve(val, breadcrumbs)
+    })
+}

@@ -1,0 +1,47 @@
+points:
+  zones:
+    matrix:
+      columns:
+        c1:
+          rows.r1:
+            shift: [-10,10]
+            rotate: 45
+        c2:
+          rows.r1:
+            rotate: -90
+        c3:
+          rows.r1:
+            shift: [10,5]
+            rotate: -10
+      rows:
+        r3:
+        r2:
+        r1:
+  mirror.distance: 150
+outlines:
+  # an explicit list of source points, cloned to the other half
+  clone-points:
+    - what: rectangle
+      where:
+        - matrix_c1_r1
+        - matrix_c1_r2
+        - matrix_c1_r3
+        - matrix_c2_r1
+        - matrix_c2_r2
+        - matrix_c2_r3
+        - matrix_c3_r1
+        - matrix_c3_r2
+        - matrix_c3_r3
+      asym: clone
+      size: 18
+  # filters that match both halves should only yield the mirrored half, too
+  clone-regex:
+    - what: rectangle
+      where: /matrix/
+      asym: clone
+      size: 18
+  clone-all:
+    - what: rectangle
+      where: true
+      asym: clone
+      size: 18

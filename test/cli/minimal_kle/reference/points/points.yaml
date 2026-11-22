@@ -23,7 +23,7 @@ key1_key1col_key1row:
         asym: both
         colrow: key1col_key1row
         name: key1_key1col_key1row
-        label: '0_0'
+        label: 0_0
         column_net: col_0
         row_net: row_0
         zone:
@@ -41,7 +41,7 @@ key1_key1col_key1row:
                         key1row:
                             width: 1 u
                             height: 1 u
-                            label: '0_0'
+                            label: 0_0
                             column_net: col_0
                             row_net: row_0
                     key: {}
@@ -52,7 +52,7 @@ key1_key1col_key1row:
                 key1row:
                     width: 1 u
                     height: 1 u
-                    label: '0_0'
+                    label: 0_0
                     column_net: col_0
                     row_net: row_0
             key: {}
@@ -88,7 +88,7 @@ key2_key2col_key2row:
         asym: both
         colrow: key2col_key2row
         name: key2_key2col_key2row
-        label: '0_1'
+        label: 0_1
         column_net: col_1
         row_net: row_0
         zone:
@@ -106,7 +106,7 @@ key2_key2col_key2row:
                         key2row:
                             width: 1 u
                             height: 1 u
-                            label: '0_1'
+                            label: 0_1
                             column_net: col_1
                             row_net: row_0
                     key: {}
@@ -117,7 +117,7 @@ key2_key2col_key2row:
                 key2row:
                     width: 1 u
                     height: 1 u
-                    label: '0_1'
+                    label: 0_1
                     column_net: col_1
                     row_net: row_0
             key: {}
@@ -153,7 +153,7 @@ key3_key3col_key3row:
         asym: both
         colrow: key3col_key3row
         name: key3_key3col_key3row
-        label: '1_0'
+        label: 1_0
         column_net: col_0
         row_net: row_1
         zone:
@@ -171,7 +171,7 @@ key3_key3col_key3row:
                         key3row:
                             width: 1 u
                             height: 1 u
-                            label: '1_0'
+                            label: 1_0
                             column_net: col_0
                             row_net: row_1
                     key: {}
@@ -182,7 +182,7 @@ key3_key3col_key3row:
                 key3row:
                     width: 1 u
                     height: 1 u
-                    label: '1_0'
+                    label: 1_0
                     column_net: col_0
                     row_net: row_1
             key: {}
@@ -218,7 +218,7 @@ key4_key4col_key4row:
         asym: both
         colrow: key4col_key4row
         name: key4_key4col_key4row
-        label: '1_1'
+        label: 1_1
         column_net: col_1
         row_net: row_1
         zone:
@@ -236,7 +236,7 @@ key4_key4col_key4row:
                         key4row:
                             width: 1 u
                             height: 1 u
-                            label: '1_1'
+                            label: 1_1
                             column_net: col_1
                             row_net: row_1
                     key: {}
@@ -247,7 +247,7 @@ key4_key4col_key4row:
                 key4row:
                     width: 1 u
                     height: 1 u
-                    label: '1_1'
+                    label: 1_1
                     column_net: col_1
                     row_net: row_1
             key: {}

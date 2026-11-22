@@ -1,0 +1,56 @@
+# Trigonometry solvers, usable in any math expression (all angles in degrees):
+#   triangle_sss(opposite_side, side, other_side)
+#     the angle opposite the first side, given all three sides
+#   triangle_asa(opposite_angle, side, other_angle)
+#     the length opposite the first angle, given the side between the two angles
+units:
+  # gusset sides
+  base: 60
+  left: 45
+  right: 35
+  # v notch width
+  notch: 30
+  # thumb keys 21mm apart on an 80mm radius
+  pitch: 21
+  radius: 80
+  step: triangle_sss(pitch, radius, radius)
+points:
+  zones:
+    matrix: {}
+    thumb:
+      anchor.shift: [0, -40]
+      key:
+        spread: 0
+        origin: [0, -radius]
+      columns:
+        inner: {}
+        home.key.splay: -step
+        outer.key.splay: -step
+  mirror.distance: 200
+outlines:
+  # a triangle with all three sides known, mirrored to the other half
+  gusset:
+    - what: polygon
+      where: matrix
+      asym: both
+      points:
+        - shift: [0, 0]
+        - shift: [base, 0]
+        # turn back along the base, then open up by the angle opposite the left side
+        - orient: 180 - triangle_sss(left, right, base)
+          shift: [right, 0]
+  # an isosceles notch with 75 degree base angles
+  notch:
+    - what: polygon
+      where: matrix
+      points:
+        - shift: [0, 0]
+        - shift: [notch, 0]
+        # formulas with commas need quotes within flow arrays
+        - orient: 105
+          shift: ["triangle_asa(75, notch, 75)", 0]
+  # neighbouring key centers are exactly one pitch apart
+  thumb-keys:
+    - what: rectangle
+      where: /thumb/
+      size: 18

@@ -1,0 +1,17 @@
+module.exports = {
+    alps: require('./alps'),
+    choc_hotswap_socket: require('./choc_hotswap_socket'),
+    choc_v1: require('./choc_v1'),
+    choc_v2: require('./choc_v2'),
+    debug: require('./debug'),
+    ergogen_logo: require('./ergogen_logo'),
+    jstph: require('./jstph'),
+    mx: require('./mx'),
+    mx_hotswap_socket: require('./mx_hotswap_socket'),
+    oled: require('./oled'),
+    promicro: require('./promicro'),
+    rgb: require('./rgb'),
+    rotary: require('./rotary'),
+    scrollwheel: require('./scrollwheel'),
+    trrs: require('./trrs'),
+}

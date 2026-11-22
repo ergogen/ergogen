@@ -21,16 +21,7 @@ const deep = exports.deep = (obj, key, val) => {
 
 exports.template = (str, vals={}) => {
     const regex = /\{\{([^}]*)\}\}/g
-    let res = str
-    let shift = 0
-    for (const match of str.matchAll(regex)) {
-        const replacement = (deep(vals, match[1]) || '') + ''
-        res = res.substring(0, match.index + shift)
-            + replacement
-            + res.substring(match.index + shift + match[0].length)
-        shift += replacement.length - match[0].length
-    }
-    return res
+    return str.replace(regex, (_, key) => (deep(vals, key) || '') + '')
 }
 
 const eq = exports.eq = (a=[], b=[]) => {

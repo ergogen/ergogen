@@ -1,6 +1,6 @@
 {
     "name": "ergogen",
-    "version": "4.2.1",
+    "version": "4.3.0",
     "description": "Ergonomic keyboard layout generator",
     "author": "Bán Dénes <mr@zealot.hu>",
     "license": "MIT",
@@ -9,6 +9,9 @@
     "bugs": "https://github.com/ergogen/ergogen/issues",
     "main": "./src/ergogen.js",
     "bin": "./src/cli.js",
+    "engines": {
+        "node": ">=24"
+    },
     "scripts": {
         "build": "rollup -c",
         "test": "mocha -r test/helpers/register test/index.js",
@@ -16,30 +19,35 @@
     },
     "dependencies": {
         "fs-extra": "^11.3.2",
-        "hull": "github:andriiheonia/hull",
-        "js-yaml": "^3.14.1",
+        "hull": "github:ceoloide/hull#4a8a9147f9f4fcbaf0c8a91a4e8f1b6092b2ca18",
+        "js-yaml": "^4.2.0",
         "jszip": "^3.10.1",
         "kle-serial": "github:ergogen/kle-serial#ergogen",
-        "makerjs": "^0.18.1",
-        "mathjs": "^15.0.0",
-        "yargs": "^17.7.2"
+        "makerjs": "^0.19.2",
+        "mathjs": "^15.2.0",
+        "yargs": "^18.0.0"
     },
     "devDependencies": {
-        "@rollup/plugin-commonjs": "^28.0.7",
+        "@rollup/plugin-commonjs": "^29.0.3",
         "@rollup/plugin-json": "^6.1.0",
         "chai": "^4.5.0",
         "chai-as-promised": "^7.1.2",
         "dir-compare": "^5.0.0",
-        "glob": "^11.0.3",
+        "glob": "^13.0.6",
         "mocha": "^11.7.4",
-        "nyc": "^17.1.0",
-        "rollup": "^4.52.4",
-        "sinon": "^21.0.0"
+        "nyc": "^18.0.0",
+        "rollup": "^4.62.2",
+        "sinon": "^22.0.0"
     },
     "nyc": {
         "all": true,
         "include": [
             "src/**/*.js"
-        ]
+        ],
+        "check-coverage": true,
+        "statements": 100,
+        "branches": 100,
+        "functions": 100,
+        "lines": 100
     }
 }

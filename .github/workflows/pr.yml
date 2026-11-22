@@ -1,15 +1,44 @@
 name: Check for 100% test coverage
-on:
-  pull_request:
-    branches: ["develop"]
+on: pull_request
+# a new push to a pull request cancels the run for the previous one
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      # report every node version, even when one of them fails
+      fail-fast: false
+      matrix:
+        include:
+          - node-version: '24.x'
+            marker: node_24
+          - node-version: '26.x'
+            marker: node_26
+    outputs:
+      node_24: ${{ steps.marker.outputs.node_24 }}
+      node_26: ${{ steps.marker.outputs.node_26 }}
     steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js
-        uses: actions/setup-node@v1
+      - uses: actions/checkout@v7
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v6
         with:
-          node-version: '20.x'
-      - run: npm install
+          node-version: ${{ matrix.node-version }}
+      - run: npm ci
       - run: npm run coverage
+      - run: npm run build
+      - id: marker
+        run: echo "${{ matrix.marker }}=success" >> "$GITHUB_OUTPUT"
+  tests:
+    name: Tests
+    needs: build
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          NODE_24: ${{ needs.build.outputs.node_24 }}
+          NODE_26: ${{ needs.build.outputs.node_26 }}
+        run: |
+          echo "node_24=${NODE_24:-missing} node_26=${NODE_26:-missing}"
+          test "$NODE_24" = success && test "$NODE_26" = success

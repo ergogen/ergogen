@@ -1,4 +1,3 @@
-const m = require('makerjs')
 const yaml = require('js-yaml')
 
 const u = require('./utils')
