@@ -129,6 +129,24 @@ describe('Interface', function() {
         let arcs = 0
         m.model.walk(panel, {onPath: walked => { if (walked.pathContext.type == 'arc') arcs++ }})
         arcs.should.equal(0)
+
+        // $unset array slots survive nested inheritance into anchor shift defaults
+        const anchor_unset = await ergogen.process({
+            templates: {
+                base: {shift: [10, 20]},
+                unset_y: {$extends: 'templates.base', shift: [null, '$unset']}
+            },
+            points: {
+                zones: {
+                    matrix: {
+                        anchor: {$extends: 'templates.unset_y', rotate: 15}
+                    }
+                }
+            }
+        }, {debug: true})
+        anchor_unset.points.matrix.x.should.equal(10)
+        anchor_unset.points.matrix.y.should.equal(0)
+        anchor_unset.points.matrix.r.should.equal(15)
     })
 
     it('reserved keys', async function() {

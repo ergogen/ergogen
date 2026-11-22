@@ -1,6 +1,13 @@
 const u = require('./utils')
 const a = require('./assert')
 
+// like u.deepcopy, but keeps undefined array slots left by $unset
+const copy = val => {
+    if (Array.isArray(val)) return Array.from(val, copy)
+    if (val && typeof val === 'object') return Object.fromEntries(Object.entries(val).map(([k, v]) => [k, copy(v)]))
+    return val
+}
+
 const _extend = exports._extend = (to, from) => {
     const to_type = a.type(to)()
     const from_type = a.type(from)()
@@ -8,14 +15,14 @@ const _extend = exports._extend = (to, from) => {
     if (from === '$unset') return undefined
     if (to_type != from_type) return from
     if (from_type == 'object') {
-        const res = u.deepcopy(to)
+        const res = copy(to)
         for (const key of Object.keys(from)) {
             res[key] = _extend(to[key], from[key])
             if (res[key] === undefined) delete res[key]
         }
         return res
     } else if (from_type == 'array') {
-        const res = u.deepcopy(to)
+        const res = copy(to)
         for (const [i, val] of from.entries()) {
             res[i] = _extend(res[i], val)
         }
@@ -91,7 +98,7 @@ exports.inherit = config => {
         stack.push(val)
         let current = val
         if (type === 'object' && val.$extends !== undefined) {
-            current = overlay(undefined, u.deepcopy(val), breadcrumbs)
+            current = overlay(undefined, copy(val), breadcrumbs)
         }
 
         const current_type = a.type(current)()
@@ -119,7 +126,7 @@ exports.inherit = config => {
     const overlay = (base, local, breadcrumbs) => {
         const local_type = a.type(local)()
         if (local_type === 'array' && a.type(base)() === 'array') {
-            const res = u.deepcopy(base)
+            const res = copy(base)
             for (const [i, val] of local.entries()) {
                 res[i] = overlay(res[i], val, [...breadcrumbs, `[${i}]`])
             }
@@ -142,26 +149,17 @@ exports.inherit = config => {
             for (const target of list) {
                 if (base !== target) base = _extend(base, target)
             }
+            // without local fields the block is its targets, whatever their type;
             // the targets are cached, so results must not share their data
-            base = copy(base)
-            // without local fields the block is its targets, whatever their type
-            if (list.length > 0 && Object.keys(local).length === 0) return base
+            if (list.length > 0 && Object.keys(local).length === 0) return copy(base)
         }
         if (a.type(base)() !== 'object') return _extend(base, local)
-        const res = u.deepcopy(base)
+        const res = copy(base)
         for (const [key, val] of Object.entries(local)) {
-            res[key] = overlay(base[key], val, [...breadcrumbs, key])
+            res[key] = overlay(res[key], val, [...breadcrumbs, key])
             if (res[key] === undefined) delete res[key]
         }
         return res
-    }
-
-    // like u.deepcopy, but keeps undefined array slots left by $unset
-    const copy = val => {
-        const type = a.type(val)()
-        if (type === 'array') return val.map(copy)
-        if (type === 'object') return Object.fromEntries(Object.entries(val).map(([k, v]) => [k, copy(v)]))
-        return val
     }
 
     return resolve(config, [])

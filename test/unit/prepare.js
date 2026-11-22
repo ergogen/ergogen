@@ -21,6 +21,8 @@ describe('Prepare', function() {
         p.extend(27, 28).should.equal(28)
         p.extend({a: 1, c: 1, d: 1}, {b: 2, c: 2, d: '$unset'}).should.deep.equal({a: 1, b: 2, c: 2})
         p.extend([3, 2, 1], [null, 4, 5]).should.deep.equal([3, 4, 5])
+        // $unset array slots stay undefined across subsequent array merges
+        p.extend([1, 2], [null, '$unset'], [9]).should.deep.equal([9, undefined])
     })
 
     it('inherit', function() {
@@ -418,6 +420,41 @@ describe('Prepare', function() {
         }).C.child
         layered.should.deep.equal({z: 0, k: 1, d: {b: 1}, j: 2, m: 3})
         Object.keys(layered).should.deep.equal(['z', 'k', 'd', 'j', 'm'])
+
+        // $unset array slots stay undefined across multi-step inheritance and merges
+        const unset_arr = p.inherit({
+            A: {shift: [10, 20]},
+            B: {$extends: 'A', shift: [null, '$unset']},
+            X: {rotate: 15},
+            C: {$extends: 'B'},
+            D: {$extends: 'B', rotate: 15},
+            E: {$extends: 'B', shift: [5]},
+            F: {$extends: ['B', 'X']}
+        })
+        unset_arr.B.should.deep.equal({shift: [10, undefined]})
+        unset_arr.C.should.deep.equal({shift: [10, undefined]})
+        unset_arr.D.should.deep.equal({shift: [10, undefined], rotate: 15})
+        unset_arr.E.should.deep.equal({shift: [5, undefined]})
+        unset_arr.F.should.deep.equal({shift: [10, undefined], rotate: 15})
+
+        // null local overrides keep cached target arrays isolated
+        const null_res = p.inherit({
+            A: {list: [1, 2]},
+            C: {$extends: 'A', list: null},
+            D: {$extends: 'A'}
+        })
+        null_res.C.list.push(3)
+        null_res.A.list.should.deep.equal([1, 2])
+        null_res.D.list.should.deep.equal([1, 2])
+
+        // sparse array holes in an extending object become explicit undefined slots
+        const sparse = [1, , 3]
+        const sparse_res = p.inherit({
+            A: {x: 1},
+            B: {$extends: 'A', arr: sparse}
+        })
+        sparse_res.B.arr.should.deep.equal([1, undefined, 3])
+        Object.keys(sparse_res.B.arr).should.deep.equal(['0', '1', '2'])
 
         // nested errors keep pointing to the nested field
         p.inherit.bind(this, {
