@@ -6,6 +6,7 @@ const Point = require('./point')
 const prep = require('./prepare')
 const anchor = require('./anchor').parse
 const filter = require('./filter').parse
+const svg_lib = require('./svg')
 const hulljs = require('hull')
 
 const binding = (base, bbox, point, units) => {
@@ -309,7 +310,7 @@ const path = (config, name, points, outlines, units) => {
 const svg = (config, name, points, outlines, units) => {
     // only inline svg outlines take their path data from the config
     const {paths, ...rest} = config
-    return u.svg_paths_to_outline(paths, rest, name, points, outlines, units)
+    return svg_lib.outline(paths)(rest, name, points, outlines, units)
 }
 
 // built-in and library outlines share one registry, which injections can extend or override

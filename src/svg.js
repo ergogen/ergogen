@@ -1,7 +1,9 @@
 const m = require('makerjs')
+const u = require('./utils')
 const a = require('./assert')
 
-// path extraction for SVG outlines, shared by bundle loading (io.js) and the rollup build
+// path extraction for SVG outlines, shared by bundle loading (io.js) and the rollup build,
+// and the outline factory that inline, bundled, built and library svg outlines all go through
 //
 // this is an importer for the "d" attributes of paths, not an svg renderer, and only a path-data subset of SVG is supported:
 //  - the "d" data of every rendered <path> becomes an outline path, in millimetres
@@ -377,4 +379,78 @@ exports.extract = (text, name) => {
     a.assert(root_seen, `SVG outline "${name}" does not contain an <svg> element!`)
     a.assert(!stack.length, `SVG outline "${name}" has unclosed elements!`)
     return paths
+}
+
+// imports a single path, and validates it before a union could hide its problems
+const import_svg_path = (raw, index, name, options) => {
+    a.assert(a.type(raw)() == 'string', `Path ${index} for SVG outline "${name}" must be a string!`)
+    a.assert(raw.trim() !== '', `Path ${index} for SVG outline "${name}" cannot be empty!`)
+    // malformed path data is rejected before makerjs could misread it, or hang on it
+    const data = path_data(raw, `Path ${index} for SVG outline "${name}"`)
+    let model
+    try {
+        model = m.importer.fromSVGPathData(data, options)
+    } catch (ex) {
+        throw new Error(`Path ${index} for SVG outline "${name}" could not be imported: ${ex.message}`, {cause: ex})
+    }
+    // the callback is skipped (and the result is undefined) for models without any geometry
+    let closed = undefined
+    m.model.findChains(model, (chains, loose) => {
+        closed = chains.length > 0 && loose.length === 0 && chains.every(chain => chain.endless)
+    })
+    a.assert(closed !== undefined, `Path ${index} for SVG outline "${name}" does not contain any geometry!`)
+    a.assert(closed, `SVG paths need to be closed shapes (check failed for path ${index} of "${name}")!`)
+    return model
+}
+
+// the outline type for the given path data (validated and imported for each part that uses it)
+// `offset` is the built-in origin of the paths, which a configured origin is relative to
+exports.outline = (paths_raw, offset=[0, 0]) => (config, name, points, outlines, units) => {
+    a.unexpected(config, name, ['accuracy', 'flip_horizontally', 'flip_vertically', 'origin'])
+    // without an explicit accuracy, makerjs derives one from the size of each curve
+    // (a fixed fine default would make unions of curved paths orders of magnitude slower)
+    const options = {}
+    if (config.accuracy !== undefined) {
+        options.bezierAccuracy = a.sane(config.accuracy, `${name}.accuracy`, 'number')(units)
+        a.assert(Number.isFinite(options.bezierAccuracy) && options.bezierAccuracy > 0, `Field "${name}.accuracy" should be a positive finite number!`)
+    }
+
+    const flip_horizontally = a.sane(config.flip_horizontally || false, `${name}.flip_horizontally`, 'boolean')(units)
+    const flip_vertically = a.sane(config.flip_vertically || false, `${name}.flip_vertically`, 'boolean')(units)
+    const origin = a.xy(config.origin || [0, 0], `${name}.origin`)(units).map((val, index) => offset[index] + val)
+
+    let paths = paths_raw
+    if (a.type(paths)() == 'string') paths = [paths]
+    a.assert(a.type(paths)() == 'array', `Field "paths" for SVG outline "${name}" must be a string or an array!`)
+    a.assert(paths.length > 0, `SVG outline "${name}" must have at least one path!`)
+
+    // separate paths are unioned, while the subpaths of a single path keep their compound topology
+    // this happens once per part (even without placements), and each placement gets its own copy
+    let shape = undefined
+    for (const [index, raw] of paths.entries()) {
+        const imported = import_svg_path(raw, index, name, options)
+        if (shape === undefined) {
+            shape = imported
+        } else {
+            shape = u.union(shape, imported)
+            m.model.simplify(shape)
+        }
+    }
+
+    if (origin[0] !== 0 || origin[1] !== 0) {
+        shape = m.model.moveRelative(shape, [-origin[0], -origin[1]])
+    }
+
+    if (flip_horizontally || flip_vertically) {
+        shape = m.model.mirror(shape, flip_horizontally, flip_vertically)
+    }
+
+    return [point => {
+        let placed = u.deepcopy(shape)
+        if (point.meta.mirrored) {
+            placed = m.model.mirror(placed, true, false)
+        }
+        const bbox = m.measure.modelExtents(placed)
+        return [placed, {low: bbox.low, high: bbox.high}]
+    }, units]
 }

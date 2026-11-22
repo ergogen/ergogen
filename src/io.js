@@ -62,13 +62,7 @@ exports.unpack = async (zip) => {
             injections.push(['outline', name, parsed])
         } else {
             // the path data is extracted (and the svg validated) once, while loading the bundle
-            const paths = svg_lib.extract(text, name)
-
-            const svg_injected = (config, name, points, outlines, units) => {
-                return u.svg_paths_to_outline(paths, config, name, points, outlines, units)
-            }
-
-            injections.push(['outline', name, svg_injected])
+            injections.push(['outline', name, svg_lib.outline(svg_lib.extract(text, name))])
         }
     }
 

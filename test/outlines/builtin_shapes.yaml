@@ -11,17 +11,32 @@ outlines:
   # there is no reference, as the shapes are free to change: this only shows that each of them can be placed
   shapes:
     - what: alps
+      where: true
     - what: choc_hotswap_socket
+      where: true
     - what: choc_v1
+      where: true
     - what: choc_v2
+      where: true
     - what: debug
+      where: true
     - what: ergogen_logo
+      where: true
     - what: jstph
+      where: true
     - what: mx
+      where: true
     - what: mx_hotswap_socket
+      where: true
     - what: oled
+      where: true
     - what: promicro
+      where: true
     - what: rgb
+      where: true
     - what: rotary
+      where: true
     - what: scrollwheel
+      where: true
     - what: trrs
+      where: true

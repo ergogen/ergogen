@@ -8,7 +8,7 @@ import {fileURLToPath} from 'node:url'
 // the svg helpers are resolved from this file, so .svg files can live anywhere
 const require = createRequire(import.meta.url)
 const svg_lib = require('./src/svg.js')
-const utils_path = fileURLToPath(new URL('./src/utils.js', import.meta.url))
+const svg_path = fileURLToPath(new URL('./src/svg.js', import.meta.url))
 
 // turns .svg imports into ESM outline factories, with the same path extraction as bundle loading
 export const svg_outline_plugin = () => {
@@ -19,9 +19,9 @@ export const svg_outline_plugin = () => {
       const paths = svg_lib.extract(code, path.basename(id, '.svg'))
       return {
         code: [
-          `import u from ${JSON.stringify(utils_path)}`,
+          `import svg_lib from ${JSON.stringify(svg_path)}`,
           `const paths = ${JSON.stringify(paths)}`,
-          'export default (config, name, points, outlines, units) => u.svg_paths_to_outline(paths, config, name, points, outlines, units)',
+          'export default svg_lib.outline(paths)',
         ].join('\n'),
         map: {mappings: ''}
       }
