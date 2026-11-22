@@ -74,31 +74,23 @@ exports.inherit = config => {
         a.assert(!stack.includes(val), `"${breadcrumbs.join('.')}" leads to a circular dependency!`)
 
         stack.push(val)
-        let res
-        if (type === 'object') {
-            let current = val
-            if (val.$extends !== undefined) {
-                current = overlay(undefined, u.deepcopy(val), breadcrumbs)
-            }
+        let current = val
+        if (type === 'object' && val.$extends !== undefined) {
+            current = overlay(undefined, u.deepcopy(val), breadcrumbs)
+        }
 
-            const current_type = a.type(current)()
-            if (current_type === 'object') {
-                res = {}
-                for (const [k, v] of Object.entries(current)) {
-                    res[k] = resolve(v, [...breadcrumbs, k])
-                }
-            } else if (current_type === 'array') {
-                res = []
-                for (let i = 0; i < current.length; i++) {
-                    res[i] = resolve(current[i], [...breadcrumbs, `[${i}]`])
-                }
-            } else {
-                res = current
+        const current_type = a.type(current)()
+        let res = current
+        if (current_type === 'object') {
+            res = {}
+            for (const [k, v] of Object.entries(current)) {
+                res[k] = resolve(v, [...breadcrumbs, k])
             }
-        } else { // array
+        } else if (current_type === 'array') {
+            // the index loop turns array holes into explicit undefined slots
             res = []
-            for (let i = 0; i < val.length; i++) {
-                res[i] = resolve(val[i], [...breadcrumbs, `[${i}]`])
+            for (let i = 0; i < current.length; i++) {
+                res[i] = resolve(current[i], [...breadcrumbs, `[${i}]`])
             }
         }
         stack.pop()
