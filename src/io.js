@@ -1,5 +1,4 @@
 const yaml = require('js-yaml')
-const jszip = require('jszip')
 const makerjs = require('makerjs')
 
 const u = require('./utils')

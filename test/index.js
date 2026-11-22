@@ -2,7 +2,6 @@ const fs = require('fs-extra')
 const path = require('path')
 const yaml = require('js-yaml')
 const glob = require('glob')
-const u = require('../src/utils')
 const a = require('../src/assert')
 const ergogen = require('../src/ergogen')
 require('./helpers/mock').inject(ergogen)
@@ -51,12 +50,45 @@ const dump_structure = (obj, depth=-1, prefix='', breadcrumbs=[]) => {
     }
 }
 
+const stages = ['points', 'outlines', 'cases', 'pcbs', 'footprints']
+
+// integration cases that intentionally only check that processing succeeds
+const smoke_tests = new Set([
+    'outlines/builtin_shapes.yaml'
+])
+
+const resolve_output = (obj, stem) => {
+    if (a.type(obj)() != 'object') return undefined
+    if (Object.prototype.hasOwnProperty.call(obj, stem)) return obj[stem]
+    for (const [key, val] of Object.entries(obj)) {
+        if (stem.startsWith(`${key}_`)) {
+            const found = resolve_output(val, stem.slice(key.length + 1))
+            if (found !== undefined) return found
+        }
+    }
+    return undefined
+}
+
+const check_orphans = stage => {
+    it('no orphaned reference files', function() {
+        const dir = path.join(__dirname, stage)
+        const files = fs.readdirSync(dir)
+        const bases = new Set(files.filter(f => f.endsWith('.yaml')).map(f => path.basename(f, '.yaml')))
+        const orphans = files.filter(f => {
+            if (f.endsWith('.yaml')) return false
+            const sep = f.indexOf('___')
+            return sep === -1 || !bases.has(f.slice(0, sep))
+        })
+        a.assert(!orphans.length, `Unmatched reference file(s) in "test/${stage}": ${orphans.join(', ')}!`)
+    })
+}
+
 const cap = s => s.charAt(0).toUpperCase() + s.slice(1)
 
 const test = function(input_path) {
     this.timeout(120000)
     this.slow(120000)
-    title = path.basename(input_path, '.yaml').split('_').join(' ')
+    const title = path.basename(input_path, '.yaml').split('_').join(' ')
     it(title, async function() {
         
         const input = yaml.load(fs.readFileSync(input_path).toString())
@@ -79,8 +111,14 @@ const test = function(input_path) {
                 if (expected_path.endsWith('.json')) {
                     expected = JSON.parse(expected)
                 }
-                const comp_path = expected_path.split('___')[1].split('.')[0].split('_').join('.')
-                const output_part = u.deep(output, comp_path)
+                const file_name = path.basename(expected_path)
+                const ref_part = file_name.slice(file_name.indexOf('___') + 3)
+                const stem = ref_part.slice(0, ref_part.length - path.extname(ref_part).length)
+                const output_part = resolve_output(output, stem)
+                a.assert(
+                    output_part !== undefined,
+                    `Reference "${file_name}" does not match any output!`
+                )
                 if (dump) {
                     if (a.type(output_part)() == 'string') {
                         fs.writeFileSync(expected_path, output_part)
@@ -104,6 +142,9 @@ const test = function(input_path) {
         // if there aren't, dump now outputs a list of candidates that could be referenced
         } else if (dump) {
             dump_structure(output, 3, base + '___')
+        } else {
+            const rel = handle_slash(path.relative(__dirname, input_path))
+            a.assert(smoke_tests.has(rel), `No reference files found for "${rel}"!`)
         }
     })
 }
@@ -120,14 +161,16 @@ if (what) {
             regex = path.join(__dirname, w, '*.yaml')
         }
         describe(title, function() {
+            if (stages.includes(w)) check_orphans(w)
             for (const i of glob.sync(handle_slash(regex))) {
                 test.call(this, i)
             }
         })
     }
 } else {
-    for (const part of ['points', 'outlines', 'cases', 'pcbs', 'footprints']) {
+    for (const part of stages) {
         describe(cap(part), function() {
+            check_orphans(part)
             for (const i of glob.sync(handle_slash(path.join(__dirname, part, '*.yaml')))) {
                 test.call(this, i)
             }

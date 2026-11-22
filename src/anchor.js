@@ -1,4 +1,3 @@
-const u = require('./utils')
 const a = require('./assert')
 const Point = require('./point')
 const m = require('makerjs')

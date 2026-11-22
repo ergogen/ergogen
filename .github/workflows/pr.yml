@@ -5,11 +5,15 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ['24.x', '26.x']
     steps:
       - uses: actions/checkout@v7
-      - name: Use Node.js
+      - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v6
         with:
-          node-version: '24.x'
-      - run: npm install
+          node-version: ${{ matrix.node-version }}
+      - run: npm ci
       - run: npm run coverage
+      - run: npm run build
