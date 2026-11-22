@@ -84,6 +84,7 @@ describe('SVG', function() {
             `<g style="marker: none"><path marker-end="none" filter="none" style="rotate: none; scale: none" d="${square}"/></g>`), unit_square],
         'inert important declarations': [doc(`<g style="fill:red !important;Transform:none!important"><path ` +
             `style="stroke:blue; -webkit-transform: none ! IMPORTANT; marker-end:none !important" d="${square}"/></g>`), unit_square],
+        'case-insensitive none values': [doc(`<path clip-path="None" style="transform: NONE; marker-end: None !important" d="${square}"/>`), unit_square],
         'default namespace restored after a foreign group': [doc(`<g xmlns="urn:other"><path d="${far_square}"/></g><path d="${square}"/>`), unit_square],
         'svg namespace inside a foreign group': [doc(`<g xmlns="urn:other"><g xmlns="${svg_ns}"><path d="${far_square}"/></g></g><path d="${square}"/>`), unit_square],
         'rebound prefix': [`<svg ${ns} xmlns:s="urn:other"><s:path d="${far_square}"/><g xmlns:s="${svg_ns}"><s:path d="${square}"/></g>` +
@@ -112,6 +113,7 @@ describe('SVG', function() {
         'misplaced cdata': ['<![CDATA[x]]>' + doc(''), 'misplaced or unterminated CDATA'],
         'unterminated cdata': [doc('<![CDATA[x'), 'misplaced or unterminated CDATA'],
         'unterminated instruction': ['<?xml ' + doc(''), 'unterminated processing instruction'],
+        'overlapping processing instruction': ['<?>' + doc(''), 'unterminated processing instruction'],
         'doctype declarations': ['<!DOCTYPE svg [<!ENTITY e "M 0 0">]>' + doc(''), 'DOCTYPE'],
         'undeclared prefix': [doc('<x:g/>'), 'undeclared namespace prefix "x"'],
         'unsupported element': [doc(`<switch><path d="${square}"/></switch>`), 'unsupported element <switch>'],
@@ -537,6 +539,10 @@ describe('SVG', function() {
             await unplaced('M 0 0 L 10 0 L 10 10', 'SVG paths need to be closed shapes (check failed for path 0 of "outlines.o.0")')
             await unplaced([], 'SVG outline "outlines.o.0" must have at least one path!')
             await unplaced(12, 'must be a string or an array')
+            // numeric and math-expression strings are checked as plain strings, not through mathjs
+            await unplaced('0', 'Path 0 for SVG outline "outlines.o.0" has invalid path data, unexpected "0" at offset 0')
+            await unplaced('pi', 'Path 0 for SVG outline "outlines.o.0" has invalid path data, unexpected "p" at offset 0')
+            await unplaced([square, 'pi'], 'Path 1 for SVG outline "outlines.o.0" has invalid path data, unexpected "p" at offset 0')
             // malformed path data is rejected before makerjs could misread it (or hang on it), in any of the paths
             await unplaced([square, `${square} X`], 'Path 1 for SVG outline "outlines.o.0" has invalid path data, unexpected "X" at offset 30')
             // valid paths without placements produce nothing

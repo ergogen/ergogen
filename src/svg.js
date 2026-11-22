@@ -222,7 +222,7 @@ const style_declarations = (style, qname, name) => {
     return declarations
 }
 
-const active = value => value !== undefined && value.trim() !== '' && value.trim() != 'none'
+const active = value => value !== undefined && value.trim() !== '' && value.trim().toLowerCase() != 'none'
 
 const positive_length = (raw, field, name) => {
     const match = length_regex.exec(raw)
@@ -356,7 +356,7 @@ exports.extract = (text, name) => {
             a.assert(stack.length && end != -1, `SVG outline "${name}" has a misplaced or unterminated CDATA section!`)
             pos = end + 3
         } else if (text.startsWith('<?', pos)) {
-            const end = text.indexOf('?>', pos)
+            const end = text.indexOf('?>', pos + 2)
             a.assert(end != -1, `SVG outline "${name}" has an unterminated processing instruction!`)
             pos = end + 2
         } else if (text.startsWith('<!DOCTYPE', pos)) {
@@ -386,7 +386,7 @@ exports.extract = (text, name) => {
 
 // imports a single path, and validates it before a union could hide its problems
 const import_svg_path = (raw, index, name, options) => {
-    a.assert(a.type(raw)() == 'string', `Path ${index} for SVG outline "${name}" must be a string!`)
+    a.assert(typeof raw == 'string', `Path ${index} for SVG outline "${name}" must be a string!`)
     a.assert(raw.trim() !== '', `Path ${index} for SVG outline "${name}" cannot be empty!`)
     // malformed path data is rejected before makerjs could misread it, or hang on it
     const data = path_data(raw, `Path ${index} for SVG outline "${name}"`)
@@ -425,8 +425,8 @@ exports.outline = (paths_raw, offset=[0, 0]) => (config, name, points, outlines,
     const resist = a.sane(config.resist || false, `${name}.resist`, 'boolean')(units)
 
     let paths = paths_raw
-    if (a.type(paths)() == 'string') paths = [paths]
-    a.assert(a.type(paths)() == 'array', `Field "paths" for SVG outline "${name}" must be a string or an array!`)
+    if (typeof paths == 'string') paths = [paths]
+    a.assert(Array.isArray(paths), `Field "paths" for SVG outline "${name}" must be a string or an array!`)
     a.assert(paths.length > 0, `SVG outline "${name}" must have at least one path!`)
 
     // separate paths are unioned, while the subpaths of a single path keep their compound topology
