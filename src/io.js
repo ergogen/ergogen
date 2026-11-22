@@ -33,10 +33,11 @@ exports.unpack = async (zip) => {
     const fps = zip.folder('footprints')
     const module_prefix = 'const module = {};\n\n'
     const module_suffix = '\n\nreturn module.exports;'
+    const load_module = (name, text) => new Function('require', module_prefix + text + module_suffix)(fake_require(name))
     for (const fp of fps.file(/.*\.js$/)) {
         const name = fp.name.slice('footprints/'.length).split('.')[0]
         const text = await fp.async('string')
-        const parsed = new Function('require', module_prefix + text + module_suffix)(fake_require(name))
+        const parsed = load_module(name, text)
         // TODO: some sort of footprint validation?
         injections.push(['footprint', name, parsed])
     }
@@ -46,18 +47,22 @@ exports.unpack = async (zip) => {
     for (const tpl of tpls.file(/.*\.js$/)) {
         const name = tpl.name.slice('templates/'.length).split('.')[0]
         const text = await tpl.async('string')
-        const parsed = new Function('require', module_prefix + text + module_suffix)(fake_require(name))
+        const parsed = load_module(name, text)
         // TODO: some sort of template validation?
         injections.push(['template', name, parsed])
     }
 
     // bundled outlines
     const ots = zip.folder('outlines')
+    const seen_outlines = new Set()
     for (const ot of ots.file(/.*\.(svg|js)$/)) {
         const name = ot.name.slice('outlines/'.length).replace(/\.(svg|js)$/, '')
+        a.assert(!seen_outlines.has(name), `Duplicate outline "${name}" in bundle!`)
+        seen_outlines.add(name)
         const text = await ot.async('string')
         if (ot.name.endsWith('.js')) {
-            const parsed = new Function('require', module_prefix + text + module_suffix)(fake_require(name))
+            const parsed = load_module(name, text)
+            a.assert(typeof parsed == 'function', `Outline "${name}" should export a function!`)
             injections.push(['outline', name, parsed])
         } else {
             // the path data is extracted (and the svg validated) once, while loading the bundle

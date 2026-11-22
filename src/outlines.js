@@ -444,5 +444,6 @@ exports.parse = (config, points, units) => {
 }
 
 exports.inject_outline = (name, outline) => {
+    a.assert(typeof outline == 'function', `Outline "${name}" should be a function!`)
     whats[name] = outline
 }

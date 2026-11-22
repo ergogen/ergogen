@@ -111,6 +111,33 @@ describe('Internals', function() {
         result.pcbs.board.should.contain('second-footprint-body')
         result.pcbs.board.should.not.contain('first-footprint-body')
     })
+
+    it('should validate injected outline functions', function() {
+        for (const bad of [{}, null]) {
+            ergogen.inject.bind(this, 'outline', 'bad', bad).should.throw('Outline "bad" should be a function!')
+            Object.prototype.hasOwnProperty.call(whats, 'bad').should.be.false
+        }
+    })
+
+    it('should validate bundled outline modules and reject duplicate names', async function() {
+        const bundle_with = files => {
+            const zip = new jszip()
+            zip.file('config.yaml', 'points.zones.matrix: null')
+            for (const [file_path, content] of Object.entries(files)) {
+                zip.file(file_path, content)
+            }
+            return zip
+        }
+
+        await io.unpack(bundle_with({'outlines/empty.js': '// no module.exports'}))
+            .should.be.rejectedWith('Outline "empty" should export a function!')
+        await io.unpack(bundle_with({'outlines/obj.js': 'module.exports = {}'}))
+            .should.be.rejectedWith('Outline "obj" should export a function!')
+        await io.unpack(bundle_with({
+            'outlines/dup.js': 'module.exports = () => {}',
+            'outlines/dup.svg': '<svg><path d="M 0 0 L 10 0 L 10 10 Z" /></svg>'
+        })).should.be.rejectedWith('Duplicate outline "dup" in bundle!')
+    })
 })
 
 
