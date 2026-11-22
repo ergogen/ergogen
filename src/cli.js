@@ -56,14 +56,20 @@ console.log()
 // functions shamelessly repurposed from https://github.com/Stuk/jszip/issues/386
 
 // return a flat array of absolute paths of all files recursively contained in the dir
-const list_files_in_dir = async (dir) => {
+const list_files_in_dir = async (dir, ancestors=new Set()) => {
+    const real = await fsp.realpath(dir)
+    if (ancestors.has(real)) {
+        throw new Error(`Symlink cycle detected at "${dir}"!`)
+    }
+    const seen = new Set(ancestors)
+    seen.add(real)
     const list = await fsp.readdir(dir, { withFileTypes: true })
     const statPromises = list.map(async (dirent) => {
         const fullPath = path.resolve(dir, dirent.name)
         // dirents describe the link itself, so stat symlinks to follow linked directories
         const entry = dirent.isSymbolicLink() ? await fsp.stat(fullPath) : dirent
         if (entry.isDirectory()) {
-            return list_files_in_dir(fullPath)
+            return list_files_in_dir(fullPath, seen)
         }
         return fullPath
     })
